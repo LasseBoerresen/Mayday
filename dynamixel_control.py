@@ -1,6 +1,13 @@
 import serial
 import math
 import doctest
+import logging
+import time
+
+FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel('INFO')
 
 
 """
@@ -23,11 +30,12 @@ class DynamixelServo:
 
 
 class DynamixelController:
-
-
+    """
+    Defines serial connection to cm9.04 and functions to control dynamixel servos.
+    """
 
     def __init__(self):
-        pass
+        self.ser = None
 
     def init_serial(self):
         self.ser = serial.Serial()
@@ -36,30 +44,34 @@ class DynamixelController:
         self.ser.open()
 
 
-    def goal_position(self, id, angle):
+    def goal_position(self, id, pos):
         """
         Set servo with id to a specified angle:
 
-        :param int id:
-        :param float angle:
+        :param int id: id of dynamixel servo
+        :param float pos: goal position in radians
         :return:
         """
+        if self.ser is None:
+            self.init_serial()
 
-        self.ser.write(b'{id}_{')
-
+        ticks = self.cnv_angle_rad_2_tick(pos)
+        self.ser.write(b'gps_%03d_%04d' % (id, ticks))
+        time.sleep(0.5)
+        logger.info(self.ser.read_all())
 
     def cnv_angle_rad_2_tick(self, rad):
         """
         Convert between radians and angle ticks
 
-        :param int rad: angle in radians
+        :param float rad: angle in radians
         :return: angle in ticks
         :rtype: int
 
         >>> dxl_ctr = DynamixelController()
-        >>> dxl_ctr.cnv_angle_rad_2_tick(-math.tau/2)
+        >>> dxl_ctr.cnv_angle_rad_2_tick(-512*0.29*math.tau/360)
         0
-        >>> dxl_ctr.cnv_angle_rad_2_tick(math.tau/2 * 1023/1024)
+        >>> dxl_ctr.cnv_angle_rad_2_tick(511*0.29*math.tau/360)
         1023
         >>> dxl_ctr.cnv_angle_rad_2_tick(0.0)
         512
@@ -67,9 +79,9 @@ class DynamixelController:
         """
 
         assert type(rad) == float, 'rad should be a float value'
-        assert -math.tau / 2 <= rad < math.tau / 2, 'rad should be in range -pi <= rad < pi'
+        assert -512*0.29*math.tau/360 <= rad <= 512*0.29*math.tau/360, 'rad should be in range -2.59 <= rad < 2.59'
 
-        return int(rad * 1024 / math.tau + 512)
+        return round(rad / (0.29*math.tau/360) + 512)
 
     def cnv_angle_tick_2_rad(self, tick):
         """
@@ -81,27 +93,40 @@ class DynamixelController:
 
         >>> dxl_ctr = DynamixelController()
         >>> dxl_ctr.cnv_angle_tick_2_rad(0)
-        -3.141592653589793
+        -2.5914648733611805
         >>> dxl_ctr.cnv_angle_tick_2_rad(1023)
-        3.1354567304382504
+        2.586403418530397
         >>> dxl_ctr.cnv_angle_tick_2_rad(512)
         0.0
-
         """
-        assert type(tick) == int, 'Tick should be an int value'
-        assert tick >= 0, 'Tick should be in range 0 to 1023'
 
-        return  (tick - 512) * math.tau / 1024
+
+
+        assert type(tick) == int, 'Tick should be an int value'
+        assert 0 <= tick <= 1023, 'Tick should be in range 0 to 1023'
+
+        return  (tick - 512) * 0.29*math.tau/360
 
 if __name__ == '__main__':
     doctest.testmod()
-    #
-    # ser = serial.Serial()
-    # ser.baudrate = 1000000
-    # ser.port = '/dev/ttyACM0'
-    # ser.open()
-    # ser.write(b'Hello World!\n')
-    # print(ser.readline())
-    # print(ser.readline())
-    # print(ser.readline())
-    # ser.close()
+
+    dxl_ctr = DynamixelController()
+
+    dxl_ctr.goal_position(0, math.tau / 4)
+    time.sleep(2)
+    dxl_ctr.goal_position(1, math.tau / 8)
+    time.sleep(2)
+    dxl_ctr.goal_position(2, -math.tau / 4)
+    time.sleep(2)
+    dxl_ctr.goal_position(0, 0.0)
+    time.sleep(0.1)
+    dxl_ctr.goal_position(1, 0.0)
+    time.sleep(0.1)
+    dxl_ctr.goal_position(2, 0.0)
+    time.sleep(0.1)
+    ser = serial.Serial()
+    ser.baudrate = 1000000
+    ser.port = '/dev/ttyACM0'
+    ser.open()
+    logger.info(ser.read_all())
+    ser.close()
