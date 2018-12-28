@@ -1,0 +1,29 @@
+<launch>
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find mayday_gazebo)/worlds/mayday.world"/>
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+	<!-- Convert an xacro and put on parameter server -->
+	<param name="robot_description" 
+	  command="$(find xacro)/xacro.py --inorder $(find mayday_description)/robots/mayday.urdf.xacro" />
+
+	<!-- Spawn a robot into Gazebo -->
+	<!-- node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model mayday" /-->
+	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model mayday -param robot_description"/>
+
+	<include file="$(find mayday_control)/launch/mayday_control.launch" />
+</launch>

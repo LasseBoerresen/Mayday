@@ -1,0 +1,32 @@
+<launch>
+
+
+  <arg name="model" default="$(find mayday_description)/robots/mayday.urdf.xacro"/>
+  <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find mayday_description)/rviz/urdf.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro -v --inorder $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <rosparam command="load"
+            file="$(find mayday_description)/config/left_front_leg.yaml"
+            ns="mayday_left_front_leg_controller" />
+  <rosparam command="load"
+            file="$(find mayday_description)/config/left_center_leg.yaml"
+            ns="mayday_left_center_leg_controller" />
+  <rosparam command="load"
+            file="$(find mayday_description)/config/left_hind_leg.yaml"
+            ns="mayday_left_hind_leg_controller" />
+  <rosparam command="load"
+            file="$(find mayday_description)/config/right_front_leg.yaml"
+            ns="mayday_right_front_leg_controller" />
+  <rosparam command="load"
+            file="$(find mayday_description)/config/right_center_leg.yaml"
+            ns="mayday_right_center_leg_controller" />
+  <rosparam command="load"
+            file="$(find mayday_description)/config/right_hind_leg.yaml"
+            ns="mayday_right_hind_leg_controller" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>

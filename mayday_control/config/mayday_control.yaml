@@ -1,0 +1,88 @@
+mayday:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100
+
+  # Coxa Controllers
+  # Position Controllers ---------------------------------------
+  right_front_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_front_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_center_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_center_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_hind_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_hind_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_front_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_front_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_center_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_center_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_hind_coxa_dynamixel_to_top_coxa_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_hind_coxa_dynamixel_to_top_coxa_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+
+  # Femur Controllers
+  # Position Controllers ---------------------------------------
+  right_front_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_front_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_center_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_center_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_hind_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_hind_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_front_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_front_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_center_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_center_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_hind_femur_dynamixel_to_left_femur_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_hind_femur_dynamixel_to_left_femur_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  
+  # Tibia Controllers
+  # Position Controllers ---------------------------------------
+  right_front_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_front_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_center_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_center_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  right_hind_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: right_hind_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_front_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_front_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_center_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_center_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+  left_hind_left_femur_to_tibia_dynamixel_joint_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: left_hind_left_femur_to_tibia_dynamixel_joint
+    pid: {p: 3.0, i: 0.11, d: 0.5}
+
+  
