@@ -245,7 +245,7 @@
     <joint name="${prefix}_left_femur_to_tibia_dynamixel_joint" type="revolute">
       <parent link="${prefix}_left_femur"/>
       <child link="${prefix}_tibia_dynamixel"/>
-      <origin xyz="${femur_x - dynamixel_y} 0 ${-(dynamixel_z/2 + femur_z/2 + tolerance)}" rpy="0 ${tau/2} 0" />
+      <origin xyz="${femur_x - dynamixel_y} 0 ${-(dynamixel_z/2 + femur_z/2 + tolerance)}" rpy="${tau/2} ${tau/2} 0" />
       <axis xyz="0 0 1"/>
       <limit effort="1.5" lower="${-tau*3/8}" upper="${tau*3/8}" velocity="${2*tau}"/>
       <dynamics damping="0.01" friction="0.1"/>
