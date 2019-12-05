@@ -42,5 +42,5 @@
   <arg name="rvizconfig" default="$(find mayday_gazebo)/rviz/rviz.rviz" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 
-  <!--node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/-->
+  <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
 </launch>
