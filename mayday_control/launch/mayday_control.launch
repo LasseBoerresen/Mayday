@@ -5,9 +5,25 @@
 
   <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" ns="/mayday" args="joint_state_controller 
+    output="screen" ns="/mayday" args="joint_state_controller
                                        right_front_coxa_dynamixel_to_top_coxa_joint_position_controller
-                                       right_center_coxa_dynamixel_to_top_coxa_joint_position_controller right_hind_coxa_dynamixel_to_top_coxa_joint_position_controller left_front_coxa_dynamixel_to_top_coxa_joint_position_controller left_center_coxa_dynamixel_to_top_coxa_joint_position_controller left_hind_coxa_dynamixel_to_top_coxa_joint_position_controller right_front_femur_dynamixel_to_left_femur_joint_position_controller right_center_femur_dynamixel_to_left_femur_joint_position_controller right_hind_femur_dynamixel_to_left_femur_joint_position_controller left_front_femur_dynamixel_to_left_femur_joint_position_controller left_center_femur_dynamixel_to_left_femur_joint_position_controller left_hind_femur_dynamixel_to_left_femur_joint_position_controller right_front_left_femur_to_tibia_dynamixel_joint_position_controller right_center_left_femur_to_tibia_dynamixel_joint_position_controller right_hind_left_femur_to_tibia_dynamixel_joint_position_controller left_front_left_femur_to_tibia_dynamixel_joint_position_controller left_center_left_femur_to_tibia_dynamixel_joint_position_controller left_hind_left_femur_to_tibia_dynamixel_joint_position_controller"/>
+                                       right_center_coxa_dynamixel_to_top_coxa_joint_position_controller
+                                       right_hind_coxa_dynamixel_to_top_coxa_joint_position_controller
+                                       left_front_coxa_dynamixel_to_top_coxa_joint_position_controller
+                                       left_center_coxa_dynamixel_to_top_coxa_joint_position_controller
+                                       left_hind_coxa_dynamixel_to_top_coxa_joint_position_controller
+                                       right_front_femur_dynamixel_to_left_femur_joint_position_controller
+                                       right_center_femur_dynamixel_to_left_femur_joint_position_controller
+                                       right_hind_femur_dynamixel_to_left_femur_joint_position_controller
+                                       left_front_femur_dynamixel_to_left_femur_joint_position_controller
+                                       left_center_femur_dynamixel_to_left_femur_joint_position_controller
+                                       left_hind_femur_dynamixel_to_left_femur_joint_position_controller
+                                       right_front_left_femur_to_tibia_dynamixel_joint_position_controller
+                                       right_center_left_femur_to_tibia_dynamixel_joint_position_controller
+                                       right_hind_left_femur_to_tibia_dynamixel_joint_position_controller
+                                       left_front_left_femur_to_tibia_dynamixel_joint_position_controller
+                                       left_center_left_femur_to_tibia_dynamixel_joint_position_controller
+                                       left_hind_left_femur_to_tibia_dynamixel_joint_position_controller"/>
 
   <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"

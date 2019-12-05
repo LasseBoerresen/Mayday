@@ -4,7 +4,7 @@ import doctest
 import logging
 import time
 
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+FORMAT = '%(asctime)s %(levelname)-8s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
@@ -26,7 +26,7 @@ class DynamixelServo:
 
     def __init__(self, id, model='XL-320'):
         self.id = id
-        self.model=model
+        self.model = model
 
 
 class DynamixelController:
@@ -42,7 +42,6 @@ class DynamixelController:
         self.ser.baudrate = 1000000
         self.ser.port = '/dev/ttyACM0'
         self.ser.open()
-
 
     def goal_position(self, id, pos):
         """
@@ -100,12 +99,11 @@ class DynamixelController:
         0.0
         """
 
-
-
         assert type(tick) == int, 'Tick should be an int value'
         assert 0 <= tick <= 1023, 'Tick should be in range 0 to 1023'
 
         return  (tick - 512) * 0.29*math.tau/360
+
 
 if __name__ == '__main__':
     doctest.testmod()
