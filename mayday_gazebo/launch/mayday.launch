@@ -7,14 +7,14 @@
   <arg name="debug" default="false"/>
 
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <!--include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find mayday_gazebo)/worlds/mayday.world"/>
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="headless" value="$(arg headless)"/>
-  </include>
+  </include-->
 
   <!-- Convert an xacro and put on parameter server -->
   <param name="robot_description"
@@ -22,7 +22,7 @@
 
   <!-- Spawn a robot into Gazebo -->
   <!-- node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model mayday" /-->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+  <!--node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
   args="-urdf -model mayday -param robot_description -z 1
   -J left_front_femur_dynamixel_to_left_femur_joint -1.2
   -J left_front_left_femur_to_tibia_dynamixel_joint 2.3
@@ -35,7 +35,7 @@
   -J right_center_femur_dynamixel_to_left_femur_joint -1.2
   -J right_center_left_femur_to_tibia_dynamixel_joint 2.3
   -J right_hind_femur_dynamixel_to_left_femur_joint -1.2
-  -J right_hind_left_femur_to_tibia_dynamixel_joint 2.3"/>
+  -J right_hind_left_femur_to_tibia_dynamixel_joint 2.3"/-->
 
   <include file="$(find mayday_control)/launch/mayday_control.launch" />
 

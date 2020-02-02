@@ -28,7 +28,6 @@
 # To use another Dynamixel model, such as X series, see their details in E-Manual(support.robotis.com) and edit below variables yourself.
 # Be sure that Dynamixel PRO properties are already set as %% ID : 1 / Baudnum : 1 (Baudrate : 57600)
 #
-
 import os
 import pandas as pd
 import time
@@ -49,8 +48,10 @@ import time
 #             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 #         return ch
 
-from dynamixel_sdk import *                    # Uses Dynamixel SDK library
+from dxl_sdk import *                    # Uses Dynamixel SDK library
 import logging
+import unittest
+
 FORMAT = '%(asctime)-15s %(levelname)-8s %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
@@ -59,14 +60,14 @@ logger.setLevel('DEBUG')
 
 class dxl_controller:
 
-    def dxl_write(self, id, name, value):
+    def dxl_write(self, id, name, value, ct, packet_handler, port_handler):
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.
 
 
         :param self:
-        :param int id: id of dynamixel
+        :param int id: id of dxl
         :param str name: name of control table entry
         :param int value: value to write to control table
         :return: None
@@ -77,33 +78,33 @@ class dxl_controller:
         addr = ct.loc[name, 'Address']
 
         if size == 1:
-            dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, id, addr, 0)
+            dxl_comm_result, dxl_error = packet_handler.write1ByteTxRx(port_handler, id, addr, 0)
         elif size == 2:
-            dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, id, addr, 0)
+            dxl_comm_result, dxl_error = packet_handler.write2ByteTxRx(port_handler, id, addr, 0)
         elif size == 4:
-            dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, id, addr, 0)
+            dxl_comm_result, dxl_error = packet_handler.write4ByteTxRx(port_handler, id, addr, 0)
         else:
             raise Exception('\'size [byte]\' was not 1,2 or 4: ' + str(size))
 
         # Handle return messages
         if dxl_comm_result != COMM_SUCCESS:
-            logger.error("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            logger.error("%s" % packet_handler.getTxRxResult(dxl_comm_result))
         if dxl_error != 0:
-            logger.error("%s" % packetHandler.getRxPacketError(dxl_error))
+            logger.error("%s" % packet_handler.getRxPacketError(dxl_error))
         if dxl_comm_result == COMM_SUCCESS and dxl_error == 0:
             logger.debug(
                 '{name} has been successfully been changed to {value} on dxl {id}'
                 .format(name=name, value=value, id=id))
 
 
-    def dxl_read(self, id, name):
+    def dxl_read(self, id, name, ct, packet_handler, port_handler):
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.
 
 
         :param self:
-        :param int id: id of dynamixel
+        :param int id: id of dxl
         :param str name: name of control table entry
         :return: value read from control table
         :rtype: int
@@ -113,158 +114,35 @@ class dxl_controller:
         addr = ct.loc[name, 'Address']
 
         if size == 1:
-            value, dxl_comm_result, dxl_error = packetHandler.read1ByteTxRx(portHandler, id, addr)
+            value, dxl_comm_result, dxl_error = packet_handler.read1ByteTxRx(port_handler, id, addr)
         elif size == 2:
-            value, dxl_comm_result, dxl_error = packetHandler.read2ByteTxRx(portHandler, id, addr)
+            value, dxl_comm_result, dxl_error = packet_handler.read2ByteTxRx(port_handler, id, addr)
         elif size == 4:
-            value, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, id, addr)
+            value, dxl_comm_result, dxl_error = packet_handler.read4ByteTxRx(port_handler, id, addr)
         else:
             raise Exception('\'size [byte]\' was not 1,2 or 4: ' + str(size))
 
         # Handle return messages
         if dxl_comm_result != COMM_SUCCESS:
-            logger.error("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            logger.error("%s" % packet_handler.getTxRxResult(dxl_comm_result))
         if dxl_error != 0:
-            logger.error("%s" % packetHandler.getRxPacketError(dxl_error))
+            logger.error("%s" % packet_handler.getRxPacketError(dxl_error))
         if dxl_comm_result == COMM_SUCCESS and dxl_error == 0:
             logger.debug(
                 '{name} has been successfully been read as {value} on dxl {id}'
                 .format(name=name, value=value, id=id))
 
 
-if __name__ == '__main__':
-    pd.set_option('expand_frame_repr', False)
+def walk(ct, packet_handler, port_handler):
+    """
 
-    # Control table address
-    ct = pd.read_csv('/home/lb/Mayday/XL430_W250_control_table.csv', sep=';', index_col=3)
+    put leg set 0 down, set 1 up.
+    move set0 back while moving set1 forward
+    put set0 up, while set1 down
+    move set0 forward, while set1 back
 
-    # Protocol version
-    PROTOCOL_VERSION = 2.0  # See which protocol version is used in the Dynamixel
-
-    # Default setting
-    DXL_ID = 1  # Dynamixel ID : 1
-    BAUDRATE = 57600  # Dynamixel default baudrate : 57600
-    DEVICENAME = '/dev/ttyUSB0'  # Check which port is being used on your controller
-    # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
-
-    TORQUE_ENABLE = 1  # Value for enabling the torque
-    TORQUE_DISABLE = 0  # Value for disabling the torque
-    DXL_MINIMUM_POSITION_VALUE = 1400  # Dynamixel will rotate between this value
-    DXL_MAXIMUM_POSITION_VALUE = 2400  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
-    DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
-
-    index = 0
-    dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE, DXL_MAXIMUM_POSITION_VALUE]  # Goal position
-
-    # Initialize PortHandler instance
-    # Set the port path
-    # Get methods and members of PortHandlerLinux or PortHandlerWindows
-    portHandler = PortHandler(DEVICENAME)
-
-    # Initialize PacketHandler instance
-    # Set the protocol version
-    # Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
-    packetHandler = PacketHandler(PROTOCOL_VERSION)
-
-    # Open port
-    if portHandler.openPort():
-        print("Succeeded to open the port")
-    else:
-        print("Failed to open the port")
-        print("Press any key to terminate...")
-        # getch()
-        quit()
-
-    # Set port baudrate
-    if portHandler.setBaudRate(BAUDRATE):
-        print("Succeeded to change the baudrate")
-    else:
-        print("Failed to change the baudrate")
-        print("Press any key to terminate...")
-        # getch()
-        quit()
-
-
-    # Make sure torque is disabled
-    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(
-        portHandler, DXL_ID, ct.loc['Torque Enable', 'Address'], 0)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print("Dynamixel has been successfully connected")
-
-
-    # Change Acceleration Limits
-    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-        portHandler, BROADCAST_ID, ct.loc['Profile Acceleration', 'Address'], 0)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print("Profile acceleration has been been successfully changed to: ", 0)
-
-
-    # Change Velocity Limits
-    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-        portHandler, BROADCAST_ID, ct.loc['Profile Velocity', 'Address'], 16)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print("Profile Velocity has been been successfully changed to: ", 16)
-
-
-    # # Change Position Limits
-    # dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-    #     portHandler, DXL_ID, ct.loc['Min Position Limit', 'Address'], 1300)
-    # if dxl_comm_result != COMM_SUCCESS:
-    #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    # elif dxl_error != 0:
-    #     print("%s" % packetHandler.getRxPacketError(dxl_error))
-    # else:
-    #     print("Dynamixel limit has been successfully changed to: ", 1300)
-    #
-    # dxl_min_position_limit, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(
-    #     portHandler, DXL_ID, ct.loc['Min Position Limit', 'Address'])
-    # if dxl_comm_result != COMM_SUCCESS:
-    #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    # elif dxl_error != 0:
-    #     print("%s" % packetHandler.getRxPacketError(dxl_error))
-    # else:
-    #     print('dxl_min_position_limit: ', dxl_min_position_limit)
-    #
-    # dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-    #     portHandler, DXL_ID, ct.loc['Max Position Limit', 'Address'], 2500)
-    # if dxl_comm_result != COMM_SUCCESS:
-    #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    # elif dxl_error != 0:
-    #     print("%s" % packetHandler.getRxPacketError(dxl_error))
-    # else:
-    #     print("Dynamixel has been successfully connected")
-    #
-    # dxl_max_position_limit, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(
-    #     portHandler, DXL_ID, ct.loc['Max Position Limit', 'Address'])
-    # if dxl_comm_result != COMM_SUCCESS:
-    #     print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    # elif dxl_error != 0:
-    #     print("%s" % packetHandler.getRxPacketError(dxl_error))
-    # else:
-    #     print('dxl_max_position_limit: ', dxl_max_position_limit)
-
-
-    # Enable Dynamixel Torque
-    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(
-        portHandler, BROADCAST_ID, ct.loc['Torque Enable', 'Address'], TORQUE_ENABLE)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
-    else:
-        print("Dynamixel has been successfully connected")
+    :return:
+    """
 
     # j_min = 1347
     # j_nor = 2047
@@ -273,7 +151,6 @@ if __name__ == '__main__':
     j_nor = 2047
     j_min = j_nor - 200
     j_max = j_nor + 200
-
 
     legs_forward_down_left = [j_min, j_max-600, j_nor-600]
     legs_forward_up_left = [j_min, j_min-600, j_nor-600]
@@ -297,44 +174,134 @@ if __name__ == '__main__':
         for conf in confs:
             for leg in range(6):
                 for joint in range(1, 4):
-                    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-                        portHandler, leg * 3 + joint, ct.loc['Goal Position', 'Address'], conf[leg][joint-1])
+                    dxl_comm_result, dxl_error = packet_handler.write4ByteTxRx(
+                        port_handler, leg * 3 + joint, ct.loc['Goal Position', 'Address'], conf[leg][joint-1])
                     if dxl_comm_result != COMM_SUCCESS:
-                        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+                        print("%s" % packet_handler.getTxRxResult(dxl_comm_result))
                     elif dxl_error != 0:
-                        print("%s" % packetHandler.getRxPacketError(dxl_error))
+                        print("%s" % packet_handler.getRxPacketError(dxl_error))
             time.sleep(0.5)
 
 
-        # put leg set 0 down, set 1 up.
-        # move set0 back while moving set1 forward
-        # put set0 up, while set1 down
-        # move set0 forward, while set1 back
+def init_dxl_communication(packet_handler, port_handler):
+    """
 
-    while 1:
+    :return:
+    """
+
+    BAUDRATE = 57600  # Dynamixel default baudrate : 57600
+    DEVICENAME = '/dev/ttyUSB0'  # Check which port is being used on your controller
+    PROTOCOL_VERSION = 2.0  # See which protocol version is used in the Dynamixel
+
+    # Initialize port_handler instance
+    # Set the port path
+    # Get methods and members of PortHandlerLinux or PortHandlerWindows
+    port_handler = port_handler(DEVICENAME)
+
+    # Initialize packet_handler instance
+    # Set the protocol version
+    # Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
+    packet_handler = packet_handler(PROTOCOL_VERSION)
+
+    # Open port
+    if port_handler.openPort():
+        print("Succeeded to open the port")
+    else:
+        print("Failed to open the port")
+        print("Press any key to terminate...")
+        # getch()
+        quit()
+
+    # Set port baudrate
+    if port_handler.setBaudRate(BAUDRATE):
+        print("Succeeded to change the baudrate")
+    else:
+        print("Failed to change the baudrate")
+        print("Press any key to terminate...")
+        # getch()
+
+    return packet_handler, port_handler
+
+
+def init_dxls(dxl_ctrlr, ct, DXL_IDs, packet_handler, port_handler):
+    """
+    Set dxl movement setting and limits
+
+    :param dxl_ctrlr: controller object for communicating with dxls
+    :param DXL_IDs: list of dxl ids to init
+    :return:
+    """
+
+    for DXL_ID in DXL_IDs:
+
+        dxl_ctrlr.dxl_write(DXL_ID, 'Torque Enable', 0, ct, packet_handler, port_handler)
+
+        # Change Acceleration Limits
+        dxl_ctrlr.dxl_write(DXL_ID, 'Profile Acceleration', 0, ct, packet_handler, port_handler)
+
+        # Change Velocity Limits
+        dxl_ctrlr.dxl_write(DXL_ID, 'Profile Velocity', 16, ct, packet_handler, port_handler)
+
+        # Set position limits
+        # dxl_ctrlr.dxl_write(DXL_ID, 'Min Position Limit', 1300, ct, packet_handler, port_handler)
+        # dxl_ctrlr.dxl_write(DXL_ID, 'Max Position Limit', 2500, ct, packet_handler, port_handler)
+
+        # Enable torque again.
+        dxl_ctrlr.dxl_write(DXL_ID, 'Torque Enable', 1, ct, packet_handler, port_handler)
+
+
+def main():
+    """
+
+
+    :return:
+    """
+
+    pd.set_option('expand_frame_repr', False)
+    pd.set_option('max_rows', 20)
+
+    # Control table address
+    control_table = pd.read_csv('/home/lb/Mayday/XL430_W250_control_table.csv', sep=';', index_col=3)
+
+
+    # Default setting
+    DXL_ID = 1  # Dynamixel ID : 1
+    dxl_ids = range(1, 18)
+
+    # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
+
+    TORQUE_ENABLE = 1  # Value for enabling the torque
+    TORQUE_DISABLE = 0  # Value for disabling the torque
+    DXL_MINIMUM_POSITION_VALUE = 1400  # Dynamixel will rotate between this value
+    DXL_MAXIMUM_POSITION_VALUE = 2400  # and this value (note that the Dynamixel would not move when the position value
+    # is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+    DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
+
+    index = 0
+    dxl_goal_position = [DXL_MINIMUM_POSITION_VALUE, DXL_MAXIMUM_POSITION_VALUE]  # Goal position
+
+
+    packet_handler, port_handler = init_dxl_communication()
+
+    dxl_ctrlr = dxl_controller()
+
+    init_dxls(dxl_ctrlr, control_table, [dxl_ids])
+
+    while True:
         print("Press any key to continue! (or press ESC to quit!)")
         # if getch() == chr(0x1b):
         #     break
 
         # Write goal position
-        dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(
-            portHandler, DXL_ID, ct.loc['Goal Position', 'Address'], dxl_goal_position[index])
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-        elif dxl_error != 0:
-            print("%s" % packetHandler.getRxPacketError(dxl_error))
+        dxl_ctrlr.dxl_write(
+            DXL_ID, 'Goal Position', dxl_goal_position[index], control_table, packet_handler, port_handler)
 
-        while 1:
+        while True:
             # Read present position
-            dxl_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, DXL_ID,
-                                                                                           ct.loc['Present Position', 'Address'])
-            if dxl_comm_result != COMM_SUCCESS:
-                print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-            elif dxl_error != 0:
-                print("%s" % packetHandler.getRxPacketError(dxl_error))
+            dxl_present_position = dxl_ctrlr.dxl_read(
+                DXL_ID, 'Present Position', control_table, packet_handler, port_handler)
 
             print("[ID:%03d] GoalPos:%03d  PresPos:%03d" % (DXL_ID, dxl_goal_position[index], dxl_present_position))
-
 
             if not abs(dxl_goal_position[index] - dxl_present_position) > DXL_MOVING_STATUS_THRESHOLD:
                 break
@@ -346,12 +313,12 @@ if __name__ == '__main__':
             index = 0
 
     # Disable Dynamixel Torque
-    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(
-        portHandler, DXL_ID, ct.loc['Torque Enable', 'Address'], TORQUE_DISABLE)
-    if dxl_comm_result != COMM_SUCCESS:
-        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-    elif dxl_error != 0:
-        print("%s" % packetHandler.getRxPacketError(dxl_error))
+    dxl_present_position = dxl_ctrlr.dxl_write(
+        DXL_ID, 'Torque Enable', TORQUE_DISABLE, control_table, packet_handler, port_handler)
 
     # Close port
-    portHandler.closePort()
+    port_handler.closePort()
+
+
+if __name__ == '__main__':
+    main()
