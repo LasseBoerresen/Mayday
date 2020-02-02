@@ -1,0 +1,10 @@
+<launch>
+
+    <!-- Convert an xacro and put on parameter server -->
+    <param name="robot_description"
+        command="$(find xacro)/xacro.py --inorder $(find mayday_description)/robots/mayday.urdf.xacro" />
+
+    <!-- just run with rosrun for now, or in pycharm, opened from terminal after sourcing ros setup and catkin setup -->
+    <!--node pkg="mayday_control" name="motion_control" type="scripts/motion_control.py" output="screen">
+    </node-->
+</launch>
