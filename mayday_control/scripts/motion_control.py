@@ -12,6 +12,7 @@ from gazebo_msgs.msg import LinkStates
 import matplotlib.pyplot as plt
 
 
+######## OBS must load pycharm in terminal after sourceing ros setup and catkin setup #######
 # Load the urdf_parser_py manifest, you use your own package
 # name on the condition but in this case, you need to depend on
 # urdf_parser_py.
@@ -25,6 +26,11 @@ import tensorflow as tf
 # from tensorflow.contrib import learn
 
 import pprint
+import logging
+
+
+logging.basicConfig(format='%{asctime}s %{levelname}-8s %{message}s')
+logger = logging.getLogger(__name__)
 
 
 # OBS Use rospy.logdebug or rospy.loginfo etc instead
@@ -98,136 +104,136 @@ class Memory:
             return random.sample(self._samples, no_samples)
 
 
-class GameRunner:
-    def __init__(self, sess, model, env, memory, max_eps, min_eps,
-                 decay, render=True):
-        self._sess = sess
-        self._env = env
-        self._model = model
-        self._memory = memory
-        self._render = render
-        self._max_eps = max_eps
-        self._min_eps = min_eps
-        self._decay = decay
-        self._eps = self._max_eps
-        self._steps = 0
-        self._reward_store = []
-        self._max_x_store = []
-
-    def run(self):
-        state = self._env.reset()
-        tot_reward = 0
-        max_x = -100
-        while True:
-            if self._render:
-                self._env.render()
-
-            action = self._choose_action(state)
-            next_state, reward, done, info = self._env.step(action)
-            if next_state[0] >= 0.1:
-                reward += 10
-            elif next_state[0] >= 0.25:
-                reward += 20
-            elif next_state[0] >= 0.5:
-                reward += 100
-
-            if next_state[0] > max_x:
-                max_x = next_state[0]
-            # is the game complete? If so, set the next state to
-            # None for storage sake
-            if done:
-                next_state = None
-
-            self._memory.add_sample((state, action, reward, next_state))
-            self._replay()
-
-            # exponentially decay the eps value
-            self._steps += 1
-            self._eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * math.exp(-LAMBDA * self._steps)
-
-            # move the agent to the next state and accumulate the reward
-            state = next_state
-            tot_reward += reward
-
-            # if the game is done, break the loop
-            if done:
-                self._reward_store.append(tot_reward)
-                self._max_x_store.append(max_x)
-                break
-
-        print("Step {}, Total reward: {}, Eps: {}".format(self._steps, tot_reward, self._eps))
-
-    def _choose_action(self, state):
-        """
-
-        :param state:
-        :return:
-        """
-
-        if random.random() < self._eps:
-            return random.randint(0, self._model.num_actions - 1)
-        else:
-            return np.argmax(self._model.predict_one(state, self._sess))
-
-    def _replay(self):
-        """
-
-        :return:
-        """
-
-        batch = self._memory.sample(self._model.batch_size)
-        states = np.array([val[0] for val in batch])
-        next_states = np.array([(np.zeros(self._model.num_states)
-                                 if val[3] is None else val[3]) for val in batch])
-        # predict Q(s,a) given the batch of states
-        q_s_a = self._model.predict_batch(states, self._sess)
-        # predict Q(s',a') - so that we can do gamma * max(Q(s'a')) below
-        q_s_a_d = self._model.predict_batch(next_states, self._sess)
-        # setup training arrays
-        x = np.zeros((len(batch), self._model.num_states))
-        y = np.zeros((len(batch), self._model.num_actions))
-        for i, b in enumerate(batch):
-            state, action, reward, next_state = b[0], b[1], b[2], b[3]
-            # get the current q values for all actions in state
-            current_q = q_s_a[i]
-            # update the q value for action
-            if next_state is None:
-                # in this case, the game completed after action, so there is no max Q(s',a')
-                # prediction possible
-                current_q[action] = reward
-            else:
-                current_q[action] = reward + GAMMA * np.amax(q_s_a_d[i])
-            x[i] = state
-            y[i] = current_q
-        self._model.train_batch(self._sess, x, y)
-
-
-if __name__ == "__main__":
-    env_name = 'MountainCar-v0'
-    env = gym.make(env_name)
-
-    num_states = env.env.observation_space.shape[0]
-    num_actions = env.env.action_space.n
-
-    model = Model(num_states, num_actions, BATCH_SIZE)
-    mem = Memory(50000)
-
-    with tf.Session() as sess:
-        sess.run(model.var_init)
-        gr = GameRunner(sess, model, env, mem, MAX_EPSILON, MIN_EPSILON,
-                        LAMBDA)
-        num_episodes = 300
-        cnt = 0
-        while cnt < num_episodes:
-            if cnt % 10 == 0:
-                print('Episode {} of {}'.format(cnt+1, num_episodes))
-            gr.run()
-            cnt += 1
-        plt.plot(gr.reward_store)
-        plt.show()
-        plt.close("all")
-        plt.plot(gr.max_x_store)
-        plt.show()
+# class GameRunner:
+#     def __init__(self, sess, model, env, memory, max_eps, min_eps,
+#                  decay, render=True):
+#         self._sess = sess
+#         self._env = env
+#         self._model = model
+#         self._memory = memory
+#         self._render = render
+#         self._max_eps = max_eps
+#         self._min_eps = min_eps
+#         self._decay = decay
+#         self._eps = self._max_eps
+#         self._steps = 0
+#         self._reward_store = []
+#         self._max_x_store = []
+#
+#     def run(self):
+#         state = self._env.reset()
+#         tot_reward = 0
+#         max_x = -100
+#         while True:
+#             if self._render:
+#                 self._env.render()
+#
+#             action = self._choose_action(state)
+#             next_state, reward, done, info = self._env.step(action)
+#             if next_state[0] >= 0.1:
+#                 reward += 10
+#             elif next_state[0] >= 0.25:
+#                 reward += 20
+#             elif next_state[0] >= 0.5:
+#                 reward += 100
+#
+#             if next_state[0] > max_x:
+#                 max_x = next_state[0]
+#             # is the game complete? If so, set the next state to
+#             # None for storage sake
+#             if done:
+#                 next_state = None
+#
+#             self._memory.add_sample((state, action, reward, next_state))
+#             self._replay()
+#
+#             # exponentially decay the eps value
+#             self._steps += 1
+#             self._eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * math.exp(-LAMBDA * self._steps)
+#
+#             # move the agent to the next state and accumulate the reward
+#             state = next_state
+#             tot_reward += reward
+#
+#             # if the game is done, break the loop
+#             if done:
+#                 self._reward_store.append(tot_reward)
+#                 self._max_x_store.append(max_x)
+#                 break
+#
+#         print("Step {}, Total reward: {}, Eps: {}".format(self._steps, tot_reward, self._eps))
+#
+#     def _choose_action(self, state):
+#         """
+#
+#         :param state:
+#         :return:
+#         """
+#
+#         if random.random() < self._eps:
+#             return random.randint(0, self._model.num_actions - 1)
+#         else:
+#             return np.argmax(self._model.predict_one(state, self._sess))
+#
+#     def _replay(self):
+#         """
+#
+#         :return:
+#         """
+#
+#         batch = self._memory.sample(self._model.batch_size)
+#         states = np.array([val[0] for val in batch])
+#         next_states = np.array([(np.zeros(self._model.num_states)
+#                                  if val[3] is None else val[3]) for val in batch])
+#         # predict Q(s,a) given the batch of states
+#         q_s_a = self._model.predict_batch(states, self._sess)
+#         # predict Q(s',a') - so that we can do gamma * max(Q(s'a')) below
+#         q_s_a_d = self._model.predict_batch(next_states, self._sess)
+#         # setup training arrays
+#         x = np.zeros((len(batch), self._model.num_states))
+#         y = np.zeros((len(batch), self._model.num_actions))
+#         for i, b in enumerate(batch):
+#             state, action, reward, next_state = b[0], b[1], b[2], b[3]
+#             # get the current q values for all actions in state
+#             current_q = q_s_a[i]
+#             # update the q value for action
+#             if next_state is None:
+#                 # in this case, the game completed after action, so there is no max Q(s',a')
+#                 # prediction possible
+#                 current_q[action] = reward
+#             else:
+#                 current_q[action] = reward + GAMMA * np.amax(q_s_a_d[i])
+#             x[i] = state
+#             y[i] = current_q
+#         self._model.train_batch(self._sess, x, y)
+#
+#
+# if __name__ == "__main__":
+#     env_name = 'MountainCar-v0'
+#     env = gym.make(env_name)
+#
+#     num_states = env.env.observation_space.shape[0]
+#     num_actions = env.env.action_space.n
+#
+#     model = Model(num_states, num_actions, BATCH_SIZE)
+#     mem = Memory(50000)
+#
+#     with tf.Session() as sess:
+#         sess.run(model.var_init)
+#         gr = GameRunner(sess, model, env, mem, MAX_EPSILON, MIN_EPSILON,
+#                         LAMBDA)
+#         num_episodes = 300
+#         cnt = 0
+#         while cnt < num_episodes:
+#             if cnt % 10 == 0:
+#                 print('Episode {} of {}'.format(cnt+1, num_episodes))
+#             gr.run()
+#             cnt += 1
+#         plt.plot(gr.reward_store)
+#         plt.show()
+#         plt.close("all")
+#         plt.plot(gr.max_x_store)
+#         plt.show()
 
 
 
@@ -250,32 +256,37 @@ class Robot:
             'joints': {},
             'links': {}
         }
+
+        # get xacro model of robot
         self.robot_description = URDF.from_parameter_server()
+
+
         self.joint_publishers = []
         self.joint_subscribers = []
         self.link_subscribers = []
 
+        # Subscribe and publish to joint topics
         self.init_joints()
-        self.init_links()
+
+        # Link states are calculated from joint states. TODO Add later for training feedback
+        # self.init_links()
 
         self.rate = rospy.Rate(10)  # 10hz
 
-        # rospy.spin()
+        # Wait for first joint state update
+        while self.robot_state['joints'] == {} and not rospy.is_shutdown():
+            logger.debug('waiting for joint states')
+            self.rate.sleep()
 
+        # This is where the magic happens
         while not rospy.is_shutdown():
             x = self.format_robot_state_for_nn()
-            # hello_str = "hello world %s" % rospy.get_time()
-            # angle = ((rospy.get_time() % 5) / 5 * (np.pi) - np.pi / 2) - np.pi / 2
-            # rospy.loginfo(angle)
-            # goals = [angle] * len(self.joint_publishers)
-
-            goals = self.find_new_joint_goals()
-
+            goals = self.find_new_joint_goals(x)
             self.output_joint_goals(goals)
             self.rate.sleep()
 
     def joint_subscriber_callback(self, data, args):
-        """save data from triggering join topic"""
+        """save data from triggering joint topic"""
 
         self.robot_state['joints'][args['joint']] = data
 
@@ -508,13 +519,19 @@ class TestMotion_control(unittest.TestCase):
 
 def main():
     """
+    This script should initiate all the legs in a safe position, then move them to the initial standing resting
+    position and await commands. Commands should come from remote control.
+
+    Robot state should mirror gazebo, no matter whether it comes from the real robot. States are taken from a
+    subscription, and commands are published.
+
 
     :return:
     """
 
     try:
+        # Run robot, including initialization of legs and idle for commands.
         robot = Robot()
-        # talker()
     except rospy.ROSInterruptException:
         pass
 
