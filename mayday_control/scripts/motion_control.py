@@ -11,6 +11,7 @@ from control_msgs.msg import JointControllerState
 from gazebo_msgs.msg import LinkStates
 import matplotlib.pyplot as plt
 
+import dynamixel_controller
 
 ######## OBS must load pycharm in terminal after sourceing ros setup and catkin setup #######
 # Load the urdf_parser_py manifest, you use your own package
@@ -46,6 +47,7 @@ pp = pprint.PrettyPrinter()
 
 # Should mayday be modelled as an object? Probably. It could be Initiated by the xacro file.
 
+tau = math.pi * 2.0
 
 class Model:
     def __init__(self, num_states, num_actions, batch_size):
@@ -252,86 +254,52 @@ class Robot:
         # Declare this node to ros
         rospy.init_node('mayday', anonymous=False)
 
-        self.robot_state = {
-            'joints': {},
-            'links': {}
-        }
-
         # get xacro model of robot
-        self.robot_description = URDF.from_parameter_server()
+        self.description = URDF.from_parameter_server()
 
+        # Initiate state object from description
+        self.state = {}
+        for joint in self.description['Joints']:
+            self.state[joint['name']] = {}
 
-        self.joint_publishers = []
-        self.joint_subscribers = []
-        self.link_subscribers = []
+        self.dxl_controller = dynamixel_controller.DxlController()
+        self.dxl_controller.arm()
 
-        # Subscribe and publish to joint topics
-        self.init_joints()
-
-        # Link states are calculated from joint states. TODO Add later for training feedback
-        # self.init_links()
+        # OBS Not dealing with ros for now.
+        # # Subscribe and publish to joint topics
+        # self.joint_publishers = []
+        # self.joint_subscribers = []
+        # self.link_subscribers = []
+        #
+        # self.init_joint_subpubs()
+        #
+        # # Link states are calculated from joint states. TODO Add later for training feedback
+        # # self.init_links()
 
         self.rate = rospy.Rate(10)  # 10hz
 
-        # Wait for first joint state update
-        while self.robot_state['joints'] == {} and not rospy.is_shutdown():
-            logger.debug('waiting for joint states')
-            self.rate.sleep()
+        # # Wait for first joint state update
+        # while self.robot_state['joints'] == {} and not rospy.is_shutdown():
+        #     logger.debug('waiting for joint states')
+        #     self.rate.sleep()
 
         # This is where the magic happens
         while not rospy.is_shutdown():
+            self.update_state()
             x = self.format_robot_state_for_nn()
             goals = self.find_new_joint_goals(x)
             self.output_joint_goals(goals)
             self.rate.sleep()
 
-    def joint_subscriber_callback(self, data, args):
-        """save data from triggering joint topic"""
-
-        self.robot_state['joints'][args['joint']] = data
-
-    def init_joints(self):
+    def update_state(self):
         """
+        Updates robot state by looping all defined joints and reads values from dynamixels.
 
         :return:
         """
 
-        for i, transmission in enumerate(self.robot_description.transmissions):
-            topic = '/mayday/' + transmission.joints[0].name + '_position_controller/command'
-            self.joint_publishers.append(rospy.Publisher(topic, std_msgs.msg.Float64, queue_size=10))
-
-            topic = '/mayday/' + transmission.joints[0].name + '_position_controller/state'
-            self.joint_subscribers.append(rospy.Subscriber(
-                name=topic, data_class=JointControllerState, callback=self.joint_subscriber_callback,
-                callback_args={'joint': transmission.joints[0].name}))
-
-    def link_subscriber_callback(self, data):
-        """
-
-        :param data:
-        :return:
-        """
-
-        self.robot_state['links'] = data
-
-    def model_subscriber_callback(self, data):
-        """
-
-        :param data:
-        :return:
-        """
-
-        self.robot_state['model'] = data
-
-    def init_links(self):
-        """
-
-        :return:
-        """
-
-        topic = '/gazebo/link_states'
-        self.link_subscribers.append(rospy.Subscriber(
-            name=topic, data_class=LinkStates, callback=self.link_subscriber_callback))
+        for joint in self.description['Joints']:
+            self.state[joint['name']] = self.dxl_controller.read_dxl_state(joint['id'])
 
     def format_robot_state_for_nn(self):
 
@@ -339,49 +307,46 @@ class Robot:
         y = pd.DataFrame()
 
         # Input current joint states
-        for joint in self.robot_state['joints']:
-            x[joint + '_theta'] = self.robot_state['joints'][joint].process_value
-            x[joint + '_theta_dot'] = self.robot_state['joints'][joint].process_value_dot
-            x[joint + '_torque'] = self.robot_state['joints'][joint].command
+        for joint in self.state['joints']:
+            x[joint['name'] + '_pos'] = joint['pos']
+            x[joint['name'] + '_vel'] = joint['vel']
+            x[joint['name'] + '_torq'] = joint['torq']
+            x[joint['name'] + '_temp'] = joint['temp']
 
         # Input IMU messurements. And other sensors available.
         # Acceleration xyz, meassures orientation around x and y axi, given gravity.
         # Gyro xyz
         # Compas xyz, measures orientation around z axis
 
-
         # Input feet touch sensors
 
-
         # Input belly and back touch sensors.
-
 
         # Input goal thorax pose and velocity
 
         # for i, name in enumerate(self.robot_state['links'].name)
         # Ignore all links but base_link for now. Only base is used for now.
         name = 'thorax'  # 'mayday::base_link'
-        x['goal_' + name + '_pose_position_x'] = 0.0  # self.robot_state['links'].pose[1].position.x
-        x['goal_' + name + '_pose_position_y'] = 0.0  # self.robot_state['links'].pose[1].position.y
-        x['goal_' + name + '_pose_position_z'] = 0.0  # self.robot_state['links'].pose[1].position.z
+        # TODO input actual goal position, from some behaviour function. Could just be sinusoid.
+        x['goal_' + name + '_pose_pos_x'] = 0.0  # self.robot_state['links'].pose[1].position.x
+        x['goal_' + name + '_pose_pos_y'] = 0.0  # self.robot_state['links'].pose[1].position.y
+        x['goal_' + name + '_pose_pos_z'] = 0.0  # self.robot_state['links'].pose[1].position.z
 
-        x['goal_' + name + '_pose_orientation_x'] = 0.0  # self.robot_state['links'].pose[1].orientation.x
-        x['goal_' + name + '_pose_orientation_y'] = 0.0  # self.robot_state['links'].pose[1].orientation.y
-        x['goal_' + name + '_pose_orientation_z'] = 0.0  # self.robot_state['links'].pose[1].orientation.z
-        x['goal_' + name + '_pose_orientation_w'] = 0.0  # self.robot_state['links'].pose[1].orientation.w
+        x['goal_' + name + '_pose_ori_r'] = 0.0  # self.robot_state['links'].pose[1].orientation.x
+        x['goal_' + name + '_pose_ori_p'] = 0.0  # self.robot_state['links'].pose[1].orientation.y
+        x['goal_' + name + '_pose_ori_y'] = 0.0  # self.robot_state['links'].pose[1].orientation.z
 
-        x['goal_' + name + '_twist_position_x'] = 0.0  # self.robot_state['links'].pose[1].position.x
-        x['goal_' + name + '_twist_position_y'] = 0.0  # self.robot_state['links'].pose[1].position.y
+        # x['goal_' + name + '_twist_position_x'] = 0.0  # self.robot_state['links'].pose[1].position.x
+        # x['goal_' + name + '_twist_position_y'] = 0.0  # self.robot_state['links'].pose[1].position.y
 
-        x['goal_' + name + '_twist_orientation_z'] = 0.0  # self.robot_state['links'].pose[1].orientation.x
+        # x['goal_' + name + '_twist_orientation_z'] = 0.0  # self.robot_state['links'].pose[1].orientation.x
+
+        # Goal defining thorax movement speeds, in SI units.
+        x['goal_' + name + '_pose_pos_movement_speed'] = 0.01  # 1 cm per second
+        x['goal_' + name + '_pose_pos_movement_speed'] = 0.01 * tau  # 1/100 of a rev per second.
 
         # input goal stance width
-        x['goal_' + name + '_stance_radius'] = 0.0
-
-
-        # input desired thorax location and orientation. But are these final positions, or speeds?
-        # For body shift, each could be a deviation from an origo position. Then an extra movement
-        # speed for actually walking could be added for x, y and orientation x, y.
+        # x['goal_' + name + '_stance_radius'] = 0.0
 
         return x
 
@@ -400,7 +365,7 @@ class Robot:
         # y = self.nn.predict(x)
         # joint_goals = self.nn.postprocess(y)
 
-        return joint_goals
+        self.state = self.format_nn_output_for_state()
 
     def output_joint_goals(self, goals):
         """
@@ -409,8 +374,11 @@ class Robot:
         :return:
         """
 
-        for i, (pub, goal) in enumerate(zip(self.joint_publishers, goals)):
-            pub.publish(goal)
+        for joint in goals:
+            self.dxl_controller.write_dxl_goal_pos(joint[], )
+
+        # for i, (pub, goal) in enumerate(zip(self.joint_publishers, goals)):
+        #     pub.publish(goal)
 
     def initialize_robot_position(self):
         """
@@ -429,7 +397,7 @@ class Robot:
         # I could set a from-to path planner, ramping up and all.
 
 
-        for transmission in self.robot_description.transmissions:
+        for transmission in self.description.transmissions:
             pass
 
         # I could have a subprocess sending goal positions.
@@ -506,15 +474,53 @@ class Robot:
 
         pass
 
-
-class TestMotion_control(unittest.TestCase):
-
-    def test_preprocess_input(self):
-        data = [
-            [1]
-        ]
-
-        pass
+    # def joint_subscriber_callback(self, data, args):
+    #     """save data from triggering joint topic"""
+    #
+    #     self.robot_state['joints'][args['joint']] = data
+    #
+    # def init_joint_subpubs(self):
+    #     """
+    #
+    #     :return:
+    #     """
+    #
+    #     for i, transmission in enumerate(self.robot_description.transmissions):
+    #         topic = '/mayday/' + transmission.joints[0].name + '_position_controller/command'
+    #         self.joint_publishers.append(rospy.Publisher(topic, std_msgs.msg.Float64, queue_size=10))
+    #
+    #         topic = '/mayday/' + transmission.joints[0].name + '_position_controller/state'
+    #         self.joint_subscribers.append(rospy.Subscriber(
+    #             name=topic, data_class=JointControllerState, callback=self.joint_subscriber_callback,
+    #             callback_args={'joint': transmission.joints[0].name}))
+    #
+    # def link_subscriber_callback(self, data):
+    #     """
+    #
+    #     :param data:
+    #     :return:
+    #     """
+    #
+    #     self.robot_state['links'] = data
+    #
+    # def model_subscriber_callback(self, data):
+    #     """
+    #
+    #     :param data:
+    #     :return:f
+    #     """
+    #
+    #     self.robot_state['model'] = data
+    #
+    # def init_links(self):
+    #     """
+    #
+    #     :return:
+    #     """
+    #
+    #     topic = '/gazebo/link_states'
+    #     self.link_subscribers.append(rospy.Subscriber(
+    #         name=topic, data_class=LinkStates, callback=self.link_subscriber_callback))
 
 
 def main():
@@ -532,6 +538,7 @@ def main():
     try:
         # Run robot, including initialization of legs and idle for commands.
         robot = Robot()
+
     except rospy.ROSInterruptException:
         pass
 
