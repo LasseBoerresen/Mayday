@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 import random
 import math
 import unittest
@@ -19,6 +20,7 @@ import dynamixel_controller
 # urdf_parser_py.
 import roslib; roslib.load_manifest('urdfdom_py')
 import rospy
+import sys
 from urdf_parser_py.urdf import URDF
 
 
@@ -26,12 +28,13 @@ from urdf_parser_py.urdf import URDF
 import tensorflow as tf
 # from tensorflow.contrib import learn
 
+from collections import OrderedDict
 import pprint
 import logging
 
-
-logging.basicConfig(format='%{asctime}s %{levelname}-8s %{message}s')
-logger = logging.getLogger(__name__)
+# OBS using rospy for logging instead
+#logging.basicConfig(format='%{asctime}s %{levelname}-8s %{message}s', level='DEBUG')
+#logger = logging.getLogger(__name__)
 
 
 # OBS Use rospy.logdebug or rospy.loginfo etc instead
@@ -47,63 +50,18 @@ pp = pprint.PrettyPrinter()
 
 # Should mayday be modelled as an object? Probably. It could be Initiated by the xacro file.
 
-tau = math.pi * 2.0
+TAU = math.pi * 2.0
 
-class Model:
-    def __init__(self, num_states, num_actions, batch_size):
-        self._num_states = num_states
-        self._num_actions = num_actions
-        self._batch_size = batch_size
+class neural_network:
+    """
+    This nn should learn by reinforcement learning. In theory it should be recurrent, but lets shelve that for now. It
+    should just basically take the different motor states as input and ouput the 18 goal positions. How does a
+    reinforcement nn train in practice?
 
-        # define the placeholders
-        self._states = None
-        self._actions = None
+    """
 
-        # the output operations
-        self._logits = None
-        self._optimizer = None
-        self._var_init = None
+    
 
-        # now setup the model
-        self._define_model()
-
-    def _define_model(self):
-        self._states = tf.placeholder(shape=[None, self._num_states], dtype=tf.float32)
-        self._q_s_a = tf.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
-
-        # create a couple of fully connected hidden layers
-        fc1 = tf.layers.dense(self._states, 50, activation=tf.nn.relu)
-        fc2 = tf.layers.dense(fc1, 50, activation=tf.nn.relu)
-        self._logits = tf.layers.dense(fc2, self._num_actions)
-        loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
-        self._optimizer = tf.train.AdamOptimizer().minimize(loss)
-        self._var_init = tf.global_variables_initializer()
-
-    def predict_one(self, state, sess):
-        return sess.run(self._logits, feed_dict={self._states: state.reshape(1, self.num_states)})
-
-    def predict_batch(self, states, sess):
-        return sess.run(self._logits, feed_dict={self._states: states})
-
-    def train_batch(self, sess, x_batch, y_batch):
-        sess.run(self._optimizer, feed_dict={self._states: x_batch, self._q_s_a: y_batch})
-
-
-class Memory:
-    def __init__(self, max_memory):
-        self._max_memory = max_memory
-        self._samples = []
-
-    def add_sample(self, sample):
-        self._samples.append(sample)
-        if len(self._samples) > self._max_memory:
-            self._samples.pop(0)
-
-    def sample(self, no_samples):
-        if no_samples > len(self._samples):
-            return random.sample(self._samples, len(self._samples))
-        else:
-            return random.sample(self._samples, no_samples)
 
 
 # class GameRunner:
@@ -238,7 +196,6 @@ class Memory:
 #         plt.show()
 
 
-
 class Robot:
     """
     RNN to control each motor position each time step. Goal is to reach a certain body and leg configuration, decided by
@@ -252,18 +209,27 @@ class Robot:
         """
 
         # Declare this node to ros
-        rospy.init_node('mayday', anonymous=False)
+        rospy.init_node('mayday', anonymous=False, log_level=rospy.DEBUG)
 
         # get xacro model of robot
         self.description = URDF.from_parameter_server()
 
-        # Initiate state object from description
-        self.state = {}
-        for joint in self.description['Joints']:
-            self.state[joint['name']] = {}
+        # Initiate state object from description, index num in orderedDict corresponds to dxl_id -1.
+        self.state = OrderedDict()
+        for joint in self.description.joints:
+            if joint.joint_type == 'revolute':
+                self.state[joint.name] = {}
+            if len(self.state) >= 3:
+                break
+
+        # self.nn =
 
         self.dxl_controller = dynamixel_controller.DxlController()
         self.dxl_controller.arm()
+
+        # get out of bed
+        self.initialize_robot_position()
+        sys.exit(0)
 
         # OBS Not dealing with ros for now.
         # # Subscribe and publish to joint topics
@@ -280,43 +246,43 @@ class Robot:
 
         # # Wait for first joint state update
         # while self.robot_state['joints'] == {} and not rospy.is_shutdown():
-        #     logger.debug('waiting for joint states')
+        #     rospy.logdebug('waiting for joint states')
         #     self.rate.sleep()
 
         # This is where the magic happens
         while not rospy.is_shutdown():
-            self.update_state()
-            x = self.format_robot_state_for_nn()
-            goals = self.find_new_joint_goals(x)
-            self.output_joint_goals(goals)
+            self.read_joint_states()
+            self.find_new_joint_goals()
+            self.write_joint_goals()
             self.rate.sleep()
 
-    def update_state(self):
+    def read_joint_states(self):
         """
         Updates robot state by looping all defined joints and reads values from dynamixels.
 
         :return:
         """
+        # TODO Handle that pos_goal is overwritten
+        for id, joint_key in enumerate(self.state.keys()):
+            # dxl ids start at 1, because 0 is broadcast
+            self.state[joint_key] = self.dxl_controller.read_dxl_state(id + 1)
 
-        for joint in self.description['Joints']:
-            self.state[joint['name']] = self.dxl_controller.read_dxl_state(joint['id'])
-
-    def format_robot_state_for_nn(self):
+    def format_state_for_nn(self):
 
         x = pd.DataFrame()
         y = pd.DataFrame()
 
         # Input current joint states
-        for joint in self.state['joints']:
-            x[joint['name'] + '_pos'] = joint['pos']
-            x[joint['name'] + '_vel'] = joint['vel']
-            x[joint['name'] + '_torq'] = joint['torq']
-            x[joint['name'] + '_temp'] = joint['temp']
+        for joint_key in self.state.keys():
+            x[joint_key + '_pos'] = self.state[joint_key]['pos']
+            x[joint_key + '_vel'] = self.state[joint_key]['vel']
+            x[joint_key + '_torq'] = self.state[joint_key]['torq']
+            x[joint_key + '_temp'] = self.state[joint_key]['temp']
 
-        # Input IMU messurements. And other sensors available.
-        # Acceleration xyz, meassures orientation around x and y axi, given gravity.
+        # Input IMU measurements. And other sensors available.
+        # Acceleration xyz, measures orientation around x and y axi, given gravity.
         # Gyro xyz
-        # Compas xyz, measures orientation around z axis
+        # Compass xyz, measures orientation around z axis
 
         # Input feet touch sensors
 
@@ -341,14 +307,27 @@ class Robot:
 
         # x['goal_' + name + '_twist_orientation_z'] = 0.0  # self.robot_state['links'].pose[1].orientation.x
 
-        # Goal defining thorax movement speeds, in SI units.
+        # Goal defining maximum movement speeds, in SI units.
         x['goal_' + name + '_pose_pos_movement_speed'] = 0.01  # 1 cm per second
-        x['goal_' + name + '_pose_pos_movement_speed'] = 0.01 * tau  # 1/100 of a rev per second.
+        x['goal_' + name + '_pose_ori_movement_speed'] = 0.01 * TAU  # 1/100 of a rev per second.
+        x['goal_joint_movement_speed'] = 0.02 * TAU  # 1/100 of a rev per second.
 
         # input goal stance width
         # x['goal_' + name + '_stance_radius'] = 0.0
 
         return x
+
+    def format_nn_output_for_state(self, y):
+        """
+
+        :param pd.DataFrame y:
+        :return:
+        """
+
+        for joint_key in self.state.keys():
+            self.state[joint_key]['pos_goal'] = y[joint_key]
+
+        pass
 
     def find_new_joint_goals(self):
         """
@@ -360,86 +339,95 @@ class Robot:
         # for
         # joint_goals =
 
-
+        x = self.format_state_for_nn()
         # x = self.nn.preprocess(joint_states)
         # y = self.nn.predict(x)
-        # joint_goals = self.nn.postprocess(y)
+        self.format_nn_output_for_state(y)
 
-        self.state = self.format_nn_output_for_state()
-
-    def output_joint_goals(self, goals):
+    def write_joint_goals(self):
         """
 
         :param goals:
         :return:
         """
-
-        for joint in goals:
-            self.dxl_controller.write_dxl_goal_pos(joint[], )
+        #
+        for i, joint_key in enumerate(self.state.keys()):
+            self.dxl_controller.write_dxl_goal_pos(i+1, self.state[joint_key]['pos_goal'])
 
         # for i, (pub, goal) in enumerate(zip(self.joint_publishers, goals)):
         #     pub.publish(goal)
 
-    def initialize_robot_position(self):
+    def check_joints_at_rest(self):
         """
-        Make sure robot is in a safe position when it starts up. Collect legs lying on its belly then slowly stand up to
-        neutal position.
+        Check that all joints are below TORQUE_LIMIT_REST
 
+        # TODO check that all are not movoing either. Maybe this is superfluous.
+
+        # TODO ask for manual robot reposition, then retry.
         :return:
         """
 
-        # I need a controller sending the steering commands to the servo topics at the right speed. The goal positions
-        # and goal speeds are final positions in this case. I then need to use a linear leg controller.
+        for joint_key in self.state.keys():
+            # joint torque is signed, we are only interested in absolute torque
+            if math.fabs(self.state[joint_key]['torq']) > dynamixel_controller.TORQ_LIMIT_REST:
+                raise Exception(
+                    'joint torque not at rest, joint: {joint}, torque: abs({torq}%) is not < {torq_rest}'
+                    .format(
+                        joint=joint_key, torq=self.state[joint_key]['torq'],
+                        torq_rest=dynamixel_controller.TORQ_LIMIT_REST))
 
-        # You could argue that the dynamixels have built in linear controller, by setting speed and position. But Gazebo
-        # does not immidiately have this complicated controller.
+    def initialize_robot_position(self):
+        """
+        Make sure robot is in a safe position when it starts up. Collect legs lying on its belly then slowly move
+        femur to stand up to neutral position. The neutral position should not feel any torque, simply because of
+        friction in the joints.
 
-        # I could set a from-to path planner, ramping up and all.
-
-
-        for transmission in self.description.transmissions:
-            pass
-
-        # I could have a subprocess sending goal positions.
-
-        # TODO get robot description from xacro xml
-
-        joints = [
-            'left_center_coxa_dynamixel_to_top_coxa_joint',
-             'left_center_femur_dynamixel_to_left_femur_joint',
-             'left_center_left_femur_to_tibia_dynamixel_joint',
-             'left_front_coxa_dynamixel_to_top_coxa_joint',
-             'left_front_femur_dynamixel_to_left_femur_joint',
-             'left_front_left_femur_to_tibia_dynamixel_joint',
-             'left_hind_coxa_dynamixel_to_top_coxa_joint',
-             'left_hind_femur_dynamixel_to_left_femur_joint',
-             'left_hind_left_femur_to_tibia_dynamixel_joint',
-             'right_center_coxa_dynamixel_to_top_coxa_joint',
-             'right_center_femur_dynamixel_to_left_femur_joint',
-             'right_center_left_femur_to_tibia_dynamixel_joint',
-             'right_front_coxa_dynamixel_to_top_coxa_joint',
-             'right_front_femur_dynamixel_to_left_femur_joint',
-             'right_front_left_femur_to_tibia_dynamixel_joint',
-             'right_hind_coxa_dynamixel_to_top_coxa_joint',
-             'right_hind_femur_dynamixel_to_left_femur_joint',
-             'right_hind_left_femur_to_tibia_dynamixel_joint']
+        Check that none of the legs are under torque load before and after procedure.
+        :return:
+        """
 
 
+        # check that none of the motors have torque
+        self.read_joint_states()
+        self.check_joints_at_rest()
+        rospy.loginfo('all joints are torqueless at start of init')
 
-        initial_position = {
-            'legs' : [
-                {
-                    'id': 0,
-                    'name': ''
-                }
-            ]
+        # Set movement speed to rather slow
+        # OBS robot always starts slow for dxl init.
 
-        }
+        # Collect legs close to body, lying on its belly. Toes should not move when getting up.
+        for joint_key in self.state.keys():
+            if 'coxa_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2
+            elif 'femur_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2 + TAU * 2.5 / 8
+            elif 'tibia_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2 + TAU * 1.75 / 8
+
+        # Move to sitting position and take a breath
+        self.write_joint_goals()
+        time.sleep(2)
+
+        # Simply move femur to neutral, getting up on its legs, and tibia to accommodate not moving toe.
+        for joint_key in self.state.keys():
+            if 'coxa_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2
+            elif 'femur_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2 + TAU/4 - TAU/16
+            elif 'tibia_dynamixel' in joint_key:
+                self.state[joint_key]['pos_goal'] = TAU/2 + TAU/4
+
+        # move to upright postion
+        self.write_joint_goals()
+
+        # Check that joints are at rest in the awakened pose
+        self.read_joint_states()
+        self.check_joints_at_rest()
+        rospy.loginfo('all joints are torqueless at end of init')
+
+        # TODO Set joint velocity limits to a faster speed
 
 
-        for leg in legs:
-            for joint in leg.joints:
-                pass
 
     def linear_position_controller(self, start_pos, end_pos, goal_vel, step=2 * np.pi / 2 ** 8):
         """
@@ -452,27 +440,6 @@ class Robot:
         :param float step:
         :return:
         """
-
-    def preprocess_input(self, x):
-        """
-        For each timestep, process input vector to fit NN.
-        Inputs:
-        - Accelerometer, gyro, compass, pos, velo, torque for each motor.
-        - Body goal position, leg goal position.
-            - Movement comes from body goal position absolute. Body also has relative pos.
-            - To walk, body and all other control points should have speed goals.
-            - When a human controls a limb, each part of the body can be given a goal position. The rest will follow. I
-              could define positions for all leg feet and knees, tail, nose, belly and back. Each position can be
-              calculated precisely from leg positions, given a flat floor. But goal for each position can be Nan,
-              meaning it is not under goal. With all NAN, it should just float.
-
-
-        :return:
-        """
-
-    def import_data(self):
-
-        pass
 
     # def joint_subscriber_callback(self, data, args):
     #     """save data from triggering joint topic"""

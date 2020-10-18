@@ -4,7 +4,10 @@
     <param name="robot_description"
         command="$(find xacro)/xacro.py --inorder $(find mayday_description)/robots/mayday.urdf.xacro" />
 
+
+    <!--#TODO cannot figure out how to make this script visible to ros. Tried adding to CMakeLists.txt.
+     node pkg="mayday_control" name="pycharm" type="scripts/pycharm.sh" output="screen"></node-->
+
     <!-- just run with rosrun for now, or in pycharm, opened from terminal after sourcing ros setup and catkin setup -->
-    <!--node pkg="mayday_control" name="motion_control" type="scripts/motion_control.py" output="screen">
-    </node-->
+    <!--node pkg="mayday_control" name="motion_control" type="scripts/motion_control.py" output="screen"></node-->
 </launch>
