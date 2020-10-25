@@ -8,24 +8,25 @@ import numpy as np
 import pandas as pd
 import std_msgs
 from std_msgs.msg import String
-from control_msgs.msg import JointControllerState
-from gazebo_msgs.msg import LinkStates
-import matplotlib.pyplot as plt
+# from control_msgs.msg import JointControllerState
+# from gazebo_msgs.msg import LinkStates
+# import matplotlib.pyplot as plt
 
-import dynamixel_controller
+import dynamixel_adapter
 
 ######## OBS must load pycharm in terminal after sourceing ros setup and catkin setup #######
 # Load the urdf_parser_py manifest, you use your own package
 # name on the condition but in this case, you need to depend on
 # urdf_parser_py.
-import roslib; roslib.load_manifest('urdfdom_py')
-import rospy
+# import roslib;
+# import roslib.load_manifest('urdfdom_py')
+# import rospy
 import sys
 from urdf_parser_py.urdf import URDF
 
 
 # tensorflow not installed for 2.7
-import tensorflow as tf
+# import tensorflow as tf
 # from tensorflow.contrib import learn
 
 from collections import OrderedDict
@@ -224,7 +225,7 @@ class Robot:
 
         # self.nn =
 
-        self.dxl_controller = dynamixel_controller.DxlController()
+        self.dxl_controller = dynamixel_adapter.DynamixelAdapter()
         self.dxl_controller.arm()
 
         # get out of bed
@@ -265,7 +266,7 @@ class Robot:
         # TODO Handle that pos_goal is overwritten
         for id, joint_key in enumerate(self.state.keys()):
             # dxl ids start at 1, because 0 is broadcast
-            self.state[joint_key] = self.dxl_controller.read_dxl_state(id + 1)
+            self.state[joint_key] = self.dxl_controller.read_state(id + 1)
 
     def format_state_for_nn(self):
 
@@ -352,7 +353,7 @@ class Robot:
         """
         #
         for i, joint_key in enumerate(self.state.keys()):
-            self.dxl_controller.write_dxl_goal_pos(i+1, self.state[joint_key]['pos_goal'])
+            self.dxl_controller.write_goal_pos(i + 1, self.state[joint_key]['pos_goal'])
 
         # for i, (pub, goal) in enumerate(zip(self.joint_publishers, goals)):
         #     pub.publish(goal)
@@ -369,12 +370,12 @@ class Robot:
 
         for joint_key in self.state.keys():
             # joint torque is signed, we are only interested in absolute torque
-            if math.fabs(self.state[joint_key]['torq']) > dynamixel_controller.TORQ_LIMIT_REST:
+            if math.fabs(self.state[joint_key]['torq']) > dynamixel_adapter.TORQ_LIMIT_REST:
                 raise Exception(
                     'joint torque not at rest, joint: {joint}, torque: abs({torq}%) is not < {torq_rest}'
                     .format(
                         joint=joint_key, torq=self.state[joint_key]['torq'],
-                        torq_rest=dynamixel_controller.TORQ_LIMIT_REST))
+                        torq_rest=dynamixel_adapter.TORQ_LIMIT_REST))
 
     def initialize_robot_position(self):
         """

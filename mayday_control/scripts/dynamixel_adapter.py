@@ -11,19 +11,15 @@ import os
 
 from serial import SerialException
 
-from motor import Motor
-
-
+from motor_state import MotorState
+from math import tau
 FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
 logging.basicConfig(format=FORMAT, level='DEBUG')
 logger = logging.getLogger(__name__)
 # logger = rclpy.logging.getLogger(__name__)
 
 
-TAU = math.pi * 2
-
-
-class DxlController:
+class DynamixelAdapter:
 
     def __init__(self):
         self.control_table = pd.read_csv('../../XL430_W250_control_table.csv', sep=';', index_col=3)
@@ -34,14 +30,10 @@ class DxlController:
         self.port_handler = None
 
         self.TORQ_LIMIT_REST = 1.0
-        self.VEL_LIMIT_SLOW = TAU / 8
-        self.ACC_LIMIT_SLOW = None  # TAU / 8
+        self.VEL_LIMIT_SLOW = tau / 8
+        self.ACC_LIMIT_SLOW = None  # tau / 8
 
-    def arm(self):
-        self.init_dxl_communication()
-        self.init_dxls()
-
-    def init_dxl_communication(self):
+    def init_communication(self):
         self.port_handler = PortHandler(self.DEVICE_NAME)
         try:
             if not self.port_handler.openPort():
@@ -53,33 +45,24 @@ class DxlController:
 
         self.packet_handler = PacketHandler(self.PROTOCOL_VERSION)
 
-    def init_dxl(self, dxl_id, side):
+    def init_single(self, dxl_id):
         self.dxl_write(dxl_id, 'Torque Enable', 0)
 
         # Change Acceleration Limits, no limit for now.
-        self.write_dxl_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
+        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
 
         # Start with a slow velocity limit
-        self.write_dxl_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
-
-        self.set_side(dxl_id, side)
+        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
 
         # Set position limits
         logger.warning('position limits not set, commented out.')
+        self.dxl_write(dxl_id, 'Min Position Limit', 0)
+        self.dxl_write(dxl_id, 'Max Position Limit', 4095)
         # self.dxl_write(dxl_id, 'Min Position Limit', 1300)
         # self.dxl_write(dxl_id, 'Max Position Limit', 2500)
 
         # Enable torque again.
         self.dxl_write(dxl_id, 'Torque Enable', 1)
-
-    def set_side(self, dxl_id, side):
-        # if second half of dynamixels, revers movement direction to get symmetrical behaviour
-        if side == 'right':
-            self.dxl_write(dxl_id, 'Drive Mode', 1)
-        elif side == 'left':
-            self.dxl_write(dxl_id, 'Drive Mode', 0)
-        else:
-            raise ValueError(f'Side not recognized, expected right or left, got: {side}')
 
     def dxl_write(self, dxl_id, name, value):
         """
@@ -170,23 +153,23 @@ class DxlController:
         :rtype: int
 
         0 should translate to range_min
-        >>> t = DxlController()
+        >>> t = DynamixelAdapter()
         >>> t.rad_to_int_range(0.0, 0, 4095)
         0
 
         tau/2 should give center of range
-        >>> t = DxlController()
-        >>> t.rad_to_int_range(TAU / 2, 0, 4095)
+        >>> t = DynamixelAdapter()
+        >>> t.rad_to_int_range(tau / 2, 0, 4095)
         2048
 
         To get 1 out, the rad input should tau * 1 / range
-        >>> t = DxlController()
-        >>> t.rad_to_int_range(TAU * 1 / (4095 - 0), 0, 4095)
+        >>> t = DynamixelAdapter()
+        >>> t.rad_to_int_range(tau * 1 / (4095 - 0), 0, 4095)
         1
 
         To get the highest value of the interval, the rad input should be: tau -  tau * 1/(range)
-        >>> t = DxlController()
-        >>> t.rad_to_int_range(TAU - TAU * 1 / (4095 - 0), 0, 4095)
+        >>> t = DynamixelAdapter()
+        >>> t.rad_to_int_range(tau - tau * 1 / (4095 - 0), 0, 4095)
         4095
         """
 
@@ -194,12 +177,12 @@ class DxlController:
             raise ValueError(
                 'Range_min must be less than range_max: range_min: {}, range_max: {}'.format(range_min, range_max))
 
-        if value_rad < 0.0 or value_rad >= TAU:
+        if value_rad < 0.0 or value_rad >= tau:
             raise ValueError(
                 'Value_rad must be within (0, tau), value_rad: {}'
                 .format(value_rad))
 
-        return int(round((value_rad % TAU) * (range_max - range_min + 1) / TAU))
+        return int(round((value_rad % tau) * (range_max - range_min + 1) / tau))
 
     def int_range_to_rad(self, value_int, range_min, range_max):
         """
@@ -214,13 +197,13 @@ class DxlController:
         :rtype: int
 
         0 should translate to 0.0 rad
-        >>> t = DxlController()
+        >>> t = DynamixelAdapter()
         >>> t.int_range_to_rad(0, 0, 4095)
         0.0
 
         halfway through the range should tau/2
-        >>> t = DxlController()
-        >>> t.int_range_to_rad(2048, 0, 4095) == TAU/2
+        >>> t = DynamixelAdapter()
+        >>> t.int_range_to_rad(2048, 0, 4095) == tau/2
         True
         """
 
@@ -233,9 +216,9 @@ class DxlController:
                 'Value_int must be within range: range_min: {}, range_max: {}, value_int: {}'
                 .format(range_min, range_max, value_int))
 
-        return value_int * TAU / (range_max - range_min + 1)
+        return value_int * tau / (range_max - range_min + 1)
 
-    def read_dxl_state(self, dxl_id):
+    def read_state(self, dxl_id) -> MotorState:
         """
         read values from dynamixel and save in state dict object. Convert to SI compatible units first.
 
@@ -253,7 +236,7 @@ class DxlController:
         state['pos'] = self.int_range_to_rad(self.dxl_read(dxl_id, 'Present Position'), 0, 4095)
 
         #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
-        state['vel'] = self.dxl_read(dxl_id, 'Present Velocity') * 0.229 * TAU / 60.0
+        state['vel'] = self.dxl_read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
 
         #  Read torque in %, raw values from -1000 ~ 1000, measured in unit 0.1 %.
         #      Load is directional positive values are CCW
@@ -265,7 +248,7 @@ class DxlController:
 
         return state
 
-    def write_dxl_goal_pos(self, dxl_id, goal_pos):
+    def write_goal_pos(self, dxl_id, goal_pos):
         """
         Write goal position, translating from radians to range defined by dxl controltable, i.e. 0-4095
 
@@ -276,7 +259,7 @@ class DxlController:
         self.dxl_write(dxl_id, 'Goal Position', self.rad_to_int_range(goal_pos, 0, 4095))
 
     # TODO test velocity and acceleration limit conversions
-    def write_dxl_vel_limit(self, dxl_id, vel_limit):
+    def write_vel_limit(self, dxl_id, vel_limit):
         """
 
         :param dxl_id:
@@ -289,15 +272,15 @@ class DxlController:
         if vel_limit is None:
             vel_limit = 0
         # if vel_limit is lower than 1, set to 1 as minimum value
-        elif int(vel_limit * 60 / (0.229 * TAU)) < 1:
+        elif int(vel_limit * 60 / (0.229 * tau)) < 1:
             vel_limit = 1
         else:
-            vel_limit = int(vel_limit * 60 / (0.229 * TAU))
+            vel_limit = int(vel_limit * 60 / (0.229 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
         self.dxl_write(dxl_id, 'Profile Velocity', vel_limit)
 
-    def write_dxl_acc_limit(self, dxl_id, acc_limit):
+    def write_acc_limit(self, dxl_id, acc_limit):
         """
 
         :param dxl_id:
@@ -310,16 +293,19 @@ class DxlController:
         if acc_limit is None:
             acc_limit = 0
         # if acc_limit is lower than 1, set to 1 as minium value
-        elif int(acc_limit * 60**2 / (214.577 * TAU)) < 1:
+        elif int(acc_limit * 60**2 / (214.577 * tau)) < 1:
             acc_limit = 1
         else:
-            acc_limit = int(acc_limit * 60**2 / (214.577 * TAU))
+            acc_limit = int(acc_limit * 60**2 / (214.577 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
         self.dxl_write(dxl_id, 'Profile Acceleration', acc_limit)
 
     class NoRobotException(BaseException):
         pass
+
+    def write_drive_mode(self, dxl_id, drive_mode):
+        self.dxl_write(dxl_id, 'Drive Mode', drive_mode)
 
 
 if __name__ == '__main__':

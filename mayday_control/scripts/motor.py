@@ -1,21 +1,26 @@
-from abc import ABC, abstractmethod
+from dynamixel_adapter import DynamixelAdapter
+from motor_state import MotorState
 
 
-class AbstractMotor(ABC):
-    pass
+class DxlMotor:
+    def __init__(self, id, adapter: DynamixelAdapter, state: MotorState):
+        self.id = id
+        self.adapter = adapter
+        self.state = state
 
+        self.adapter.init_single(self.id)
 
-class Motor(AbstractMotor):
-    pass
+    @property
+    def state(self):
+        self.state = self.adapter.read_state(self.id)
+        return self.__state
 
+    @state.setter
+    def state(self, state_new):
+        self.__state = state_new
 
-class Dxl(Motor):
-    """
-    should contain a reference to a global controller,
+    def set_goal_position(self, position):
+        self.adapter.write_goal_pos(self.id, position)
 
-    has id
-    has controller
-    has side, property, change sets in dynamixel automatically.
-
-    """
-    pass
+    def set_drive_mode(self, drive_mode):
+        self.adapter.write_drive_mode(self.id, drive_mode)

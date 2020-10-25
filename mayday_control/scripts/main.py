@@ -1,0 +1,22 @@
+from dynamixel_adapter import DynamixelAdapter
+from mayday_robot import MaydayRobotFactory, LegFactory, MaydayRobot
+
+
+def main():
+
+    may = create_mayday()
+    may.set_start_position()
+    may.set_standing_position()
+
+
+def create_mayday() -> MaydayRobot:
+    dxl_adapter = DynamixelAdapter()
+    leg_factory = LegFactory()
+    mayday_factory = MaydayRobotFactory(leg_factory)
+    may = mayday_factory.create_basic(dxl_adapter)
+
+    return may
+
+
+if __name__ == '__main__':
+    main()

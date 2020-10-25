@@ -363,8 +363,6 @@
   </xacro:macro>
 
 
-
-
   <!-- legs  -->
   <xacro:leg prefix="right_front"  x_offset="${thorax_x/2}" yaw_offset="${tau*1/8}" reflect="-1" />
   <xacro:leg prefix="right_center" x_offset="0.0"            yaw_offset="${tau*2/8}" reflect="-1" />
