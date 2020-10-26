@@ -11,6 +11,7 @@ def main():
 
 def create_mayday() -> MaydayRobot:
     dxl_adapter = DynamixelAdapter()
+    dxl_adapter.init_communication()
     leg_factory = LegFactory()
     mayday_factory = MaydayRobotFactory(leg_factory)
     may = mayday_factory.create_basic(dxl_adapter)

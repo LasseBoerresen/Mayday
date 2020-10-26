@@ -30,8 +30,11 @@ class DynamixelAdapter:
         self.port_handler = None
 
         self.TORQ_LIMIT_REST = 1.0
-        self.VEL_LIMIT_SLOW = tau / 8
+        self.VEL_LIMIT_SLOW = tau / 8  # tau / 16
         self.ACC_LIMIT_SLOW = None  # tau / 8
+        self.POSITION_P_GAIN_SOFT = 1000 #200
+        self.POSITION_I_GAIN_SOFT = 100
+        self.POSITION_D_GAIN_SOFT = 4000
 
     def init_communication(self):
         self.port_handler = PortHandler(self.DEVICE_NAME)
@@ -45,8 +48,10 @@ class DynamixelAdapter:
 
         self.packet_handler = PacketHandler(self.PROTOCOL_VERSION)
 
-    def init_single(self, dxl_id):
+    def init_single(self, dxl_id, drive_mode):
         self.dxl_write(dxl_id, 'Torque Enable', 0)
+
+        self.write_drive_mode(dxl_id, drive_mode)
 
         # Change Acceleration Limits, no limit for now.
         self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
@@ -54,12 +59,19 @@ class DynamixelAdapter:
         # Start with a slow velocity limit
         self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
 
+        self.dxl_write(dxl_id, 'Position P Gain', self.POSITION_P_GAIN_SOFT)
+        self.dxl_write(dxl_id, 'Position I Gain', self.POSITION_I_GAIN_SOFT)
+        self.dxl_write(dxl_id, 'Position D Gain', self.POSITION_D_GAIN_SOFT)
+
+
         # Set position limits
         logger.warning('position limits not set, commented out.')
         self.dxl_write(dxl_id, 'Min Position Limit', 0)
         self.dxl_write(dxl_id, 'Max Position Limit', 4095)
         # self.dxl_write(dxl_id, 'Min Position Limit', 1300)
         # self.dxl_write(dxl_id, 'Max Position Limit', 2500)
+
+        # TODO set torque limit
 
         # Enable torque again.
         self.dxl_write(dxl_id, 'Torque Enable', 1)
@@ -140,83 +152,47 @@ class DynamixelAdapter:
 
         return value
 
-    def rad_to_int_range(self, value_rad, range_min, range_max):
+    @staticmethod
+    def rad_to_int_range(value_rad, range_min=1, range_max=4095):
         """
-        Tranform a radian value to one in an integer range
+        Transform a radian value to one in an integer range
 
         0 radians will map to middle of range.
-
-        :param float value_rad:
-        :param int range_min:
-        :param int range_max:
-        :return: value specified in the configured range
-        :rtype: int
-
-        0 should translate to range_min
-        >>> t = DynamixelAdapter()
-        >>> t.rad_to_int_range(0.0, 0, 4095)
-        0
-
-        tau/2 should give center of range
-        >>> t = DynamixelAdapter()
-        >>> t.rad_to_int_range(tau / 2, 0, 4095)
-        2048
-
-        To get 1 out, the rad input should tau * 1 / range
-        >>> t = DynamixelAdapter()
-        >>> t.rad_to_int_range(tau * 1 / (4095 - 0), 0, 4095)
-        1
-
-        To get the highest value of the interval, the rad input should be: tau -  tau * 1/(range)
-        >>> t = DynamixelAdapter()
-        >>> t.rad_to_int_range(tau - tau * 1 / (4095 - 0), 0, 4095)
-        4095
         """
 
         if range_min >= range_max:
             raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'.format(range_min, range_max))
+                'Range_min must be less than range_max: range_min: {}, range_max: {}'
+                .format(range_min, range_max))
 
-        if value_rad < 0.0 or value_rad >= tau:
-            raise ValueError(
-                'Value_rad must be within (0, tau), value_rad: {}'
-                .format(value_rad))
+        if not (-tau / 2 <= value_rad <= tau/2):
+            raise ValueError(f'Value_rad must be within (-tau/2, tau/2), value_rad: {value_rad}')
 
-        return int(round((value_rad % tau) * (range_max - range_min + 1) / tau))
+        step_size_int = (range_max - range_min) / tau
 
-    def int_range_to_rad(self, value_int, range_min, range_max):
+        return round(value_rad * step_size_int) + 2048
+
+    @staticmethod
+    def int_range_to_rad(value_int, range_min=1, range_max=4095):
         """
-        Tranform a radian value to one in an integer range
+        Transform a integer range value to one in radians
 
-        0 radians will map to middle of range.
-
-        :param float value_rad:
-        :param int range_min:
-        :param int range_max:
-        :return: value specified in the configured range
-        :rtype: int
-
-        0 should translate to 0.0 rad
-        >>> t = DynamixelAdapter()
-        >>> t.int_range_to_rad(0, 0, 4095)
-        0.0
-
-        halfway through the range should tau/2
-        >>> t = DynamixelAdapter()
-        >>> t.int_range_to_rad(2048, 0, 4095) == tau/2
-        True
+        2048 will map to 0 radians.
         """
 
         if range_min >= range_max:
             raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'.format(range_min, range_max))
+                'Range_min must be less than range_max: range_min: {}, range_max: {}'
+                .format(range_min, range_max))
 
-        if  value_int < range_min or value_int > range_max:
+        if not (range_min <= value_int <= range_max):
             raise ValueError(
-                'Value_int must be within range: range_min: {}, range_max: {}, value_int: {}'
+                'Value_int must be within range: range_min: {}, range_max: {}, got value_int: {}'
                 .format(range_min, range_max, value_int))
 
-        return value_int * tau / (range_max - range_min + 1)
+        step_size_rad = tau / (range_max - range_min)
+
+        return (value_int - 2048) * step_size_rad
 
     def read_state(self, dxl_id) -> MotorState:
         """
@@ -233,7 +209,7 @@ class DynamixelAdapter:
         state = {}
 
         # Read position in radians, raw values from 0 ~ 4095
-        state['pos'] = self.int_range_to_rad(self.dxl_read(dxl_id, 'Present Position'), 0, 4095)
+        state['pos'] = self.int_range_to_rad(self.dxl_read(dxl_id, 'Present Position'))
 
         #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
         state['vel'] = self.dxl_read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
@@ -305,8 +281,26 @@ class DynamixelAdapter:
         pass
 
     def write_drive_mode(self, dxl_id, drive_mode):
-        self.dxl_write(dxl_id, 'Drive Mode', drive_mode)
+        if drive_mode == 'forward':
+            dxl_drive_mode = 0
+        elif drive_mode == 'backward':
+            dxl_drive_mode = 1
+        else:
+            raise ValueError(f'Drive mode not recognized, got: {drive_mode}')
 
+        self.write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
+
+
+    def read_drive_mode(self, dxl_id):
+        return 'forward' if self.dxl_read(dxl_id, 'Drive Mode') == 0 else 'backward'
+
+    def write_config(self, dxl_id, name, value):
+        torque_enabled_backup = self.dxl_read(dxl_id, 'Torque Enable')
+        self.dxl_write(dxl_id, 'Torque Enable', 0)
+        self.dxl_write(dxl_id, name, value)
+        self.dxl_write(dxl_id, 'Torque Enable', torque_enabled_backup)
+
+        # TODO test write_config
 
 if __name__ == '__main__':
     import doctest

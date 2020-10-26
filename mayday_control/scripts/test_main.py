@@ -10,11 +10,23 @@ with open('mayday_config.json', 'r') as f:
     config = json.load(f)
 
 
+@pytest.mark.skipif(not config['robot_is_connected'], reason='Robot is not connected')
 class TestMainEndToEndIntegration:
     """
-    Don't mock anything, literaly turn on Mayday and test basic maneuvers, like, start up and lift leg.
+    Don't mock anything, literally turn on Mayday and test basic maneuvers, like, start up and lift leg.
     """
-    pass
+    #@pytest.mark.skip(reason='not ready for automatic run')
+    def test_given_mayday__when_calling_set_start_position__then_all_legs_reach_start_position(self):
+        may = main.create_mayday()
+        may.set_start_position()
+        may.set_standing_wide_position()
+        may.set_standing_position()
+        may.set_standing_wide_position()
+        may.set_start_position()
+
+        raise NotImplementedError('need to assert position')
+
+    # TODO test that no motor is in error state when starting.
 
 
 class TestMainAcceptance:

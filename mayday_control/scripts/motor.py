@@ -3,12 +3,13 @@ from motor_state import MotorState
 
 
 class DxlMotor:
-    def __init__(self, id, adapter: DynamixelAdapter, state: MotorState):
+    def __init__(self, id, adapter: DynamixelAdapter, state: MotorState, drive_mode):
         self.id = id
         self.adapter = adapter
         self.state = state
+        self.drive_mode = drive_mode
 
-        self.adapter.init_single(self.id)
+        self.adapter.init_single(self.id, self.drive_mode)
 
     @property
     def state(self):
@@ -21,6 +22,3 @@ class DxlMotor:
 
     def set_goal_position(self, position):
         self.adapter.write_goal_pos(self.id, position)
-
-    def set_drive_mode(self, drive_mode):
-        self.adapter.write_drive_mode(self.id, drive_mode)

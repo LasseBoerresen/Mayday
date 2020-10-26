@@ -21,12 +21,19 @@ class Leg(object):
 
 
 class LegFactory(object):
-    def create_basic(self, base_id, adapter) -> Leg:
+    # TODO maybe base id should be starting id, and then joint 0 just has that as dxl_id
+    def create_basic(self, base_id, adapter, side) -> Leg:
         N_JOINTS = 3
         joints = []
         for joint_num in range(N_JOINTS):
             id_num = base_id * 3 + joint_num + 1
-            joints.append(DxlMotor(id_num, adapter, MotorState()))
+            if joint_num == 0:
+                drive_mode = 'forward' if side == 'left' else 'backward'
+            elif joint_num == 1:
+                drive_mode = 'backward'
+            elif joint_num == 2:
+                drive_mode = 'forward'
+            joints.append(DxlMotor(id_num, adapter, MotorState(), drive_mode))
 
         return Leg(joints)
 
@@ -43,15 +50,21 @@ class MaydayRobot:
         description_urdf = xacro.process(description_xacro_path)
         self.description = URDF.from_xml_string(description_urdf)
 
-    def set_start_position(self):
-        LEG_START_POSE = (0, tau * 3 / 8, -tau * 3 / 8)
+    def set_all_legs_to_pose(self, pose):
         for leg in self.legs:
-            leg.set_pose(LEG_START_POSE)
+            leg.set_pose(pose)
+
+    def set_neutral_position(self):
+        self.set_all_legs_to_pose((0, 0, 0))
+
+    def set_start_position(self):
+        self.set_all_legs_to_pose((0, tau * 0.3, -tau * 0.2))
 
     def set_standing_position(self):
-        LEG_STANDING_POSE = (0, tau / 4, -tau * 3 / 8)
-        for leg in self.legs:
-            leg.set_pose(LEG_STANDING_POSE)
+        self.set_all_legs_to_pose((0, tau * 0.2, -tau * 0.25))
+
+    def set_standing_wide_position(self):
+        self.set_all_legs_to_pose((0, tau * 0.1, -tau * 0.1))
 
 
 class MaydayRobotFactory(object):
@@ -64,21 +77,13 @@ class MaydayRobotFactory(object):
     def create_basic(self, adapter):
         N_LEGS = 6
         LEFT_SIDE_LEG_NUMBERS = [0, 1, 2]
-        DRIVE_MODE_LEFT = 0
-        DRIVE_MODE_RIGHT = 1
 
         legs = []
         for leg_num in range(N_LEGS):
-            leg = self.leg_factory.create_basic(leg_num, adapter)
-            if leg_num in LEFT_SIDE_LEG_NUMBERS:
-                drive_mode = DRIVE_MODE_LEFT
-            else:
-                drive_mode = DRIVE_MODE_RIGHT
-            leg.joints[0].set_drive_mode(drive_mode)
-
+            side = 'left' if leg_num in LEFT_SIDE_LEG_NUMBERS else 'right'
+            leg = self.leg_factory.create_basic(leg_num, adapter, side)
             legs.append(leg)
 
         return MaydayRobot(legs)
 
-
-# TODO build MaydayRobot from urdf description
+    # TODO build MaydayRobot from urdf description

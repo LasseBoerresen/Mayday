@@ -1,6 +1,6 @@
 from math import tau
 from typing import List
-from unittest.mock import MagicMock, call, create_autospec
+from unittest.mock import MagicMock, call, create_autospec, patch
 
 import pytest
 
@@ -31,6 +31,7 @@ class TestInit:
         for leg in may.legs:
             assert call.set_pose((0, tau / 4, -tau * 3 / 8)) in leg.method_calls
 
+    @pytest.mark.skip('not implemented')
     def test_when_set_start_position__then_waits_for_goal_position_reached(self):
         raise NotImplementedError()
 
@@ -58,29 +59,78 @@ class TestLegFactory:
     def test_given_base_id_0__then_joint_0_has_id_1(self):
         base_id = 0
         leg_factory = LegFactory()
-        leg = leg_factory.create_basic(base_id, MagicMock())
+        leg = leg_factory.create_basic(base_id, MagicMock(), None)
         assert leg.joints[0].id == 1
 
     def test_given_base_id_1__then_joint_0_has_id_4(self):
         base_id = 1
         leg_factory = LegFactory()
-        leg = leg_factory.create_basic(base_id, MagicMock())
+        leg = leg_factory.create_basic(base_id, MagicMock(), None)
         assert leg.joints[0].id == 4
 
     def test_given_base_id_5__then_joint_2_has_id_18(self):
         base_id = 5
         leg_factory = LegFactory()
-        leg = leg_factory.create_basic(base_id, MagicMock())
+        leg = leg_factory.create_basic(base_id, MagicMock(), None)
         assert leg.joints[2].id == 18
 
     def test_given_same_adapter__all_joins_point_to_that(self):
         mock_adapter = MagicMock()
         factory = LegFactory()
-        leg = factory.create_basic(3, mock_adapter)
+        leg = factory.create_basic(3, mock_adapter, None)
 
         for joint in leg.joints:
             assert joint.adapter == mock_adapter
 
+    def test_given_side_right__then_sets_joint_0_as_drive_mode_backward(self):
+        base_id = 5
+        side = 'right'
+        leg_factory = LegFactory()
+        mock_adapter = create_autospec(DynamixelAdapter)
+
+        leg = leg_factory.create_basic(base_id, mock_adapter, side)
+
+        assert leg.joints[0].drive_mode == 'backward'
+
+    def test_given_side_left__then_sets_joint_0_as_drive_mode_forward(self):
+        base_id = 1
+        side = 'left'
+        leg_factory = LegFactory()
+        mock_adapter = create_autospec(DynamixelAdapter)
+
+        leg = leg_factory.create_basic(base_id, mock_adapter, side)
+
+        assert leg.joints[0].drive_mode == 'forward'
+
+    def test_given_side_right__then_sets_joint_1_as_drive_mode_backward(self):
+        base_id = 5
+        side = 'right'
+        leg_factory = LegFactory()
+        mock_adapter = create_autospec(DynamixelAdapter)
+
+        leg = leg_factory.create_basic(base_id, mock_adapter, side)
+
+        assert leg.joints[1].drive_mode == 'backward'
+
+    def test_given_side_right__then_sets_joint_2_as_drive_mode_forward(self):
+        base_id = 5
+        side = 'right'
+        leg_factory = LegFactory()
+        mock_adapter = create_autospec(DynamixelAdapter)
+
+        leg = leg_factory.create_basic(base_id, mock_adapter, side)
+
+        assert leg.joints[2].drive_mode == 'forward'
+
+    def test_given_side_left__then_sets_joint_2_as_drive_mode_forward(self):
+        base_id = 2
+        side = 'left'
+        leg_factory = LegFactory()
+        mock_adapter = create_autospec(DynamixelAdapter)
+
+        leg = leg_factory.create_basic(base_id, mock_adapter, side)
+
+        assert leg.joints[2].drive_mode == 'forward'
 
 @pytest.fixture()
 def mayday_factory():
@@ -91,26 +141,28 @@ def mayday_factory():
 
 class TestMaydayRobotFactory:
 
-    def test_when_calling_create_basic__then_has_6_legs(self, mayday_factory):
+    def test_when_create_basic__then_has_6_legs(self, mayday_factory):
         mock_adapter = MagicMock()
 
         may = mayday_factory.create_basic(mock_adapter)
 
         assert len(may.legs) == 6
 
-    def test_when_calling_create_basic__then_sets_right_side_coxa_motor_mirrored(self, mayday_factory):
+    def test_when_calling_create_basic__then_sets_last_3_legs_side_to_right(self):
         mock_adapter = MagicMock()
+        mock_leg_factory = create_autospec(LegFactory)
+        mayday_factory = MaydayRobotFactory(mock_leg_factory)
 
         may = mayday_factory.create_basic(mock_adapter)
 
         left_side_leg_numbers = [0, 1, 2]
         for leg_num, leg in enumerate(may.legs):
             if leg_num in left_side_leg_numbers:
-                expected_drive_mode = 0
+                expected_side = 'left'
             else:
-                expected_drive_mode = 1
-            assert call.write_drive_mode(leg.joints[0].id, expected_drive_mode) in mock_adapter.method_calls
+                expected_side = 'right'
 
+            assert call.create_basic(leg_num, mock_adapter, expected_side) in mock_leg_factory.method_calls
     # TODO when creating a mayday robot, motors should be initialized. But should that happen on construction? Also
     #  known as __init__ aka initialization. That means, I cannot create a mayday object without having a connected
     #  dynamixel controller and actual motors... This seems difficult to work with.
