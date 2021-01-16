@@ -3,6 +3,8 @@ import dynamixel_sdk                    # Uses Dynamixel SDK library
 from dynamixel_sdk.port_handler import PortHandler
 from dynamixel_sdk.packet_handler import PacketHandler
 
+from dynamixel_sdk.packet_handler import COMM_SUCCESS
+
 import logging
 import rclpy
 import math
@@ -13,14 +15,15 @@ from serial import SerialException
 
 from motor_state import MotorState
 from math import tau
+
+
 FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
 logging.basicConfig(format=FORMAT, level='DEBUG')
 logger = logging.getLogger(__name__)
 # logger = rclpy.logging.getLogger(__name__)
 
 
-class DynamixelAdapter:
-
+class DynamixelPortAdapter:
     def __init__(self):
         self.control_table = pd.read_csv('../../XL430_W250_control_table.csv', sep=';', index_col=3)
         self.BAUD_RATE = 57600  # Dynamixel default baud_rate : 57600
@@ -28,13 +31,6 @@ class DynamixelAdapter:
         self.PROTOCOL_VERSION = 2.0  # See which protocol version is used in the Dynamixel
         self.packet_handler = None
         self.port_handler = None
-
-        self.TORQ_LIMIT_REST = 1.0
-        self.VEL_LIMIT_SLOW = tau / 8  # tau / 16
-        self.ACC_LIMIT_SLOW = None  # tau / 8
-        self.POSITION_P_GAIN_SOFT = 1000 #200
-        self.POSITION_I_GAIN_SOFT = 100
-        self.POSITION_D_GAIN_SOFT = 4000
 
     def init_communication(self):
         self.port_handler = PortHandler(self.DEVICE_NAME)
@@ -48,35 +44,7 @@ class DynamixelAdapter:
 
         self.packet_handler = PacketHandler(self.PROTOCOL_VERSION)
 
-    def init_single(self, dxl_id, drive_mode):
-        self.dxl_write(dxl_id, 'Torque Enable', 0)
-
-        self.write_drive_mode(dxl_id, drive_mode)
-
-        # Change Acceleration Limits, no limit for now.
-        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
-
-        # Start with a slow velocity limit
-        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
-
-        self.dxl_write(dxl_id, 'Position P Gain', self.POSITION_P_GAIN_SOFT)
-        self.dxl_write(dxl_id, 'Position I Gain', self.POSITION_I_GAIN_SOFT)
-        self.dxl_write(dxl_id, 'Position D Gain', self.POSITION_D_GAIN_SOFT)
-
-
-        # Set position limits
-        logger.warning('position limits not set, commented out.')
-        self.dxl_write(dxl_id, 'Min Position Limit', 0)
-        self.dxl_write(dxl_id, 'Max Position Limit', 4095)
-        # self.dxl_write(dxl_id, 'Min Position Limit', 1300)
-        # self.dxl_write(dxl_id, 'Max Position Limit', 2500)
-
-        # TODO set torque limit
-
-        # Enable torque again.
-        self.dxl_write(dxl_id, 'Torque Enable', 1)
-
-    def dxl_write(self, dxl_id, name, value):
+    def write(self, dxl_id, name, value):
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.
@@ -95,6 +63,12 @@ class DynamixelAdapter:
         size = self.control_table.loc[name, 'Size [byte]']
         addr = self.control_table.loc[name, 'Address']
 
+        dxl_comm_result, dxl_error = self.write_given_size(addr, dxl_id, size, value)
+
+        mode = 'write'
+        self.handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
+
+    def write_given_size(self, addr, dxl_id, size, value):
         if size == 1:
             dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, dxl_id, addr, value)
         elif size == 2:
@@ -102,18 +76,10 @@ class DynamixelAdapter:
         elif size == 4:
             dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, dxl_id, addr, value)
         else:
-            raise Exception('\'size [byte]\' was not 1,2 or 4: ' + str(size))
+            raise Exception('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
+        return dxl_comm_result, dxl_error
 
-        # Handle return messages
-        error_msg = f"write dxl_id {dxl_id} and address {name} with value {value} gave error: "
-        if dxl_comm_result != dynamixel_sdk.packet_handler.COMM_SUCCESS:
-            raise Exception(error_msg + self.packet_handler.getTxRxResult(dxl_comm_result))
-        if dxl_error != 0:
-            raise Exception(error_msg + self.packet_handler.getRxPacketError(dxl_error))
-        if dxl_comm_result == dynamixel_sdk.packet_handler.COMM_SUCCESS and dxl_error == 0:
-            logger.debug(f'{name} has been successfully been changed to {value} on dxl {dxl_id}')
-
-    def dxl_read(self, dxl_id, name):
+    def read(self, dxl_id, name):
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.
@@ -129,6 +95,14 @@ class DynamixelAdapter:
         size = self.control_table.loc[name, 'Size [byte]']
         addr = self.control_table.loc[name, 'Address']
 
+        dxl_comm_result, dxl_error, value = self.read_given_size(addr, dxl_id, size)
+
+        mode = 'read'
+        self.handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
+
+        return value
+
+    def read_given_size(self, addr, dxl_id, size):
         if size == 1:
             value, dxl_comm_result, dxl_error = self.packet_handler.read1ByteTxRx(self.port_handler, dxl_id, addr)
             value = int(np.int8(value))
@@ -139,18 +113,61 @@ class DynamixelAdapter:
             value, dxl_comm_result, dxl_error = self.packet_handler.read4ByteTxRx(self.port_handler, dxl_id, addr)
             value = int(np.int32(value))
         else:
-            raise Exception('\'size [byte]\' was not 1,2 or 4: ' + str(size))
+            raise Exception('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
+        return dxl_comm_result, dxl_error, value
 
-        # Handle return messages
-        error_msg = f"Read dxl_id {dxl_id} and address {name} gave error: "
-        if dxl_comm_result != dynamixel_sdk.packet_handler.COMM_SUCCESS:
+    def handle_return_messages(self, dxl_comm_result, dxl_error, dxl_id, mode, name, value):
+        error_msg = f"{mode} dxl_id {dxl_id} and address {name} gave error: "
+        if dxl_comm_result != COMM_SUCCESS:
             raise Exception(error_msg + self.packet_handler.getTxRxResult(dxl_comm_result))
-        if dxl_error != 0:
+        elif dxl_error != 0:
             raise Exception(error_msg + self.packet_handler.getRxPacketError(dxl_error))
-        if dxl_comm_result == dynamixel_sdk.packet_handler.COMM_SUCCESS and dxl_error == 0:
-            logger.debug(f'{name} has been successfully been read as {value} on dxl {dxl_id}')
+        else:
+            logger.debug(f'{name} has been successfully been {mode} as {value} on dxl {dxl_id}')
 
-        return value
+    class NoRobotException(BaseException):
+        pass
+
+
+class DynamixelAdapter:
+
+    def __init__(self, port_adapter: DynamixelPortAdapter):
+        self.port_adapter = port_adapter
+
+        self.TORQ_LIMIT_REST = 1.0
+        self.VEL_LIMIT_SLOW = tau / 8  # tau / 16
+        self.ACC_LIMIT_SLOW = None  # tau / 8
+        self.POSITION_P_GAIN_SOFT = 640  # 200
+        self.POSITION_I_GAIN_SOFT = 300
+        self.POSITION_D_GAIN_SOFT = 4000
+
+    def init_single(self, dxl_id, drive_mode):
+        self.port_adapter.write(dxl_id, 'Torque Enable', 0)
+
+        self.write_drive_mode(dxl_id, drive_mode)
+
+        # Change Acceleration Limits, no limit for now.
+        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
+
+        # Start with a slow velocity limit
+        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
+
+        self.port_adapter.write(dxl_id, 'Position P Gain', self.POSITION_P_GAIN_SOFT)
+        self.port_adapter.write(dxl_id, 'Position I Gain', self.POSITION_I_GAIN_SOFT)
+        self.port_adapter.write(dxl_id, 'Position D Gain', self.POSITION_D_GAIN_SOFT)
+
+
+        # Set position limits
+        logger.warning('position limits not set, commented out.')
+        self.port_adapter.write(dxl_id, 'Min Position Limit', 0)
+        self.port_adapter.write(dxl_id, 'Max Position Limit', 4095)
+        # self.port_adapter.dxl_write(dxl_id, 'Min Position Limit', 1300)
+        # self.port_adapter.dxl_write(dxl_id, 'Max Position Limit', 2500)
+
+        # TODO set torque limit
+
+        # Enable torque again.
+        self.port_adapter.write(dxl_id, 'Torque Enable', 1)
 
     @staticmethod
     def rad_to_int_range(value_rad, range_min=1, range_max=4095):
@@ -196,35 +213,35 @@ class DynamixelAdapter:
 
     def read_state(self, dxl_id) -> MotorState:
         """
-        read values from dynamixel and save in state dict object. Convert to SI compatible units first.
+        read values from dynamixel and save in MotorState object. Convert to SI compatible units first.
 
         :param dxl_id:
         :return: state
-        :rtype: dict
+        :rtype: MotorState
         """
 
         # Unit;Value;Range
         # rpm, 0.229, [0 ~ 1, 023]
 
-        state = {}
+        state = MotorState()
 
         # Read position in radians, raw values from 0 ~ 4095
-        state['pos'] = self.int_range_to_rad(self.dxl_read(dxl_id, 'Present Position'))
+        state.position = self.int_range_to_rad(self.port_adapter.read(dxl_id, 'Present Position'))
 
         #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
-        state['vel'] = self.dxl_read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
+        state.velocity = self.port_adapter.read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
 
         #  Read torque in %, raw values from -1000 ~ 1000, measured in unit 0.1 %.
-        #      Load is directional positive values are CCW
-        state['torq'] = self.dxl_read(dxl_id, 'Present Load') / 10.0
+        #      Load is directional, positive values are CCW
+        state.torque = self.port_adapter.read(dxl_id, 'Present Load') / 10.0
 
         # Read temperature in degC, raw values from 0 ~ 100, measured in unit 1 degC
         # IDEA Temperature could be used by the robot to move less, like it was getting tired, or was sweating.
-        state['temp'] = self.dxl_read(dxl_id, 'Present Temperature')
+        state.temperature = self.port_adapter.read(dxl_id, 'Present Temperature')
 
         return state
 
-    def write_goal_pos(self, dxl_id, goal_pos):
+    def write_goal_position(self, dxl_id, goal_pos):
         """
         Write goal position, translating from radians to range defined by dxl controltable, i.e. 0-4095
 
@@ -232,7 +249,7 @@ class DynamixelAdapter:
         :param goal_pos: angular position in radians
         """
 
-        self.dxl_write(dxl_id, 'Goal Position', self.rad_to_int_range(goal_pos, 0, 4095))
+        self.port_adapter.write(dxl_id, 'Goal Position', self.rad_to_int_range(goal_pos, 0, 4095))
 
     # TODO test velocity and acceleration limit conversions
     def write_vel_limit(self, dxl_id, vel_limit):
@@ -254,7 +271,7 @@ class DynamixelAdapter:
             vel_limit = int(vel_limit * 60 / (0.229 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self.dxl_write(dxl_id, 'Profile Velocity', vel_limit)
+        self.port_adapter.write(dxl_id, 'Profile Velocity', vel_limit)
 
     def write_acc_limit(self, dxl_id, acc_limit):
         """
@@ -275,10 +292,7 @@ class DynamixelAdapter:
             acc_limit = int(acc_limit * 60**2 / (214.577 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self.dxl_write(dxl_id, 'Profile Acceleration', acc_limit)
-
-    class NoRobotException(BaseException):
-        pass
+        self.port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
 
     def write_drive_mode(self, dxl_id, drive_mode):
         if drive_mode == 'forward':
@@ -290,19 +304,18 @@ class DynamixelAdapter:
 
         self.write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
-
     def read_drive_mode(self, dxl_id):
-        return 'forward' if self.dxl_read(dxl_id, 'Drive Mode') == 0 else 'backward'
+        return 'forward' if self.port_adapter.read(dxl_id, 'Drive Mode') == 0 else 'backward'
 
     def write_config(self, dxl_id, name, value):
-        torque_enabled_backup = self.dxl_read(dxl_id, 'Torque Enable')
-        self.dxl_write(dxl_id, 'Torque Enable', 0)
-        self.dxl_write(dxl_id, name, value)
-        self.dxl_write(dxl_id, 'Torque Enable', torque_enabled_backup)
+        torque_enabled_backup = self.port_adapter.read(dxl_id, 'Torque Enable')
+        self.port_adapter.write(dxl_id, 'Torque Enable', 0)
+        self.port_adapter.write(dxl_id, name, value)
+        self.port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
 
         # TODO test write_config
+
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-

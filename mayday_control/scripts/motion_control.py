@@ -225,7 +225,7 @@ class Robot:
 
         # self.nn =
 
-        self.dxl_controller = dynamixel_adapter.DynamixelAdapter()
+        self.dxl_controller = dynamixel_adapter.DynamixelAdapter(None)
         self.dxl_controller.arm()
 
         # get out of bed
@@ -353,7 +353,7 @@ class Robot:
         """
         #
         for i, joint_key in enumerate(self.state.keys()):
-            self.dxl_controller.write_goal_pos(i + 1, self.state[joint_key]['pos_goal'])
+            self.dxl_controller.write_goal_position(i + 1, self.state[joint_key]['pos_goal'])
 
         # for i, (pub, goal) in enumerate(zip(self.joint_publishers, goals)):
         #     pub.publish(goal)

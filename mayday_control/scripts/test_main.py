@@ -1,4 +1,5 @@
 import json
+from math import tau
 from unittest.mock import create_autospec, call, patch, MagicMock
 
 import pytest
@@ -18,13 +19,14 @@ class TestMainEndToEndIntegration:
     #@pytest.mark.skip(reason='not ready for automatic run')
     def test_given_mayday__when_calling_set_start_position__then_all_legs_reach_start_position(self):
         may = main.create_mayday()
-        may.set_start_position()
-        may.set_standing_wide_position()
-        may.set_standing_position()
-        may.set_standing_wide_position()
-        may.set_start_position()
+        may.set_legs_to_start_position()
+        # may.set_standing_wide_position()
+        # may.set_standing_position()
+        # may.set_standing_wide_position()
+        # may.set_start_position()
 
-        raise NotImplementedError('need to assert position')
+        for leg in may.legs:
+            assert leg.get_joint_positions() == (0, tau * 0.3, -tau * 0.2)
 
     # TODO test that no motor is in error state when starting.
 
@@ -40,7 +42,7 @@ class TestMainAcceptance:
         with patch('main.create_mayday', return_value=mock_mayday) as mock_create_mayday:
             main.main()
 
-        assert [call.set_start_position(), call.set_standing_position()] == mock_mayday.method_calls
+        assert [call.set_legs_to_start_position(), call.set_legs_to_standing_position()] == mock_mayday.method_calls
 
 
 if __name__ == '__main__':

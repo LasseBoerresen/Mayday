@@ -21,4 +21,7 @@ class DxlMotor:
         self.__state = state_new
 
     def set_goal_position(self, position):
-        self.adapter.write_goal_pos(self.id, position)
+        self.adapter.write_goal_position(self.id, position)
+
+    def get_position(self):
+        raise NotImplementedError('should call return self.adapter.read_goal_pos(self.id)')

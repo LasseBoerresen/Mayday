@@ -1,6 +1,6 @@
 import os
 from math import tau
-from typing import List
+from typing import List, Tuple
 
 import xacro
 
@@ -15,9 +15,16 @@ class Leg(object):
     def __init__(self, joints: List[DxlMotor]):
         self.joints = joints
 
-    def set_pose(self, pose):
-        for joint, position in zip(self.joints, pose):
+    def set_joint_positions(self, positions):
+        for joint, position in zip(self.joints, positions):
             joint.set_goal_position(position)
+
+    def get_joint_positions(self) -> List[float]:
+        positions = []
+        for joint in self.joints:
+            positions.append(joint.state.position)
+
+        return positions
 
 
 class LegFactory(object):
@@ -39,7 +46,7 @@ class LegFactory(object):
 
 
 class MaydayRobot:
-    def __init__(self, legs):
+    def __init__(self, legs: List[Leg]):
         self.legs = legs
         self.description = None
 
@@ -50,21 +57,21 @@ class MaydayRobot:
         description_urdf = xacro.process(description_xacro_path)
         self.description = URDF.from_xml_string(description_urdf)
 
-    def set_all_legs_to_pose(self, pose):
+    def set_joint_positions_for_all_legs(self, pose):
         for leg in self.legs:
-            leg.set_pose(pose)
+            leg.set_joint_positions(pose)
 
-    def set_neutral_position(self):
-        self.set_all_legs_to_pose((0, 0, 0))
+    def set_legs_to_neutral_position(self):
+        self.set_joint_positions_for_all_legs((0, 0, 0))
 
-    def set_start_position(self):
-        self.set_all_legs_to_pose((0, tau * 0.3, -tau * 0.2))
+    def set_legs_to_start_position(self):
+        self.set_joint_positions_for_all_legs((0, tau * 0.3, -tau * 0.2))
 
-    def set_standing_position(self):
-        self.set_all_legs_to_pose((0, tau * 0.2, -tau * 0.25))
+    def set_legs_to_standing_position(self):
+        self.set_joint_positions_for_all_legs((0, tau * 0.2, -tau * 0.25))
 
-    def set_standing_wide_position(self):
-        self.set_all_legs_to_pose((0, tau * 0.1, -tau * 0.1))
+    def set_legs_to_standing_wide_position(self):
+        self.set_joint_positions_for_all_legs((0, tau * 0.1, -tau * 0.1))
 
 
 class MaydayRobotFactory(object):

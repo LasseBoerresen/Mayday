@@ -40,7 +40,21 @@ class TestSetGoalPosition:
 
         motor.set_goal_position(position)
 
-        assert call.write_goal_pos(motor.id, position) in mock_dxl_adapter.method_calls
+        assert call.write_goal_position(motor.id, position) in mock_dxl_adapter.method_calls
+
+
+class TestGetPosition:
+    def test_given_adapter_returns_state_with_pos_4__when_get_state__then_returns_4(self):
+        id = 5
+        position = 4
+        state = MotorState(position)
+        mock_adapter = create_autospec(DynamixelAdapter)
+        mock_adapter.read_state = MagicMock(return_value=state)
+        motor = DxlMotor(id, mock_adapter, MotorState(), 'forward')
+
+        actual = motor.state.position
+
+        assert actual == position
 
 
 if __name__ == '__main__':

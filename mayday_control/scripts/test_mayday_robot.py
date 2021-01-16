@@ -16,20 +16,20 @@ class TestInit:
         mayday_factory = MaydayRobotFactory(mock_leg_factory)
         may = mayday_factory.create_basic(MagicMock())
 
-        may.set_start_position()
+        may.set_legs_to_start_position()
 
         for leg in may.legs:
-            assert call.set_pose((0, tau * 3 / 8, -tau * 3 / 8)) in leg.method_calls
+            assert call.set_joint_positions((0, tau * 0.3, -tau * 0.2)) in leg.method_calls
 
     def test_when_set_standing_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
         mayday_factory = MaydayRobotFactory(mock_leg_factory)
         may = mayday_factory.create_basic(MagicMock())
 
-        may.set_standing_position()
+        may.set_legs_to_standing_position()
 
         for leg in may.legs:
-            assert call.set_pose((0, tau / 4, -tau * 3 / 8)) in leg.method_calls
+            assert call.set_joint_positions((0, tau * 0.2, -tau * 0.25)) in leg.method_calls
 
     @pytest.mark.skip('not implemented')
     def test_when_set_start_position__then_waits_for_goal_position_reached(self):
@@ -38,21 +38,6 @@ class TestInit:
     @pytest.mark.skip('not_implemented')
     def test_when_set_start_position__then_start_up_torque_not_exceeded(self):
         raise NotImplementedError()
-
-
-class TestLeg:
-    def test_given_pose__when_set_pose__then_calls_set_goal_position_on_all_joints(self):
-        pose = (2, 3, 5)
-
-        leg = Leg(joints=[
-            create_autospec(DxlMotor),
-            create_autospec(DxlMotor),
-            create_autospec(DxlMotor)])
-
-        leg.set_pose(pose)
-
-        for joint, position in zip(leg.joints, pose):
-            assert call.set_goal_position(position) in joint.method_calls
 
 
 class TestLegFactory:

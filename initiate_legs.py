@@ -234,20 +234,20 @@ def init_dxls(dxl_ctrlr, ct, DXL_IDs, packet_handler, port_handler):
 
     for DXL_ID in DXL_IDs:
 
-        dxl_ctrlr.dxl_write(DXL_ID, 'Torque Enable', 0, ct, packet_handler, port_handler)
+        dxl_ctrlr.write(DXL_ID, 'Torque Enable', 0, ct, packet_handler, port_handler)
 
         # Change Acceleration Limits
-        dxl_ctrlr.dxl_write(DXL_ID, 'Profile Acceleration', 0, ct, packet_handler, port_handler)
+        dxl_ctrlr.write(DXL_ID, 'Profile Acceleration', 0, ct, packet_handler, port_handler)
 
         # Change Velocity Limits
-        dxl_ctrlr.dxl_write(DXL_ID, 'Profile Velocity', 16, ct, packet_handler, port_handler)
+        dxl_ctrlr.write(DXL_ID, 'Profile Velocity', 16, ct, packet_handler, port_handler)
 
         # Set position limits
         # dxl_ctrlr.dxl_write(DXL_ID, 'Min Position Limit', 1300, ct, packet_handler, port_handler)
         # dxl_ctrlr.dxl_write(DXL_ID, 'Max Position Limit', 2500, ct, packet_handler, port_handler)
 
         # Enable torque again.
-        dxl_ctrlr.dxl_write(DXL_ID, 'Torque Enable', 1, ct, packet_handler, port_handler)
+        dxl_ctrlr.write(DXL_ID, 'Torque Enable', 1, ct, packet_handler, port_handler)
 
 
 def main():
@@ -313,7 +313,7 @@ def main():
             index = 0
 
     # Disable Dynamixel Torque
-    dxl_present_position = dxl_ctrlr.dxl_write(
+    dxl_present_position = dxl_ctrlr.write(
         DXL_ID, 'Torque Enable', TORQUE_DISABLE, control_table, packet_handler, port_handler)
 
     # Close port
