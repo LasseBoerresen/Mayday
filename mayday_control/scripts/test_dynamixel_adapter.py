@@ -1,11 +1,12 @@
 import json
 import time
 from math import tau
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, create_autospec
 
 import pytest
 import pandas as pd
 from dynamixel_adapter import DynamixelAdapter
+from dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
 
 with open('mayday_config.json', 'r') as f:
@@ -25,8 +26,9 @@ but not know about mayday. This is a more generic module.
 
 
 @pytest.fixture()
-def dxl_adapter():
-    return DynamixelAdapter(None)
+def adapter():
+    mock_port_adapter = create_autospec(DynamixelPortAdapter)
+    return DynamixelAdapter(mock_port_adapter)
 
 
 @pytest.fixture()
@@ -37,20 +39,10 @@ def initialized_dxl_adapter():
 
 
 class TestDynamixelAdapterTestCase:
-    def test_when_init__then_ctrl_table_is_pd_dataframe(self, dxl_adapter):
-        assert type(dxl_adapter.control_table) is pd.DataFrame
-
-    def test_when_init__then_ctrl_table_index_is_data_name(self, dxl_adapter):
-        assert dxl_adapter.control_table.index.name == 'Data Name'
-
-    def test_when_init__then_torque_enable_address_is_64(self, dxl_adapter):
-        actual_te_address = dxl_adapter.control_table.loc['Torque Enable', 'Address']
-        assert 64, actual_te_address
-
     @pytest.mark.skip('does not mock failing port, so if port actually exists, test fails')
-    def test_given_port_not_available__raises_no_robot_exception(self, dxl_adapter):
+    def test_given_port_not_available__raises_no_robot_exception(self, adapter):
         with pytest.raises(DynamixelAdapter.NoRobotException) as e:
-            dxl_adapter.init_communication()
+            adapter.init_communication()
 
     def test_given_drive_mode_forward__when_write_drive_mode__then_calls_dxl_write_with_0(self):
         id_num = 11
@@ -74,10 +66,9 @@ class TestDynamixelAdapterTestCase:
         drive_mode_expected = 1
         adapter.write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
 
-    def test_given_drive_mode_1__when_read_drive_mode__then_returns_backward(self):
+    def test_given_drive_mode_1__when_read_drive_mode__then_returns_backward(self, adapter):
         id_num = 11
         drive_mode = 1
-        adapter = DynamixelAdapter(None)
         adapter.dxl_read = MagicMock(return_value=drive_mode)
 
         actual = adapter.read_drive_mode(id_num)
@@ -85,10 +76,9 @@ class TestDynamixelAdapterTestCase:
         adapter.dxl_read.assert_called_with(id_num, 'Drive Mode')
         assert actual == 'backward'
 
-    def test_given_drive_mode_bafwards__when_write_drive_mode__then_raises_value_error(self):
+    def test_given_drive_mode_bafwards__when_write_drive_mode__then_raises_value_error(self, adapter):
         id_num = 11
         drive_mode = 'bafwards'
-        adapter = DynamixelAdapter(None)
         adapter.dxl_write = MagicMock()
 
         with pytest.raises(ValueError) as cm:
