@@ -1,4 +1,4 @@
-asdfimport numpy as np
+import numpy as np
 import pandas as pd
 from dynamixel_sdk import PortHandler, PacketHandler, COMM_SUCCESS
 from serial import SerialException
@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+#
 class DynamixelPortAdapter:
     def __init__(self):
         self.control_table = pd.read_csv('../../XL430_W250_control_table.csv', sep=';', index_col=3)
