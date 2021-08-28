@@ -134,14 +134,14 @@ class TestReadState:
 
         assert actual == 0.0
 
-    def test_given_read_present_vel_int_0__then_returns_0(self, mock_port_adapter):
+    def test_given_read_present_vel_int_1__then_returns_1(self, mock_port_adapter):
         dxl_id = 4
-        mock_port_adapter.read = MagicMock(return_value=0)
+        mock_port_adapter.read = MagicMock(return_value=1)
         adapter = DynamixelAdapter(mock_port_adapter)
 
         actual = adapter.read_state(dxl_id).velocity
 
-        assert actual == 0.0
+        assert actual == 1.0 * 0.229 * tau / 60.0  # converted to rad/s
 
     def test_given_read_present_vel_int_1__then_returns_0_024(self, mock_port_adapter):
         dxl_id = 4
