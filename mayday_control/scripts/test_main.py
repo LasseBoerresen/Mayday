@@ -33,9 +33,10 @@ class TestMainEndToEndIntegration:
 
 class TestMainAcceptance:
     """
-    Tests run underlying code in a test environment, thus, should not run real robot, unless it specifically tests the
-    physical robot. Instead, the robot should be mocked out, and main should simply be tested agains what we expect
-    main functionality to do, like create a robot object, initialize and start autonomy function.
+    Tests run underlying code in a test environment, thus, should not run real robot, unless it
+    specifically tests the physical robot. Instead, the robot should be mocked out, and main should
+    simply be tested agains what we expect main functionality to do, like create a robot object,
+    initialize and start autonomy function.
     """
     def test_calls_set_start_and_stand_position(self):
         mock_mayday = create_autospec(MaydayRobot)
