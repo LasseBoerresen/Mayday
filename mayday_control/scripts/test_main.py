@@ -19,23 +19,24 @@ class TestMainEndToEndIntegration:
     #@pytest.mark.skip(reason='not ready for automatic run')
     def test_given_mayday__when_calling_set_start_position__then_all_legs_reach_start_position(self):
         may = main.create_mayday()
-        may.set_legs_to_start_position()
-        # may.set_standing_wide_position()
-        # may.set_standing_position()
-        # may.set_standing_wide_position()
-        # may.set_start_position()
+        may.set_legs_to_start_bposition()
 
         for leg in may.legs:
-            assert leg.get_joint_positions() == (0, tau * 0.3, -tau * 0.2)
+            for joint_pos, goal in zip(leg.get_joint_positions(), (0, tau * 0.3, -tau * 0.2)):
+                assert abs(goal - joint_pos()) < tau/100
+
 
     # TODO test that no motor is in error state when starting.
+    # TODO test that motors does not error just because they cannot reach their goal
+    #  or continously use current
+    # TODO test that when starting robot, errors have been reset
 
 
 class TestMainAcceptance:
     """
     Tests run underlying code in a test environment, thus, should not run real robot, unless it
     specifically tests the physical robot. Instead, the robot should be mocked out, and main should
-    simply be tested agains what we expect main functionality to do, like create a robot object,
+    simply be tested against what we expect main functionality to do, like create a robot object,
     initialize and start autonomy function.
     """
     def test_calls_set_start_and_stand_position(self):
