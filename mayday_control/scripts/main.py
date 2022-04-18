@@ -16,7 +16,7 @@ def create_mayday() -> MaydayRobot:
     dxl_adapter.port_adapter.init_communication()
     leg_factory = LegFactory()
     mayday_factory = MaydayRobotFactory(leg_factory, dxl_adapter)
-    may = mayday_factory.create_basic()  # TODO Why does the factory not just take this as input?
+    may = mayday_factory.create_basic()
 
     return may
 
