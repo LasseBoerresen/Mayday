@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 import xacro
 
-from urdf_parser_py.urdf import URDF
+# from urdf_parser_py.urdf import URDF
 
 from motor import DxlMotor
 from motor_state import MotorState
@@ -40,6 +40,8 @@ class LegFactory(object):
                 drive_mode = 'backward'
             elif joint_num == 2:
                 drive_mode = 'forward'
+            else:
+                raise Exception(f'Joint number not recognized, got {joint_num}')
             joints.append(DxlMotor(id_num, adapter, MotorState(), drive_mode))
 
         return Leg(joints)
@@ -50,7 +52,7 @@ class MaydayRobot:
         self.legs = legs
         self.description = None
 
-        self.read_description()
+        # self.read_description()
 
     def read_description(self):
         description_xacro_path = os.path.join(os.path.dirname(__file__), 'mayday.urdf.xacro')
@@ -93,4 +95,4 @@ class MaydayRobotFactory(object):
 
         return MaydayRobot(legs)
 
-    # TODO build MaydayRobot from urdf description
+    # TODO build MaydayRobot from urdf description, Why actually?
