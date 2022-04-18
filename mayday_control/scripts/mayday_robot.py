@@ -75,6 +75,9 @@ class MaydayRobot:
     def set_legs_to_standing_wide_position(self):
         self.set_joint_positions_for_all_legs((0, tau * 0.1, -tau * 0.1))
 
+    def disable_torque(self):
+        NotImplementedError()
+
 
 class MaydayRobotFactory(object):
     def __init__(self, leg_factory: LegFactory, adapter: DynamixelAdapter):

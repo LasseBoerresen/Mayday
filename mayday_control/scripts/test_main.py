@@ -53,12 +53,35 @@ class TestMainAcceptance:
     simply be tested against what we expect main functionality to do, like create a robot object,
     initialize and start autonomy function.
     """
-    def test_calls_set_start_and_stand_position(self):
-        mock_mayday = create_autospec(MaydayRobot)
-        with patch('main.create_mayday', return_value=mock_mayday) as mock_create_mayday:
+    def setup(self):
+        self.mock_mayday: MagicMock = create_autospec(MaydayRobot)
+
+    def test__calls_disable_torque(self):
+        # When
+        with patch('main.create_mayday', return_value=self.mock_mayday):
             main.main()
 
-        assert [call.set_legs_to_start_position(), call.set_legs_to_standing_position()] == mock_mayday.method_calls
+        # Then
+        self.mock_mayday.disable_torque.assert_called()
+
+    def test_calls_set_start_position(self):
+        # When
+        with patch('main.create_mayday', return_value=self.mock_mayday):
+            main.main()
+
+        # Then
+        self.mock_mayday.set_legs_to_start_position.assert_called()
+
+    def test_calls_set_stand_position(self):
+        # When
+        with patch('main.create_mayday', return_value=self.mock_mayday):
+            main.main()
+
+        # Then
+        self.mock_mayday.set_legs_to_standing_position.assert_called()
+
+
+    # TODO test calls loop for waiting to reach this position.
 
 
 if __name__ == '__main__':

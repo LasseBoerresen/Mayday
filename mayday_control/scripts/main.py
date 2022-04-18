@@ -4,8 +4,9 @@ from mayday_robot import MaydayRobotFactory, LegFactory, MaydayRobot
 
 
 def main():
+    may: MaydayRobot = create_mayday()
 
-    may = create_mayday()
+    may.disable_torque()
     may.set_legs_to_start_position()
     may.set_legs_to_standing_position()
 
