@@ -54,7 +54,7 @@ class TestDynamixelAdapterIntegrationTestCase:
                 time.sleep(0.5)
         assert abs(2200 - initialized_dxl_adapter.port_adapter.read(dxl_id, 'Present Position')) < 10
 
-    def test_when_set_goal_position_2000__then_present_position_is_2000(self, initialized_dxl_adapter):
+    def test_when_set_goal_position_2000__then_present_position_is_within_20(self, initialized_dxl_adapter):
         dxl_id = 1
         initialized_dxl_adapter.port_adapter.write(dxl_id, 'Torque Enable', 0)
         initialized_dxl_adapter.port_adapter.write(dxl_id, 'Min Position Limit', 0)
@@ -67,7 +67,7 @@ class TestDynamixelAdapterIntegrationTestCase:
         for i in range(5):
             if initialized_dxl_adapter.port_adapter.read(dxl_id, 'Moving'):
                 time.sleep(0.5)
-        assert abs(2000 - initialized_dxl_adapter.port_adapter.read(dxl_id, 'Present Position')) < 10
+        assert abs(2000 - initialized_dxl_adapter.port_adapter.read(dxl_id, 'Present Position')) < 20
 
     def test_given_bad_position_limit__when_set_goal_pos__then_raises_limit_exceeded(self, initialized_dxl_adapter):
         dxl_id = 1
