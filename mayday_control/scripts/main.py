@@ -1,4 +1,5 @@
 from dynamixel_adapter import DynamixelAdapter
+from dynamixel_port_adapter import DynamixelPortAdapter
 from mayday_robot import MaydayRobotFactory, LegFactory, MaydayRobot
 
 
@@ -10,11 +11,12 @@ def main():
 
 
 def create_mayday() -> MaydayRobot:
-    dxl_adapter = DynamixelAdapter(None)
-    dxl_adapter.init_communication()
+    dxl_port_adapter = DynamixelPortAdapter()
+    dxl_adapter = DynamixelAdapter(dxl_port_adapter)  # Todo why does this not just init communication?
+    dxl_adapter.port_adapter.init_communication()
     leg_factory = LegFactory()
     mayday_factory = MaydayRobotFactory(leg_factory)
-    may = mayday_factory.create_basic(dxl_adapter)
+    may = mayday_factory.create_basic(dxl_adapter)  # TODO Why does the factory not just take this as input?
 
     return may
 

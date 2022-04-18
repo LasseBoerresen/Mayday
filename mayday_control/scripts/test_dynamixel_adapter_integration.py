@@ -18,10 +18,12 @@ class TestDynamixelAdapterIntegrationTestCase:
         assert initialized_dxl_adapter.port_adapter.port_handler.is_open
 
     def test_when_init_dxl_communication__then_port_handler_baud_rate_is_set(self, initialized_dxl_adapter):
-        assert initialized_dxl_adapter.port_adapter.port_handler.baudrate == initialized_dxl_adapter.BAUD_RATE
+        port_handler_baud_rate = initialized_dxl_adapter.port_adapter.port_handler.baudrate
+        initial_baud_rate = initialized_dxl_adapter.port_adapter.BAUD_RATE
+        assert port_handler_baud_rate == initial_baud_rate
 
     def test_when_init_dxl_communication__then_packet_handler_protocol_is_2(self, initialized_dxl_adapter):
-        assert initialized_dxl_adapter.packet_handler.getProtocolVersion() == 2.0
+        assert initialized_dxl_adapter.port_adapter.packet_handler.getProtocolVersion() == 2.0
 
     def test_when_torque_enable_dxl_1__then_is_read_as_enabled(self, initialized_dxl_adapter):
         dxl_id = 1
