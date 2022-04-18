@@ -1,4 +1,5 @@
 import json
+import time
 from math import tau
 from unittest.mock import create_autospec, call, patch, MagicMock
 
@@ -17,14 +18,28 @@ class TestMainEndToEndIntegration:
     Don't mock anything, literally turn on Mayday and test basic maneuvers, like, start up and lift leg.
     """
     #@pytest.mark.skip(reason='not ready for automatic run')
-    def test_given_mayday__when_calling_set_start_position__then_all_legs_reach_start_position(self):
+    def test_given_mayday_in_neutral_pos__when_calling_set_start_position__then_all_legs_reach_start_position(self):
+        # Given
         may = main.create_mayday()
-        may.set_legs_to_start_bposition()
 
+        may.set_legs_to_neutral_position()
+        time.sleep(5)
+
+        goal_positions = (0, 0, 0)
+        self.assert_goal_positions_are_reached(goal_positions, may)
+
+        # When
+        may.set_legs_to_start_position()
+        time.sleep(5)
+
+        # Then
+        goal_positions = (0, tau * 0.3, -tau * 0.2)
+        self.assert_goal_positions_are_reached(goal_positions, may)
+
+    def assert_goal_positions_are_reached(self, goal_positions, may):
         for leg in may.legs:
-            for joint_pos, goal in zip(leg.get_joint_positions(), (0, tau * 0.3, -tau * 0.2)):
-                assert abs(goal - joint_pos()) < tau/100
-
+            for joint_pos, goal in zip(leg.get_joint_positions(), goal_positions):
+                assert abs(goal - joint_pos) < tau / 100
 
     # TODO test that no motor is in error state when starting.
     # TODO test that motors does not error just because they cannot reach their goal
