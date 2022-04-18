@@ -17,7 +17,6 @@ class TestMainEndToEndIntegration:
     """
     Don't mock anything, literally turn on Mayday and test basic maneuvers, like, start up and lift leg.
     """
-    #@pytest.mark.skip(reason='not ready for automatic run')
     def test_given_mayday_in_neutral_pos__when_calling_set_start_position__then_all_legs_reach_start_position(self):
         # Given
         may = main.create_mayday()
