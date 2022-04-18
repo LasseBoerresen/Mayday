@@ -5,7 +5,7 @@ from typing import List, Tuple
 import xacro
 
 # from urdf_parser_py.urdf import URDF
-
+from dynamixel_adapter import DynamixelAdapter
 from motor import DxlMotor
 from motor_state import MotorState
 
@@ -54,10 +54,10 @@ class MaydayRobot:
 
         # self.read_description()
 
-    def read_description(self):
-        description_xacro_path = os.path.join(os.path.dirname(__file__), 'mayday.urdf.xacro')
-        description_urdf = xacro.process(description_xacro_path)
-        self.description = URDF.from_xml_string(description_urdf)
+    # def read_description(self):
+    #     description_xacro_path = os.path.join(os.path.dirname(__file__), 'mayday.urdf.xacro')
+    #     description_urdf = xacro.process(description_xacro_path)
+    #     self.description = URDF.from_xml_string(description_urdf)
 
     def set_joint_positions_for_all_legs(self, pose):
         for leg in self.legs:
@@ -77,20 +77,21 @@ class MaydayRobot:
 
 
 class MaydayRobotFactory(object):
-    def __init__(self, leg_factory: LegFactory):
+    def __init__(self, leg_factory: LegFactory, adapter: DynamixelAdapter):
         self.leg_factory = leg_factory
+        self.adapter = adapter
 
     def from_urdf(self, urdf):
         raise NotImplementedError()
 
-    def create_basic(self, adapter):
+    def create_basic(self):
         N_LEGS = 6
         LEFT_SIDE_LEG_NUMBERS = [0, 1, 2]
 
         legs = []
         for leg_num in range(N_LEGS):
             side = 'left' if leg_num in LEFT_SIDE_LEG_NUMBERS else 'right'
-            leg = self.leg_factory.create_basic(leg_num, adapter, side)
+            leg = self.leg_factory.create_basic(leg_num, self.adapter, side)
             legs.append(leg)
 
         return MaydayRobot(legs)

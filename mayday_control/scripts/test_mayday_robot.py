@@ -13,8 +13,8 @@ from motor_state import MotorState
 class TestInit:
     def test_when_set_start_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
-        may = mayday_factory.create_basic(MagicMock())
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, adapter=MagicMock())
+        may = mayday_factory.create_basic()
 
         may.set_legs_to_start_position()
 
@@ -23,8 +23,8 @@ class TestInit:
 
     def test_when_set_standing_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
-        may = mayday_factory.create_basic(MagicMock())
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, adapter=MagicMock())
+        may = mayday_factory.create_basic()
 
         may.set_legs_to_standing_position()
 
@@ -120,25 +120,23 @@ class TestLegFactory:
 @pytest.fixture()
 def mayday_factory():
     leg_factory = LegFactory()
-    mayday_factory = MaydayRobotFactory(leg_factory)
+    mayday_factory = MaydayRobotFactory(leg_factory, adapter=MagicMock())
     return mayday_factory
 
 
 class TestMaydayRobotFactory:
 
     def test_when_create_basic__then_has_6_legs(self, mayday_factory):
-        mock_adapter = MagicMock()
-
-        may = mayday_factory.create_basic(mock_adapter)
+        may = mayday_factory.create_basic()
 
         assert len(may.legs) == 6
 
     def test_when_calling_create_basic__then_sets_last_3_legs_side_to_right(self):
-        mock_adapter = MagicMock()
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
+        mock_adapter = MagicMock()
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, adapter=mock_adapter)
 
-        may = mayday_factory.create_basic(mock_adapter)
+        may = mayday_factory.create_basic()
 
         left_side_leg_numbers = [0, 1, 2]
         for leg_num, leg in enumerate(may.legs):
