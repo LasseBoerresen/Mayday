@@ -29,7 +29,7 @@ class DynamixelPortAdapter:
 
         self.packet_handler = PacketHandler(self.PROTOCOL_VERSION)
 
-    def write(self, dxl_id, name, value):
+    def write(self, dxl_id: int, name: str, value: int):
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.
@@ -64,7 +64,7 @@ class DynamixelPortAdapter:
             raise Exception('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
         return dxl_comm_result, dxl_error
 
-    def read(self, dxl_id, name):
+    def read(self, dxl_id: int, name: str) -> int:
         """
         Write value to address of name using dxl_sdk.
         Check input value against min and max given by control table reference.

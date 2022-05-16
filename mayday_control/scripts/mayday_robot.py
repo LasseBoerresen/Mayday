@@ -29,7 +29,7 @@ class Leg(object):
 
 class LegFactory(object):
     # TODO maybe base id should be starting id, and then joint 0 just has that as dxl_id
-    def create_basic(self, base_id, adapter, side) -> Leg:
+    def create_basic(self, base_id: int, adapter: DynamixelAdapter, side: str) -> Leg:
         N_JOINTS = 3
         joints = []
         for joint_num in range(N_JOINTS):
@@ -87,7 +87,7 @@ class MaydayRobotFactory(object):
     def from_urdf(self, urdf):
         raise NotImplementedError()
 
-    def create_basic(self):
+    def create_basic(self) -> MaydayRobot:
         N_LEGS = 6
         LEFT_SIDE_LEG_NUMBERS = [0, 1, 2]
 

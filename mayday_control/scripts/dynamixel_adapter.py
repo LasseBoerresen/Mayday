@@ -123,7 +123,7 @@ class DynamixelAdapter:
 
         return state
 
-    def write_goal_position(self, dxl_id, goal_pos):
+    def write_goal_position(self, dxl_id: int, goal_pos: float):
         """
         Write goal position, translating from radians to range defined by dxl controltable, i.e. 0-4095
 
