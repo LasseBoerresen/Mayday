@@ -7,8 +7,8 @@ def main():
     may: MaydayRobot = create_mayday()
 
     may.disable_torque()
-    may.set_joint_positions_for_all_legs(Leg.STARTING_POSE)
-    may.set_joint_positions_for_all_legs(Leg.STANDING_POSE)
+    may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
+    may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)
 
 
 def create_mayday() -> MaydayRobot:

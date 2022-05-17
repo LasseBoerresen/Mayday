@@ -12,10 +12,10 @@ from motor_state import MotorState
 
 
 class Leg(object):
-    NEUTRAL_POSE = LegPose((0, 0, 0))
-    STARTING_POSE = LegPose((0, tau * 0.3, -tau * 0.2))
-    STANDING_POSE = LegPose((0, tau * 0.2, -tau * 0.25))
-    STANDING_WIDE_POSE = LegPose((0, tau * 0.1, -tau * 0.1))
+    POSE_NEUTRAL = LegPose((0, 0, 0))
+    POSE_STARTING = LegPose((0, tau * 0.3, -tau * 0.2))
+    POSE_STANDING = LegPose((0, tau * 0.2, -tau * 0.25))
+    POSE_STANDING_WIDE = LegPose((0, tau * 0.1, -tau * 0.1))
 
     # TODO test that there are always 3 motors. Or should it be dynamic?
     def __init__(self, joints: List[DxlMotor]):

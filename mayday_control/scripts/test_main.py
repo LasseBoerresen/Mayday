@@ -71,7 +71,7 @@ class TestMainAcceptance:
 
         # Then
         expected_method = self.mock_mayday.set_joint_positions_for_all_legs
-        expected_method.assert_any_call(Leg.STARTING_POSE)
+        expected_method.assert_any_call(Leg.POSE_STARTING)
 
     def test_calls_set_stand_position(self):
         # When
@@ -80,7 +80,7 @@ class TestMainAcceptance:
 
         # Then
         expected_method = self.mock_mayday.set_joint_positions_for_all_legs
-        expected_method.assert_called_with(Leg.STANDING_POSE)  # read called last with
+        expected_method.assert_called_with(Leg.POSE_STANDING)  # read called last with
 
 
     # TODO test calls loop for waiting to reach this position.

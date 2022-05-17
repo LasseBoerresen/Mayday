@@ -16,7 +16,7 @@ class TestInit:
         mayday_factory = MaydayRobotFactory(mock_leg_factory)
         may = mayday_factory.create_basic()
 
-        may.set_joint_positions_for_all_legs(Leg.STARTING_POSE)
+        may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
 
         for leg in may.legs:
             assert call.set_joint_positions(LegPose((0, tau * 0.3, -tau * 0.2))) in leg.method_calls
@@ -26,7 +26,7 @@ class TestInit:
         mayday_factory = MaydayRobotFactory(mock_leg_factory)
         may = mayday_factory.create_basic()
 
-        may.set_joint_positions_for_all_legs(Leg.STANDING_POSE)
+        may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)
 
         for leg in may.legs:
             assert call.set_joint_positions(LegPose((0, tau * 0.2, -tau * 0.25))) in leg.method_calls
