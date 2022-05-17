@@ -6,6 +6,7 @@ import xacro
 
 # from urdf_parser_py.urdf import URDF
 from dynamixel_adapter import DynamixelAdapter
+from leg_pose import LegPose
 from motor import DxlMotor
 from motor_state import MotorState
 
@@ -15,16 +16,16 @@ class Leg(object):
     def __init__(self, joints: List[DxlMotor]):
         self.joints = joints
 
-    def set_joint_positions(self, positions):
+    def set_joint_positions(self, positions: LegPose):
         for joint, position in zip(self.joints, positions):
             joint.set_goal_position(position)
 
-    def get_joint_positions(self) -> List[float]:
+    def get_joint_positions(self) -> LegPose:
         positions = []
         for joint in self.joints:
             positions.append(joint.state.position)
 
-        return positions
+        return LegPose(positions)
 
 
 class LegFactory(object):
@@ -59,7 +60,7 @@ class MaydayRobot:
     #     description_urdf = xacro.process(description_xacro_path)
     #     self.description = URDF.from_xml_string(description_urdf)
 
-    def set_joint_positions_for_all_legs(self, pose):
+    def set_joint_positions_for_all_legs(self, pose: LegPose):
         for leg in self.legs:
             leg.set_joint_positions(pose)
 

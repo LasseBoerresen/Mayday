@@ -19,7 +19,7 @@ class TestInit:
         may.set_legs_to_start_position()
 
         for leg in may.legs:
-            assert call.set_joint_positions((0, tau * 0.3, -tau * 0.2)) in leg.method_calls
+            assert call.set_joint_positions(LegPose((0, tau * 0.3, -tau * 0.2))) in leg.method_calls
 
     def test_when_set_standing_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
@@ -29,7 +29,7 @@ class TestInit:
         may.set_legs_to_standing_position()
 
         for leg in may.legs:
-            assert call.set_joint_positions((0, tau * 0.2, -tau * 0.25)) in leg.method_calls
+            assert call.set_joint_positions(LegPose((0, tau * 0.2, -tau * 0.25))) in leg.method_calls
 
     @pytest.mark.skip('not implemented')
     def test_when_set_start_position__then_waits_for_goal_position_reached(self):
