@@ -6,7 +6,7 @@ from unittest.mock import create_autospec, call, patch, MagicMock
 import pytest
 
 import main
-from mayday_robot import MaydayRobot
+from mayday_robot import MaydayRobot, Leg
 
 with open('mayday_config.json', 'r') as f:
     config = json.load(f)
@@ -64,13 +64,14 @@ class TestMainAcceptance:
         # Then
         self.mock_mayday.disable_torque.assert_called()
 
-    def test_calls_set_start_position(self):
+    def test_calls_set_start_pose_and_then_standing_pose(self):
         # When
         with patch('main.create_mayday', return_value=self.mock_mayday):
             main.main()
 
         # Then
-        self.mock_mayday.set_legs_to_start_position.assert_called()
+        expected_method = self.mock_mayday.set_joint_positions_for_all_legs
+        expected_method.assert_any_call(Leg.STARTING_POSE)
 
     def test_calls_set_stand_position(self):
         # When
@@ -78,7 +79,8 @@ class TestMainAcceptance:
             main.main()
 
         # Then
-        self.mock_mayday.set_legs_to_standing_position.assert_called()
+        expected_method = self.mock_mayday.set_joint_positions_for_all_legs
+        expected_method.assert_called_with(Leg.STANDING_POSE)  # read called last with
 
 
     # TODO test calls loop for waiting to reach this position.

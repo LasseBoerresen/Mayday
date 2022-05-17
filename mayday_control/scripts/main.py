@@ -1,14 +1,14 @@
 from dynamixel_adapter import DynamixelAdapter
 from dynamixel_port_adapter import DynamixelPortAdapter
-from mayday_robot import MaydayRobotFactory, LegFactory, MaydayRobot
+from mayday_robot import MaydayRobotFactory, LegFactory, MaydayRobot, Leg
 
 
 def main():
     may: MaydayRobot = create_mayday()
 
     may.disable_torque()
-    may.set_legs_to_start_position()
-    may.set_legs_to_standing_position()
+    may.set_joint_positions_for_all_legs(Leg.STARTING_POSE)
+    may.set_joint_positions_for_all_legs(Leg.STANDING_POSE)
 
 
 def create_mayday() -> MaydayRobot:

@@ -12,6 +12,11 @@ from motor_state import MotorState
 
 
 class Leg(object):
+    NEUTRAL_POSE = LegPose((0, 0, 0))
+    STARTING_POSE = LegPose((0, tau * 0.3, -tau * 0.2))
+    STANDING_POSE = LegPose((0, tau * 0.2, -tau * 0.25))
+    STANDING_WIDE_POSE = LegPose((0, tau * 0.1, -tau * 0.1))
+
     # TODO test that there are always 3 motors. Or should it be dynamic?
     def __init__(self, joints: List[DxlMotor]):
         self.joints = joints
@@ -63,18 +68,6 @@ class MaydayRobot:
     def set_joint_positions_for_all_legs(self, pose: LegPose):
         for leg in self.legs:
             leg.set_joint_positions(pose)
-
-    def set_legs_to_neutral_position(self):
-        self.set_joint_positions_for_all_legs((0, 0, 0))
-
-    def set_legs_to_start_position(self):
-        self.set_joint_positions_for_all_legs((0, tau * 0.3, -tau * 0.2))
-
-    def set_legs_to_standing_position(self):
-        self.set_joint_positions_for_all_legs((0, tau * 0.2, -tau * 0.25))
-
-    def set_legs_to_standing_wide_position(self):
-        self.set_joint_positions_for_all_legs((0, tau * 0.1, -tau * 0.1))
 
     def disable_torque(self):
         NotImplementedError()
