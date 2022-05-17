@@ -34,8 +34,11 @@ class Leg(object):
 
 
 class LegFactory(object):
+    def __init__(self, adapter: DynamixelAdapter):
+        self.adapter = adapter
+
     # TODO maybe base id should be starting id, and then joint 0 just has that as dxl_id
-    def create_basic(self, base_id: int, adapter: DynamixelAdapter, side: str) -> Leg:
+    def create_basic(self, base_id: int, side: str) -> Leg:
         N_JOINTS = 3
         joints = []
         for joint_num in range(N_JOINTS):
@@ -48,7 +51,7 @@ class LegFactory(object):
                 drive_mode = 'forward'
             else:
                 raise Exception(f'Joint number not recognized, got {joint_num}')
-            joints.append(DxlMotor(id_num, adapter, MotorState(), drive_mode))
+            joints.append(DxlMotor(id_num, self.adapter, MotorState(), drive_mode))
 
         return Leg(joints)
 
@@ -74,9 +77,8 @@ class MaydayRobot:
 
 
 class MaydayRobotFactory(object):
-    def __init__(self, leg_factory: LegFactory, adapter: DynamixelAdapter):
+    def __init__(self, leg_factory: LegFactory):
         self.leg_factory = leg_factory
-        self.adapter = adapter
 
     def from_urdf(self, urdf):
         raise NotImplementedError()
@@ -88,7 +90,7 @@ class MaydayRobotFactory(object):
         legs = []
         for leg_num in range(N_LEGS):
             side = 'left' if leg_num in LEFT_SIDE_LEG_NUMBERS else 'right'
-            leg = self.leg_factory.create_basic(leg_num, self.adapter, side)
+            leg = self.leg_factory.create_basic(leg_num, side)
             legs.append(leg)
 
         return MaydayRobot(legs)

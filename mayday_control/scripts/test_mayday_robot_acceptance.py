@@ -12,8 +12,8 @@ class TestLeg:
     @pytest.fixture()
     def mock_leg(self):
         self.mock_adapter = create_autospec(DynamixelAdapter)
-        leg_factory = LegFactory()
-        leg = leg_factory.create_basic(1, self.mock_adapter, 'left')
+        leg_factory = LegFactory(self.mock_adapter)
+        leg = leg_factory.create_basic(base_id=1, side='left')
 
         return leg
 
