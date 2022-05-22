@@ -1,3 +1,4 @@
+from math import tau
 from unittest.mock import MagicMock, call, create_autospec
 
 import pytest

@@ -1,5 +1,5 @@
 from dynamixel_adapter import DynamixelAdapter
-from mayday_robot import Leg
+from leg import Leg
 from motor import DxlMotor
 from motor_state import MotorState
 

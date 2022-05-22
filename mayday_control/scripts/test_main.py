@@ -6,7 +6,8 @@ from unittest.mock import create_autospec, call, patch, MagicMock
 import pytest
 
 import main
-from mayday_robot import MaydayRobot, Leg
+from mayday_robot import MaydayRobot
+from leg import Leg
 
 with open('mayday_config.json', 'r') as f:
     config = json.load(f)
