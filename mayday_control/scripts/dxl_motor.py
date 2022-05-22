@@ -8,9 +8,8 @@ class DxlMotor:
         self.id = id
         self.adapter = adapter
         self.state = state
-        self.drive_mode = drive_mode
 
-        self.adapter.init_single(self.id, self.drive_mode)
+        self.adapter.init_single(self.id, drive_mode)
 
     @property
     def state(self) -> MotorState:
