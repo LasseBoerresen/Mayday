@@ -5,6 +5,7 @@ from dynamixel_adapter import DynamixelAdapter
 from leg import Leg
 from dxl_motor import DxlMotor
 from motor_state import MotorState
+from side import Side
 
 
 class LegFactory:
@@ -13,14 +14,14 @@ class LegFactory:
     def __init__(self, adapter: DynamixelAdapter):
         self.adapter = adapter
 
-    def create_basic(self, base_id: int, side: str) -> Leg:
+    def create_basic(self, base_id: int, side: Side) -> Leg:
         joints = self._create_joints(base_id, side)
         return Leg(joints)
 
-    def _create_joints(self, base_id: int, side: str) -> List[DxlMotor]:
+    def _create_joints(self, base_id: int, side: Side) -> List[DxlMotor]:
         return [self._create_joint(base_id, joint_num, side) for joint_num in range(self.N_JOINTS)]
 
-    def _create_joint(self, base_id: int, joint_num: int, side) -> DxlMotor:
+    def _create_joint(self, base_id: int, joint_num: int, side: Side) -> DxlMotor:
         motor_id = self._motor_id(base_id, joint_num)
         drive_mode = self._drive_mode(joint_num, side)
         return DxlMotor(motor_id, self.adapter, MotorState(), drive_mode)
@@ -30,9 +31,9 @@ class LegFactory:
         return base_id * 3 + joint_num + 1
 
     @staticmethod
-    def _drive_mode(joint_num: int, side: str) -> DriveMode:
+    def _drive_mode(joint_num: int, side: Side) -> DriveMode:
         if joint_num == 0:
-            drive_mode = DriveMode.FORWARD if side == 'left' else DriveMode.BACKWARD
+            drive_mode = DriveMode.FORWARD if side == Side.LEFT else DriveMode.BACKWARD
         elif joint_num == 1:
             drive_mode = DriveMode.BACKWARD
         elif joint_num == 2:

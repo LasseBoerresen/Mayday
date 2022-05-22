@@ -1,5 +1,6 @@
 from mayday_robot import MaydayRobot
 from leg_factory import LegFactory
+from side import Side
 
 
 class MaydayRobotFactory(object):
@@ -21,7 +22,7 @@ class MaydayRobotFactory(object):
         return self.leg_factory.create_basic(base_id=leg_num, side=side)
 
     def _resolve_leg_side(self, leg_num):
-        return 'left' if leg_num in self.LEFT_SIDE_LEG_NUMBERS else 'right'
+        return Side.LEFT if leg_num in self.LEFT_SIDE_LEG_NUMBERS else Side.RIGHT
 
 
     # TODO build MaydayRobot from urdf description, Why actually?

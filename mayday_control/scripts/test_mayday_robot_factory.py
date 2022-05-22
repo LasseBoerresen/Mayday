@@ -4,6 +4,7 @@ import pytest
 
 from leg_factory import LegFactory
 from mayday_robot_factory import MaydayRobotFactory
+from side import Side
 
 
 class TestMaydayRobotFactory:
@@ -11,8 +12,7 @@ class TestMaydayRobotFactory:
     @pytest.fixture()
     def mayday_factory(self):
         leg_factory = LegFactory(adapter=MagicMock())
-        mayday_factory = MaydayRobotFactory(leg_factory)
-        return mayday_factory
+        return MaydayRobotFactory(leg_factory)
 
     def test_when_create_basic__then_has_6_legs(self, mayday_factory):
         may = mayday_factory.create_basic()
@@ -27,11 +27,7 @@ class TestMaydayRobotFactory:
 
         left_side_leg_numbers = [0, 1, 2]
         for leg_num, leg in enumerate(may.legs):
-            if leg_num in left_side_leg_numbers:
-                expected_side = 'left'
-            else:
-                expected_side = 'right'
-
+            expected_side = Side.LEFT if leg_num in left_side_leg_numbers else Side.RIGHT
             assert call.create_basic(base_id=leg_num, side=expected_side) in mock_leg_factory.method_calls
     # TODO when creating a mayday robot, motors should be initialized. But should that happen on construction? Also
     #  known as __init__ aka initialization. That means, I cannot create a mayday object without having a connected
