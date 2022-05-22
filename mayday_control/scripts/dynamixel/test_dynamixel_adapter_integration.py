@@ -1,12 +1,12 @@
 import json
 import time
+from os.path import join, dirname
 from unittest.mock import MagicMock
 import pytest
 
 from drive_mode import DriveMode
-from test_dynamixel_adapter import initialized_dxl_adapter
 
-with open('mayday_config.json', 'r') as f:
+with open(join(dirname(dirname(__file__)), 'mayday_config.json'), 'r') as f:
     config = json.load(f)
 
 

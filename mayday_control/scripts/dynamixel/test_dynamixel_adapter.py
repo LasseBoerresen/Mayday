@@ -1,17 +1,16 @@
 import json
-import time
 from math import tau
-from unittest.mock import MagicMock, call, create_autospec
+from os.path import dirname, join
+from unittest.mock import MagicMock, create_autospec
 from drive_mode import DriveMode
 import pytest
-import pandas as pd
 from dynamixel_sdk import PortHandler, PacketHandler
 
-from dynamixel_adapter import DynamixelAdapter
-from dynamixel_port_adapter import DynamixelPortAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
 
-with open('mayday_config.json', 'r') as f:
+with open(join(dirname(dirname(__file__)), 'mayday_config.json'), 'r') as f:
     config = json.load(f)
 
 """

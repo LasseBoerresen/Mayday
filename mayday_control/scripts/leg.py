@@ -2,7 +2,7 @@ from math import tau
 from typing import List
 
 from leg_pose import LegPose
-from dxl_motor import DxlMotor
+from dynamixel.dxl_motor import DxlMotor
 
 
 class Leg(object):

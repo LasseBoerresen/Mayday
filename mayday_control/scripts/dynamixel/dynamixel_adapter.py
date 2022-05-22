@@ -1,7 +1,7 @@
 import logging
 
 from drive_mode import DriveMode
-from dynamixel_port_adapter import DynamixelPortAdapter
+from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
 from math import tau
 

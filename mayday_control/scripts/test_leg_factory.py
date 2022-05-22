@@ -1,7 +1,7 @@
 from unittest.mock import create_autospec
 
 from drive_mode import DriveMode
-from dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg_factory import LegFactory
 from side import Side
 

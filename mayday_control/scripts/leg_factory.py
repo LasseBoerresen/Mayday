@@ -1,9 +1,9 @@
 from typing import List
 
 from drive_mode import DriveMode
-from dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg import Leg
-from dxl_motor import DxlMotor
+from dynamixel.dxl_motor import DxlMotor
 from side import Side
 
 

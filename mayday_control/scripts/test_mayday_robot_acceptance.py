@@ -2,7 +2,7 @@ from unittest.mock import create_autospec, call, MagicMock
 
 import pytest
 
-from dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg_pose import LegPose
 from leg_factory import LegFactory
 from motor_state import MotorState

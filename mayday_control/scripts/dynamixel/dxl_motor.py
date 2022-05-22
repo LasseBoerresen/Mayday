@@ -1,5 +1,5 @@
 from drive_mode import DriveMode
-from dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from motor_state import MotorState
 
 

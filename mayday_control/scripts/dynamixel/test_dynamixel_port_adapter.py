@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from dynamixel_sdk import PortHandler, PacketHandler
 
-from dynamixel_port_adapter import DynamixelPortAdapter
+from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 
 
 class TestDynamixelAdapterTestCase:

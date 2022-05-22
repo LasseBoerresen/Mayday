@@ -1,7 +1,7 @@
 from dynamixel_sdk import PortHandler, PacketHandler
 
-from dynamixel_adapter import DynamixelAdapter
-from dynamixel_port_adapter import DynamixelPortAdapter
+from dynamixel.dynamixel_adapter import DynamixelAdapter
+from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 from mayday_robot import MaydayRobot
 from leg import Leg
 from leg_factory import LegFactory

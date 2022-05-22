@@ -1,3 +1,5 @@
+from os.path import dirname, join
+
 import numpy as np
 import pandas as pd
 from dynamixel_sdk import PortHandler, PacketHandler, COMM_SUCCESS
@@ -10,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 class DynamixelPortAdapter:
     def __init__(self, port_handler: PortHandler, packet_handler: PacketHandler):
-        self.control_table = pd.read_csv('../../XL430_W250_control_table.csv', sep=';', index_col=3)
+        path = join(dirname(__file__), 'XL430_W250_control_table.csv')
+        self.control_table = pd.read_csv(path, sep=';', index_col=3)
         self.BAUD_RATE = 57600  # Dynamixel default baud_rate : 57600
         self.packet_handler = packet_handler
         self.port_handler = port_handler
