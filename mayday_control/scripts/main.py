@@ -20,9 +20,7 @@ def create_mayday() -> MaydayRobot:
     dxl_adapter.port_adapter.init_communication()
     leg_factory = LegFactory(dxl_adapter)
     mayday_factory = MaydayRobotFactory(leg_factory)
-    may = mayday_factory.create_basic()
-
-    return may
+    return mayday_factory.create_basic()
 
 
 if __name__ == '__main__':
