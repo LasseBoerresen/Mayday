@@ -14,6 +14,7 @@ class DxlMotor:
 
     @property
     def state(self) -> MotorState:
+        # updates state using setter before returning it.
         self.state = self.adapter.read_state(self.id)
         return self.__state
 
