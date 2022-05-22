@@ -25,32 +25,36 @@ class DynamixelAdapter:
         self.POSITION_D_GAIN_SOFT = 4000
 
     def init_single(self, dxl_id, drive_mode: DriveMode):
+        self._disable_torque(dxl_id)
+        self._write_drive_mode(dxl_id, drive_mode)
+        self._set_limits(dxl_id)
+        self._set_pid_gains(dxl_id)
+        # TODO set torque limit
+        self._enable_torque(dxl_id)
+
+    def _set_limits(self, dxl_id):
+        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
+        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
+        self._set_position_limits(dxl_id)
+
+    def _enable_torque(self, dxl_id):
+        self.port_adapter.write(dxl_id, 'Torque Enable', 1)
+
+    def _disable_torque(self, dxl_id):
         self.port_adapter.write(dxl_id, 'Torque Enable', 0)
 
-        self.write_drive_mode(dxl_id, drive_mode)
-
-        # Change Acceleration Limits, no limit for now.
-        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
-
-        # Start with a slow velocity limit
-        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
-
+    def _set_pid_gains(self, dxl_id):
         self.port_adapter.write(dxl_id, 'Position P Gain', self.POSITION_P_GAIN_SOFT)
         self.port_adapter.write(dxl_id, 'Position I Gain', self.POSITION_I_GAIN_SOFT)
         self.port_adapter.write(dxl_id, 'Position D Gain', self.POSITION_D_GAIN_SOFT)
 
-
+    def _set_position_limits(self, dxl_id):
         # Set position limits
         logger.warning('position limits not set, commented out.')
         self.port_adapter.write(dxl_id, 'Min Position Limit', 0)
         self.port_adapter.write(dxl_id, 'Max Position Limit', 4095)
         # self.port_adapter.dxl_write(dxl_id, 'Min Position Limit', 1300)
         # self.port_adapter.dxl_write(dxl_id, 'Max Position Limit', 2500)
-
-        # TODO set torque limit
-
-        # Enable torque again.
-        self.port_adapter.write(dxl_id, 'Torque Enable', 1)
 
     def read_state(self, dxl_id) -> MotorState:
         """
@@ -135,7 +139,7 @@ class DynamixelAdapter:
         # Change Velocity Limits, raw unit is 0.229 rev/min,
         self.port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
 
-    def write_drive_mode(self, dxl_id, drive_mode: DriveMode):
+    def _write_drive_mode(self, dxl_id, drive_mode: DriveMode):
         if drive_mode == DriveMode.FORWARD:
             dxl_drive_mode = 0
         elif drive_mode == DriveMode.BACKWARD:
@@ -151,7 +155,7 @@ class DynamixelAdapter:
 
     def _write_config(self, dxl_id, name, value):
         torque_enabled_backup = self.port_adapter.read(dxl_id, 'Torque Enable')
-        self.port_adapter.write(dxl_id, 'Torque Enable', 0)
+        self._disable_torque(dxl_id)
         self.port_adapter.write(dxl_id, name, value)
         self.port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
 

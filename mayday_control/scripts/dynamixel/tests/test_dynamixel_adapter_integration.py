@@ -93,17 +93,17 @@ class TestDynamixelAdapterIntegrationTestCase:
     def test_give_drive_mode_forward__when_init_single__writes_drive_mode(self, initialized_dxl_adapter):
         dxl_id = 4
         drive_mode = DriveMode.FORWARD
-        initialized_dxl_adapter.write_drive_mode = MagicMock()
+        initialized_dxl_adapter._write_drive_mode = MagicMock()
 
         initialized_dxl_adapter.init_single(dxl_id, drive_mode)
 
-        initialized_dxl_adapter.write_drive_mode.assert_called_once_with(dxl_id, drive_mode)
+        initialized_dxl_adapter._write_drive_mode.assert_called_once_with(dxl_id, drive_mode)
 
     def test_given_drive_mode_backward__when_write__then_drive_mode_is_1(self, initialized_dxl_adapter):
         dxl_id = 7
         drive_mode = DriveMode.BACKWARD
 
-        initialized_dxl_adapter.write_drive_mode(dxl_id, drive_mode)
+        initialized_dxl_adapter._write_drive_mode(dxl_id, drive_mode)
 
         drive_mode_expected = 1
         assert initialized_dxl_adapter.port_adapter.read(dxl_id, 'Drive Mode') == drive_mode_expected
@@ -112,7 +112,7 @@ class TestDynamixelAdapterIntegrationTestCase:
         dxl_id = 7
         drive_mode = DriveMode.FORWARD
 
-        initialized_dxl_adapter.write_drive_mode(dxl_id, drive_mode)
+        initialized_dxl_adapter._write_drive_mode(dxl_id, drive_mode)
 
         drive_mode_expected = 0
         assert initialized_dxl_adapter.port_adapter.read(dxl_id, 'Drive Mode') == drive_mode_expected

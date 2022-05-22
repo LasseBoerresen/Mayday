@@ -52,7 +52,7 @@ class TestDynamixelAdapterTestCase:
         adapter = DynamixelAdapter(None)
         adapter._write_config = MagicMock()
 
-        adapter.write_drive_mode(id_num, drive_mode)
+        adapter._write_drive_mode(id_num, drive_mode)
 
         drive_mode_expected = 0
         adapter._write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
@@ -63,7 +63,7 @@ class TestDynamixelAdapterTestCase:
         adapter = DynamixelAdapter(None)
         adapter._write_config = MagicMock()
 
-        adapter.write_drive_mode(id_num, drive_mode)
+        adapter._write_drive_mode(id_num, drive_mode)
 
         drive_mode_expected = 1
         adapter._write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
@@ -84,7 +84,7 @@ class TestDynamixelAdapterTestCase:
         adapter.dxl_write = MagicMock()
 
         with pytest.raises(ValueError) as cm:
-            adapter.write_drive_mode(id_num, drive_mode)
+            adapter._write_drive_mode(id_num, drive_mode)
 
 
 class TestRadianConversion:
