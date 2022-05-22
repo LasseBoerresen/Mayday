@@ -9,9 +9,6 @@ class MaydayRobotFactory(object):
     def __init__(self, leg_factory: LegFactory):
         self.leg_factory = leg_factory
 
-    def from_urdf(self, urdf):
-        raise NotImplementedError()
-
     def create_basic(self) -> MaydayRobot:
         legs = self._create_legs()
         return MaydayRobot(legs)
