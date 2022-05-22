@@ -1,13 +1,9 @@
-from math import tau
-from typing import List
-from unittest.mock import MagicMock, call, create_autospec, patch
+from unittest.mock import MagicMock, call, create_autospec
 
 import pytest
 
-from dynamixel_adapter import DynamixelAdapter
 from mayday_robot import *
-from motor import DxlMotor
-from motor_state import MotorState
+from mayday_robot_factory import MaydayRobotFactory
 
 
 class TestInit:
