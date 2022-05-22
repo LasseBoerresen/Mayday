@@ -33,8 +33,8 @@ class DynamixelAdapter:
         self._enable_torque(dxl_id)
 
     def _set_limits(self, dxl_id):
-        self.write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
-        self.write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
+        self._write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
+        self._write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
         self._set_position_limits(dxl_id)
 
     def _enable_torque(self, dxl_id):
@@ -97,7 +97,7 @@ class DynamixelAdapter:
         self.port_adapter.write(dxl_id, 'Goal Position', self._rad_to_int_range(goal_pos, 0, 4095))
 
     # TODO test velocity and acceleration limit conversions
-    def write_vel_limit(self, dxl_id, vel_limit):
+    def _write_vel_limit(self, dxl_id, vel_limit):
         """
 
         :param dxl_id:
@@ -118,7 +118,7 @@ class DynamixelAdapter:
         # Change Velocity Limits, raw unit is 0.229 rev/min,
         self.port_adapter.write(dxl_id, 'Profile Velocity', vel_limit)
 
-    def write_acc_limit(self, dxl_id, acc_limit):
+    def _write_acc_limit(self, dxl_id, acc_limit):
         """
 
         :param dxl_id:
