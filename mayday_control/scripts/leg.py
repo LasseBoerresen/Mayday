@@ -4,7 +4,7 @@ from leg_pose import LegPose
 from dynamixel.dxl_motor import DxlMotor
 
 
-class Leg(object):
+class Leg:
     POSE_NEUTRAL = LegPose((0, 0, 0))
     POSE_STARTING = LegPose((0, tau * 0.3, -tau * 0.2))
     POSE_STANDING = LegPose((0, tau * 0.2, -tau * 0.25))
