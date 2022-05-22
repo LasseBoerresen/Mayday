@@ -45,21 +45,22 @@ class DynamixelPortAdapter:
         size = self.control_table.loc[name, 'Size [byte]']
         addr = self.control_table.loc[name, 'Address']
 
-        dxl_comm_result, dxl_error = self.write_given_size(addr, dxl_id, size, value)
+        dxl_comm_result, dxl_error = self._write_given_size(addr, dxl_id, size, value)
 
         mode = 'write'
-        self.handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
+        self._handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
 
-    def write_given_size(self, addr, dxl_id, size, value):
+    def _write_given_size(self, addr, dxl_id, size, value):
         if size == 1:
-            dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(self.port_handler, dxl_id, addr, value)
+            func = self.packet_handler.write1ByteTxRx
         elif size == 2:
-            dxl_comm_result, dxl_error = self.packet_handler.write2ByteTxRx(self.port_handler, dxl_id, addr, value)
+            func = self.packet_handler.write2ByteTxRx
         elif size == 4:
-            dxl_comm_result, dxl_error = self.packet_handler.write4ByteTxRx(self.port_handler, dxl_id, addr, value)
+            func = self.packet_handler.write4ByteTxRx
         else:
-            raise Exception('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
-        return dxl_comm_result, dxl_error
+            raise ValueError('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
+
+        return func(self.port_handler, dxl_id, addr, value)
 
     def read(self, dxl_id: int, name: str) -> int:
         """
@@ -77,33 +78,35 @@ class DynamixelPortAdapter:
         size = self.control_table.loc[name, 'Size [byte]']
         addr = self.control_table.loc[name, 'Address']
 
-        dxl_comm_result, dxl_error, value = self.read_given_size(addr, dxl_id, size)
+        dxl_comm_result, dxl_error, value = self._read_given_size(addr, dxl_id, size)
 
         mode = 'read'
-        self.handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
+        self._handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
 
         return value
 
-    def read_given_size(self, addr, dxl_id, size):
+    def _read_given_size(self, addr, dxl_id, size):
         if size == 1:
-            value, dxl_comm_result, dxl_error = self.packet_handler.read1ByteTxRx(self.port_handler, dxl_id, addr)
-            value = int(np.int8(value))
+            func = self.packet_handler.read1ByteTxRx
+            cast_func = np.int8
         elif size == 2:
-            value, dxl_comm_result, dxl_error = self.packet_handler.read2ByteTxRx(self.port_handler, dxl_id, addr)
-            value = int(np.int16(value))
+            func = self.packet_handler.read2ByteTxRx
+            cast_func = np.int16
         elif size == 4:
-            value, dxl_comm_result, dxl_error = self.packet_handler.read4ByteTxRx(self.port_handler, dxl_id, addr)
-            value = int(np.int32(value))
+            func = self.packet_handler.read4ByteTxRx
+            cast_func = np.int32
         else:
-            raise Exception('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
-        return dxl_comm_result, dxl_error, value
+            raise ValueError('\'size [byte]\' was not 1,2 or 4, got: ' + str(size))
 
-    def handle_return_messages(self, dxl_comm_result, dxl_error, dxl_id, mode, name, value):
+        value, dxl_comm_result, dxl_error = func(self.port_handler, dxl_id, addr)
+        return int(cast_func(value)), dxl_comm_result, dxl_error
+
+    def _handle_return_messages(self, dxl_comm_result, dxl_error, dxl_id, mode, name, value):
         error_msg = f"{mode} dxl_id {dxl_id} and address {name} gave error: "
         if dxl_comm_result != COMM_SUCCESS:
-            raise Exception(error_msg + self.packet_handler.getTxRxResult(dxl_comm_result))
+            raise IOError(error_msg + self.packet_handler.getTxRxResult(dxl_comm_result))
         elif dxl_error != 0:
-            raise Exception(error_msg + self.packet_handler.getRxPacketError(dxl_error))
+            raise IOError(error_msg + self.packet_handler.getRxPacketError(dxl_error))
         else:
             logger.debug(f'{name} has been successfully been {mode} as {value} on dxl {dxl_id}')
 
