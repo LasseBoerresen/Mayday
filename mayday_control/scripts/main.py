@@ -1,6 +1,7 @@
 from dynamixel_adapter import DynamixelAdapter
 from dynamixel_port_adapter import DynamixelPortAdapter
-from mayday_robot import LegFactory, MaydayRobot, Leg
+from mayday_robot import MaydayRobot, Leg
+from leg_factory import LegFactory
 from mayday_robot_factory import MaydayRobotFactory
 
 

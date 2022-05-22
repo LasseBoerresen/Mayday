@@ -1,4 +1,5 @@
-from mayday_robot import LegFactory, MaydayRobot
+from mayday_robot import MaydayRobot
+from leg_factory import LegFactory
 
 
 class MaydayRobotFactory(object):

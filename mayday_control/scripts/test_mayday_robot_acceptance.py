@@ -4,7 +4,7 @@ import pytest
 
 from dynamixel_adapter import DynamixelAdapter
 from leg_pose import LegPose
-from mayday_robot import LegFactory
+from leg_factory import LegFactory
 from motor_state import MotorState
 
 

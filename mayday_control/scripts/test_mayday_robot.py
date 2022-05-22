@@ -2,6 +2,8 @@ from unittest.mock import MagicMock, call, create_autospec
 
 import pytest
 
+from dynamixel_adapter import DynamixelAdapter
+from leg_factory import LegFactory
 from mayday_robot import *
 from mayday_robot_factory import MaydayRobotFactory
 
