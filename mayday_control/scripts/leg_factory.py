@@ -1,6 +1,6 @@
 from dynamixel_adapter import DynamixelAdapter
 from leg import Leg
-from motor import DxlMotor
+from dxl_motor import DxlMotor
 from motor_state import MotorState
 
 

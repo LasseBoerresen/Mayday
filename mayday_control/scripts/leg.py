@@ -2,7 +2,7 @@ from math import tau
 from typing import List
 
 from leg_pose import LegPose
-from motor import DxlMotor
+from dxl_motor import DxlMotor
 
 
 class Leg(object):

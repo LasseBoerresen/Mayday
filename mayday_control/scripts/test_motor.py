@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, call, create_autospec
 
 import pytest
 
-from motor import *
+from dxl_motor import *
 from motor_state import MotorState
 
 
