@@ -1,5 +1,4 @@
 from math import tau
-from typing import List
 
 from leg_pose import LegPose
 from dynamixel.dxl_motor import DxlMotor
@@ -12,7 +11,7 @@ class Leg(object):
     POSE_STANDING_WIDE = LegPose((0, tau * 0.1, -tau * 0.1))
 
     # TODO test that there are always 3 motors. Or should it be dynamic?
-    def __init__(self, joints: List[DxlMotor]):
+    def __init__(self, joints: list[DxlMotor]):
         self.joints = joints
 
     def set_joint_positions(self, positions: LegPose):

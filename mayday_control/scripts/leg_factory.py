@@ -1,5 +1,3 @@
-from typing import List
-
 from drive_mode import DriveMode
 from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg import Leg
@@ -17,7 +15,7 @@ class LegFactory:
         joints = self._create_joints(base_id, side)
         return Leg(joints)
 
-    def _create_joints(self, base_id: int, side: Side) -> List[DxlMotor]:
+    def _create_joints(self, base_id: int, side: Side) -> list[DxlMotor]:
         return [self._create_joint(base_id, joint_num, side) for joint_num in range(self.N_JOINTS)]
 
     def _create_joint(self, base_id: int, joint_num: int, side: Side) -> DxlMotor:

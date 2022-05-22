@@ -1,12 +1,9 @@
-from typing import List
-
-# from urdf_parser_py.urdf import URDF
 from leg import Leg
 from leg_pose import LegPose
 
 
 class MaydayRobot:
-    def __init__(self, legs: List[Leg]):
+    def __init__(self, legs: list[Leg]):
         self.legs = legs
         self.description = None
 
