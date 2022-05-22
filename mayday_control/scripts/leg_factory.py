@@ -4,7 +4,6 @@ from drive_mode import DriveMode
 from dynamixel_adapter import DynamixelAdapter
 from leg import Leg
 from dxl_motor import DxlMotor
-from motor_state import MotorState
 from side import Side
 
 
@@ -24,7 +23,7 @@ class LegFactory:
     def _create_joint(self, base_id: int, joint_num: int, side: Side) -> DxlMotor:
         motor_id = self._motor_id(base_id, joint_num)
         drive_mode = self._drive_mode(joint_num, side)
-        return DxlMotor(motor_id, self.adapter, MotorState(), drive_mode)
+        return DxlMotor(motor_id, self.adapter, drive_mode)
 
     @staticmethod
     def _motor_id(base_id: int, joint_num: int) -> int:
