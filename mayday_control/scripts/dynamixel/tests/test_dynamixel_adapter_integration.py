@@ -6,7 +6,7 @@ import pytest
 
 from drive_mode import DriveMode
 
-with open(join(dirname(dirname(__file__)), 'mayday_config.json'), 'r') as f:
+with open(join(dirname(dirname(dirname(__file__))), 'mayday_config.json'), 'r') as f:
     config = json.load(f)
 
 

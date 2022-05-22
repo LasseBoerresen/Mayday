@@ -10,7 +10,7 @@ from dynamixel.dynamixel_adapter import DynamixelAdapter
 from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
 
-with open(join(dirname(dirname(__file__)), 'mayday_config.json'), 'r') as f:
+with open(join(dirname(dirname(dirname(__file__))), 'mayday_config.json'), 'r') as f:
     config = json.load(f)
 
 """
