@@ -38,6 +38,6 @@ class LegFactory:
         elif joint_num == 2:
             drive_mode = 'forward'
         else:
-            raise Exception(f'Joint number not recognized, got {joint_num}')
+            raise ValueError(f'Joint number not recognized, got {joint_num}')
 
         return drive_mode
