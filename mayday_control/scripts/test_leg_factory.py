@@ -1,5 +1,6 @@
 from unittest.mock import create_autospec
 
+from drive_mode import DriveMode
 from dynamixel_adapter import DynamixelAdapter
 from leg_factory import LegFactory
 
@@ -39,24 +40,24 @@ class TestLegFactory:
     def test_given_side_right__then_sets_joint_0_as_drive_mode_backward(self):
         leg = self.leg_factory.create_basic(self.base_id, side='right')
 
-        assert leg.joints[0].drive_mode == 'backward'
+        assert leg.joints[0].drive_mode == DriveMode.BACKWARD
 
     def test_given_side_left__then_sets_joint_0_as_drive_mode_forward(self):
         leg = self.leg_factory.create_basic(self.base_id, side='left')
 
-        assert leg.joints[0].drive_mode == 'forward'
+        assert leg.joints[0].drive_mode == DriveMode.FORWARD
 
     def test_given_side_right__then_sets_joint_1_as_drive_mode_backward(self):
         leg = self.leg_factory.create_basic(self.base_id, side='right')
 
-        assert leg.joints[1].drive_mode == 'backward'
+        assert leg.joints[1].drive_mode == DriveMode.BACKWARD
 
     def test_given_side_right__then_sets_joint_2_as_drive_mode_forward(self):
         leg = self.leg_factory.create_basic(self.base_id, side='right')
 
-        assert leg.joints[2].drive_mode == 'forward'
+        assert leg.joints[2].drive_mode == DriveMode.FORWARD
 
     def test_given_side_left__then_sets_joint_2_as_drive_mode_forward(self):
         leg = self.leg_factory.create_basic(self.base_id, side='left')
 
-        assert leg.joints[2].drive_mode == 'forward'
+        assert leg.joints[2].drive_mode == DriveMode.FORWARD

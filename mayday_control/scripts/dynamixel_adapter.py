@@ -1,5 +1,6 @@
 import logging
 
+from drive_mode import DriveMode
 from dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
 from math import tau
@@ -23,7 +24,7 @@ class DynamixelAdapter:
         self.POSITION_I_GAIN_SOFT = 300
         self.POSITION_D_GAIN_SOFT = 4000
 
-    def init_single(self, dxl_id, drive_mode):
+    def init_single(self, dxl_id, drive_mode: DriveMode):
         self.port_adapter.write(dxl_id, 'Torque Enable', 0)
 
         self.write_drive_mode(dxl_id, drive_mode)
@@ -176,10 +177,10 @@ class DynamixelAdapter:
         # Change Velocity Limits, raw unit is 0.229 rev/min,
         self.port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
 
-    def write_drive_mode(self, dxl_id, drive_mode):
-        if drive_mode == 'forward':
+    def write_drive_mode(self, dxl_id, drive_mode: DriveMode):
+        if drive_mode == DriveMode.FORWARD:
             dxl_drive_mode = 0
-        elif drive_mode == 'backward':
+        elif drive_mode == DriveMode.BACKWARD:
             dxl_drive_mode = 1
         else:
             raise ValueError(f'Drive mode not recognized, got: {drive_mode}')
@@ -187,7 +188,8 @@ class DynamixelAdapter:
         self.write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
     def read_drive_mode(self, dxl_id):
-        return 'forward' if self.port_adapter.read(dxl_id, 'Drive Mode') == 0 else 'backward'
+        drive_mode = self.port_adapter.read(dxl_id, 'Drive Mode')
+        return DriveMode.FORWARD if drive_mode == 0 else DriveMode.BACKWARD
 
     def write_config(self, dxl_id, name, value):
         torque_enabled_backup = self.port_adapter.read(dxl_id, 'Torque Enable')

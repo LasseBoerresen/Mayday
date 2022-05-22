@@ -1,9 +1,10 @@
+from drive_mode import DriveMode
 from dynamixel_adapter import DynamixelAdapter
 from motor_state import MotorState
 
 
 class DxlMotor:
-    def __init__(self, id, adapter: DynamixelAdapter, state: MotorState, drive_mode: str):
+    def __init__(self, id, adapter: DynamixelAdapter, state: MotorState, drive_mode: DriveMode):
         self.id = id
         self.adapter = adapter
         self.state = state

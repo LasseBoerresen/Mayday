@@ -2,6 +2,8 @@ import json
 import time
 from unittest.mock import MagicMock
 import pytest
+
+from drive_mode import DriveMode
 from test_dynamixel_adapter import initialized_dxl_adapter
 
 with open('mayday_config.json', 'r') as f:
@@ -84,13 +86,13 @@ class TestDynamixelAdapterIntegrationTestCase:
         dxl_id = 4
         initialized_dxl_adapter.port_adapter.write(dxl_id, 'Torque Enable', 0)
 
-        initialized_dxl_adapter.init_single(dxl_id, 'forward')
+        initialized_dxl_adapter.init_single(dxl_id, DriveMode.FORWARD)
 
         assert initialized_dxl_adapter.port_adapter.read(dxl_id, 'Torque Enable')
 
     def test_give_drive_mode_forward__when_init_single__writes_drive_mode(self, initialized_dxl_adapter):
         dxl_id = 4
-        drive_mode = 'forward'
+        drive_mode = DriveMode.FORWARD
         initialized_dxl_adapter.write_drive_mode = MagicMock()
 
         initialized_dxl_adapter.init_single(dxl_id, drive_mode)
@@ -99,7 +101,7 @@ class TestDynamixelAdapterIntegrationTestCase:
 
     def test_given_drive_mode_backward__when_write__then_drive_mode_is_1(self, initialized_dxl_adapter):
         dxl_id = 7
-        drive_mode = 'backward'
+        drive_mode = DriveMode.BACKWARD
 
         initialized_dxl_adapter.write_drive_mode(dxl_id, drive_mode)
 
@@ -108,7 +110,7 @@ class TestDynamixelAdapterIntegrationTestCase:
 
     def test_given_drive_mode_forward__when_write__then_drive_mode_is_0(self, initialized_dxl_adapter):
         dxl_id = 7
-        drive_mode = 'forward'
+        drive_mode = DriveMode.FORWARD
 
         initialized_dxl_adapter.write_drive_mode(dxl_id, drive_mode)
 

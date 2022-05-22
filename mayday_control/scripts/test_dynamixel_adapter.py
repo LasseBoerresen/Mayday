@@ -2,7 +2,7 @@ import json
 import time
 from math import tau
 from unittest.mock import MagicMock, call, create_autospec
-
+from drive_mode import DriveMode
 import pytest
 import pandas as pd
 from dynamixel_sdk import PortHandler, PacketHandler
@@ -49,7 +49,7 @@ class TestDynamixelAdapterTestCase:
 
     def test_given_drive_mode_forward__when_write_drive_mode__then_calls_dxl_write_with_0(self):
         id_num = 11
-        drive_mode = 'forward'
+        drive_mode = DriveMode.FORWARD
         adapter = DynamixelAdapter(None)
         adapter.write_config = MagicMock()
 
@@ -60,7 +60,7 @@ class TestDynamixelAdapterTestCase:
 
     def test_given_drive_mode_backward__when_write_drive_mode__then_calls_dxl_write_with_1(self):
         id_num = 11
-        drive_mode = 'backward'
+        drive_mode = DriveMode.BACKWARD
         adapter = DynamixelAdapter(None)
         adapter.write_config = MagicMock()
 
@@ -77,7 +77,7 @@ class TestDynamixelAdapterTestCase:
         actual = adapter.read_drive_mode(id_num)
 
         adapter.port_adapter.read.assert_called_with(id_num, 'Drive Mode')
-        assert actual == 'backward'
+        assert actual == DriveMode.BACKWARD
 
     def test_given_drive_mode_bafwards__when_write_drive_mode__then_raises_value_error(self, adapter):
         id_num = 11

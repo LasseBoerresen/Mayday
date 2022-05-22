@@ -9,7 +9,7 @@ from motor_state import MotorState
 class TestInitMotorConfig:
     def test_when_init__then_calls_adapter_init_single(self):
         id_num = 4
-        drive_mode = 'forward'
+        drive_mode = DriveMode.FORWARD
         mock_adapter = create_autospec(DynamixelAdapter)
 
         DxlMotor(id_num, mock_adapter, MotorState(), drive_mode)
@@ -23,7 +23,7 @@ class TestGetStateAcceptanceTestCase:
         state_new = MotorState(position=3, velocity=5, torque=7, temperature=11, position_goal=13)
         mock_dxl_adapter = MagicMock()
         mock_dxl_adapter.read_state = MagicMock(return_value=state_new)
-        motor = DxlMotor(dxl_id, mock_dxl_adapter, MotorState(), 'forward')
+        motor = DxlMotor(dxl_id, mock_dxl_adapter, MotorState(), DriveMode.FORWARD)
 
         assert state_new == motor.state
 
@@ -36,7 +36,7 @@ class TestSetGoalPosition:
         position = 3
         idd = 5
         mock_dxl_adapter = create_autospec(DynamixelAdapter)
-        motor = DxlMotor(idd, mock_dxl_adapter, MotorState(), 'forward')
+        motor = DxlMotor(idd, mock_dxl_adapter, MotorState(), DriveMode.FORWARD)
 
         motor.set_goal_position(position)
 
@@ -50,7 +50,7 @@ class TestGetPosition:
         state = MotorState(position)
         mock_adapter = create_autospec(DynamixelAdapter)
         mock_adapter.read_state = MagicMock(return_value=state)
-        motor = DxlMotor(id, mock_adapter, MotorState(), 'forward')
+        motor = DxlMotor(id, mock_adapter, MotorState(), DriveMode.FORWARD)
 
         actual = motor.state.position
 

@@ -1,5 +1,6 @@
 from typing import List
 
+from drive_mode import DriveMode
 from dynamixel_adapter import DynamixelAdapter
 from leg import Leg
 from dxl_motor import DxlMotor
@@ -29,13 +30,13 @@ class LegFactory:
         return base_id * 3 + joint_num + 1
 
     @staticmethod
-    def _drive_mode(joint_num: int, side: str) -> str:
+    def _drive_mode(joint_num: int, side: str) -> DriveMode:
         if joint_num == 0:
-            drive_mode = 'forward' if side == 'left' else 'backward'
+            drive_mode = DriveMode.FORWARD if side == 'left' else DriveMode.BACKWARD
         elif joint_num == 1:
-            drive_mode = 'backward'
+            drive_mode = DriveMode.BACKWARD
         elif joint_num == 2:
-            drive_mode = 'forward'
+            drive_mode = DriveMode.FORWARD
         else:
             raise ValueError(f'Joint number not recognized, got {joint_num}')
 
