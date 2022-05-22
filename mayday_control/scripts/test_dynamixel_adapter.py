@@ -51,23 +51,23 @@ class TestDynamixelAdapterTestCase:
         id_num = 11
         drive_mode = DriveMode.FORWARD
         adapter = DynamixelAdapter(None)
-        adapter.write_config = MagicMock()
+        adapter._write_config = MagicMock()
 
         adapter.write_drive_mode(id_num, drive_mode)
 
         drive_mode_expected = 0
-        adapter.write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
+        adapter._write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
 
     def test_given_drive_mode_backward__when_write_drive_mode__then_calls_dxl_write_with_1(self):
         id_num = 11
         drive_mode = DriveMode.BACKWARD
         adapter = DynamixelAdapter(None)
-        adapter.write_config = MagicMock()
+        adapter._write_config = MagicMock()
 
         adapter.write_drive_mode(id_num, drive_mode)
 
         drive_mode_expected = 1
-        adapter.write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
+        adapter._write_config.assert_called_with(id_num, 'Drive Mode', drive_mode_expected)
 
     def test_given_drive_mode_1__when_read_drive_mode__then_returns_backward(self, adapter):
         id_num = 11
@@ -91,25 +91,25 @@ class TestDynamixelAdapterTestCase:
 class TestRadianConversion:
     @pytest.mark.parametrize('angle, expected', [(0.0, 2048), (-tau/2, 1), (tau/2, 4095)])
     def test_given_angle__when_rad_to_int_range__then_returns_expected(self, angle, expected):
-        actual = DynamixelAdapter.rad_to_int_range(angle)
+        actual = DynamixelAdapter._rad_to_int_range(angle)
 
         assert actual == expected
 
     @pytest.mark.parametrize('int_value, expected', [(2048, 0.0), (1, -tau/2), (4095, tau/2)])
     def test_given_int__when_int_range_to_rad__then_returns_expected(self, int_value, expected):
-        actual = DynamixelAdapter.int_range_to_rad(int_value)
+        actual = DynamixelAdapter._int_range_to_rad(int_value)
 
         assert actual == expected
 
     @pytest.mark.parametrize('angle', [tau, -tau, tau/2+0.0001, -tau/2-0.0001])
     def test_given_too_big_angle__when_rad_to_int_range__then_raises_value_error(self, angle):
         with pytest.raises(ValueError) as cm:
-            actual = DynamixelAdapter.rad_to_int_range(angle)
+            actual = DynamixelAdapter._rad_to_int_range(angle)
 
     @pytest.mark.parametrize('int_value', [0, 4096])
     def test_given_too_big_int_value__when_int_range_to_rad__then_raises_value_error(self, int_value):
         with pytest.raises(ValueError) as cm:
-            actual = DynamixelAdapter.int_range_to_rad(int_value)
+            actual = DynamixelAdapter._int_range_to_rad(int_value)
 
 
 class TestReadState:

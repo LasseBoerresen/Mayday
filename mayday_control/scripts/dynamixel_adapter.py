@@ -52,48 +52,6 @@ class DynamixelAdapter:
         # Enable torque again.
         self.port_adapter.write(dxl_id, 'Torque Enable', 1)
 
-    @staticmethod
-    def rad_to_int_range(value_rad, range_min=1, range_max=4095):
-        """
-        Transform a radian value to one in an integer range
-
-        0 radians will map to middle of range.
-        """
-
-        if range_min >= range_max:
-            raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'
-                .format(range_min, range_max))
-
-        if not (-tau / 2 <= value_rad <= tau/2):
-            raise ValueError(f'Value_rad must be within (-tau/2, tau/2), value_rad: {value_rad}')
-
-        step_size_int = (range_max - range_min) / tau
-
-        return round(value_rad * step_size_int) + 2048
-
-    @staticmethod
-    def int_range_to_rad(value_int, range_min=1, range_max=4095):
-        """
-        Transform a integer range value to one in radians
-
-        2048 will map to 0 radians.
-        """
-
-        if range_min >= range_max:
-            raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'
-                .format(range_min, range_max))
-
-        if not (range_min <= value_int <= range_max):
-            raise ValueError(
-                'Value_int must be within range: range_min: {}, range_max: {}, got value_int: {}'
-                .format(range_min, range_max, value_int))
-
-        step_size_rad = tau / (range_max - range_min)
-
-        return (value_int - 2048) * step_size_rad
-
     def read_state(self, dxl_id) -> MotorState:
         """
         read values from dynamixel and save in MotorState object. Convert to SI compatible units first.
@@ -109,7 +67,7 @@ class DynamixelAdapter:
         state = MotorState()
 
         # Read position in radians, raw values from 0 ~ 4095
-        state.position = self.int_range_to_rad(self.port_adapter.read(dxl_id, 'Present Position'))
+        state.position = self._int_range_to_rad(self.port_adapter.read(dxl_id, 'Present Position'))
 
         #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
         state.velocity = self.port_adapter.read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
@@ -132,7 +90,7 @@ class DynamixelAdapter:
         :param goal_pos: angular position in radians
         """
 
-        self.port_adapter.write(dxl_id, 'Goal Position', self.rad_to_int_range(goal_pos, 0, 4095))
+        self.port_adapter.write(dxl_id, 'Goal Position', self._rad_to_int_range(goal_pos, 0, 4095))
 
     # TODO test velocity and acceleration limit conversions
     def write_vel_limit(self, dxl_id, vel_limit):
@@ -185,19 +143,61 @@ class DynamixelAdapter:
         else:
             raise ValueError(f'Drive mode not recognized, got: {drive_mode}')
 
-        self.write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
+        self._write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
     def read_drive_mode(self, dxl_id):
         drive_mode = self.port_adapter.read(dxl_id, 'Drive Mode')
         return DriveMode.FORWARD if drive_mode == 0 else DriveMode.BACKWARD
 
-    def write_config(self, dxl_id, name, value):
+    def _write_config(self, dxl_id, name, value):
         torque_enabled_backup = self.port_adapter.read(dxl_id, 'Torque Enable')
         self.port_adapter.write(dxl_id, 'Torque Enable', 0)
         self.port_adapter.write(dxl_id, name, value)
         self.port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
 
         # TODO test write_config
+
+    @staticmethod
+    def _rad_to_int_range(value_rad, range_min=1, range_max=4095):
+        """
+        Transform a radian value to one in an integer range
+
+        0 radians will map to middle of range.
+        """
+
+        if range_min >= range_max:
+            raise ValueError(
+                'Range_min must be less than range_max: range_min: {}, range_max: {}'
+                .format(range_min, range_max))
+
+        if not (-tau / 2 <= value_rad <= tau/2):
+            raise ValueError(f'Value_rad must be within (-tau/2, tau/2), value_rad: {value_rad}')
+
+        step_size_int = (range_max - range_min) / tau
+
+        return round(value_rad * step_size_int) + 2048
+
+    @staticmethod
+    def _int_range_to_rad(value_int, range_min=1, range_max=4095):
+        """
+        Transform a integer range value to one in radians
+
+        2048 will map to 0 radians.
+        """
+
+        if range_min >= range_max:
+            raise ValueError(
+                'Range_min must be less than range_max: range_min: {}, range_max: {}'
+                .format(range_min, range_max))
+
+        if not (range_min <= value_int <= range_max):
+            raise ValueError(
+                'Value_int must be within range: range_min: {}, range_max: {}, got value_int: {}'
+                .format(range_min, range_max, value_int))
+
+        step_size_rad = tau / (range_max - range_min)
+
+        return (value_int - 2048) * step_size_rad
 
 
 if __name__ == '__main__':
