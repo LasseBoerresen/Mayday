@@ -125,7 +125,7 @@ class TestMaydayRobotFactory:
             else:
                 expected_side = 'right'
 
-            assert call.create_basic(leg_num, expected_side) in mock_leg_factory.method_calls
+            assert call.create_basic(base_id=leg_num, side=expected_side) in mock_leg_factory.method_calls
     # TODO when creating a mayday robot, motors should be initialized. But should that happen on construction? Also
     #  known as __init__ aka initialization. That means, I cannot create a mayday object without having a connected
     #  dynamixel controller and actual motors... This seems difficult to work with.
