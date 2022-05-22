@@ -20,8 +20,5 @@ class Leg(object):
             joint.set_goal_position(position)
 
     def get_joint_positions(self) -> LegPose:
-        positions = []
-        for joint in self.joints:
-            positions.append(joint.state.position)
-
+        positions = [joint.state.position for joint in self.joints]
         return LegPose(positions)
