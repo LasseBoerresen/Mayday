@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, call, create_autospec
 
 import pytest
 import pandas as pd
+from dynamixel_sdk import PortHandler, PacketHandler
+
 from dynamixel_adapter import DynamixelAdapter
 from dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
@@ -33,7 +35,8 @@ def adapter():
 
 @pytest.fixture()
 def initialized_dxl_adapter():
-    dxl_adapter = DynamixelAdapter(DynamixelPortAdapter())
+    dxl_adapter = DynamixelAdapter(
+        DynamixelPortAdapter(PortHandler('/dev/ttyUSB0'), PacketHandler(2.0)))
     dxl_adapter.port_adapter.init_communication()
     return dxl_adapter
 

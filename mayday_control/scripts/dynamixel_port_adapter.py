@@ -9,16 +9,14 @@ logger = logging.getLogger(__name__)
 
 #
 class DynamixelPortAdapter:
-    def __init__(self):
+    def __init__(self, port_handler, packet_handler):
         self.control_table = pd.read_csv('../../XL430_W250_control_table.csv', sep=';', index_col=3)
         self.BAUD_RATE = 57600  # Dynamixel default baud_rate : 57600
-        self.DEVICE_NAME = '/dev/ttyUSB0'  # Check which port is being used on your controller
-        self.PROTOCOL_VERSION = 2.0  # See which protocol version is used in the Dynamixel
-        self.packet_handler = None
-        self.port_handler = None
+        self.packet_handler = packet_handler
+        self.port_handler = port_handler
 
     def init_communication(self):
-        self.port_handler = PortHandler(self.DEVICE_NAME)
+
         try:
             if not self.port_handler.openPort():
                 raise self.NoRobotException("Failed to open the port for device: " + self.DEVICE_NAME)
@@ -27,7 +25,7 @@ class DynamixelPortAdapter:
         if not self.port_handler.setBaudRate(self.BAUD_RATE):
             raise Exception("Failed to change the baudrate to: " + str(self.BAUD_RATE))
 
-        self.packet_handler = PacketHandler(self.PROTOCOL_VERSION)
+
 
     def write(self, dxl_id: int, name: str, value: int):
         """

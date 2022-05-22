@@ -1,15 +1,15 @@
 import pytest
 import pandas as pd
+from dynamixel_sdk import PortHandler, PacketHandler
 
 from dynamixel_port_adapter import DynamixelPortAdapter
 
 
-@pytest.fixture()
-def dxl_port_adapter():
-    return DynamixelPortAdapter()
-
-
 class TestDynamixelAdapterTestCase:
+    @pytest.fixture()
+    def dxl_port_adapter(self):
+        return DynamixelPortAdapter(PortHandler('/dev/ttyUSB0'), PacketHandler(2.0))
+
     def test_when_init__then_ctrl_table_is_pd_dataframe(self, dxl_port_adapter):
         assert type(dxl_port_adapter.control_table) is pd.DataFrame
 

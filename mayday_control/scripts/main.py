@@ -1,3 +1,5 @@
+from dynamixel_sdk import PortHandler, PacketHandler
+
 from dynamixel_adapter import DynamixelAdapter
 from dynamixel_port_adapter import DynamixelPortAdapter
 from mayday_robot import MaydayRobot
@@ -15,7 +17,7 @@ def main():
 
 
 def create_mayday() -> MaydayRobot:
-    dxl_port_adapter = DynamixelPortAdapter()
+    dxl_port_adapter = DynamixelPortAdapter(PortHandler('/dev/ttyUSB0'), PacketHandler(2.0))
     dxl_adapter = DynamixelAdapter(dxl_port_adapter)  # Todo why does this not just init communication?
     dxl_adapter.port_adapter.init_communication()
     leg_factory = LegFactory(dxl_adapter)
