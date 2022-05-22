@@ -21,9 +21,9 @@ class LegFactory:
         return [self._create_joint(base_id, joint_num, side) for joint_num in range(self.N_JOINTS)]
 
     def _create_joint(self, base_id: int, joint_num: int, side) -> DxlMotor:
-        id = self._motor_id(base_id, joint_num)
+        motor_id = self._motor_id(base_id, joint_num)
         drive_mode = self._drive_mode(joint_num, side)
-        return DxlMotor(id, self.adapter, MotorState(), drive_mode)
+        return DxlMotor(motor_id, self.adapter, MotorState(), drive_mode)
 
     @staticmethod
     def _motor_id(base_id: int, joint_num: int) -> int:
