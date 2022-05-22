@@ -12,7 +12,6 @@ class LegFactory:
     def __init__(self, adapter: DynamixelAdapter):
         self.adapter = adapter
 
-    # TODO maybe base id should be starting id, and then joint 0 just has that as dxl_id
     def create_basic(self, base_id: int, side: str) -> Leg:
         joints = self._create_joints(base_id, side)
         return Leg(joints)
