@@ -18,22 +18,22 @@ class TestMainEndToEndIntegration:
     """
     Don't mock anything, literally turn on Mayday and test basic maneuvers, like, start up and lift leg.
     """
-    def test_given_mayday_in_neutral_pos__when_calling_set_start_position__then_all_legs_reach_start_position(self):
+    def test_given_mayday_in_starting_pos__when_calling_set_standing_position__then_all_legs_reach_that_position(self):
         # Given
         may = main.create_mayday()
 
-        may.set_legs_to_neutral_position()
+        may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
         time.sleep(5)
 
-        goal_positions = (0, 0, 0)
+        goal_positions = Leg.POSE_STARTING
         self.assert_goal_positions_are_reached(goal_positions, may)
 
         # When
-        may.set_legs_to_start_position()
+        may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)
         time.sleep(5)
 
         # Then
-        goal_positions = (0, tau * 0.3, -tau * 0.2)
+        goal_positions = Leg.POSE_STANDING
         self.assert_goal_positions_are_reached(goal_positions, may)
 
     def assert_goal_positions_are_reached(self, goal_positions, may):
