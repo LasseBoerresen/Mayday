@@ -36,7 +36,7 @@ def adapter():
 def initialized_dxl_adapter():
     dxl_adapter = DynamixelAdapter(
         DynamixelPortAdapter(PortHandler('/dev/ttyUSB0'), PacketHandler(2.0)))
-    dxl_adapter.port_adapter.init_communication()
+    dxl_adapter._port_adapter.init_communication()
     return dxl_adapter
 
 
@@ -75,7 +75,7 @@ class TestDynamixelAdapterTestCase:
 
         actual = adapter.read_drive_mode(id_num)
 
-        adapter.port_adapter.read.assert_called_with(id_num, 'Drive Mode')
+        adapter._port_adapter.read.assert_called_with(id_num, 'Drive Mode')
         assert actual == DriveMode.BACKWARD
 
     def test_given_drive_mode_bafwards__when_write_drive_mode__then_raises_value_error(self, adapter):

@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 class DynamixelAdapter:
 
     def __init__(self, port_adapter: DynamixelPortAdapter):
-        self.port_adapter = port_adapter
+        self._port_adapter = port_adapter
 
-        self.TORQ_LIMIT_REST = 1.0
-        self.VEL_LIMIT_SLOW = tau / 8  # tau / 16
-        self.ACC_LIMIT_SLOW = None  # tau / 8
-        self.POSITION_P_GAIN_SOFT = 640  # 200
-        self.POSITION_I_GAIN_SOFT = 300
-        self.POSITION_D_GAIN_SOFT = 4000
+        self._TORQ_LIMIT_REST = 1.0
+        self._VEL_LIMIT_SLOW = tau / 8  # tau / 16
+        self._ACC_LIMIT_SLOW = None  # tau / 8
+        self._POSITION_P_GAIN_SOFT = 640  # 200
+        self._POSITION_I_GAIN_SOFT = 300
+        self._POSITION_D_GAIN_SOFT = 4000
 
     def init_single(self, dxl_id, drive_mode: DriveMode):
         self._disable_torque(dxl_id)
@@ -47,18 +47,18 @@ class DynamixelAdapter:
         state = MotorState()
 
         # Read position in radians, raw values from 0 ~ 4095
-        state.position = self._int_range_to_rad(self.port_adapter.read(dxl_id, 'Present Position'))
+        state.position = self._int_range_to_rad(self._port_adapter.read(dxl_id, 'Present Position'))
 
         #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
-        state.velocity = self.port_adapter.read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
+        state.velocity = self._port_adapter.read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
 
         #  Read torque in %, raw values from -1000 ~ 1000, measured in unit 0.1 %.
         #      Load is directional, positive values are CCW
-        state.torque = self.port_adapter.read(dxl_id, 'Present Load') / 10.0
+        state.torque = self._port_adapter.read(dxl_id, 'Present Load') / 10.0
 
         # Read temperature in degC, raw values from 0 ~ 100, measured in unit 1 degC
         # IDEA Temperature could be used by the robot to move less, like it was getting tired, or was sweating.
-        state.temperature = self.port_adapter.read(dxl_id, 'Present Temperature')
+        state.temperature = self._port_adapter.read(dxl_id, 'Present Temperature')
 
         return state
 
@@ -70,33 +70,33 @@ class DynamixelAdapter:
         :param goal_pos: angular position in radians
         """
 
-        self.port_adapter.write(dxl_id, 'Goal Position', self._rad_to_int_range(goal_pos, 0, 4095))
+        self._port_adapter.write(dxl_id, 'Goal Position', self._rad_to_int_range(goal_pos, 0, 4095))
 
     def read_drive_mode(self, dxl_id):
-        drive_mode = self.port_adapter.read(dxl_id, 'Drive Mode')
+        drive_mode = self._port_adapter.read(dxl_id, 'Drive Mode')
         return DriveMode.FORWARD if drive_mode == 0 else DriveMode.BACKWARD
 
     def _set_limits(self, dxl_id):
-        self._write_acc_limit(dxl_id, self.ACC_LIMIT_SLOW)
-        self._write_vel_limit(dxl_id, self.VEL_LIMIT_SLOW)
+        self._write_acc_limit(dxl_id, self._ACC_LIMIT_SLOW)
+        self._write_vel_limit(dxl_id, self._VEL_LIMIT_SLOW)
         self._set_position_limits(dxl_id)
 
     def _enable_torque(self, dxl_id):
-        self.port_adapter.write(dxl_id, 'Torque Enable', 1)
+        self._port_adapter.write(dxl_id, 'Torque Enable', 1)
 
     def _disable_torque(self, dxl_id):
-        self.port_adapter.write(dxl_id, 'Torque Enable', 0)
+        self._port_adapter.write(dxl_id, 'Torque Enable', 0)
 
     def _set_pid_gains(self, dxl_id):
-        self.port_adapter.write(dxl_id, 'Position P Gain', self.POSITION_P_GAIN_SOFT)
-        self.port_adapter.write(dxl_id, 'Position I Gain', self.POSITION_I_GAIN_SOFT)
-        self.port_adapter.write(dxl_id, 'Position D Gain', self.POSITION_D_GAIN_SOFT)
+        self._port_adapter.write(dxl_id, 'Position P Gain', self._POSITION_P_GAIN_SOFT)
+        self._port_adapter.write(dxl_id, 'Position I Gain', self._POSITION_I_GAIN_SOFT)
+        self._port_adapter.write(dxl_id, 'Position D Gain', self._POSITION_D_GAIN_SOFT)
 
     def _set_position_limits(self, dxl_id):
         # Set position limits
         logger.warning('position limits not set, commented out.')
-        self.port_adapter.write(dxl_id, 'Min Position Limit', 0)
-        self.port_adapter.write(dxl_id, 'Max Position Limit', 4095)
+        self._port_adapter.write(dxl_id, 'Min Position Limit', 0)
+        self._port_adapter.write(dxl_id, 'Max Position Limit', 4095)
         # self.port_adapter.dxl_write(dxl_id, 'Min Position Limit', 1300)
         # self.port_adapter.dxl_write(dxl_id, 'Max Position Limit', 2500)
 
@@ -120,7 +120,7 @@ class DynamixelAdapter:
             vel_limit = int(vel_limit * 60 / (0.229 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self.port_adapter.write(dxl_id, 'Profile Velocity', vel_limit)
+        self._port_adapter.write(dxl_id, 'Profile Velocity', vel_limit)
 
     def _write_acc_limit(self, dxl_id, acc_limit):
         """
@@ -141,7 +141,7 @@ class DynamixelAdapter:
             acc_limit = int(acc_limit * 60**2 / (214.577 * tau))
 
         # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self.port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
+        self._port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
 
     def _write_drive_mode(self, dxl_id, drive_mode: DriveMode):
         if drive_mode == DriveMode.FORWARD:
@@ -154,10 +154,10 @@ class DynamixelAdapter:
         self._write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
     def _write_config(self, dxl_id, name, value):
-        torque_enabled_backup = self.port_adapter.read(dxl_id, 'Torque Enable')
+        torque_enabled_backup = self._port_adapter.read(dxl_id, 'Torque Enable')
         self._disable_torque(dxl_id)
-        self.port_adapter.write(dxl_id, name, value)
-        self.port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
+        self._port_adapter.write(dxl_id, name, value)
+        self._port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
 
         # TODO test write_config
 
