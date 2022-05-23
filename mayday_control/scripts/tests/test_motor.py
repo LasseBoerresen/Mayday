@@ -4,6 +4,10 @@ import pytest
 
 from dynamixel.dxl_motor import *
 from motor_state import MotorState
+from physical_quantities.angle import Angle
+from physical_quantities.angular_velocity import AngularVelocity
+from physical_quantities.load import Load
+from physical_quantities.temperature import Temperature
 
 
 class TestInitMotorConfig:
@@ -20,7 +24,12 @@ class TestInitMotorConfig:
 class TestGetStateAcceptanceTestCase:
     def test_given_adapter_returns_state__then_motor_has_new_state(self):
         dxl_id = 13
-        state_new = MotorState(position=3, velocity=5, torque=7, temperature=11, position_goal=13)
+        state_new = MotorState(
+            position=Angle(3),
+            velocity=AngularVelocity(5),
+            load=Load(7),
+            temperature=Temperature(11),
+            position_goal=Angle(13))
         mock_dxl_adapter = MagicMock()
         mock_dxl_adapter.read_state = MagicMock(return_value=state_new)
         motor = DxlMotor(dxl_id, mock_dxl_adapter, DriveMode.FORWARD)

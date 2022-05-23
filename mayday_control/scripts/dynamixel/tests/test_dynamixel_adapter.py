@@ -9,6 +9,7 @@ from dynamixel_sdk import PortHandler, PacketHandler
 from dynamixel.dynamixel_adapter import DynamixelAdapter
 from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
 from motor_state import MotorState
+from physical_quantities.angle import Angle
 
 with open(join(dirname(dirname(dirname(__file__))), 'mayday_config.json'), 'r') as f:
     config = json.load(f)
@@ -88,27 +89,30 @@ class TestDynamixelAdapterTestCase:
 
 
 class TestRadianConversion:
-    @pytest.mark.parametrize('angle, expected', [(0.0, 2048), (-tau/2, 1), (tau/2, 4095)])
+    @pytest.mark.parametrize(
+        'angle, expected', [(Angle(0.0), 2048), (Angle(-tau/2), 1), (Angle(tau/2), 4095)])
     def test_given_angle__when_rad_to_int_range__then_returns_expected(self, angle, expected):
-        actual = DynamixelAdapter._rad_to_int_range(angle)
+        actual = DynamixelAdapter._to_position_step(angle)
 
         assert actual == expected
 
-    @pytest.mark.parametrize('int_value, expected', [(2048, 0.0), (1, -tau/2), (4095, tau/2)])
+    @pytest.mark.parametrize(
+        'int_value, expected', [(2048, Angle(0.0)), (1, Angle(-tau/2)), (4095, Angle(tau/2))])
     def test_given_int__when_int_range_to_rad__then_returns_expected(self, int_value, expected):
-        actual = DynamixelAdapter._int_range_to_rad(int_value)
+        actual = DynamixelAdapter._from_position_step(int_value)
 
         assert actual == expected
 
-    @pytest.mark.parametrize('angle', [tau, -tau, tau/2+0.0001, -tau/2-0.0001])
+    @pytest.mark.parametrize(
+        'angle', [Angle(tau), Angle(-tau), Angle(tau/2+0.0001), Angle(-tau/2-0.0001)])
     def test_given_too_big_angle__when_rad_to_int_range__then_raises_value_error(self, angle):
         with pytest.raises(ValueError) as cm:
-            actual = DynamixelAdapter._rad_to_int_range(angle)
+            actual = DynamixelAdapter._to_position_step(angle)
 
-    @pytest.mark.parametrize('int_value', [0, 4096])
+    @pytest.mark.parametrize('int_value', [-1, 4096])
     def test_given_too_big_int_value__when_int_range_to_rad__then_raises_value_error(self, int_value):
         with pytest.raises(ValueError) as cm:
-            actual = DynamixelAdapter._int_range_to_rad(int_value)
+            actual = DynamixelAdapter._from_position_step(int_value)
 
 
 class TestReadState:

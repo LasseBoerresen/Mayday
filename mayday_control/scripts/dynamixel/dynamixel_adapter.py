@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class DynamixelAdapter:
     POSITION_STEP_CENTER = 2048
-    POSITION_STEP_SIZE = Angle(math.tau/4096)
+    POSITION_STEP_EXTREME = 2047
+    POSITION_STEP_SIZE = Angle(math.tau / (POSITION_STEP_EXTREME * 2))
     VELOCITY_STEP_SIZE = AngularVelocity.from_rpm(0.229)
     ACCELERATION_STEP_SIZE = AngularAcceleration.from_rpmm(214.577)
     LOAD_STEP_SIZE = Load(0.1)
@@ -63,11 +64,25 @@ class DynamixelAdapter:
         position_dxl = self._port_adapter.read(dxl_id, 'Goal Position')
         return self._from_position_step(position_dxl)
 
-    def _from_position_step(self, position_dxl: int):
-        return Angle((position_dxl - self.POSITION_STEP_CENTER) * self.POSITION_STEP_SIZE)
+    @classmethod
+    def _from_position_step(cls, position_dxl: int):
+        cls._check_position_step_is_within_bounds(position_dxl)
+        return Angle((position_dxl - cls.POSITION_STEP_CENTER) * cls.POSITION_STEP_SIZE)
 
-    def _to_position_step(self, val: Angle):
-        return math.floor(val / self.POSITION_STEP_SIZE) + self.POSITION_STEP_CENTER
+    @classmethod
+    def _check_position_step_is_within_bounds(cls, position_dxl):
+        if abs(cls.POSITION_STEP_CENTER - position_dxl) > cls.POSITION_STEP_EXTREME:
+            raise ValueError(f'step outside accepted range , got {position_dxl}')
+
+    @classmethod
+    def _to_position_step(cls, angle: Angle):
+        cls._check_angle_is_withing_semicircle(angle)
+        return int(angle / cls.POSITION_STEP_SIZE) + cls.POSITION_STEP_CENTER
+
+    @classmethod
+    def _check_angle_is_withing_semicircle(cls, angle):
+        if angle < Angle(-tau / 2) or angle > Angle(tau / 2):
+            raise ValueError(f'angle bigger than a semicircle, got {angle}')
 
     def _set_limits(self, dxl_id):
         self._write_acc_limit(dxl_id, self._ACC_LIMIT_SLOW)
