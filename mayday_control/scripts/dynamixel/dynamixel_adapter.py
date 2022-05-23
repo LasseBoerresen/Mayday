@@ -1,10 +1,15 @@
 import logging
+import math
 
+from physical_quantities.angle import Angle
+from physical_quantities.angular_acceleration import AngularAcceleration
+from physical_quantities.angular_velocity import AngularVelocity
 from drive_mode import DriveMode
 from dynamixel.dynamixel_port_adapter import DynamixelPortAdapter
+from physical_quantities.load import Load
 from motor_state import MotorState
 from math import tau
-
+from physical_quantities.temperature import Temperature
 
 FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
 logging.basicConfig(format=FORMAT, level='DEBUG')
@@ -13,12 +18,19 @@ logger = logging.getLogger(__name__)
 
 
 class DynamixelAdapter:
+    POSITION_STEP_CENTER = 2048
+    POSITION_STEP_SIZE = Angle(math.tau/4096)
+    VELOCITY_STEP_SIZE = AngularVelocity.from_rpm(0.229)
+    ACCELERATION_STEP_SIZE = AngularAcceleration.from_rpmm(214.577)
+    LOAD_STEP_SIZE = Load(0.1)
+    TEMPERATURE_STEP_SIZE = Temperature(1.0)
 
     def __init__(self, port_adapter: DynamixelPortAdapter):
+
         self._port_adapter = port_adapter
 
         self._TORQ_LIMIT_REST = 1.0
-        self._VEL_LIMIT_SLOW = tau / 8  # tau / 16
+        self._VEL_LIMIT_SLOW = AngularVelocity(tau / 8)  # tau / 16
         self._ACC_LIMIT_SLOW = None  # tau / 8
         self._POSITION_P_GAIN_SOFT = 640  # 200
         self._POSITION_I_GAIN_SOFT = 300
@@ -33,48 +45,29 @@ class DynamixelAdapter:
         self._enable_torque(dxl_id)
 
     def read_state(self, dxl_id) -> MotorState:
-        """
-        read values from dynamixel and save in MotorState object. Convert to SI compatible units first.
-
-        :param dxl_id:
-        :return: state
-        :rtype: MotorState
-        """
-
-        # Unit;Value;Range
-        # rpm, 0.229, [0 ~ 1, 023]
-
-        state = MotorState()
-
-        # Read position in radians, raw values from 0 ~ 4095
-        state.position = self._int_range_to_rad(self._port_adapter.read(dxl_id, 'Present Position'))
-
-        #  Read velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
-        state.velocity = self._port_adapter.read(dxl_id, 'Present Velocity') * 0.229 * tau / 60.0
-
-        #  Read torque in %, raw values from -1000 ~ 1000, measured in unit 0.1 %.
-        #      Load is directional, positive values are CCW
-        state.torque = self._port_adapter.read(dxl_id, 'Present Load') / 10.0
-
-        # Read temperature in degC, raw values from 0 ~ 100, measured in unit 1 degC
-        # IDEA Temperature could be used by the robot to move less, like it was getting tired, or was sweating.
-        state.temperature = self._port_adapter.read(dxl_id, 'Present Temperature')
-
-        return state
-
-    def write_goal_position(self, dxl_id: int, goal_pos: float):
-        """
-        Write goal position, translating from radians to range defined by dxl controltable, i.e. 0-4095
-
-        :param dxl_id:
-        :param goal_pos: angular position in radians
-        """
-
-        self._port_adapter.write(dxl_id, 'Goal Position', self._rad_to_int_range(goal_pos, 0, 4095))
+        return MotorState(
+            position=self._read_position(dxl_id),
+            velocity=self._read_velocity(dxl_id),
+            load=self._read_load(dxl_id),
+            temperature=self._read_temperature(dxl_id),
+            position_goal=self._read_goal_position(dxl_id))
 
     def read_drive_mode(self, dxl_id):
         drive_mode = self._port_adapter.read(dxl_id, 'Drive Mode')
         return DriveMode.FORWARD if drive_mode == 0 else DriveMode.BACKWARD
+
+    def write_goal_position(self, dxl_id: int, val: Angle):
+        self._port_adapter.write(dxl_id, 'Goal Position', self._to_position_step(val))
+
+    def _read_goal_position(self, dxl_id) -> Angle:
+        position_dxl = self._port_adapter.read(dxl_id, 'Goal Position')
+        return self._from_position_step(position_dxl)
+
+    def _from_position_step(self, position_dxl: int):
+        return Angle((position_dxl - self.POSITION_STEP_CENTER) * self.POSITION_STEP_SIZE)
+
+    def _to_position_step(self, val: Angle):
+        return math.floor(val / self.POSITION_STEP_SIZE) + self.POSITION_STEP_CENTER
 
     def _set_limits(self, dxl_id):
         self._write_acc_limit(dxl_id, self._ACC_LIMIT_SLOW)
@@ -82,10 +75,10 @@ class DynamixelAdapter:
         self._set_position_limits(dxl_id)
 
     def _enable_torque(self, dxl_id):
-        self._port_adapter.write(dxl_id, 'Torque Enable', 1)
+        self._write_torque_enabled(dxl_id, 1)
 
     def _disable_torque(self, dxl_id):
-        self._port_adapter.write(dxl_id, 'Torque Enable', 0)
+        self._write_torque_enabled(dxl_id, 0)
 
     def _set_pid_gains(self, dxl_id):
         self._port_adapter.write(dxl_id, 'Position P Gain', self._POSITION_P_GAIN_SOFT)
@@ -94,6 +87,7 @@ class DynamixelAdapter:
 
     def _set_position_limits(self, dxl_id):
         # Set position limits
+        # TODO limits should be specified in radians
         logger.warning('position limits not set, commented out.')
         self._port_adapter.write(dxl_id, 'Min Position Limit', 0)
         self._port_adapter.write(dxl_id, 'Max Position Limit', 4095)
@@ -101,47 +95,23 @@ class DynamixelAdapter:
         # self.port_adapter.dxl_write(dxl_id, 'Max Position Limit', 2500)
 
     # TODO test velocity and acceleration limit conversions
-    def _write_vel_limit(self, dxl_id, vel_limit):
-        """
-
-        :param dxl_id:
-        :param vel_limit: maximum velocity in rad/s
-        :return:
-
-        """
-
-        # infinite velocity = 0
+    def _write_vel_limit(self, dxl_id, vel_limit: AngularVelocity):
         if vel_limit is None:
-            vel_limit = 0
-        # if vel_limit is lower than 1, set to 1 as minimum value
-        elif int(vel_limit * 60 / (0.229 * tau)) < 1:
-            vel_limit = 1
+            infinite_velocity_dxl = 0
+            vel_limit_dxl = infinite_velocity_dxl
         else:
-            vel_limit = int(vel_limit * 60 / (0.229 * tau))
+            vel_limit_dxl = math.ceil(vel_limit / self.VELOCITY_STEP_SIZE)
 
-        # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self._port_adapter.write(dxl_id, 'Profile Velocity', vel_limit)
+        self._port_adapter.write(dxl_id, 'Profile Velocity', vel_limit_dxl)
 
-    def _write_acc_limit(self, dxl_id, acc_limit):
-        """
-
-        :param dxl_id:
-        :param vel_limit: maximum velocity in rad/s
-        :return:
-
-        """
-
-        # infinite accleration = 0
+    def _write_acc_limit(self, dxl_id, acc_limit: AngularAcceleration):
         if acc_limit is None:
-            acc_limit = 0
-        # if acc_limit is lower than 1, set to 1 as minium value
-        elif int(acc_limit * 60**2 / (214.577 * tau)) < 1:
-            acc_limit = 1
+            acc_infinite_dxl = 0
+            acc_limit_dxl = acc_infinite_dxl
         else:
-            acc_limit = int(acc_limit * 60**2 / (214.577 * tau))
+            acc_limit_dxl = math.ceil(acc_limit / self.ACCELERATION_STEP_SIZE)
 
-        # Change Velocity Limits, raw unit is 0.229 rev/min,
-        self._port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit)
+        self._port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit_dxl)
 
     def _write_drive_mode(self, dxl_id, drive_mode: DriveMode):
         if drive_mode == DriveMode.FORWARD:
@@ -154,54 +124,51 @@ class DynamixelAdapter:
         self._write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
     def _write_config(self, dxl_id, name, value):
-        torque_enabled_backup = self._port_adapter.read(dxl_id, 'Torque Enable')
+        torque_enabled_backup = self._read_torque_enabled(dxl_id)
         self._disable_torque(dxl_id)
         self._port_adapter.write(dxl_id, name, value)
-        self._port_adapter.write(dxl_id, 'Torque Enable', torque_enabled_backup)
+        self._write_torque_enabled(dxl_id, torque_enabled_backup)
 
         # TODO test write_config
 
-    @staticmethod
-    def _rad_to_int_range(value_rad, range_min=1, range_max=4095):
+    def _write_torque_enabled(self, dxl_id, value: int):
+        self._port_adapter.write(dxl_id, 'Torque Enable', value)
+
+    def _read_torque_enabled(self, dxl_id) -> int:
+        return self._port_adapter.read(dxl_id, 'Torque Enable')
+
+    def _read_load(self, dxl_id) -> Load:
         """
-        Transform a radian value to one in an integer range
-
-        0 radians will map to middle of range.
+        Reads torque in %, raw values from -1000 ~ 1000, measured in unit 0.1 %.
+        Load is directional, positive values are CCW
         """
+        load_dxl = self._port_adapter.read(dxl_id, 'Present Load')
+        return Load(load_dxl * self.LOAD_STEP_SIZE)
 
-        if range_min >= range_max:
-            raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'
-                .format(range_min, range_max))
-
-        if not (-tau / 2 <= value_rad <= tau/2):
-            raise ValueError(f'Value_rad must be within (-tau/2, tau/2), value_rad: {value_rad}')
-
-        step_size_int = (range_max - range_min) / tau
-
-        return round(value_rad * step_size_int) + 2048
-
-    @staticmethod
-    def _int_range_to_rad(value_int, range_min=1, range_max=4095):
+    def _read_velocity(self, dxl_id) -> AngularVelocity:
         """
-        Transform a integer range value to one in radians
-
-        2048 will map to 0 radians.
+        Reads velocity in rad/s, raw values from 0 ~ 1023, measured in unit 0.229 rpm
         """
 
-        if range_min >= range_max:
-            raise ValueError(
-                'Range_min must be less than range_max: range_min: {}, range_max: {}'
-                .format(range_min, range_max))
+        velocity_dxl = self._port_adapter.read(dxl_id, 'Present Velocity')
+        return AngularVelocity(velocity_dxl * self.VELOCITY_STEP_SIZE)
 
-        if not (range_min <= value_int <= range_max):
-            raise ValueError(
-                'Value_int must be within range: range_min: {}, range_max: {}, got value_int: {}'
-                .format(range_min, range_max, value_int))
+    def _read_position(self, dxl_id) -> Angle:
+        """
+        # Reads position in radians, raw values from 0 ~ 4095
+        """
 
-        step_size_rad = tau / (range_max - range_min)
+        position_dxl = self._port_adapter.read(dxl_id, 'Present Position')
+        return self._from_position_step(position_dxl)
 
-        return (value_int - 2048) * step_size_rad
+    def _read_temperature(self, dxl_id) -> Temperature:
+        """
+        Reads temperature in degC, raw values from 0 ~ 100, measured in unit 1 degC
+        IDEA Temperature could be used by the robot to move less, like it was getting tired, or was
+        sweating.
+        """
+        temperature_dxl = self._port_adapter.read(dxl_id, 'Present Temperature')
+        return Temperature(temperature_dxl * self.TEMPERATURE_STEP_SIZE)
 
 
 if __name__ == '__main__':
