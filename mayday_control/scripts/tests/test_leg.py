@@ -3,6 +3,7 @@ from unittest.mock import create_autospec, call, MagicMock
 import pytest
 
 from dynamixel.dynamixel_adapter import DynamixelAdapter
+from leg import Leg
 from leg_pose import LegPose
 from leg_factory import LegFactory
 from motor_state import MotorState
@@ -11,7 +12,7 @@ from side import Side
 
 class TestLeg:
     @pytest.fixture()
-    def mock_leg(self):
+    def mock_leg(self) -> Leg:
         self.mock_adapter = create_autospec(DynamixelAdapter)
         leg_factory = LegFactory(self.mock_adapter)
         return leg_factory.create_basic(base_id=1, side=Side.LEFT)
