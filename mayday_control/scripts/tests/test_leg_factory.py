@@ -62,3 +62,7 @@ class TestLegFactory:
         leg = self.leg_factory.create_basic(self.base_id, side=Side.LEFT)
 
         assert leg.joints[2].drive_mode == DriveMode.FORWARD
+
+
+if __name__ == '__main__':
+    pytest.main()

@@ -32,3 +32,7 @@ class TestLeg:
         actual = mock_leg.get_joint_positions()
 
         assert actual == leg_pose
+
+
+if __name__ == '__main__':
+    pytest.main()

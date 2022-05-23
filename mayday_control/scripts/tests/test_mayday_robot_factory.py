@@ -43,3 +43,7 @@ class TestMaydayRobotFactory:
     # def test_when_init__then_description_contains_joints(self):
     #     may = MaydayRobot(None)
     #     assert len(may.description.joints) > 0
+
+
+if __name__ == '__main__':
+    pytest.main()
