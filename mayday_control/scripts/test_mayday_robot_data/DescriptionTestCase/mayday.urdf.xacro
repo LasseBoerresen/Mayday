@@ -18,7 +18,6 @@
   <xacro:property name="dynamixel_z" value="0.034" />
   <xacro:property name="dynamixel_weight" value="0.0572" />
 
-
   <xacro:property name="thorax_x" value="0.2" />
   <xacro:property name="thorax_y" value="0.1" />
   <xacro:property name="thorax_z" value="${dynamixel_z - tolerance}" />
@@ -39,6 +38,7 @@
   <xacro:property name="tibia_z" value="0.01" />
   <xacro:property name="tibia_weight" value="0.05" />
 
+  <!-- materials -->
   <material name="black">
     <color rgba="0 0 0 1"/>
   </material>
@@ -82,44 +82,6 @@
     </link>
   </xacro:macro>
 
-  <link name="base_link">
-  </link>
-
-
-  <!-- thorax  -->
-  <link name="thorax">
-    <visual>
-      <geometry>
-        <box size="${thorax_x} ${thorax_y} ${thorax_z}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="grey"/>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="${thorax_x} ${thorax_y} ${thorax_z}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </collision>
-    <xacro:box_inertial mass="${thorax_weight}" x="${thorax_x}" y="${thorax_y}" z="${thorax_z}"
-                        x_="0" y_="0" z_="0" />
-  </link>
-  <joint name="base_link_to_thorax_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="thorax"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
-
-  <gazebo reference="thorax">
-    <mu1 value="0.2"/>
-    <mu2 value="0.2"/>
-    <kp value="10000000.0" />
-    <kd value="1.0" />
-    <material>Gazebo/Grey</material>
-    <selfCollide>True</selfCollide>
-  </gazebo>
-
-
   <!-- coxa macro  -->
   <xacro:macro name="coxa" params="prefix">
     <link name="${prefix}_coxa">
@@ -140,7 +102,6 @@
                           x_="${coxa_x/2-dynamixel_y/2}" y_="0" z_="0"/>
     </link>
   </xacro:macro>
-
 
   <!-- femur macro  -->
   <xacro:macro name="femur" params="prefix">
@@ -163,7 +124,7 @@
     </link>
   </xacro:macro>
 
-
+  <!-- leg macro  -->
   <xacro:macro name="leg" params="prefix x_offset yaw_offset reflect">
 
     <!-- coxa_dynamixel  -->
@@ -362,8 +323,41 @@
 
   </xacro:macro>
 
+  <!-- base_link  -->
+  <link name="base_link">
+  </link>
 
-
+  <!-- thorax  -->
+  <link name="thorax">
+    <visual>
+      <geometry>
+        <box size="${thorax_x} ${thorax_y} ${thorax_z}"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${thorax_x} ${thorax_y} ${thorax_z}"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+    <xacro:box_inertial mass="${thorax_weight}" x="${thorax_x}" y="${thorax_y}" z="${thorax_z}"
+                        x_="0" y_="0" z_="0" />
+  </link>
+  <joint name="base_link_to_thorax_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="thorax"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <gazebo reference="thorax">
+    <mu1 value="0.2"/>
+    <mu2 value="0.2"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Grey</material>
+    <selfCollide>True</selfCollide>
+  </gazebo>
 
   <!-- legs  -->
   <xacro:leg prefix="right_front"  x_offset="${thorax_x/2}" yaw_offset="${tau*1/8}" reflect="-1" />
@@ -373,6 +367,7 @@
   <xacro:leg prefix="left_center"  x_offset="0.0"            yaw_offset="${tau*2/8}" reflect="1" />
   <xacro:leg prefix="left_hind"    x_offset="${-thorax_x/2}" yaw_offset="${tau*3/8}" reflect="1" />
 
+  <!-- gazebo ros control -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/mayday</robotNamespace>
