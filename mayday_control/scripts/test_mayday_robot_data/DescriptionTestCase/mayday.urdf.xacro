@@ -9,7 +9,6 @@
   <xacro:property name="bodylen" value="0.6" />
   <xacro:property name="baselen" value="0.4" />
   <xacro:property name="wheeldiam" value="0.07" />
-  <xacro:property name="tau" value="${pi*2}" />
 
   <xacro:property name="tolerance" value="0.001" />
 
