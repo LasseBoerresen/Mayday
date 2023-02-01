@@ -12,30 +12,33 @@ from math import tau
 from physical_quantities.temperature import Temperature
 
 FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
-logging.basicConfig(format=FORMAT, level='DEBUG')
+logging.basicConfig(format=FORMAT, level='INFO')
 logger = logging.getLogger(__name__)
 # logger = rclpy.logging.getLogger(__name__)
 
 
 class DynamixelAdapter:
-    POSITION_STEP_CENTER = 2048
-    POSITION_STEP_EXTREME = 2047
-    POSITION_STEP_SIZE = Angle(math.tau / (POSITION_STEP_EXTREME * 2))
-    VELOCITY_STEP_SIZE = AngularVelocity.from_rpm(0.229)
-    ACCELERATION_STEP_SIZE = AngularAcceleration.from_rpmm(214.577)
-    LOAD_STEP_SIZE = Load(0.1)
-    TEMPERATURE_STEP_SIZE = Temperature(1.0)
+    _POSITION_STEP_CENTER = 2048
+    _POSITION_STEP_EXTREME = 2047
+    _POSITION_STEP_SIZE = Angle(math.tau / (_POSITION_STEP_EXTREME * 2))
+    _VELOCITY_STEP_SIZE = AngularVelocity.from_rpm(0.229)
+    _ACCELERATION_STEP_SIZE = AngularAcceleration.from_rpmm(214.577)
+    _LOAD_STEP_SIZE = Load(0.1)
+    _TEMPERATURE_STEP_SIZE = Temperature(1.0)
+
+    _TORQ_LIMIT_REST = 1.0
+    _VEL_LIMIT_SLOW = AngularVelocity(tau / 2)  # tau / 16
+    _VEL_LIMIT_FAST = AngularVelocity(tau / 2)  # tau / 16
+    _ACC_LIMIT_SLOW = None  # tau / 8
+    _POSITION_P_GAIN_SOFT = 640  # 200
+    _POSITION_I_GAIN_SOFT = 300
+    _POSITION_D_GAIN_SOFT = 4000
 
     def __init__(self, port_adapter: DynamixelPortAdapter):
 
         self._port_adapter = port_adapter
 
-        self._TORQ_LIMIT_REST = 1.0
-        self._VEL_LIMIT_SLOW = AngularVelocity(tau / 8)  # tau / 16
-        self._ACC_LIMIT_SLOW = None  # tau / 8
-        self._POSITION_P_GAIN_SOFT = 640  # 200
-        self._POSITION_I_GAIN_SOFT = 300
-        self._POSITION_D_GAIN_SOFT = 4000
+
 
     def init_single(self, dxl_id, drive_mode: DriveMode):
         self._disable_torque(dxl_id)
@@ -67,17 +70,17 @@ class DynamixelAdapter:
     @classmethod
     def _from_position_step(cls, position_dxl: int):
         cls._check_position_step_is_within_bounds(position_dxl)
-        return Angle((position_dxl - cls.POSITION_STEP_CENTER) * cls.POSITION_STEP_SIZE)
+        return Angle((position_dxl - cls._POSITION_STEP_CENTER) * cls._POSITION_STEP_SIZE)
 
     @classmethod
     def _check_position_step_is_within_bounds(cls, position_dxl):
-        if abs(cls.POSITION_STEP_CENTER - position_dxl) > cls.POSITION_STEP_EXTREME:
+        if abs(cls._POSITION_STEP_CENTER - position_dxl) > cls._POSITION_STEP_EXTREME:
             raise ValueError(f'step outside accepted range , got {position_dxl}')
 
     @classmethod
     def _to_position_step(cls, angle: Angle):
         cls._check_angle_is_withing_semicircle(angle)
-        return int(angle / cls.POSITION_STEP_SIZE) + cls.POSITION_STEP_CENTER
+        return int(angle / cls._POSITION_STEP_SIZE) + cls._POSITION_STEP_CENTER
 
     @classmethod
     def _check_angle_is_withing_semicircle(cls, angle):
@@ -115,7 +118,7 @@ class DynamixelAdapter:
             infinite_velocity_dxl = 0
             vel_limit_dxl = infinite_velocity_dxl
         else:
-            vel_limit_dxl = math.ceil(vel_limit / self.VELOCITY_STEP_SIZE)
+            vel_limit_dxl = math.ceil(vel_limit / self._VELOCITY_STEP_SIZE)
 
         self._port_adapter.write(dxl_id, 'Profile Velocity', vel_limit_dxl)
 
@@ -124,7 +127,7 @@ class DynamixelAdapter:
             acc_infinite_dxl = 0
             acc_limit_dxl = acc_infinite_dxl
         else:
-            acc_limit_dxl = math.ceil(acc_limit / self.ACCELERATION_STEP_SIZE)
+            acc_limit_dxl = math.ceil(acc_limit / self._ACCELERATION_STEP_SIZE)
 
         self._port_adapter.write(dxl_id, 'Profile Acceleration', acc_limit_dxl)
 
@@ -158,7 +161,7 @@ class DynamixelAdapter:
         Load is directional, positive values are CCW
         """
         load_dxl = self._port_adapter.read(dxl_id, 'Present Load')
-        return Load(load_dxl * self.LOAD_STEP_SIZE)
+        return Load(load_dxl * self._LOAD_STEP_SIZE)
 
     def _read_velocity(self, dxl_id) -> AngularVelocity:
         """
@@ -166,7 +169,7 @@ class DynamixelAdapter:
         """
 
         velocity_dxl = self._port_adapter.read(dxl_id, 'Present Velocity')
-        return AngularVelocity(velocity_dxl * self.VELOCITY_STEP_SIZE)
+        return AngularVelocity(velocity_dxl * self._VELOCITY_STEP_SIZE)
 
     def _read_position(self, dxl_id) -> Angle:
         """
@@ -183,7 +186,7 @@ class DynamixelAdapter:
         sweating.
         """
         temperature_dxl = self._port_adapter.read(dxl_id, 'Present Temperature')
-        return Temperature(temperature_dxl * self.TEMPERATURE_STEP_SIZE)
+        return Temperature(temperature_dxl * self._TEMPERATURE_STEP_SIZE)
 
 
 if __name__ == '__main__':

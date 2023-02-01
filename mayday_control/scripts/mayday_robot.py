@@ -11,5 +11,10 @@ class MaydayRobot:
         for leg in self.legs:
             leg.set_joint_positions(pose)
 
+    def set_leg_joint_positions(self, leg_id, xyz):
+        # TODO inverse kinematics
+        pose = LegPose(xyz)
+        self.legs[leg_id].set_joint_positions(pose)
+
     def disable_torque(self):
         NotImplementedError()
