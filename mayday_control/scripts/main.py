@@ -15,6 +15,7 @@ def main():
 
     may.enable_torque()
     may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
+    time.sleep(1)
     may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)
 
 
