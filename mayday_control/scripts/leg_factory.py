@@ -8,10 +8,11 @@ from side import Side
 class LegFactory:
     N_JOINTS = 3
 
-    def __init__(self, adapter: DynamixelAdapter):
+    def __init__(self, adapter: DynamixelAdapter, init_dynamixel=False):
         self.adapter = adapter
+        self.init_dynamixel = init_dynamixel
 
-    def create_basic(self, base_id: int, side: Side) -> Leg:
+    def create_basic(self, base_id: int, side: Side, ) -> Leg:
         joints = self._create_joints(base_id, side)
         return Leg(joints)
 
@@ -21,7 +22,7 @@ class LegFactory:
     def _create_joint(self, base_id: int, joint_num: int, side: Side) -> DxlMotor:
         motor_id = self._motor_id(base_id, joint_num)
         drive_mode = self._drive_mode(joint_num, side)
-        return DxlMotor(motor_id, self.adapter, drive_mode)
+        return DxlMotor(motor_id, self.adapter, drive_mode, init=self.init_dynamixel)
 
     @staticmethod
     def _motor_id(base_id: int, joint_num: int) -> int:

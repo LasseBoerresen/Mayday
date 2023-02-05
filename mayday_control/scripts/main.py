@@ -1,3 +1,4 @@
+import json
 import time
 
 from dynamixel_sdk import PortHandler, PacketHandler
@@ -11,7 +12,10 @@ from mayday_robot_factory import MaydayRobotFactory
 
 
 def main():
-    may: MaydayRobot = create_mayday()
+    with open('mayday_config.json', 'r') as f:
+        mayday_config = json.load(f)
+
+    may: MaydayRobot = create_mayday(init_dynamixels=mayday_config['init_dynamixels'])
 
     may.enable_torque()
     may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
@@ -19,7 +23,7 @@ def main():
     may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)
 
 
-def create_mayday() -> MaydayRobot:
+def create_mayday(init_dynamixels) -> MaydayRobot:
     port_handler = PortHandler(port_name='/dev/ttyUSB0')
     packet_handler = PacketHandler(protocol_version=2.0)
     dxl_port_adapter = DynamixelPortAdapter(port_handler, packet_handler)
@@ -27,8 +31,8 @@ def create_mayday() -> MaydayRobot:
 
     dxl_adapter = DynamixelAdapter(dxl_port_adapter)
 
-    leg_factory = LegFactory(dxl_adapter)
-    mayday_factory = MaydayRobotFactory(leg_factory, dxl_adapter)
+    leg_factory = LegFactory(dxl_adapter, init_dynamixels)
+    mayday_factory = MaydayRobotFactory(leg_factory, dxl_adapter, init_dynamixels)
 
     return mayday_factory.create_basic()
 

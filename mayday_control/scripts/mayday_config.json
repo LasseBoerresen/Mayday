@@ -1,3 +1,4 @@
 {
-  "robot_is_connected": false
+  "robot_is_connected": true,
+  "init_dynamixels": false
 }
