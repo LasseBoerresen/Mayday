@@ -11,7 +11,8 @@ from mayday_robot_factory import MaydayRobotFactory
 class TestInit:
     def test_when_set_start_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
+        mock_dynamixel_adapter = create_autospec(DynamixelAdapter)
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, mock_dynamixel_adapter)
         may = mayday_factory.create_basic()
 
         may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
@@ -21,7 +22,8 @@ class TestInit:
 
     def test_when_set_standing_position__then_calls_set_pose_on_all_legs(self):
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
+        mock_dynamixel_adapter = create_autospec(DynamixelAdapter)
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, mock_dynamixel_adapter)
         may = mayday_factory.create_basic()
 
         may.set_joint_positions_for_all_legs(Leg.POSE_STANDING)

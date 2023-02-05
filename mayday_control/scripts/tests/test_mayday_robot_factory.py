@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, create_autospec, call
 
 import pytest
 
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg_factory import LegFactory
 from mayday_robot_factory import MaydayRobotFactory
 from side import Side
@@ -12,7 +13,8 @@ class TestMaydayRobotFactory:
     @pytest.fixture()
     def mayday_factory(self):
         leg_factory = LegFactory(adapter=MagicMock())
-        return MaydayRobotFactory(leg_factory)
+        mock_dynamixel_adapter = create_autospec(DynamixelAdapter)
+        return MaydayRobotFactory(leg_factory, mock_dynamixel_adapter)
 
     def test_when_create_basic__then_has_6_legs(self, mayday_factory):
         may = mayday_factory.create_basic()
@@ -21,7 +23,8 @@ class TestMaydayRobotFactory:
 
     def test_when_calling_create_basic__then_sets_last_3_legs_side_to_right(self):
         mock_leg_factory = create_autospec(LegFactory)
-        mayday_factory = MaydayRobotFactory(mock_leg_factory)
+        mock_dynamixel_adapter = create_autospec(DynamixelAdapter)
+        mayday_factory = MaydayRobotFactory(mock_leg_factory, mock_dynamixel_adapter)
 
         may = mayday_factory.create_basic()
 

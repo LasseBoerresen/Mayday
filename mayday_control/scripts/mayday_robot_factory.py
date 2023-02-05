@@ -1,3 +1,4 @@
+from dynamixel.dynamixel_adapter import DynamixelAdapter
 from mayday_robot import MaydayRobot
 from leg_factory import LegFactory
 from side import Side
@@ -7,12 +8,13 @@ class MaydayRobotFactory(object):
     N_LEGS = 6
     LEFT_SIDE_LEG_NUMBERS = [0, 1, 2]
 
-    def __init__(self, leg_factory: LegFactory):
+    def __init__(self, leg_factory: LegFactory, joint_adapter: DynamixelAdapter):
         self.leg_factory = leg_factory
+        self.joint_adapter = joint_adapter
 
     def create_basic(self) -> MaydayRobot:
         legs = self._create_legs()
-        return MaydayRobot(legs)
+        return MaydayRobot(legs, joint_adapter=self.joint_adapter)
 
     def _create_legs(self):
         return [self._create_leg(leg_num) for leg_num in range(self.N_LEGS)]
