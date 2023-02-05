@@ -20,7 +20,9 @@ def main():
 
 
 def create_mayday() -> MaydayRobot:
-    dxl_port_adapter = DynamixelPortAdapter(PortHandler('/dev/ttyUSB0'), PacketHandler(2.0))
+    port_handler = PortHandler(port_name='/dev/ttyUSB0')
+    packet_handler = PacketHandler(protocol_version=2.0)
+    dxl_port_adapter = DynamixelPortAdapter(port_handler, packet_handler)
     dxl_port_adapter.init_communication()
 
     dxl_adapter = DynamixelAdapter(dxl_port_adapter)
