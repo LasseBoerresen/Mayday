@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class DynamixelAdapter:
+    DXL_BROADCAST_ID = 254
     _POSITION_STEP_CENTER = 2048
     _POSITION_STEP_EXTREME = 2047
     _POSITION_STEP_SIZE = Angle(math.tau / (_POSITION_STEP_EXTREME * 2))
@@ -36,12 +37,18 @@ class DynamixelAdapter:
 
         self._port_adapter = port_adapter
 
-    def init_single(self, dxl_id, drive_mode: DriveMode):
+    def init_all(self):
+        dxl_id = self.DXL_BROADCAST_ID
         self.disable_torque(dxl_id)
         self._write_drive_mode(dxl_id, drive_mode)
         self._set_limits(dxl_id)
         self._set_pid_gains(dxl_id)
         # TODO set torque limit
+        self.enable_torque(dxl_id)
+
+    def init_single(self, dxl_id, drive_mode: DriveMode):
+        self.disable_torque(dxl_id)
+        self._write_drive_mode(dxl_id, drive_mode)
         self.enable_torque(dxl_id)
 
     def read_state(self, dxl_id) -> MotorState:

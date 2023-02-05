@@ -14,9 +14,7 @@ class MaydayRobot:
             leg.set_joint_positions(pose)
 
     def enable_torque(self):
-        for leg in self.legs:
-            leg.enable_torque()
+        self.joint_adapter.enable_torque(self.joint_adapter.DXL_BROADCAST_ID)
 
     def disable_torque(self):
-        for leg in self.legs:
-            leg.disable_torque()
+        self.joint_adapter.disable_torque(self.joint_adapter.DXL_BROADCAST_ID)
