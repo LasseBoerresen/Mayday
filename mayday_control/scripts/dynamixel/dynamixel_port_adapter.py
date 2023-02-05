@@ -14,7 +14,10 @@ class DynamixelPortAdapter:
     def __init__(self, port_handler: PortHandler, packet_handler: PacketHandler):
         path = join(dirname(__file__), 'XL430_W250_control_table.csv')
         self.control_table = pd.read_csv(path, sep=';', index_col=3)
-        self.BAUD_RATE = 57600  # Dynamixel default baud_rate : 57600
+
+        # OBS: must change usb-serial latency timer from default 16 to 1 to utilize higher baud rate
+        # sudo su, echo 1 > /sys/bus/usb-serial/devices/ttyUSB0/latency_timer
+        self.BAUD_RATE = 4000000  # 57600  # Dynamixel default baud_rate : 57600
         self.packet_handler = packet_handler
         self.port_handler = port_handler
 
