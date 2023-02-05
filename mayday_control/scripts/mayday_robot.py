@@ -13,5 +13,10 @@ class MaydayRobot:
         for leg in self.legs:
             leg.set_joint_positions(pose)
 
+    def enable_torque(self):
+        for leg in self.legs:
+            leg.enable_torque()
+
     def disable_torque(self):
-        NotImplementedError()
+        for leg in self.legs:
+            leg.disable_torque()

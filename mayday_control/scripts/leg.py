@@ -21,3 +21,11 @@ class Leg:
     def get_joint_positions(self) -> LegPose:
         positions = [joint.state.position for joint in self.joints]
         return LegPose(positions)
+
+    def enable_torque(self):
+        for joint in self.joints:
+            joint.enable_torque()
+
+    def disable_torque(self):
+        for joint in self.joints:
+            joint.disable_torque()

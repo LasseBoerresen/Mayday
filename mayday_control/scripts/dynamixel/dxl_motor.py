@@ -20,3 +20,10 @@ class DxlMotor:
 
     def get_position(self):
         raise NotImplementedError('should call return self.adapter.read_goal_pos(self.id)')
+
+    def enable_torque(self):
+        self.adapter.enable_torque(self.id)
+
+    def disable_torque(self):
+        self.adapter.disable_torque(self.id)
+

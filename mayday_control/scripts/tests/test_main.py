@@ -24,7 +24,7 @@ class TestMainEndToEndIntegration:
         may = main.create_mayday()
 
         may.set_joint_positions_for_all_legs(Leg.POSE_STARTING)
-        time.sleep(5)
+        time.sleep(1)
 
         goal_positions = Leg.POSE_STARTING
         self.assert_goal_positions_are_reached(goal_positions, may)
@@ -58,13 +58,13 @@ class TestMainAcceptance:
     def setup(self):
         self.mock_mayday: MagicMock = create_autospec(MaydayRobot)
 
-    def test__calls_disable_torque(self):
+    def test__calls_enable_torque(self):
         # When
         with patch('main.create_mayday', return_value=self.mock_mayday):
             main.main()
 
         # Then
-        self.mock_mayday.disable_torque.assert_called()
+        self.mock_mayday.enable_torque.assert_called()
 
     def test_calls_set_start_pose_and_then_standing_pose(self):
         # When
