@@ -81,7 +81,7 @@ class DynamixelPortAdapter:
         size = self.control_table.loc[name, 'Size [byte]']
         addr = self.control_table.loc[name, 'Address']
 
-        dxl_comm_result, dxl_error, value = self._read_given_size(addr, dxl_id, size)
+        value, dxl_comm_result, dxl_error  = self._read_given_size(addr, dxl_id, size)
 
         mode = 'read'
         self._handle_return_messages(dxl_comm_result, dxl_error, dxl_id, mode, name, value)
