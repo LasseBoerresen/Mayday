@@ -4,13 +4,12 @@ from motor_state import MotorState
 
 
 class DxlMotor:
-    def __init__(self, id, adapter: DynamixelAdapter, drive_mode: DriveMode, init=False):
+    def __init__(self, id, adapter: DynamixelAdapter, drive_mode: DriveMode):
         self.id = id
         self.adapter = adapter
         self.drive_mode = drive_mode
 
-        if init:
-            self.adapter.init_single(self.id, self.drive_mode)
+        self.adapter.init_single(self.id, self.drive_mode)
 
     @property
     def state(self) -> MotorState:

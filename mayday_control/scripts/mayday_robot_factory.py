@@ -8,14 +8,13 @@ class MaydayRobotFactory(object):
     N_LEGS = 6
     LEFT_SIDE_LEG_NUMBERS = [0, 1, 2]
 
-    def __init__(self, leg_factory: LegFactory, joint_adapter: DynamixelAdapter, init_dynamixels=False):
+    def __init__(self, leg_factory: LegFactory, joint_adapter: DynamixelAdapter):
         self.leg_factory = leg_factory
         self.joint_adapter = joint_adapter
-        self.init_dynamixels = init_dynamixels
 
     def create_basic(self) -> MaydayRobot:
         legs = self._create_legs()
-        return MaydayRobot(legs, self.joint_adapter, self.init_dynamixels)
+        return MaydayRobot(legs, joint_adapter=self.joint_adapter)
 
     def _create_legs(self):
         return [self._create_leg(leg_num) for leg_num in range(self.N_LEGS)]

@@ -29,9 +29,9 @@ class DynamixelAdapter:
     _TORQ_LIMIT_REST = 1.0
     _VEL_LIMIT_SLOW = None  # AngularVelocity(tau / 8)  # tau / 16
     _ACC_LIMIT_SLOW = None  # tau / 8
-    _POSITION_P_GAIN_SOFT = 400  # 200, 640
-    _POSITION_I_GAIN_SOFT = 200  # 300
-    _POSITION_D_GAIN_SOFT = 2000  # 4000
+    _POSITION_P_GAIN_SOFT = 640  # 200
+    _POSITION_I_GAIN_SOFT = 300
+    _POSITION_D_GAIN_SOFT = 4000
 
     def __init__(self, port_adapter: DynamixelPortAdapter):
 
@@ -40,6 +40,7 @@ class DynamixelAdapter:
     def init_all(self):
         dxl_id = self.DXL_BROADCAST_ID
         self.disable_torque(dxl_id)
+        self._write_drive_mode(dxl_id, drive_mode)
         self._set_limits(dxl_id)
         self._set_pid_gains(dxl_id)
         # TODO set torque limit
@@ -141,7 +142,7 @@ class DynamixelAdapter:
         else:
             raise ValueError(f'Drive mode not recognized, got: {drive_mode}')
 
-        self._port_adapter.write(dxl_id, 'Drive Mode', dxl_drive_mode)
+        self._write_config(dxl_id, 'Drive Mode', dxl_drive_mode)
 
     def _write_config(self, dxl_id, name, value):
         torque_enabled_backup = self._read_torque_enabled(dxl_id)
