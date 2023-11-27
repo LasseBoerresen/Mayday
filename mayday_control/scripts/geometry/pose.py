@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 
 
@@ -6,6 +7,10 @@ class Pose:
     x: float
     y: float
     z: float
-    r: float
-    p: float
-    j: float
+    R: float
+    P: float
+    Y: float
+
+    @classmethod
+    def zeros(cls) -> Pose:
+        return Pose(0, 0, 0, 0, 0, 0)

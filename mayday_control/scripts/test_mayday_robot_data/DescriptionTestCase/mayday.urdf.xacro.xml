@@ -344,11 +344,13 @@
     <xacro:box_inertial mass="${thorax_weight}" x="${thorax_x}" y="${thorax_y}" z="${thorax_z}"
                         x_="0" y_="0" z_="0" />
   </link>
+
   <joint name="base_link_to_thorax_joint" type="fixed">
     <parent link="base_link"/>
     <child link="thorax"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
+
   <gazebo reference="thorax">
     <mu1 value="0.2"/>
     <mu2 value="0.2"/>
@@ -357,6 +359,7 @@
     <material>Gazebo/Grey</material>
     <selfCollide>True</selfCollide>
   </gazebo>
+
 
   <!-- legs  -->
   <xacro:leg prefix="right_front"  x_offset="${thorax_x/2}" yaw_offset="${tau*1/8}" reflect="-1" />

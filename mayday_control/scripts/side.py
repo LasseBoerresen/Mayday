@@ -1,6 +1,18 @@
-from enum import Enum, auto
+from abc import ABC
+from dataclasses import dataclass
 
 
-class Side(Enum):
-    LEFT = auto()
-    RIGHT = auto()
+@dataclass
+class Side(ABC):
+    index: int
+    direction_modifier: int
+
+
+class RightSide(Side):
+    index = 0
+    direction_modifier = 1
+
+
+class LeftSide(Side):
+    index = 1
+    direction_modifier = -1

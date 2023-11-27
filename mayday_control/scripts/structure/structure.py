@@ -1,4 +1,5 @@
 from geometry.pose import Pose
+from urdfpy import URDF
 
 
 class Structure:
