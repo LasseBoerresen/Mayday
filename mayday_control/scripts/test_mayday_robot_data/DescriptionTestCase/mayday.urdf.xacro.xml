@@ -3,13 +3,6 @@
 
   <xacro:property name="robotname" value="mayday" />
 
-  <xacro:property name="width" value="0.2" />
-  <xacro:property name="leglen" value="0.6" />
-  <xacro:property name="polelen" value="0.2" />
-  <xacro:property name="bodylen" value="0.6" />
-  <xacro:property name="baselen" value="0.4" />
-  <xacro:property name="wheeldiam" value="0.07" />
-
   <xacro:property name="tolerance" value="0.001" />
 
   <xacro:property name="dynamixel_x" value="0.0465" />
