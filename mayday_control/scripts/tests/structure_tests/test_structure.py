@@ -1,32 +1,56 @@
+from math import tau
+
+import numpy as np
 import pytest
 
 from geometry.pose import Pose
-from structure.coxa import CoxaJoint
+from geometry.vec3 import Vec3
+from physical_quantities.angle import Angle
+from side import LeftSide, RightSide, Side
+from structure.components import ThoraxToCoxaJoint
+from structure.leg_position import BackLegPosition, CenterLegPosition, FrontLegPosition, LegPosition
 from structure.structure import Structure
+from tests.structure_tests.fake_motor import FakeMotor
 
 
 class TestStructure:
-    def test_given_thorax_is_root__when_get_thorax_position__then_returns_0_0_0_0_0_0_pose(self):
+
+    @pytest.fixture()
+    def structure(self):
+        return Structure()
+
+    def test__when_get_thorax_position__then_returns_0_0_0_0_0_0_pose(self, structure):
         # Given
-        structure = Structure()
 
         # When
         actual = structure.get_thorax_position()
 
         # Then
-        expected = Pose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        expected = Pose.zeros()
         assert actual == expected
 
-    def test_when_get_pose_of_right_front_coxa_joint__then_returns_that_pose(self):
+
+
+    @pytest.mark.parametrize(
+            "side,leg_position,expected",
+            [
+                (RightSide, CenterLegPosition, Pose(Vec3(0, 0.086, 0), Vec3(0, 0, -tau / 4))),
+                (RightSide, FrontLegPosition, Pose(Vec3(0.077, 0.074, 0), Vec3(0, 0, -tau / 4 - Angle.from_deg(55)))),
+                (RightSide, BackLegPosition, Pose(Vec3(-0.077, 0.074, 0), Vec3(0, 0, -tau / 4 + Angle.from_deg(55)))),
+                (LeftSide, CenterLegPosition, Pose(Vec3(0, -0.086, 0), Vec3(0, 0, tau / 4))),
+                (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
+                (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
+            ])
+    def test__given_ThoraxToCoxaJoint__when_get_origin__then_returns_expected(
+            self, side: Side, leg_position: LegPosition, expected: Pose):
+
         # Given
-        coxaJoint = CoxaJoint()
-        structure = Structure()
+        joint = ThoraxToCoxaJoint(side, leg_position, FakeMotor(), axis=Vec3(1, 0, 0))
 
         # When
-        actual = structure.get()
+        actual = joint.origin
 
         # Then
-        expected = Pose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         assert actual == expected
 
 
