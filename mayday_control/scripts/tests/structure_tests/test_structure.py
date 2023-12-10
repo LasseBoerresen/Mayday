@@ -7,7 +7,7 @@ from geometry.pose import Pose
 from geometry.vec3 import Vec3
 from physical_quantities.angle import Angle
 from side import LeftSide, RightSide, Side
-from structure.components import ThoraxToCoxaJoint
+from structure.components import ThoraxToCoxaJoint, ThoraxToCoxaMotorLink
 from structure.leg_position import BackLegPosition, CenterLegPosition, FrontLegPosition, LegPosition
 from structure.structure import Structure
 from tests.structure_tests.fake_motor import FakeMotor
@@ -41,17 +41,27 @@ class TestStructure:
                 (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
                 (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
             ])
-    def test__given_ThoraxToCoxaJoint__when_get_origin__then_returns_expected(
+    def test__given_ThoraxToCoxaLink__when_get_origin__then_returns_expected(
             self, side: Side, leg_position: LegPosition, expected: Pose):
 
         # Given
-        joint = ThoraxToCoxaJoint(side, leg_position, FakeMotor(), axis=Vec3(1, 0, 0))
+        joint = ThoraxToCoxaMotorLink(side, leg_position)
 
         # When
         actual = joint.origin
 
         # Then
         assert actual == expected
+
+    def test__given_ThoraxToCoxaJoint__when_get_origin__then_returns_pose_zeros(self):
+        # Given
+        joint = ThoraxToCoxaJoint(FakeMotor())
+
+        # When
+        actual = joint.origin
+
+        # Then
+        assert actual == Pose.zeros()
 
 
 if __name__ == '__main__':

@@ -25,18 +25,12 @@ class Component(ABC):
 
 
 class Link(Component, ABC):
-    def __init__(self, origin: Pose, mass: Mass):
-        super().__init__(origin)
-        self.mass: Mass = mass
-        # self.inertia = InertialMatrix
-
-    def add_child(self, child: Joint):
-        super().__add_child(child)
+    pass
 
 
 class BaseLink(Link):
     def __init__(self):
-        super().__init__(origin=Pose.zeros(), mass=Mass(0.0))
+        super().__init__(origin=Pose.zeros())
 
 
 class Joint(Component, ABC):
@@ -55,12 +49,12 @@ class FixedJoint(Joint):
         super().__init__(origin)
 
 
-class ThoraxToCoxaJoint(RotationalJoint):
-    def __init__(self, side: Side, leg_position: LegPosition, motor: Motor, axis: Vec3):
-        origin = self._create_origin(leg_position, side)
-        super().__init__(origin, motor, Vec3.z_axis())
+class ThoraxToCoxaMotorLink(Link):
+    def __init__(self, side: Side, leg_position: LegPosition):
+        super().__init__(leg_position.origin * side.pose)
 
-    @staticmethod
-    def _create_origin(leg_position: LegPosition, side: Side):
-        return leg_position.origin * side.pose
+
+class ThoraxToCoxaJoint(RotationalJoint):
+    def __init__(self, motor: Motor):
+        super().__init__(Pose.zeros(), motor, Vec3.z_axis())
 
