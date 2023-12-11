@@ -32,15 +32,15 @@ class TestStructure:
 
 
     @pytest.mark.parametrize(
-            "side,leg_position,expected_pose",
-            [
-                (RightSide, CenterLegPosition, Pose(Vec3(0, 0.086, 0), Vec3(0, 0, -tau / 4))),
-                (RightSide, FrontLegPosition, Pose(Vec3(0.077, 0.074, 0), Vec3(0, 0, -tau / 4 - Angle.from_deg(55)))),
-                (RightSide, BackLegPosition, Pose(Vec3(-0.077, 0.074, 0), Vec3(0, 0, -tau / 4 + Angle.from_deg(55)))),
-                (LeftSide, CenterLegPosition, Pose(Vec3(0, -0.086, 0), Vec3(0, 0, tau / 4))),
-                (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
-                (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
-            ])
+        "side,leg_position,expected_pose",
+        [
+            (RightSide, CenterLegPosition, Pose(Vec3(0, 0.086, 0), Vec3(0, 0, -tau / 4))),
+            (RightSide, FrontLegPosition, Pose(Vec3(0.077, 0.074, 0), Vec3(0, 0, -tau / 4 - Angle.from_deg(55)))),
+            (RightSide, BackLegPosition, Pose(Vec3(-0.077, 0.074, 0), Vec3(0, 0, -tau / 4 + Angle.from_deg(55)))),
+            (LeftSide, CenterLegPosition, Pose(Vec3(0, -0.086, 0), Vec3(0, 0, tau / 4))),
+            (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
+            (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
+        ])
     def test__given_ThoraxToCoxaLink__when_get_origin__then_returns_expected_pose(
             self, side: Side, leg_position: LegPosition, expected_pose: Pose):
 
