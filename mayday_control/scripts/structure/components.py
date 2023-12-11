@@ -11,8 +11,7 @@ from structure.leg_position import LegPosition
 
 
 class Component(ABC):
-    def __init__(self, origin: Pose):
-        self.origin: Pose = origin
+    def __init__(self):
         self._parent: (Component, None) = None
         self._children: [Component] = []
 
