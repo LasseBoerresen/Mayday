@@ -47,12 +47,25 @@ class FixedJoint(Joint):
         super().__init__(origin)
 
 
-class ThoraxToCoxaMotorLink(Link):
+class CoxaMotorJoint(FixedJoint):
     def __init__(self, side: Side, leg_position: LegPosition):
         super().__init__(leg_position.origin * side.pose)
 
 
-class ThoraxToCoxaJoint(RotationalJoint):
+class CoxaMotorLink(Link):
+    pass
+
+
+class CoxaJoint(RotationalJoint):
     def __init__(self, motor: Motor):
         super().__init__(Pose.zeros(), motor, Vec3.z_axis())
 
+
+class Coxa(Link):
+    def __init__(self):
+        super().__init__(Pose.zeros())
+
+
+class FemurMotor(Link):
+    def __init__(self):
+        super().__init__(Pose.zeros())
