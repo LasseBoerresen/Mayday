@@ -32,7 +32,7 @@ class TestStructure:
 
 
     @pytest.mark.parametrize(
-            "side,leg_position,expected",
+            "side,leg_position,expected_pose",
             [
                 (RightSide, CenterLegPosition, Pose(Vec3(0, 0.086, 0), Vec3(0, 0, -tau / 4))),
                 (RightSide, FrontLegPosition, Pose(Vec3(0.077, 0.074, 0), Vec3(0, 0, -tau / 4 - Angle.from_deg(55)))),
@@ -41,8 +41,8 @@ class TestStructure:
                 (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
                 (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
             ])
-    def test__given_ThoraxToCoxaLink__when_get_origin__then_returns_expected(
-            self, side: Side, leg_position: LegPosition, expected: Pose):
+    def test__given_ThoraxToCoxaLink__when_get_origin__then_returns_expected_pose(
+            self, side: Side, leg_position: LegPosition, expected_pose: Pose):
 
         # Given
         joint = ThoraxToCoxaMotorLink(side, leg_position)
@@ -51,7 +51,7 @@ class TestStructure:
         actual = joint.origin
 
         # Then
-        assert actual == expected
+        assert actual == expected_pose
 
     def test__given_ThoraxToCoxaJoint__when_get_origin__then_returns_pose_zeros(self):
         # Given
