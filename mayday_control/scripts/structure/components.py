@@ -29,6 +29,10 @@ class Link(Component, ABC):
 
 
 class Joint(Component, ABC):
+    def __init__(self, origin):
+        super().__init__()
+        self.origin: Pose = origin
+
     def add_child(self, child: Link):
         super().__add_child(child)
 
