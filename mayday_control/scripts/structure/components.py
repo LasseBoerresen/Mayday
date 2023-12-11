@@ -28,11 +28,6 @@ class Link(Component, ABC):
     pass
 
 
-class BaseLink(Link):
-    def __init__(self):
-        super().__init__(origin=Pose.zeros())
-
-
 class Joint(Component, ABC):
     def add_child(self, child: Link):
         super().__add_child(child)
