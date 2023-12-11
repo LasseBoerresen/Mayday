@@ -29,8 +29,6 @@ class TestStructure:
         expected = Pose.zeros()
         assert actual == expected
 
-
-
     @pytest.mark.parametrize(
         "side,leg_position,expected_pose",
         [
@@ -63,6 +61,18 @@ class TestStructure:
         # Then
         assert actual == Pose.zeros()
 
+    def test__given_FemurMotorJoint__when_get_origin__then_returns_expected_pose(self):
+        # Given
+        joint = FemurMotorJoint()
+
+        # When
+        actual = joint.origin
+
+        # Then
+        assert actual == Pose(Vec3(0.1, 0, -0.1), Vec3(tau/4, 0, tau/4))
+
+
+# TODO TDD simplest cases of forward Kinematics test
 
 if __name__ == '__main__':
     pytest.main()
