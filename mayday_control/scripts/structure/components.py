@@ -63,12 +63,12 @@ class CoxaJoint(RotationalJoint):
         super().__init__(Pose.zeros(), motor, Vec3.z_axis())
 
 
-class Coxa(Link):
+class CoxaAttachment(Attachment):
     def __init__(self):
-        super().__init__()
+        super().__init__(Pose.zeros())
 
 
-class FemurMotor(Link):
+class Coxa(Link):
     def __init__(self):
         super().__init__()
 
@@ -78,16 +78,36 @@ class FemurMotorAttachment(Attachment):
         super().__init__(Pose(Vec3(0.032, 0, -0.011), Vec3(tau/4, tau/4, 0)))
 
 
+class FemurMotorLink(Link):
+    def __init__(self):
+        super().__init__()
+
+
 class FemurJoint(RotationalJoint):
     def __init__(self, motor: Motor):
         super().__init__(Pose.zeros(), motor, Vec3.z_axis())
 
 
+class Femur(Link):
+    def __init__(self):
+        super().__init__()
+
+
 class TibiaJoint(RotationalJoint):
     def __init__(self, motor: Motor):
-        super().__init__(Pose(Vec3(-0.032, 0.079, 0), Vec3(tau/2, 0, 0)), motor, Vec3.z_axis())
+        super().__init__(Pose(Vec3(-0.032, 0.079, 0), Vec3(0, 0, tau/2)), motor, Vec3.z_axis())
 
 
-class TibiaMotorAttachment(Attachment):
+class TibiaMotorLink(Link):
     def __init__(self):
-        super().__init__(Pose.zeros())
+        super().__init__()
+
+
+class TibiaAttachment(Attachment):
+    def __init__(self):
+        super().__init__(Pose.zeros())  # zeros because tibia model origin is based on the dynamixel origin below
+
+
+class Tibia(Link):
+    def __init__(self):
+        super().__init__()

@@ -1,13 +1,12 @@
 from math import tau
 
-import numpy as np
 import pytest
 
 from geometry.pose import Pose
 from geometry.vec3 import Vec3
 from physical_quantities.angle import Angle
 from side import LeftSide, RightSide, Side
-from structure.components import CoxaJoint, CoxaMotorAttachment, FemurJoint, FemurMotorAttachment, Joint, TibiaJoint, TibiaMotorAttachment
+from structure.components import CoxaAttachment, CoxaJoint, CoxaMotorAttachment, FemurJoint, FemurMotorAttachment, Joint, TibiaJoint, TibiaAttachment
 from structure.leg_position import BackLegPosition, CenterLegPosition, FrontLegPosition, LegPosition
 from structure.structure import Structure
 from tests.structure_tests.fake_motor import FakeMotor
@@ -52,10 +51,11 @@ class TestStructure:
     @pytest.mark.parametrize('joint, expected_pose',
     [
         (CoxaJoint(FakeMotor()), Pose.zeros()),
+        (CoxaAttachment(), Pose.zeros()),
         (FemurMotorAttachment(), Pose(Vec3(0.032, 0, -0.011), Vec3(tau/4, tau/4, 0))),
         (FemurJoint(FakeMotor()), Pose.zeros()),
-        (TibiaJoint(FakeMotor()), Pose(Vec3(-0.032, 0.079, 0), Vec3(tau/2, 0, 0))),
-        (TibiaMotorAttachment(), Pose.zeros()),
+        (TibiaJoint(FakeMotor()), Pose(Vec3(-0.032, 0.079, 0), Vec3(0, 0, tau/2))),
+        (TibiaAttachment(), Pose.zeros()),
     ])
     def test__given_Joint__when_get_origin__then_returns_expected_pose(self, joint: Joint, expected_pose: Pose):
         # Given
