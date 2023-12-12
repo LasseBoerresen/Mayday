@@ -7,7 +7,7 @@ from geometry.pose import Pose
 from geometry.vec3 import Vec3
 from physical_quantities.angle import Angle
 from side import LeftSide, RightSide, Side
-from structure.components import CoxaJoint, CoxaMotorLink, CoxaMotorJoint
+from structure.components import CoxaJoint, CoxaMotorLink, CoxaMotorAttachment
 from structure.leg_position import BackLegPosition, CenterLegPosition, FrontLegPosition, LegPosition
 from structure.structure import Structure
 from tests.structure_tests.fake_motor import FakeMotor
@@ -39,11 +39,11 @@ class TestStructure:
             (LeftSide, FrontLegPosition, Pose(Vec3(0.077, -0.074, 0), Vec3(0, 0, tau / 4 + Angle.from_deg(55)))),
             (LeftSide, BackLegPosition, Pose(Vec3(-0.077, -0.074, 0), Vec3(0, 0, tau / 4 - Angle.from_deg(55)))),
         ])
-    def test__given_CoxaMotorJoint__when_get_origin__then_returns_expected_pose(
+    def test__given_CoxaMotorAttachment__when_get_origin__then_returns_expected_pose(
             self, side: Side, leg_position: LegPosition, expected_pose: Pose):
 
         # Given
-        joint = CoxaMotorJoint(side, leg_position)
+        joint = CoxaMotorAttachment(side, leg_position)
 
         # When
         actual = joint.origin
@@ -61,9 +61,9 @@ class TestStructure:
         # Then
         assert actual == Pose.zeros()
 
-    def test__given_FemurMotorJoint__when_get_origin__then_returns_expected_pose(self):
+    def test__given_FemurMotorAttachment__when_get_origin__then_returns_expected_pose(self):
         # Given
-        joint = FemurMotorJoint()
+        joint = FemurMotorAttachment()
 
         # When
         actual = joint.origin

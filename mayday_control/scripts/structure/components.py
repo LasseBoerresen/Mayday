@@ -42,12 +42,12 @@ class RotationalJoint(Joint):
         self.__motor = motor
 
 
-class FixedJoint(Joint):
+class Attachment(Joint):
     def __init__(self, origin: Pose):
         super().__init__(origin)
 
 
-class CoxaMotorJoint(FixedJoint):
+class CoxaMotorAttachment(Attachment):
     def __init__(self, side: Side, leg_position: LegPosition):
         super().__init__(leg_position.origin * side.pose)
 
