@@ -55,7 +55,7 @@ class TestStructure:
         (FemurMotorAttachment(), Pose(Vec3(0.032, 0, -0.011), Vec3(tau / 4, 0, tau / 4))),
         (FemurJoint(FakeMotor()), Pose.zeros())
     ])
-    def test__given_CoxaJoint__when_get_origin__then_returns_expected_pose(self, joint: Joint, expected_pose: Pose):
+    def test__given_Joint__when_get_origin__then_returns_expected_pose(self, joint: Joint, expected_pose: Pose):
         # Given
 
         # When
@@ -69,7 +69,7 @@ class TestStructure:
         CoxaJoint,
         FemurJoint
     ])
-    def test__given_RotaionalJoint__when_get_axis__then_returns_z(self, joint_type: type):
+    def test__given_RotationalJoint__when_get_axis__then_returns_z(self, joint_type: type):
         # Given
         joint = joint_type(FakeMotor())
 
