@@ -2,7 +2,7 @@ from drive_mode import DriveMode
 from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg import Leg
 from dynamixel.dxl_motor import DxlMotor
-from side import Side
+from side import LeftSide, Side
 
 
 class LegFactory:
@@ -30,7 +30,7 @@ class LegFactory:
     @staticmethod
     def _drive_mode(joint_num: int, side: Side) -> DriveMode:
         if joint_num == 0:
-            drive_mode = DriveMode.FORWARD if side == Side.LEFT else DriveMode.BACKWARD
+            drive_mode = DriveMode.FORWARD if side == LeftSide() else DriveMode.BACKWARD
         elif joint_num == 1:
             drive_mode = DriveMode.BACKWARD
         elif joint_num == 2:

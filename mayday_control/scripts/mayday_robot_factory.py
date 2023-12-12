@@ -1,7 +1,7 @@
 from dynamixel.dynamixel_adapter import DynamixelAdapter
 from mayday_robot import MaydayRobot
 from leg_factory import LegFactory
-from side import Side
+from side import LeftSide, RightSide, Side
 
 
 class MaydayRobotFactory(object):
@@ -24,7 +24,7 @@ class MaydayRobotFactory(object):
         return self.leg_factory.create_basic(base_id=leg_num, side=side)
 
     def _resolve_leg_side(self, leg_num):
-        return Side.LEFT if leg_num in self.LEFT_SIDE_LEG_NUMBERS else Side.RIGHT
+        return LeftSide() if leg_num in self.LEFT_SIDE_LEG_NUMBERS else RightSide()
 
 
     # TODO build MaydayRobot from urdf description, Why actually?

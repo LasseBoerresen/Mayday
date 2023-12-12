@@ -14,11 +14,11 @@ class Side(ABC):
 
 @dataclass(frozen=True)
 class RightSide(Side):
-    index = 0
-    pose = Pose(Vec3(1, 1, 1), Vec3(1, 1, -1))
+    index: int = 0
+    pose: Pose = Pose(Vec3(1, 1, 1), Vec3(1, 1, -1))
 
 
 @dataclass(frozen=True)
 class LeftSide(Side):
-    index = 1
-    pose = Pose(Vec3(1, -1, 1), Vec3(1, 1, 1))
+    index: int = 1
+    pose: Pose = Pose(Vec3(1, -1, 1), Vec3(1, 1, 1))

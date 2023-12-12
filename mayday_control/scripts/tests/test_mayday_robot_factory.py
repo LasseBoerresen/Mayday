@@ -5,7 +5,7 @@ import pytest
 from dynamixel.dynamixel_adapter import DynamixelAdapter
 from leg_factory import LegFactory
 from mayday_robot_factory import MaydayRobotFactory
-from side import Side
+from side import LeftSide, RightSide, Side
 
 
 class TestMaydayRobotFactory:
@@ -30,7 +30,7 @@ class TestMaydayRobotFactory:
 
         left_side_leg_numbers = [0, 1, 2]
         for leg_num, leg in enumerate(may.legs):
-            expected_side = Side.LEFT if leg_num in left_side_leg_numbers else Side.RIGHT
+            expected_side = LeftSide() if leg_num in left_side_leg_numbers else RightSide()
             assert call.create_basic(base_id=leg_num, side=expected_side) in mock_leg_factory.method_calls
     # TODO when creating a mayday robot, motors should be initialized. But should that happen on construction? Also
     #  known as __init__ aka initialization. That means, I cannot create a mayday object without having a connected
