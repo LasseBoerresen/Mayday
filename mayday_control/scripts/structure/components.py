@@ -40,6 +40,7 @@ class Joint(Component, ABC):
 class RotationalJoint(Joint):
     def __init__(self, origin: Pose, motor: Motor, axis: Vec3):
         super().__init__(origin)
+        self.axis = axis
         self.__motor = motor
 
 

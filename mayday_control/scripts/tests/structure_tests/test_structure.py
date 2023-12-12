@@ -81,6 +81,18 @@ class TestStructure:
         # Then
         assert actual == Pose.zeros()
 
+    @pytest.mark.parametrize('joint_type', [CoxaJoint, FemurJoint])
+    def test__given_RotaionalJoint__when_get_axis__then_returns_z(self, joint_type: type):
+        # Given
+        joint = joint_type(FakeMotor())
+
+        # When
+        actual = joint.axis
+
+        # Then
+        assert actual == Vec3.z_axis()
+
+
 # TODO TDD simplest cases of forward Kinematics test
 
 if __name__ == '__main__':
