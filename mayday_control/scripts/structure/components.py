@@ -63,9 +63,9 @@ class CoxaJoint(RotationalJoint):
 
 class Coxa(Link):
     def __init__(self):
-        super().__init__(Pose.zeros())
+        super().__init__()
 
 
 class FemurMotor(Link):
     def __init__(self):
-        super().__init__(Pose.zeros())
+        super().__init__()
