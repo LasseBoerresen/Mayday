@@ -7,7 +7,7 @@ from geometry.pose import Pose
 from geometry.vec3 import Vec3
 from physical_quantities.angle import Angle
 from side import LeftSide, RightSide, Side
-from structure.components import CoxaJoint, CoxaMotorLink, CoxaMotorAttachment
+from structure.components import CoxaJoint, CoxaMotorLink, CoxaMotorAttachment, FemurMotorAttachment
 from structure.leg_position import BackLegPosition, CenterLegPosition, FrontLegPosition, LegPosition
 from structure.structure import Structure
 from tests.structure_tests.fake_motor import FakeMotor
@@ -69,7 +69,7 @@ class TestStructure:
         actual = joint.origin
 
         # Then
-        assert actual == Pose(Vec3(0.1, 0, -0.1), Vec3(tau/4, 0, tau/4))
+        assert actual == Pose(Vec3(0.032, 0, -0.011), Vec3(tau/4, 0, tau/4))
 
 
 # TODO TDD simplest cases of forward Kinematics test

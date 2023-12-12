@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from math import tau
 
 from geometry.pose import Pose
 from geometry.vec3 import Vec3
@@ -69,3 +70,8 @@ class Coxa(Link):
 class FemurMotor(Link):
     def __init__(self):
         super().__init__()
+
+
+class FemurMotorAttachment(Attachment):
+    def __init__(self):
+        super().__init__(Pose(Vec3(0.032, 0, -0.011), Vec3(tau/4, 0, tau/4)))
