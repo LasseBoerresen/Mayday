@@ -75,3 +75,10 @@ class FemurMotor(Link):
 class FemurMotorAttachment(Attachment):
     def __init__(self):
         super().__init__(Pose(Vec3(0.032, 0, -0.011), Vec3(tau/4, 0, tau/4)))
+
+
+class FemurJoint(RotationalJoint):
+    def __init__(self, motor: Motor):
+        super().__init__(Pose.zeros(), motor, Vec3.z_axis())
+
+
