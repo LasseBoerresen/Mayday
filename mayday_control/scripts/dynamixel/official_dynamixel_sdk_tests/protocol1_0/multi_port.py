@@ -162,16 +162,16 @@ while 1:
         # Read Dynamixel#1 present position
         dxl1_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler1, DXL1_ID, ADDR_MX_PRESENT_POSITION)
         if dxl_comm_result != COMM_SUCCESS:
-            print packetHandler.getTxRxResult(dxl_comm_result)
+            print(packetHandler.getTxRxResult(dxl_comm_result))
         elif dxl_error != 0:
-            print packetHandler.getRxPacketError(dxl_error)
+            print(packetHandler.getRxPacketError(dxl_error))
 
         # Read Dynamixel#2 present position
         dxl2_present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler2, DXL2_ID, ADDR_MX_PRESENT_POSITION)
         if dxl_comm_result != COMM_SUCCESS:
-            print packetHandler.getTxRxResult(dxl_comm_result)
+            print(packetHandler.getTxRxResult(dxl_comm_result))
         elif dxl_error != 0:
-            print packetHandler.getRxPacketError(dxl_error)
+            print(packetHandler.getRxPacketError(dxl_error))
 
         print("[ID:%03d] GoalPos:%03d  PresPos:%03d\t[ID:%03d] GoalPos:%03d  PresPos:%03d" % (DXL1_ID, dxl_goal_position[index], dxl1_present_position, DXL2_ID, dxl_goal_position[index], dxl2_present_position))
 
