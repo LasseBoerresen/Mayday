@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "t6ydnPX8sz3ibb9EqnphCcGcQme+IJJTpl2tAl94/O8DfnBPgT96VngnH81xIEIPPF10ObVYyd/+FBDuW6hdug==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\fiffi\\repos\\Mayday\\mayday\\mayday.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\fiffi\\.nuget\\packages\\unitsnet\\5.38.2\\unitsnet.5.38.2.nupkg.sha512"
+  ],
+  "logs": []
+}

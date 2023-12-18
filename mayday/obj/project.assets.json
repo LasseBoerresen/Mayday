@@ -1,0 +1,134 @@
+{
+  "version": 3,
+  "targets": {
+    "net7.0": {
+      "UnitsNet/5.38.2": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/UnitsNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/UnitsNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "resource": {
+          "lib/net7.0/fr-CA/UnitsNet.resources.dll": {
+            "locale": "fr-CA"
+          },
+          "lib/net7.0/nb-NO/UnitsNet.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/net7.0/ru-RU/UnitsNet.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/net7.0/zh-CN/UnitsNet.resources.dll": {
+            "locale": "zh-CN"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "UnitsNet/5.38.2": {
+      "sha512": "9xFEUBKDAfzaT0bD8We24CYf0X6yRqFca4PVPDVwygIBfw/SrKkiuKe7VTEgL0NgBx9kisQEpV2UwMPG4vGsww==",
+      "type": "package",
+      "path": "unitsnet/5.38.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net7.0/UnitsNet.dll",
+        "lib/net7.0/UnitsNet.xml",
+        "lib/net7.0/fr-CA/UnitsNet.resources.dll",
+        "lib/net7.0/nb-NO/UnitsNet.resources.dll",
+        "lib/net7.0/ru-RU/UnitsNet.resources.dll",
+        "lib/net7.0/zh-CN/UnitsNet.resources.dll",
+        "lib/netstandard2.0/UnitsNet.dll",
+        "lib/netstandard2.0/UnitsNet.xml",
+        "lib/netstandard2.0/fr-CA/UnitsNet.resources.dll",
+        "lib/netstandard2.0/nb-NO/UnitsNet.resources.dll",
+        "lib/netstandard2.0/ru-RU/UnitsNet.resources.dll",
+        "lib/netstandard2.0/zh-CN/UnitsNet.resources.dll",
+        "logo-32.png",
+        "unitsnet.5.38.2.nupkg.sha512",
+        "unitsnet.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net7.0": [
+      "UnitsNet >= 5.38.2"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\fiffi\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\fiffi\\repos\\Mayday\\mayday\\mayday.csproj",
+      "projectName": "mayday",
+      "projectPath": "C:\\Users\\fiffi\\repos\\Mayday\\mayday\\mayday.csproj",
+      "packagesPath": "C:\\Users\\fiffi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\fiffi\\repos\\Mayday\\mayday\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\fiffi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net7.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net7.0": {
+        "targetAlias": "net7.0",
+        "dependencies": {
+          "UnitsNet": {
+            "target": "Package",
+            "version": "[5.38.2, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

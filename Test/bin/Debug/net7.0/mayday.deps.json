@@ -1,0 +1,55 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "mayday/1.0.0": {
+        "dependencies": {
+          "UnitsNet": "5.38.2"
+        },
+        "runtime": {
+          "mayday.dll": {}
+        }
+      },
+      "UnitsNet/5.38.2": {
+        "runtime": {
+          "lib/net7.0/UnitsNet.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.0.0"
+          }
+        },
+        "resources": {
+          "lib/net7.0/fr-CA/UnitsNet.resources.dll": {
+            "locale": "fr-CA"
+          },
+          "lib/net7.0/nb-NO/UnitsNet.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/net7.0/ru-RU/UnitsNet.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/net7.0/zh-CN/UnitsNet.resources.dll": {
+            "locale": "zh-CN"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "mayday/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnitsNet/5.38.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9xFEUBKDAfzaT0bD8We24CYf0X6yRqFca4PVPDVwygIBfw/SrKkiuKe7VTEgL0NgBx9kisQEpV2UwMPG4vGsww==",
+      "path": "unitsnet/5.38.2",
+      "hashPath": "unitsnet.5.38.2.nupkg.sha512"
+    }
+  }
+}

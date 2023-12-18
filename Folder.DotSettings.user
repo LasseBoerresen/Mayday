@@ -1,0 +1,11 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1fb608ee_002Da2c1_002D4e2c_002D9d40_002Da0413b1e7a6e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Given_WhenSetPosture_ThenGetPostureReturnsThat #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::BAB20A64-7BE0-C4ED-C163-F679A746F7AB::net7.0::Test.StandUpTestCase.Given_WhenSetPosture_ThenGetPostureReturnsThat&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2f4b012f_002D50d7_002D4447_002Db677_002Ddc209acb5634/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Given_WhenSetPosture_ThenGetPostureReturnsThat" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::BAB20A64-7BE0-C4ED-C163-F679A746F7AB::net7.0::Test.StandUpTestCase.GivenFakeStructure_WhenStand_ThenStructurePostureIsThat&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
