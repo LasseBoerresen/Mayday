@@ -4,3 +4,7 @@
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/vcs.xml
+/mayday/obj/
+/mayday/bin/
+/Test/bin/
+/Test/obj/
