@@ -6,34 +6,38 @@ using Test.Structure;
 namespace Test;
 
 public class StandUpTestCase
-{
-    [Fact]
-    public void GivenFakeStructure_WhenStand_ThenStructurePostureIsStanding()
-    {
-        // Given
-        FakeMaydayStructure maydayStructure = new();
-        StandBehaviorController behaviorController = new(maydayStructure);
+ {
+     private readonly FakeMaydayStructure _maydayStructure;
+     private readonly StandBehaviorController _behaviorController;
 
-        // When
-        behaviorController.Stand();
+     public StandUpTestCase()
+     {
+         _maydayStructure = new(MaydayPosture.Neutral);
+         _behaviorController = new(_maydayStructure);
+     }
 
-        // Then
-        var actual = maydayStructure.Posture;
-        Assert.Equal(MaydayPosture.Standing, actual);
-    }
+     [Fact]
+     public void GivenFakeStructure_WhenStand_ThenStructurePostureIsStanding()
+     {
+         // When
+         _behaviorController.Stand();
 
-    [Fact]
-    public void GivenFakeStructure_WhenSit_ThenStructurePostureIsSitting()
-    {
-        // Given
-        FakeMaydayStructure maydayStructure = new();
-        StandBehaviorController behaviorController = new(maydayStructure);
+         // Then
+         AssertPostureIs(MaydayPosture.Standing);
+     }
 
-        // When
-        behaviorController.Sit();
+     [Fact]
+     public void GivenFakeStructure_WhenSit_ThenStructurePostureIsSitting()
+     {
+         // When
+         _behaviorController.Sit();
 
-        // Then
-        var actual = maydayStructure.Posture;
-        Assert.Equal(MaydayPosture.Sitting, actual);
-    }
-}
+         // Then
+         AssertPostureIs(MaydayPosture.Sitting);
+     }
+
+     private void AssertPostureIs(MaydayPosture expectedPosture)
+     {
+         Assert.Equal(expectedPosture, _maydayStructure.Posture);
+     }
+ }

@@ -1,12 +1,12 @@
 ﻿namespace mayday.mayday;
 
 public record MaydayPosture(
-    MaydayLegPosture L0,
-    MaydayLegPosture L1,
-    MaydayLegPosture L2,
-    MaydayLegPosture L3,
-    MaydayLegPosture L4,
-    MaydayLegPosture L5)
+    MaydayLegPosture RF,
+    MaydayLegPosture RC,
+    MaydayLegPosture RB,
+    MaydayLegPosture LF,
+    MaydayLegPosture LC,
+    MaydayLegPosture LB)
 {
     public static MaydayPosture Neutral => FromLegPosture(MaydayLegPosture.Neutral);
     public static MaydayPosture Sitting => FromLegPosture(MaydayLegPosture.Sitting);
@@ -15,4 +15,9 @@ public record MaydayPosture(
 
     private static MaydayPosture FromLegPosture(MaydayLegPosture legPosture)
         => new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
+
+    public override string ToString()
+    {
+        return $"MaydayPosture:\n\tRF: {RF},\n\tRC: {RC},\n\tRB: {RB},\n\tLF: {LF},\n\tLC: {LC},\n\tLB: {LB}";
+    }
 }

@@ -1,9 +1,19 @@
-﻿using mayday.mayday;
+﻿using System;
+using mayday.mayday;
 
 namespace mayday;
 
 public class MaydayStructure
 {
-    public MaydayPosture Posture { get; set; }
-}
+    private MaydayPosture _posture;
 
+    public virtual MaydayPosture Posture
+    {
+        get => _posture;
+        set
+        {
+            _posture = value;
+            Console.WriteLine(_posture);
+        }
+    }
+};
