@@ -1,4 +1,6 @@
-﻿namespace mayday.mayday;
+﻿using mayday.Structures;
+
+namespace mayday.mayday;
 
 public record MaydayPosture(
     MaydayLegPosture RF,
@@ -14,7 +16,9 @@ public record MaydayPosture(
     public static MaydayPosture StandingWide => FromLegPosture(MaydayLegPosture.StandingWide);
 
     private static MaydayPosture FromLegPosture(MaydayLegPosture legPosture)
-        => new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
+    {
+        return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
+    }
 
     public override string ToString()
     {

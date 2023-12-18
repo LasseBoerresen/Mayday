@@ -1,18 +1,17 @@
-using mayday;
 using mayday.Behavior;
 using mayday.mayday;
-using Test.Structure;
+using Test.TestStructures;
 
 namespace Test;
 
 public class StandUpTestCase
- {
+{
      private readonly FakeMaydayStructure _maydayStructure;
      private readonly StandBehaviorController _behaviorController;
 
      public StandUpTestCase()
      {
-         _maydayStructure = new(MaydayPosture.Neutral);
+         _maydayStructure = new();
          _behaviorController = new(_maydayStructure);
      }
 
@@ -40,4 +39,4 @@ public class StandUpTestCase
      {
          Assert.Equal(expectedPosture, _maydayStructure.Posture);
      }
- }
+}

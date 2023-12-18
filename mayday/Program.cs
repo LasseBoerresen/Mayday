@@ -1,7 +1,7 @@
 ﻿using mayday;
 using mayday.Behavior;
 
-MaydayStructure maydayStructure = new MaydayStructure();
+var maydayStructure = MaydayStructure.Create();
 StandBehaviorController behaviorController = new(maydayStructure);
 Mayday may = new(behaviorController);
 
