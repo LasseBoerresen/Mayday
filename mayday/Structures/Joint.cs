@@ -1,8 +1,6 @@
-﻿using mayday.Structures;
+﻿namespace mayday.Structures;
 
-namespace mayday;
-
-public class Joint(Link? Parent, Link? Child) : Connection(Parent, Child)
+public class Joint(Motor motor, Link? parent=null, Link? child=null) : Connection(parent, child)
 {
-    public JointState State { get; }
+    public JointState State => motor.State;
 }

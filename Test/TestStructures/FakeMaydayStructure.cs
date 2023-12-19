@@ -1,4 +1,5 @@
 ﻿using mayday;
+using mayday.Structures;
 
 namespace Test.TestStructures;
 
