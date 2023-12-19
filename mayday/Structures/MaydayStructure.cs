@@ -9,7 +9,7 @@ namespace mayday;
 public class MaydayStructure(
     IEnumerable<Joint> joints,
     IEnumerable<Attachment> attachments,
-    IEnumerable<Link> links) : Structure(joints)
+    IEnumerable<Link> links) : Structure(joints, attachments, links)
 {
     public static MaydayStructure Create()
     {

@@ -1,3 +1,7 @@
-﻿namespace mayday;
+﻿using mayday.Geometry;
+using mayday.Structures;
 
-public class Connection(Link? parent, Link? child) : Component(parent, child);
+namespace mayday;
+
+public class Connection(Pose origin, Link? parent, Link? child)
+    : Component(origin, parent, child);

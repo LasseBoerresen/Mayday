@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using mayday.Maths;
+using mayday.Geometry;
 using UnitsNet;
 
 namespace mayday.mayday;

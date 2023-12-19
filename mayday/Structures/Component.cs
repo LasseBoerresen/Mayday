@@ -1,3 +1,8 @@
-﻿namespace mayday;
+﻿using mayday.Geometry;
 
-public abstract class Component(Component? Parent, Component? Child) {}
+namespace mayday.Structures;
+
+public abstract class Component(Pose origin, Component? Parent = null, Component? Child = null)
+{
+    public Pose Origin => origin;
+}

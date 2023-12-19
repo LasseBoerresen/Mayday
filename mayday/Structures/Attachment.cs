@@ -1,3 +1,7 @@
-﻿namespace mayday;
+﻿using mayday.Geometry;
+using mayday.Structures;
 
-public class Attachment(Link? Parent, Link? Child) : Connection(Parent, Child);
+namespace mayday;
+
+public class Attachment(Pose origin, Link? parent = null, Link? child = null)
+    : Connection(origin, parent, child);
