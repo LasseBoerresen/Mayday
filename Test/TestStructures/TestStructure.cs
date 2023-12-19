@@ -6,8 +6,8 @@ namespace Test.TestStructures;
 
 public class TestStructure
 {
-    private ICollection<Joint> _joints = new List<Joint>();
-    private Structure _structure;
+    private readonly ICollection<Joint> _joints = new List<Joint>();
+    private readonly Structure _structure;
 
     public TestStructure()
     {
