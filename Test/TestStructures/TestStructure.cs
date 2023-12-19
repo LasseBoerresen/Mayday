@@ -6,33 +6,35 @@ namespace Test.TestStructures;
 
 public class TestStructure
 {
+    private ICollection<Joint> _joints = new List<Joint>();
+    private Structure _structure;
+
+    public TestStructure()
+    {
+        _structure = new(_joints);
+    }
+
     [Fact]
     public void GivenNoComponents_WhenGetJointStates_ThenReturnsEmptyList()
     {
         // Given
-        Joint[] joints = {};
-        var structure = new Structure(joints);
 
-        // When
-        var actualJointStates = structure.JointStates;
-
-        // Then
-        JointState[] expextedJointStates = {};
-        Assert.Equal(expextedJointStates, actualJointStates);
+        // When // Then
+        AssertExpectedJoinStates(new JointState[]{});
     }
 
     [Fact]
     public void GivenOneJointWithZeroStateFakeMotor_WhenGetJointStates_ThenOneZeroStae()
     {
         // Given
-        Joint[] joints = {new(new ZeroStateFakeMotor())};
-        var structure = new Structure(joints);
+        _joints.Add(new(new ZeroStateFakeMotor()));
 
-        // When
-        var actualJointStates = structure.JointStates;
+        // When // Then
+        AssertExpectedJoinStates(new[] {JointState.Zero});
+    }
 
-        // Then
-        JointState[] expextedJointStates = {JointState.Zero};
-        Assert.Equal(expextedJointStates, actualJointStates);
+    private void AssertExpectedJoinStates(IEnumerable<JointState> expected)
+    {
+        Assert.Equal(expected, _structure.JointStates);
     }
 }
