@@ -24,7 +24,7 @@ public class TestStructure
     }
 
     [Fact]
-    public void GivenOneJointWithZeroStateFakeMotor_WhenGetJointStates_ThenOneZeroStae()
+    public void GivenOneJointWithZeroStateFakeMotor_WhenGetJointStates_ThenOneZeroState()
     {
         // Given
         _joints.Add(new(new ZeroStateFakeMotor()));
