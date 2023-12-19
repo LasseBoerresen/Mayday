@@ -8,4 +8,5 @@ public record Xyz(Length X, Length Y, Length Z) : Vec3<Length>(X, Y, Z)
         : this(Length.FromMeters(x), Length.FromMeters(y), Length.FromMeters(z)) {}
 
     public static Xyz Zero => new(0, 0, 0);
+    public static Xyz One => new(1, 1, 1);
 }

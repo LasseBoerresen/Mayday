@@ -50,6 +50,22 @@ public class TestStructure
         Assert.Equal(Pose.Zero, actual);
     }
 
+    [Fact]
+    public void GivenAttachmentFromBaseWithOriginOne_WhenGetPoseOfThat_ThenReturnPoseOne()
+    {
+        // Given
+        var baseLink = Link.Base;
+        var attachment = new Attachment(Pose.One);
+        _links.Add(baseLink);
+        _attachments.Add(attachment);
+
+        // When
+        var actual = _structure.GetPoseFor(attachment);
+
+        // Then
+        Assert.Equal(Pose.One, actual);
+    }
+
     private void AssertJoinStatesAre(IEnumerable<JointState> expected)
     {
         Assert.Equal(expected, _structure.JointStates);
