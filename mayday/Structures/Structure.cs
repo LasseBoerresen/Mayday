@@ -1,4 +1,5 @@
-﻿using mayday.Geometry;
+﻿using System.Numerics;
+using mayday.Geometry;
 
 namespace mayday.Structures;
 
