@@ -1,7 +1,6 @@
 ﻿using mayday;
 using mayday.Geometry;
 using mayday.Structures;
-using UnitsNet;
 
 namespace Test.TestStructures;
 
@@ -30,7 +29,9 @@ public class TestStructure
     public void GivenOneZeroStateFakeJoint_WhenGetJointStates_ThenOneZeroState()
     {
         // Given
-        _joints.Add(new ZeroStateFakeJoint());
+        var baseLink = Link.Base;
+        var link = new Link(Pose.One);
+        _joints.Add(new ZeroStateFakeJoint(baseLink, link));
 
         // When // Then
         AssertJoinStatesAre(new[] {JointState.Zero});
@@ -55,7 +56,8 @@ public class TestStructure
     {
         // Given
         var baseLink = Link.Base;
-        var attachment = new Attachment(Pose.One);
+        var link = new Link(Pose.One);
+        var attachment = new Attachment(Pose.One, baseLink, link);
         _links.Add(baseLink);
         _attachments.Add(attachment);
 
@@ -64,6 +66,25 @@ public class TestStructure
 
         // Then
         Assert.Equal(Pose.One, actual);
+    }
+
+    [Fact]
+    public void GivenLinkWithOriginOneAttachedFromBaseWithOriginOne_WhenGetPoseOfThat_ThenReturnPoseTwo()
+    {
+        // Given
+        var baseLink = Link.Base;
+        var link = new Link(Pose.One);
+        var attachment = new Attachment(Pose.One, baseLink, link);
+        _links.Add(baseLink);
+        _attachments.Add(attachment);
+        _links.Add(link);
+
+        // When
+        var actual = _structure.GetPoseFor(link);
+
+        // Then
+        var expected = Pose.One * 2.0;
+        Assert.Equal(expected, actual);
     }
 
     private void AssertJoinStatesAre(IEnumerable<JointState> expected)

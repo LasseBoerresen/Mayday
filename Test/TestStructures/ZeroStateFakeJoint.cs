@@ -3,4 +3,5 @@ using mayday.Structures;
 
 namespace Test.TestStructures;
 
-public class ZeroStateFakeJoint() : Joint(Pose.Zero, new ZeroStateFakeMotor());
+public class ZeroStateFakeJoint(Link parent, Link child)
+    : Joint(Pose.Zero, new ZeroStateFakeMotor(), parent, child);

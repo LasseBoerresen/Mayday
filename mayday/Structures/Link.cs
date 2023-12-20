@@ -2,8 +2,9 @@
 
 namespace mayday.Structures;
 
-public class Link(Pose origin, Connection? parent = null, Connection? child = null)
-    : Component(origin, parent, child)
+public class Link(Pose origin) : Component(origin)
 {
+    // public void SetParent(Connection parent) => Parent = parent;
+
     public static Link Base => new(Pose.Zero);
 };

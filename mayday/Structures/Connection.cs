@@ -3,5 +3,12 @@ using mayday.Structures;
 
 namespace mayday;
 
-public class Connection(Pose origin, Link? parent, Link? child)
-    : Component(origin, parent, child);
+public class Connection : Component
+{
+    public Connection(Pose origin, Link parent, Link child)
+        : base(origin, parent, child)
+    {
+        parent.Child = this;
+        child.Parent = this;
+    }
+}

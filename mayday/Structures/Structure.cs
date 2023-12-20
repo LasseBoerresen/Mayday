@@ -8,6 +8,7 @@ public class Structure(IEnumerable<Joint> joints, IEnumerable<Attachment> attach
 
     public Pose GetPoseFor(Component component)
     {
+
         // TODO fix cheat and actually do forward kinematics
         return component.Origin;
     }
