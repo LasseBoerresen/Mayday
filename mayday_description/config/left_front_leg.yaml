@@ -1,5 +1,0 @@
-type: "position_controllers/JointGroupPositionController"
-joints:
- - left_front_coxa_dynamixel_to_top_coxa_joint
- - left_front_femur_dynamixel_to_left_femur_joint
- - left_front_tibia_dynamixel_to_tibia_joint

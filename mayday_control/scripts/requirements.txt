@@ -1,6 +1,0 @@
-pandas
-pyserial
-pytest
-dynamixel_sdk
-urdfpy
-numpy
