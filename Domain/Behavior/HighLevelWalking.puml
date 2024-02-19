@@ -3,10 +3,21 @@
 
 title High Level Gamepad Walking
 
-autonumber
+activate GamePadBehaviorController
+activate MotionController
+activate Structure
 
-GamePadBehaviorController -> GamePadBehaviorController: GetInput() -> Twist
+[o-> GamePadBehaviorController: Start()
+loop
+GamePadBehaviorController -> GamePadBehaviorController: GetMoveInput() -> Twist
+GamePadBehaviorController -> GamePadBehaviorController: GetOffsetInput() -> Twist
+GamePadBehaviorController -> GamePadBehaviorController: GetOffsetInput() -> Twist
 GamePadBehaviorController -> MotionController: MoveThorax(Twist)
-MotionController --> GamePadBehaviorController: Authentication Response
+MotionController -> Structure: SetPosture(Posture)
+MotionController -> Structure: GetPosture()
+return Posture
+GamePadBehaviorController -> GamePadBehaviorController: Spin()
+end
+
 
 @enduml
