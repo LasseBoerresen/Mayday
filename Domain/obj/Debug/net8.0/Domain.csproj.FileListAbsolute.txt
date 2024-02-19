@@ -1,0 +1,15 @@
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\Domain.exe
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\Domain.deps.json
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\Domain.runtimeconfig.json
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\Domain.dll
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\Domain.pdb
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.AssemblyInfoInputs.cache
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.AssemblyInfo.cs
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.csproj.CoreCompileInputs.cache
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.sourcelink.json
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.dll
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\refint\Domain.dll
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.pdb
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.genruntimeconfig.cache
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\ref\Domain.dll
