@@ -13,3 +13,10 @@ C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\refint\Domain.dll
 C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.pdb
 C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.genruntimeconfig.cache
 C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\ref\Domain.dll
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.csproj.AssemblyReference.cache
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\UnitsNet.dll
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\fr-CA\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\nb-NO\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\ru-RU\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Domain\bin\Debug\net8.0\zh-CN\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Domain\obj\Debug\net8.0\Domain.csproj.Up2Date

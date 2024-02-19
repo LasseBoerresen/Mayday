@@ -16,4 +16,8 @@
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="UnitsNet" Version="5.43.0" />
+    </ItemGroup>
+
 </Project>

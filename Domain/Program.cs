@@ -1,3 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using mayday;
+using Mayday.Behavior;
+using Mayday.Structures;
 
-Console.WriteLine("Hello, World!");
+var maydayStructure = MaydayStructure.Create();
+StandBehaviorController behaviorController = new(maydayStructure);
+Mayday.Mayday may = new();
+
+behaviorController.Start();
+
