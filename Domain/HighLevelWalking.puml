@@ -1,0 +1,12 @@
+﻿@startuml
+'https://plantuml.com/sequence-diagram
+
+title High Level Gamepad Walking
+
+autonumber
+
+GamePadBehaviorController -> GamePadBehaviorController: GetInput() -> Twist
+GamePadBehaviorController -> MotionController: MoveThorax(Twist)
+MotionController --> GamePadBehaviorController: Authentication Response
+
+@enduml
