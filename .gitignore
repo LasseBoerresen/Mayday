@@ -1,0 +1,3 @@
+﻿# Exclude bin and obj directories
+**/[Oo]bj/
+**/[Bb]in/
