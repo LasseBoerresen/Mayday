@@ -1,10 +1,10 @@
-﻿using mayday;
-using Mayday.Behavior;
-using Mayday.Structures;
+﻿using Domain;
+using Domain.Behavior;
+using Domain.Structures;
 
 var maydayStructure = MaydayStructure.Create();
 StandBehaviorController behaviorController = new(maydayStructure);
-Mayday.Mayday may = new();
+Mayday may = new();
 
 behaviorController.Start();
 

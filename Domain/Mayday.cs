@@ -1,6 +1,4 @@
-﻿using Mayday.Behavior;
-
-namespace Mayday;
+﻿namespace Domain;
 
 public class Mayday()
 {

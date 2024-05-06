@@ -1,4 +1,4 @@
-﻿namespace Mayday.Geometry;
+﻿namespace Domain.Geometry;
 
 public record Pose(Xyz Xyz, Rpy Rpy)
 {

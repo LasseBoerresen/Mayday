@@ -1,6 +1,6 @@
 ﻿using UnitsNet;
 
-namespace Mayday;
+namespace Domain;
 
 public record MaydayLegPosture
 {

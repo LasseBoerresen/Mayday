@@ -1608,6 +1608,33 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
+      "UnitsNet/5.43.0": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/UnitsNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/UnitsNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "resource": {
+          "lib/net7.0/fr-CA/UnitsNet.resources.dll": {
+            "locale": "fr-CA"
+          },
+          "lib/net7.0/nb-NO/UnitsNet.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/net7.0/ru-RU/UnitsNet.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/net7.0/zh-CN/UnitsNet.resources.dll": {
+            "locale": "zh-CN"
+          }
+        }
+      },
       "xunit/2.5.3": {
         "type": "package",
         "dependencies": {
@@ -1707,6 +1734,19 @@
         },
         "build": {
           "build/net6.0/xunit.runner.visualstudio.props": {}
+        }
+      },
+      "Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "UnitsNet": "5.43.0"
+        },
+        "compile": {
+          "bin/placeholder/Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Domain.dll": {}
         }
       }
     }
@@ -5356,6 +5396,31 @@
         "system.xml.xdocument.nuspec"
       ]
     },
+    "UnitsNet/5.43.0": {
+      "sha512": "wZlnNDGfK8E+kf5qpLsBYoBKnQUMCAEFuFFywp4226OIArA6PzpxXsnhjbXoG9RMN3xe2esqZ6yMFN6YWrb8ug==",
+      "type": "package",
+      "path": "unitsnet/5.43.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net7.0/UnitsNet.dll",
+        "lib/net7.0/UnitsNet.xml",
+        "lib/net7.0/fr-CA/UnitsNet.resources.dll",
+        "lib/net7.0/nb-NO/UnitsNet.resources.dll",
+        "lib/net7.0/ru-RU/UnitsNet.resources.dll",
+        "lib/net7.0/zh-CN/UnitsNet.resources.dll",
+        "lib/netstandard2.0/UnitsNet.dll",
+        "lib/netstandard2.0/UnitsNet.xml",
+        "lib/netstandard2.0/fr-CA/UnitsNet.resources.dll",
+        "lib/netstandard2.0/nb-NO/UnitsNet.resources.dll",
+        "lib/netstandard2.0/ru-RU/UnitsNet.resources.dll",
+        "lib/netstandard2.0/zh-CN/UnitsNet.resources.dll",
+        "logo-32.png",
+        "unitsnet.5.43.0.nupkg.sha512",
+        "unitsnet.nuspec"
+      ]
+    },
     "xunit/2.5.3": {
       "sha512": "VxYDiWSwrLxOJ3UEN+ZPrBybB0SFShQ1E6PjT65VdoKCJhorgerFznThjSwawRH/WAip73YnucDVsE8WRj/8KQ==",
       "type": "package",
@@ -5497,10 +5562,16 @@
         "xunit.runner.visualstudio.2.5.3.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
+    },
+    "Domain/1.0.0": {
+      "type": "project",
+      "path": "../Domain/Domain.csproj",
+      "msbuildProject": "../Domain/Domain.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Domain >= 1.0.0",
       "Microsoft.NET.Test.Sdk >= 17.8.0",
       "coverlet.collector >= 6.0.0",
       "xunit >= 2.5.3",
@@ -5537,7 +5608,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\fiffi\\repos\\Mayday\\Domain\\Domain.csproj": {
+              "projectPath": "C:\\Users\\fiffi\\repos\\Mayday\\Domain\\Domain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -5584,7 +5659,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

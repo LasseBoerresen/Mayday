@@ -1,7 +1,6 @@
-﻿using mayday;
-using Mayday.Structures;
+﻿using Domain.Structures;
 
-namespace Mayday.Behavior;
+namespace Domain.Behavior;
 
 public class StandBehaviorController(MaydayStructure structure) : BehaviorController
 {

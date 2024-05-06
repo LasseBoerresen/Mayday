@@ -1,17 +1,26 @@
-﻿namespace Mayday.Structures;
+﻿namespace Domain.Structures;
 
-public class MaydayStructure(IEnumerable<Joint> joints) : Structure(joints)
+public class MaydayStructure : Structure
 {
-    public static MaydayStructure Create()
-    {
-        Joint[] joints = { };
-        Attachment[] attachments = { };
-        Link[] links = { };
+    public IEnumerable<MaydayLeg> Legs { get; init; }
 
-        return new(joints);
+    private MaydayStructure(IEnumerable<MaydayLeg> legs)
+        : base(
+            legs.SelectMany(l => l.Joints),
+            legs.SelectMany(l => l.Attachments),
+            legs.SelectMany(l => l.Links))
+    {
+        Legs = legs;
     }
 
-    private MaydayPosture _posture = MaydayPosture.Neutral;
+    public static MaydayStructure Create()
+    {
+        var legs = MaydayLegId.All().Map(MaydayLeg.Create());
+        return new MaydayStructure([], [], []);
+    }
+
+    MaydayPosture _posture = MaydayPosture.Neutral;
+
 
     public MaydayPosture Posture
     {

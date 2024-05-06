@@ -1,6 +1,6 @@
 ﻿using UnitsNet;
 
-namespace Mayday.Structures;
+namespace Domain.Structures;
 
 public record JointState(
     Angle Angle,

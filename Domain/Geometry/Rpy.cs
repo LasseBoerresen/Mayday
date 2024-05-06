@@ -1,9 +1,8 @@
 ﻿// using System.Numerics;
 
-using mayday.Geometry;
 using UnitsNet;
 
-namespace Mayday.Geometry;
+namespace Domain.Geometry;
 
 /// <summary>
 /// Tait-Bryan variant of Euler Angles

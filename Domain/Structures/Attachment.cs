@@ -1,6 +1,6 @@
-﻿using Mayday.Geometry;
+﻿using Domain.Geometry;
 
-namespace Mayday.Structures;
+namespace Domain.Structures;
 
 public class Attachment(Pose origin, Link parent, Link child)
     : Connection(origin, parent, child);

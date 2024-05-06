@@ -98,3 +98,14 @@ C:\Users\fiffi\repos\Mayday\Test\obj\Debug\net8.0\refint\Test.dll
 C:\Users\fiffi\repos\Mayday\Test\obj\Debug\net8.0\Test.pdb
 C:\Users\fiffi\repos\Mayday\Test\obj\Debug\net8.0\Test.genruntimeconfig.cache
 C:\Users\fiffi\repos\Mayday\Test\obj\Debug\net8.0\ref\Test.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\CoverletSourceRootsMapping_Test
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\Domain.deps.json
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\Domain.runtimeconfig.json
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\Domain.exe
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\UnitsNet.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\fr-CA\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\nb-NO\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\ru-RU\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\zh-CN\UnitsNet.resources.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\Domain.dll
+C:\Users\fiffi\repos\Mayday\Test\bin\Debug\net8.0\Domain.pdb

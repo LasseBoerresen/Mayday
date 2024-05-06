@@ -1,3 +1,3 @@
-﻿namespace Mayday.Structures;
+﻿namespace Domain.Structures;
 
 public record Posture(Component[] Components);

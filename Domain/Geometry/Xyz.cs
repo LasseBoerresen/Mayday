@@ -1,6 +1,6 @@
 ﻿using UnitsNet;
 
-namespace Mayday.Geometry;
+namespace Domain.Geometry;
 
 public record Xyz(Length X, Length Y, Length Z)
 {

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "bCQmFDAocrTK5WBta9lb6jSVOFDq6/WnGCSxCDjEuLOqK+p5m63sPfzeHojSIqY03JpmCRt3nhHtX4HHecbJoQ==",
+  "dgSpecHash": "OkSPif/mH+yK16YiQUHmZbWmIUSIwhduS2OZ258sKgNxLlGeRMRryBYFRLrdp6cDU7wCIFnmM4G14UWWIOwglw==",
   "success": true,
   "projectFilePath": "C:\\Users\\fiffi\\repos\\Mayday\\Test\\Test.csproj",
   "expectedPackageFiles": [
@@ -85,6 +85,7 @@
     "C:\\Users\\fiffi\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\fiffi\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
     "C:\\Users\\fiffi\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
+    "C:\\Users\\fiffi\\.nuget\\packages\\unitsnet\\5.43.0\\unitsnet.5.43.0.nupkg.sha512",
     "C:\\Users\\fiffi\\.nuget\\packages\\xunit\\2.5.3\\xunit.2.5.3.nupkg.sha512",
     "C:\\Users\\fiffi\\.nuget\\packages\\xunit.abstractions\\2.0.3\\xunit.abstractions.2.0.3.nupkg.sha512",
     "C:\\Users\\fiffi\\.nuget\\packages\\xunit.analyzers\\1.4.0\\xunit.analyzers.1.4.0.nupkg.sha512",

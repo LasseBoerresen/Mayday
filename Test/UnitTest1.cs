@@ -1,7 +1,19 @@
+using Domain;
+
 namespace Test;
 
-public class UnitTest1
+public class MaydayTests
 {
     [Fact]
-    public void Test1() { }
+    public void Given_When_Then()
+    {
+        // Given
+        Mayday mayday = new();
+
+        // When
+
+
+        // When
+        Assert.True(true);
+    }
 }

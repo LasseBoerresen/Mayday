@@ -1,8 +1,6 @@
-﻿using mayday.Geometry;
-using Mayday.Geometry;
-using Mayday.Structures;
+﻿using Domain.Geometry;
 
-namespace Mayday.Structures;
+namespace Domain.Structures;
 
 public class Link(Pose origin) : Component(origin)
 {

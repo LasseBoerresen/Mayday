@@ -1,4 +1,4 @@
-﻿namespace Mayday;
+﻿namespace Domain;
 
 public record MaydayPosture(
     MaydayLegPosture RF,

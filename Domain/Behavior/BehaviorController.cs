@@ -1,4 +1,4 @@
-﻿namespace Mayday.Behavior;
+﻿namespace Domain.Behavior;
 
 public interface BehaviorController
 {

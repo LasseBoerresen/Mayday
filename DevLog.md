@@ -1,8 +1,20 @@
 ﻿# Development Log
 
+
+### TDD mayday implementation
+#### 2024-05-05 15:06 +02:00 @Kaffebaren
+Only implementations can be tested. Interfaces are just structure. They are statically 
+tested, for use and compilability. Just test invariants. Define them. They are important :)
+
+### What to test?
+#### 2024-04-20 11:08 +02:00 @Rønnegade 16
+I should simply test what I expect mayday to do, when I turn it on. But with a fake ? What? 
+
+
+
 ### Thoughts on connecting to dynamixelSDK from C#
-#### 2024-02-20 08:25 +01:00 @Amarger Kaffebaren
-Aparrently, DynamixelSDK for C# is only available on windows, which is just not good enough for me. I could write it myself, what I need. Testdriven. It wouldn't be that bad. But it is yak shaving. I could use ROS to communicate with my existing well written facade to the python sdk... Could be good. And an exercise in reuse. But I still kind of need to do that with ros... Also ok. I will need multiple other tools. Rviz, simulators etc. I need ros no matter what. There even is a ROS library, 
+#### 2024-02-20 08:25 +01:00 @Amager Kaffebaren
+Aparently, DynamixelSDK for C# is only available on windows, which is just not good enough for me. I could write it myself, what I need. Testdriven. It wouldn't be that bad. But it is yak shaving. I could use ROS to communicate with my existing well written facade to the python sdk... Could be good. And an exercise in reuse. But I still kind of need to do that with ros... Also ok. I will need multiple other tools. Rviz, simulators etc. I need ros no matter what. There even is a ROS library, 
 
 I am pondering in general, how to do robust end-to-end tests. Tests with the actual robot, doing certain movements. The purpose is to make sure the robot does not stop doing what it is supposed to do, even with new features. But also, to make sure all the parts are well integrated. ALL the parts. So, what is the answer? Well, invert. 
 

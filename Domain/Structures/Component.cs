@@ -1,7 +1,6 @@
-﻿using mayday.Geometry;
-using Mayday.Geometry;
+﻿using Domain.Geometry;
 
-namespace Mayday.Structures;
+namespace Domain.Structures;
 
 public abstract class Component(Pose origin, Component? parent = null, Component? child = null)
 {

@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "Test/1.0.0": {
         "dependencies": {
+          "Domain": "1.0.0",
           "Microsoft.NET.Test.Sdk": "17.8.0",
           "coverlet.collector": "6.0.0",
           "xunit": "2.5.3",
@@ -962,6 +963,28 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
+      "UnitsNet/5.43.0": {
+        "runtime": {
+          "lib/net7.0/UnitsNet.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.0.0"
+          }
+        },
+        "resources": {
+          "lib/net7.0/fr-CA/UnitsNet.resources.dll": {
+            "locale": "fr-CA"
+          },
+          "lib/net7.0/nb-NO/UnitsNet.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/net7.0/ru-RU/UnitsNet.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/net7.0/zh-CN/UnitsNet.resources.dll": {
+            "locale": "zh-CN"
+          }
+        }
+      },
       "xunit/2.5.3": {
         "dependencies": {
           "xunit.analyzers": "1.4.0",
@@ -1019,7 +1042,15 @@
           }
         }
       },
-      "xunit.runner.visualstudio/2.5.3": {}
+      "xunit.runner.visualstudio/2.5.3": {},
+      "Domain/1.0.0": {
+        "dependencies": {
+          "UnitsNet": "5.43.0"
+        },
+        "runtime": {
+          "Domain.dll": {}
+        }
+      }
     }
   },
   "libraries": {
@@ -1595,6 +1626,13 @@
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
     },
+    "UnitsNet/5.43.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wZlnNDGfK8E+kf5qpLsBYoBKnQUMCAEFuFFywp4226OIArA6PzpxXsnhjbXoG9RMN3xe2esqZ6yMFN6YWrb8ug==",
+      "path": "unitsnet/5.43.0",
+      "hashPath": "unitsnet.5.43.0.nupkg.sha512"
+    },
     "xunit/2.5.3": {
       "type": "package",
       "serviceable": true,
@@ -1650,6 +1688,11 @@
       "sha512": "sha512-HFFL6O+QLEOfs555SqHii48ovVa4CqGYanY+B32BjLpPptdE+wEJmCFNXlLHdEOD5LYeayb9EroaUpydGpcybg==",
       "path": "xunit.runner.visualstudio/2.5.3",
       "hashPath": "xunit.runner.visualstudio.2.5.3.nupkg.sha512"
+    },
+    "Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
