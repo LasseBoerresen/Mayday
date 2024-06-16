@@ -7,8 +7,8 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     private MaydayLegPosture(double coxa, double femur, double tibia)
         : this(Angle.FromRevolutions(coxa), Angle.FromRevolutions(femur), Angle.FromRevolutions(tibia)) {}
 
-    public MaydayLegPosture(Angle[] angles)
-        : this(angles[0], angles[1], angles[2]) {}
+    public MaydayLegPosture(IEnumerable<Angle> angles)
+        : this(angles.Skip(0).First(), angles.Skip(1).First(), angles.Skip(2).First()) {}
     
     public static MaydayLegPosture Neutral => new(0.0, 0.0, 0.0);
     public static MaydayLegPosture Sitting => new(0.0, 0.3, -0.2);

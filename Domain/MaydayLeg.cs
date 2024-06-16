@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Immutable;
-using Domain.Structures;
+﻿using Domain.Structures;
 
 namespace Domain;
 
@@ -15,18 +13,14 @@ public class MaydayLeg
 
     public MaydayLegPosture GetPosture()
     {
-        var angles = _joints
-            .Select(j => j.State.Angle)
-            .ToArray();
-        
-        return new(angles);
+        return new(_joints.Select(j => j.State.Angle));
     }
 
     public void SetPosture(MaydayLegPosture posture)
     {
         _joints
-        .Zip(posture.AsEnumerable())
-        .ToList()
-        .ForEach(pair => pair.First.SetAngleGoal(pair.Second));
+            .Zip(posture.AsEnumerable())
+            .ToList()
+            .ForEach(pair => pair.First.SetAngleGoal(pair.Second));
     }
 }
