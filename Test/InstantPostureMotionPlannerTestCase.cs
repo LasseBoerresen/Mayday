@@ -10,13 +10,12 @@ namespace Test;
 [TestSubject(typeof(InstantPostureMaydayMotionPlanner))]
 public class InstantPostureMotionPlannerTestCase
 {
-    readonly Mock<Structure> _mockStructure = new();
+    readonly Mock<MaydayStructure> _mockStructure = new();
     readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
 
     public InstantPostureMotionPlannerTestCase()
     {
-        
-        _instantPostureMaydayMotionPlanner = new InstantPostureMaydayMotionPlanner();
+        _instantPostureMaydayMotionPlanner = new(_mockStructure.Object);
     }
 
     [Fact]
