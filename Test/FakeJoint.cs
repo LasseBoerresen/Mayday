@@ -11,4 +11,9 @@ public class FakeJoint(Angle angle) : Joint
         Torque.Zero,
         UnitsNet.Temperature.Zero,
         AngleGoal: Angle.Zero);
+
+    public override void SetAngleGoal(Angle goal)
+    {
+        throw new NotImplementedException();
+    }
 }

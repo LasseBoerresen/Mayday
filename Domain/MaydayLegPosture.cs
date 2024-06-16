@@ -14,4 +14,6 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     public static MaydayLegPosture Sitting => new(0.0, 0.3, -0.2);
     public static MaydayLegPosture Standing => new(0.0, 0.2, -0.25);
     public static MaydayLegPosture StandingWide => new(0.0, 0.1, -0.1);
+    
+    public IEnumerable<Angle> AsEnumerable() => [CoxaAngle, FemurAngle, TibiaAngle];
 }
