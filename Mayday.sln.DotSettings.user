@@ -1,26 +1,17 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String>
 	<s:Boolean x:Key="/Default/Environment/Highlighting/HighlightingEnabled/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingMode/@EntryValue">OnlyMarkers</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0428bcb4_002D5725_002D4e76_002D9e21_002D529aad1c1599/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=123f9eb2_002D5520_002D4bd5_002D8f1b_002D964bc468afc9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="MaydayLegTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.MaydayLegTests.GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.MaydayLegTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7e496aa4_002D71d1_002D494f_002Db020_002D7c4723c8b757/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.MaydayLegTests.GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=de2a9946_002D3af3_002D4d43_002D8384_002D625da5068537/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test_WhenSitCommand_ThenCallsMotionPlannerWithSitPosture" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.TerminalPostureBehaviorControllerTestCase.Test_WhenSitCommand_ThenCallsMotionPlannerWithSitPosture&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ef8e230f_002Ded3b_002D4706_002D894b_002Dbee103a8197e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.MaydayLegTests.GivenLegWithJointsInState_WhenGetPosture_ThenReturnPostureWithThose&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
+	
+	
+	
+	
 	
 	
 	
