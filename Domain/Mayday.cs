@@ -1,8 +1,11 @@
-﻿using Mayday.Behavior;
+﻿using Domain.Behavior;
 
-namespace Mayday;
+namespace Domain;
 
-public class Mayday()
+public class Mayday(BehaviorController behaviorController)
 {
-
+    public void Start()
+    {
+        behaviorController.Start();
+    }
 }

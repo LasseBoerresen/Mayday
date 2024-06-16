@@ -1,10 +1,10 @@
-﻿using mayday;
-using Mayday.Behavior;
-using Mayday.Structures;
+﻿using Domain.Behavior;
+using Domain.MotionPlanning;
+using Domain.Structures;
 
 var maydayStructure = MaydayStructure.Create();
-StandBehaviorController behaviorController = new(maydayStructure);
-Mayday.Mayday may = new();
+InstantPostureMotionPlanner motionPlanner = new();
+TerminalPostureBehaviorController behaviorController = new(motionPlanner);
+Domain.Mayday may = new(behaviorController);
 
-behaviorController.Start();
-
+may.Start();

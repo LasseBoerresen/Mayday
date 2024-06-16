@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
-using Mayday.Geometry;
 using UnitsNet;
 
-namespace mayday.Geometry;
+namespace Domain.Geometry;
 
 /// <summary>
 /// Rotation Quaternion

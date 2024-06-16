@@ -1,4 +1,4 @@
-﻿namespace Mayday.Structures;
+﻿namespace Domain.Structures;
 
 public class MaydayStructure(IEnumerable<Joint> joints) : Structure(joints)
 {
@@ -11,9 +11,9 @@ public class MaydayStructure(IEnumerable<Joint> joints) : Structure(joints)
         return new(joints);
     }
 
-    private MaydayPosture _posture = MaydayPosture.Neutral;
+    private Posture _posture = MaydayPosture.Neutral;
 
-    public MaydayPosture Posture
+    public Posture Posture
     {
         get => _posture;
         set

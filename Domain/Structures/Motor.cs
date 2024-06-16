@@ -1,4 +1,4 @@
-﻿namespace Mayday.Structures;
+﻿namespace Domain.Structures;
 
 public interface Motor
 {

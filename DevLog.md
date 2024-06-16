@@ -1,5 +1,17 @@
 ﻿# Development Log
 
+
+### Restarting implementing of mayday in c#
+#### 2024-03-29 11:25 +01:00 @Bed with ivy sleeping
+- TODO
+  - Look through the structure.
+  - Start with the sequence diagram, end to end. For just waking up and standing :)
+
+- Log
+  - I need to make an environment, where I can run tests against both a mock, who simply sends the position back that is requested, stable temperature, proportional force etc. This is a foolishly simple simulation. But I simply need it for working on the infrastructure. 
+
+
+
 ### Thoughts on connecting to dynamixelSDK from C#
 #### 2024-02-20 08:25 +01:00 @Amarger Kaffebaren
 Aparrently, DynamixelSDK for C# is only available on windows, which is just not good enough for me. I could write it myself, what I need. Testdriven. It wouldn't be that bad. But it is yak shaving. I could use ROS to communicate with my existing well written facade to the python sdk... Could be good. And an exercise in reuse. But I still kind of need to do that with ros... Also ok. I will need multiple other tools. Rviz, simulators etc. I need ros no matter what. There even is a ROS library, 

@@ -1,4 +1,6 @@
-﻿namespace Mayday;
+﻿using Domain.Structures;
+
+namespace Domain;
 
 public record MaydayPosture(
     MaydayLegPosture RF,
@@ -6,7 +8,7 @@ public record MaydayPosture(
     MaydayLegPosture RB,
     MaydayLegPosture LF,
     MaydayLegPosture LC,
-    MaydayLegPosture LB)
+    MaydayLegPosture LB) : Posture
 {
     public static MaydayPosture Neutral => FromLegPosture(MaydayLegPosture.Neutral);
     public static MaydayPosture Sitting => FromLegPosture(MaydayLegPosture.Sitting);
@@ -15,7 +17,7 @@ public record MaydayPosture(
 
     private static MaydayPosture FromLegPosture(MaydayLegPosture legPosture)
     {
-        return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
+        return new MaydayPosture(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
     }
 
     public override string ToString()
