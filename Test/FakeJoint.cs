@@ -1,4 +1,4 @@
-﻿using Domain.Structures;
+﻿using RobotDomain.Structures;
 using UnitsNet;
 
 namespace Test;

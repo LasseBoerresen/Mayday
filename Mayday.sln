@@ -1,8 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{55EE5E75-DFA4-4266-B056-67CB9C0A0857}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotDomain", "RobotDomain\RobotDomain.csproj", "{55EE5E75-DFA4-4266-B056-67CB9C0A0857}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{78D4CC1D-A43E-4083-BA0B-C4177CDB0F17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaydayDomain", "MaydayDomain\MaydayDomain.csproj", "{3DDBCBE1-B99E-4084-9315-8092321A2CAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualBehavior", "ManualBehavior\ManualBehavior.csproj", "{99958D3C-A325-46B3-AD98-0DBA54FCD275}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +22,13 @@ Global
 		{78D4CC1D-A43E-4083-BA0B-C4177CDB0F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78D4CC1D-A43E-4083-BA0B-C4177CDB0F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78D4CC1D-A43E-4083-BA0B-C4177CDB0F17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDBCBE1-B99E-4084-9315-8092321A2CAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDBCBE1-B99E-4084-9315-8092321A2CAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDBCBE1-B99E-4084-9315-8092321A2CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDBCBE1-B99E-4084-9315-8092321A2CAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99958D3C-A325-46B3-AD98-0DBA54FCD275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99958D3C-A325-46B3-AD98-0DBA54FCD275}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99958D3C-A325-46B3-AD98-0DBA54FCD275}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99958D3C-A325-46B3-AD98-0DBA54FCD275}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

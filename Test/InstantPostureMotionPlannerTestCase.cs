@@ -1,8 +1,8 @@
-﻿using Domain;
-using Domain.MotionPlanning;
-using Domain.Structures;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using MaydayDomain;
 using Moq;
+using RobotDomain.MotionPlanning;
+using RobotDomain.Structures;
 using Xunit;
 
 namespace Test;

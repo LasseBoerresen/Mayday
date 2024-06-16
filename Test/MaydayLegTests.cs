@@ -1,6 +1,6 @@
-﻿using Domain;
-using Domain.Structures;
+﻿using MaydayDomain;
 using Moq;
+using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
