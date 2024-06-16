@@ -4,7 +4,7 @@ using RobotDomain.Behavior;
 
 namespace ManualBehavior;
 
-public class TerminalPostureBehaviorController(MaydayMotionPlanner maydayMotionPlanner) : BehaviorController
+public class TerminalPostureBehaviorController(MaydayMotionPlanner motionPlanner) : BehaviorController
 {
     public void Start()
     {
@@ -13,9 +13,9 @@ public class TerminalPostureBehaviorController(MaydayMotionPlanner maydayMotionP
     }
 
     public void Stop() => Environment.Exit(0);
-    public void Stand() => maydayMotionPlanner.SetPosture(MaydayStructurePosture.Standing);
+    public void Stand() => motionPlanner.SetPosture(MaydayStructurePosture.Standing);
 
-    public void Sit() => maydayMotionPlanner.SetPosture(MaydayStructurePosture.Sitting);
+    public void Sit() => motionPlanner.SetPosture(MaydayStructurePosture.Sitting);
 
     private void ExecuteConsoleCommand()
     {
@@ -28,9 +28,11 @@ public class TerminalPostureBehaviorController(MaydayMotionPlanner maydayMotionP
         Console.Write("Enter command (stand/sit/stop): ");
         var commandString = Console.ReadLine()?.ToLower() ?? "";
         if (!Enum.TryParse<PostureCommand>(commandString, ignoreCase: true, out var command))
+        {
             Console.WriteLine($"Invalid command '{commandString}'. Please enter either 'stand', 'sit' or 'stop'.");
-            GetCommand();
-            
+            return GetCommand();
+        }
+
         return command;
     }
 
