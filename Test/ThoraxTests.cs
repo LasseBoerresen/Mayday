@@ -18,4 +18,17 @@ public class ThoraxTests
         // Then
         Assert.Equal(Pose.Zero, actualOrigin);
     }
+    
+    // [Fact]
+    // public void GivenThorax_WhenGetLegOrigins_ThenReturnsPosesOnCircleInCorrectOrder()
+    // {
+    //     // Given
+    //     Thorax thorax = new();
+    //
+    //     // When
+    //     var actualOrigin = thorax.LegOrigins;
+    //
+    //     // Then
+    //     Assert.Equal(Pose.Zero, actualOrigin);
+    // }
 }
