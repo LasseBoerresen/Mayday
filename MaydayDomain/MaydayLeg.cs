@@ -16,7 +16,7 @@ public class MaydayLeg
         return new(_joints.Select(j => j.State.Angle));
     }
 
-    public void SetPosture(MaydayLegPosture posture)
+    public virtual void SetPosture(MaydayLegPosture posture)
     {
         _joints
             .Zip(posture.AsEnumerable())
