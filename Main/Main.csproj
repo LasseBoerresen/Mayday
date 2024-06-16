@@ -1,12 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Dynamixel\Dynamixel.csproj" />
+      <ProjectReference Include="..\Generic\Generic.csproj" />
+      <ProjectReference Include="..\ManualBehavior\ManualBehavior.csproj" />
       <ProjectReference Include="..\MaydayDomain\MaydayDomain.csproj" />
       <ProjectReference Include="..\RobotDomain\RobotDomain.csproj" />
     </ItemGroup>

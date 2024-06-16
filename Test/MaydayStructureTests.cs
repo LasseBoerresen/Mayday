@@ -7,7 +7,7 @@ using static MaydayDomain.MaydayLegId;
 
 namespace Test;
 
-public class MaydayRobotTests
+public class MaydayStructureTests
 {
     [Fact] public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
     {
@@ -25,7 +25,7 @@ public class MaydayRobotTests
         };
 
         // When
-        MaydayRobot may = new(legs);
+        MaydayStructure may = new(legs);
 
         // Then
         Assert.True(may != null);
@@ -38,7 +38,7 @@ public class MaydayRobotTests
         AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<FakeJoint>())));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
-        MaydayRobot may = new(legsDict);
+        MaydayStructure may = new(legsDict);
         
         // When
         var posture = MaydayLegPosture.Standing;

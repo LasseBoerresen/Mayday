@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MaydayDomain\MaydayDomain.csproj" />
       <ProjectReference Include="..\RobotDomain\RobotDomain.csproj" />
     </ItemGroup>
 

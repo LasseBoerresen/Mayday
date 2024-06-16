@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
 using ManualBehavior;
 using MaydayDomain;
+using MaydayDomain.MotionPlanning;
 using Moq;
-using RobotDomain.MotionPlanning;
 using Xunit;
 
 namespace Test;
@@ -10,7 +10,7 @@ namespace Test;
 [TestSubject(typeof(TerminalPostureBehaviorController))]
 public class TerminalPostureBehaviorControllerTestCase
 {
-    private readonly Mock<MotionPlanner> _mockMotionPlanner = new();
+    private readonly Mock<MaydayMotionPlanner> _mockMotionPlanner = new();
     private readonly TerminalPostureBehaviorController _controller;
 
     public TerminalPostureBehaviorControllerTestCase()
@@ -28,7 +28,7 @@ public class TerminalPostureBehaviorControllerTestCase
         _controller.Sit();
 
         // Then
-        _mockMotionPlanner.Verify(mp => mp.SetPosture(MaydayPosture.Sitting), Times.Once);
+        _mockMotionPlanner.Verify(mp => mp.SetPosture(MaydayStructurePosture.Sitting), Times.Once);
     }
     
     [Fact]
@@ -40,6 +40,6 @@ public class TerminalPostureBehaviorControllerTestCase
         _controller.Stand();
 
         // Then
-        _mockMotionPlanner.Verify(mp => mp.SetPosture(MaydayPosture.Standing), Times.Once);
+        _mockMotionPlanner.Verify(mp => mp.SetPosture(MaydayStructurePosture.Standing), Times.Once);
     }
 }

@@ -2,9 +2,8 @@
 
 namespace RobotDomain.Structures;
 
-public class Structure(IEnumerable<Joint> joints)
+public class Structure()
 {
-    public IEnumerable<JointState> JointStates => joints.Select(j => j.State);
 
     public Pose GetPoseFor(Component component)
     {

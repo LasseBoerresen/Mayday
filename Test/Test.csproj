@@ -30,7 +30,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Dynamixel\Dynamixel.csproj" />
       <ProjectReference Include="..\Generic\Generic.csproj" />
+      <ProjectReference Include="..\Main\Main.csproj" />
       <ProjectReference Include="..\RobotDomain\RobotDomain.csproj" />
       <ProjectReference Include="..\ManualBehavior\ManualBehavior.csproj" />
       <ProjectReference Include="..\MaydayDomain\MaydayDomain.csproj" />

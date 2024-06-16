@@ -1,10 +1,10 @@
 ﻿using MaydayDomain;
+using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
-using RobotDomain.MotionPlanning;
 
 namespace ManualBehavior;
 
-public class TerminalPostureBehaviorController(MotionPlanner motionPlanner) : BehaviorController
+public class TerminalPostureBehaviorController(MaydayMotionPlanner maydayMotionPlanner) : BehaviorController
 {
     public void Start()
     {
@@ -13,9 +13,9 @@ public class TerminalPostureBehaviorController(MotionPlanner motionPlanner) : Be
     }
 
     public void Stop() => Environment.Exit(0);
-    public void Stand() => motionPlanner.SetPosture(MaydayPosture.Standing);
+    public void Stand() => maydayMotionPlanner.SetPosture(MaydayStructurePosture.Standing);
 
-    public void Sit() => motionPlanner.SetPosture(MaydayPosture.Sitting);
+    public void Sit() => maydayMotionPlanner.SetPosture(MaydayStructurePosture.Sitting);
 
     private void ExecuteConsoleCommand()
     {

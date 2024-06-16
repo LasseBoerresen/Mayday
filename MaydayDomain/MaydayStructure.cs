@@ -1,27 +1,25 @@
-﻿using RobotDomain.Structures;
+﻿using System.Collections.Immutable;
+using RobotDomain.Structures;
 
 namespace MaydayDomain;
 
-public class MaydayStructure(IEnumerable<Joint> joints) : Structure(joints)
+public class MaydayStructure
 {
-    public static MaydayStructure Create()
-    {
-        Joint[] joints = { };
-        Attachment[] attachments = { };
-        Link[] links = { };
+    private readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legs;
 
-        return new(joints);
+    public MaydayStructure(IDictionary<MaydayLegId, MaydayLeg> legs)
+    {
+        _legs = legs.ToImmutableSortedDictionary();
     }
 
-    private Posture _posture = MaydayPosture.Neutral;
-
-    public Posture Posture
+    public void SetPostureForAllLegs(MaydayLegPosture posture)
     {
-        get => _posture;
-        set
-        {
-            _posture = value;
-            Console.WriteLine(_posture);
-        }
+        _legs.ToList().ForEach(kvp => kvp.Value.SetPosture(posture));
     }
-};
+
+    public static MaydayStructure Create(JointFactory jointFactory)
+    {
+        var legs = MaydayLeg.CreateAll(jointFactory);
+        return new(legs);
+    }
+}

@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualBehavior", "ManualBeh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generic", "Generic\Generic.csproj", "{5BA9A8F3-756D-4275-ACA5-70315632AA65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{893FFD73-0B9C-424C-8F91-318778DE1F83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dynamixel", "Dynamixel\Dynamixel.csproj", "{3688333A-A6B8-40E4-9389-15A7229EEE59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{5BA9A8F3-756D-4275-ACA5-70315632AA65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BA9A8F3-756D-4275-ACA5-70315632AA65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BA9A8F3-756D-4275-ACA5-70315632AA65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{893FFD73-0B9C-424C-8F91-318778DE1F83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{893FFD73-0B9C-424C-8F91-318778DE1F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{893FFD73-0B9C-424C-8F91-318778DE1F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{893FFD73-0B9C-424C-8F91-318778DE1F83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3688333A-A6B8-40E4-9389-15A7229EEE59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3688333A-A6B8-40E4-9389-15A7229EEE59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3688333A-A6B8-40E4-9389-15A7229EEE59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3688333A-A6B8-40E4-9389-15A7229EEE59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

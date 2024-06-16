@@ -23,4 +23,9 @@ public class MaydayLeg
             .ToList()
             .ForEach(pair => pair.First.SetAngleGoal(pair.Second));
     }
+
+    public static IDictionary<MaydayLegId, MaydayLeg> CreateAll(JointFactory jointFactory)
+    {
+        throw new NotImplementedException();
+    }
 }

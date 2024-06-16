@@ -1,22 +1,22 @@
 ﻿using JetBrains.Annotations;
 using MaydayDomain;
+using MaydayDomain.MotionPlanning;
 using Moq;
-using RobotDomain.MotionPlanning;
 using RobotDomain.Structures;
 using Xunit;
 
 namespace Test;
 
-[TestSubject(typeof(InstantPostureMotionPlanner))]
+[TestSubject(typeof(InstantPostureMaydayMotionPlanner))]
 public class InstantPostureMotionPlannerTestCase
 {
     readonly Mock<Structure> _mockStructure = new();
-    readonly InstantPostureMotionPlanner _instantPostureMotionPlanner;
+    readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
 
     public InstantPostureMotionPlannerTestCase()
     {
         
-        _instantPostureMotionPlanner = new InstantPostureMotionPlanner();
+        _instantPostureMaydayMotionPlanner = new InstantPostureMaydayMotionPlanner();
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class InstantPostureMotionPlannerTestCase
         // Given
         
         // When
-        _instantPostureMotionPlanner.SetPosture(MaydayPosture.Sitting);
+        _instantPostureMaydayMotionPlanner.SetPosture(MaydayStructurePosture.Sitting);
         
         // Then
         
