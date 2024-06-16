@@ -12,11 +12,6 @@ public class MaydayLeg
         _joints = joints;
     }
 
-    public static MaydayLeg Create(IEnumerable<Joint> joints)
-    {
-        return new(joints);
-    }
-
     public MaydayLegPosture GetPosture()
     {
         var angles = _joints

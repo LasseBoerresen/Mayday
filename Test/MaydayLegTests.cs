@@ -32,7 +32,7 @@ public class MaydayLegTests
         
         // Given
         IEnumerable<FakeJoint> fakeJoints = [new(coxaAngle), new(femurAngle), new(tibiaAngle)]; 
-        var leg = MaydayLeg.Create(fakeJoints);
+        MaydayLeg leg = new(fakeJoints);
         
         // When
         var actual = leg.GetPosture();
