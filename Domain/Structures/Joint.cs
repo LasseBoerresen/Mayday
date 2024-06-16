@@ -1,9 +1,7 @@
-﻿using Mayday.Geometry;
+﻿namespace Domain.Structures;
 
-namespace Mayday.Structures;
+public abstract class Joint
 
-public class Joint(Pose origin, Motor motor, Link parent, Link child)
-    : Connection(origin, parent, child)
 {
-    public JointState State => motor.State;
+    public abstract JointState State { get; }
 }

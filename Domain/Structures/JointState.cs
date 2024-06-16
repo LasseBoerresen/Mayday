@@ -1,18 +1,18 @@
 ﻿using UnitsNet;
 
-namespace Mayday.Structures;
+namespace Domain.Structures;
 
 public record JointState(
     Angle Angle,
     RotationalSpeed RotationalSpeed,
     Torque Torque,
-    Temperature Temperature,
-    Angle? AngleGoal = null)
+    UnitsNet.Temperature Temperature,
+    Angle? AngleGoal)
 {
-    public static JointState Zero => new JointState(
+    public static JointState Zero => new(
         Angle.Zero,
         RotationalSpeed.Zero,
         Torque.Zero,
-        Temperature.Zero,
+        UnitsNet.Temperature.Zero,
         Angle.Zero);
 };

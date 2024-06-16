@@ -1,14 +1,15 @@
 ﻿using UnitsNet;
 
-namespace Mayday;
+namespace Domain;
 
-public record MaydayLegPosture
+public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAngle)
 {
-    public MaydayLegPosture(Angle coxa, Angle femur, Angle tibia) {}
-
-    public MaydayLegPosture(double coxa, double femur, double tibia)
+    private MaydayLegPosture(double coxa, double femur, double tibia)
         : this(Angle.FromRevolutions(coxa), Angle.FromRevolutions(femur), Angle.FromRevolutions(tibia)) {}
 
+    public MaydayLegPosture(Angle[] angles)
+        : this(angles[0], angles[1], angles[2]) {}
+    
     public static MaydayLegPosture Neutral => new(0.0, 0.0, 0.0);
     public static MaydayLegPosture Sitting => new(0.0, 0.3, -0.2);
     public static MaydayLegPosture Standing => new(0.0, 0.2, -0.25);
