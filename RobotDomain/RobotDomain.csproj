@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Structures\Joint\" />
       <Folder Include="Structures\MaydayStructure\" />
     </ItemGroup>
 

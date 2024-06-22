@@ -2,11 +2,11 @@
 
 namespace Dynamixel;
 
-public class DynamixelAdapter
+public static class Sdk
 {
     // const string dll_path = "../../../../../../../../c/build/win64/output/dxl_x64_c.dll"; 
     // private const string dll_path = "../DynamixelSDK/c/build/win64/output/dxl_x64_c.dll";
-    private const string dll_path =
+    const string dll_path =
         "C:/Users/fiffi_m4jrsay/RiderProjects/DynamixelSDK/c/build/win64/output/dxl_x64_c.dll";
 
     #region PortHandler

@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Generic\Generic.csproj" />
       <ProjectReference Include="..\RobotDomain\RobotDomain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="33.0.1" />
     </ItemGroup>
 
 </Project>

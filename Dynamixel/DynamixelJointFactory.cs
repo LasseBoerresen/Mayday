@@ -2,7 +2,7 @@
 
 namespace Dynamixel;
 
-public class DynamixelJointFactory(DynamixelAdapter adapter) : JointFactory
+public class DynamixelJointFactory(Adapter adapter) : JointFactory
 {
     public Joint Create(JointId id)
     {
