@@ -1,9 +1,10 @@
-﻿using Moq;
+﻿using Dynamixel;
+using Moq;
 using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 
-namespace Dynamixel;
+namespace Test.Dynamixel;
 
 public class DynamixelJointFactoryTests
 {
