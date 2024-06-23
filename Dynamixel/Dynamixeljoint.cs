@@ -3,11 +3,8 @@ using UnitsNet;
 
 namespace Dynamixel;
 
-public class DynamixelJoint : Joint
+public class DynamixelJoint(JointId id, Adapter adapter) : Joint
 {
     public override JointState State { get; }
-    public override void SetAngleGoal(Angle goal)
-    {
-        throw new NotImplementedException();
-    }
+    public override void SetAngleGoal(Angle goal) => adapter.SetGoal(id, new(goal));
 }

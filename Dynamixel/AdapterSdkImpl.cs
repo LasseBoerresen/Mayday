@@ -1,5 +1,6 @@
 ﻿using Generic;
 using LanguageExt;
+using RobotDomain.Structures;
 using UnitsNet;
 
 namespace Dynamixel;
@@ -19,8 +20,8 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static int _POSITION_I_GAIN_SOFT = 300;
     static int _POSITION_D_GAIN_SOFT = 4000;
 
-    public void SetGoal(Id id, PositionAngle angle)
+    public void SetGoal(JointId id, PositionAngle angle)
     {
-        portAdapter.Write(id, ControlRegister.GoalPosition, angle.ToPositionStep());
+        portAdapter.Write((Id)id, ControlRegister.GoalPosition, angle.ToPositionStep());
     }
 }

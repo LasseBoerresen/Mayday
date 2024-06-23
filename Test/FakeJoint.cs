@@ -1,4 +1,5 @@
-﻿using RobotDomain.Structures;
+﻿using Dynamixel;
+using RobotDomain.Structures;
 using UnitsNet;
 
 namespace Test;

@@ -1,6 +1,8 @@
-﻿namespace Dynamixel;
+﻿using RobotDomain.Structures;
+
+namespace Dynamixel;
 
 public interface Adapter
 {
-    void SetGoal(Id id, PositionAngle angle);
+    void SetGoal(JointId id, PositionAngle angle);
 }

@@ -6,6 +6,6 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory
 {
     public Joint Create(JointId id)
     {
-        throw new NotImplementedException();
+        return new DynamixelJoint(id, adapter);
     }
 }
