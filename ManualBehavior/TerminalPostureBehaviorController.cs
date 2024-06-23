@@ -17,13 +17,13 @@ public class TerminalPostureBehaviorController(MaydayMotionPlanner motionPlanner
 
     public void Sit() => motionPlanner.SetPosture(MaydayStructurePosture.Sitting);
 
-    private void ExecuteConsoleCommand()
+    void ExecuteConsoleCommand()
     {
         var command = GetCommand();
         ExecuteCommand(command);
     }
 
-    private static PostureCommand GetCommand()
+    static PostureCommand GetCommand()
     {
         Console.Write("Enter command (stand/sit/stop): ");
         var commandString = Console.ReadLine()?.ToLower() ?? "";
@@ -36,7 +36,7 @@ public class TerminalPostureBehaviorController(MaydayMotionPlanner motionPlanner
         return command;
     }
 
-    private void ExecuteCommand(PostureCommand command)
+    void ExecuteCommand(PostureCommand command)
     {
         if (command == PostureCommand.Stand)
             Stand();

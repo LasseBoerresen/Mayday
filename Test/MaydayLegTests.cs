@@ -9,7 +9,7 @@ namespace Test;
 
 public class MaydayLegTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly ITestOutputHelper _testOutputHelper;
 
     public MaydayLegTests(ITestOutputHelper testOutputHelper)
     {

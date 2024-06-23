@@ -10,8 +10,8 @@ namespace Test;
 [TestSubject(typeof(TerminalPostureBehaviorController))]
 public class TerminalPostureBehaviorControllerTestCase
 {
-    private readonly Mock<MaydayMotionPlanner> _mockMotionPlanner = new();
-    private readonly TerminalPostureBehaviorController _controller;
+    readonly Mock<MaydayMotionPlanner> _mockMotionPlanner = new();
+    readonly TerminalPostureBehaviorController _controller;
 
     public TerminalPostureBehaviorControllerTestCase()
     {

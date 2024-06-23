@@ -5,7 +5,7 @@ namespace MaydayDomain;
 
 public class MaydayStructure
 {
-    private readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legs;
+    readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legs;
 
     public MaydayStructure(IDictionary<MaydayLegId, MaydayLeg> legs)
     {

@@ -4,7 +4,7 @@ namespace MaydayDomain.MotionPlanning;
 
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
-    private readonly MaydayStructure _structure;
+    readonly MaydayStructure _structure;
 
     public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
