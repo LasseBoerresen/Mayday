@@ -13,7 +13,7 @@ public class AdapterSdkImplTests
     readonly AdapterSdkImpl _adapter;
     readonly Id _id;
 
-    AdapterSdkImplTests()
+    public AdapterSdkImplTests()
     {
          _dynamixelPortAdapterMock = new();
          _adapter = new(_dynamixelPortAdapterMock.Object);
