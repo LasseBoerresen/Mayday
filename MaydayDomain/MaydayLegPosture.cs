@@ -4,7 +4,7 @@ namespace MaydayDomain;
 
 public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAngle)
 {
-    private MaydayLegPosture(double coxa, double femur, double tibia)
+    MaydayLegPosture(double coxa, double femur, double tibia)
         : this(Angle.FromRevolutions(coxa), Angle.FromRevolutions(femur), Angle.FromRevolutions(tibia)) {}
 
     public MaydayLegPosture(IEnumerable<Angle> angles)

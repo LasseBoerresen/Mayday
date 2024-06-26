@@ -18,6 +18,7 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public override void SetPosture(MaydayStructurePosture posture)
     {
-        throw new NotImplementedException();
+        // TODO TDD
+        _structure.SetPosture(posture);
     }
 }

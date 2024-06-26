@@ -15,7 +15,8 @@ public class TerminalPostureBehaviorControllerTestCase
 
     public TerminalPostureBehaviorControllerTestCase()
     {
-        _controller = new TerminalPostureBehaviorController(_mockMotionPlanner.Object);        
+        CancellationTokenSource cancelTokenSource  = new();
+        _controller = new(_mockMotionPlanner.Object, cancelTokenSource);        
     }
     
     

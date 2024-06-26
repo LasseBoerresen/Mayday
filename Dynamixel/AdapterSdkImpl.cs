@@ -16,12 +16,12 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static Ratio _TORQ_LIMIT_REST = Ratio.FromDecimalFractions(1.0);
     static Option<RotationalSpeed> _VEL_LIMIT_SLOW = Option<RotationalSpeed>.None;  // AngularVelocity(tau / 8)  // tau / 16;
     static Option<RotationalAcceleration> _ACC_LIMIT_SLOW = Option<RotationalAcceleration>.None;  // tau / 8;
-    static int _POSITION_P_GAIN_SOFT = 640;  // 200;
+    static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
     static int _POSITION_I_GAIN_SOFT = 300;
     static int _POSITION_D_GAIN_SOFT = 4000;
 
     public void SetGoal(JointId id, PositionAngle angle)
     {
-        portAdapter.Write((Id)id, ControlRegister.GoalPosition, angle.ToPositionStep());
+        portAdapter.Write(Id.FromJointId(id), ControlRegister.GoalPosition, angle.ToPositionStep());
     }
 }

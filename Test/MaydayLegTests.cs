@@ -76,4 +76,33 @@ public class MaydayLegTests
             .ToList()
             .ForEach(pair => pair.First.Verify(j => j.SetAngleGoal(pair.Second), Times.Once));
     }
+
+    [Fact]
+    void GivenLegIdLeftFront_WhenCreateLegWithId_ThenCallsJointFactoryWithIds1And2And3()
+    {
+        // Given
+        MaydayLegId legId = MaydayLegId.LeftFront;
+        Mock<JointFactory> mockJointFactory = new();
+        
+        // When
+        _ = MaydayLeg.CreateLeg(legId, mockJointFactory.Object);
+
+        // Then
+        mockJointFactory.Verify(jf => jf.Create(new(1)), Times.Once);
+        mockJointFactory.Verify(jf => jf.Create(new(2)), Times.Once);
+        mockJointFactory.Verify(jf => jf.Create(new(3)), Times.Once);
+    }
+
+    [Fact]
+    void GivenMockJointFactory_WhenCreateAll_ThenReturns6Legs()
+    {
+        // Given
+        Mock<JointFactory> mockJointFactory = new();
+        
+        // When 
+        var actualLegsDict = MaydayLeg.CreateAll(mockJointFactory.Object);
+
+        // Then
+        Assert.Equal(6, actualLegsDict.Count);
+    }
 }

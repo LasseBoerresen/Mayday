@@ -11,6 +11,13 @@ public class MaydayStructure
     {
         _legs = legs.ToImmutableSortedDictionary();
     }
+    
+    public void SetPosture(MaydayStructurePosture posture)
+    {
+        _legs
+            .ToList()
+            .ForEach(kvp => kvp.Value.SetPosture(posture.ToLegDict()[kvp.Key]));
+    }
 
     public void SetPostureForAllLegs(MaydayLegPosture posture)
     {

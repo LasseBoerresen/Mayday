@@ -1,3 +1,3 @@
 ﻿namespace MaydayDomain;
 
-public enum Side { Right = 0 , Left = 1 }
+public enum Side { Left = 0, Right = 1 }

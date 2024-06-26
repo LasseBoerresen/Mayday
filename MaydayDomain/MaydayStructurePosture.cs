@@ -15,9 +15,22 @@ public record MaydayStructurePosture(
     public static MaydayStructurePosture Standing => FromLegPosture(MaydayLegPosture.Standing);
     public static MaydayStructurePosture StandingWide => FromLegPosture(MaydayLegPosture.StandingWide);
 
-    private static MaydayStructurePosture FromLegPosture(MaydayLegPosture legPosture)
+    public IDictionary<MaydayLegId, MaydayLegPosture> ToLegDict()
     {
-        return new MaydayStructurePosture(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
+        return new Dictionary<MaydayLegId, MaydayLegPosture>
+        {
+            { MaydayLegId.LeftFront, LF },
+            { MaydayLegId.LeftCenter, LC },
+            { MaydayLegId.LeftBack, LB },
+            { MaydayLegId.RightFront, RF },
+            { MaydayLegId.RightCenter, RC },
+            { MaydayLegId.RightBack, RB },
+        };
+    }
+
+    static MaydayStructurePosture FromLegPosture(MaydayLegPosture legPosture)
+    {
+        return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
     }
 
     public override string ToString()

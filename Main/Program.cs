@@ -1,5 +1,8 @@
 ﻿using Main;
 
 MaydayRobot
-    .Create()
+    .CreateWithTerminalPostureBehaviorController()
     .Start();
+
+
+    

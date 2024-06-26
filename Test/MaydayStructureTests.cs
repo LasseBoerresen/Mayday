@@ -18,10 +18,10 @@ public class MaydayStructureTests
         {
             { RightFront, new(fakeJoints) },
             { RightCenter, new(fakeJoints) },
-            { RightRear, new(fakeJoints) },
+            { RightBack, new(fakeJoints) },
             { LeftFront, new(fakeJoints) },
             { LeftCenter, new(fakeJoints) },
-            { LeftRear, new(fakeJoints) }
+            { LeftBack, new(fakeJoints) }
         };
 
         // When

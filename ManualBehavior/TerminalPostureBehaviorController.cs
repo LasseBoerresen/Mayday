@@ -4,18 +4,21 @@ using RobotDomain.Behavior;
 
 namespace ManualBehavior;
 
-public class TerminalPostureBehaviorController(MaydayMotionPlanner motionPlanner) : BehaviorController
+public class TerminalPostureBehaviorController(
+    MaydayMotionPlanner motionPlanner,
+    CancellationTokenSource cancelTokenSource) : BehaviorController
 {
     public void Start()
     {
-        while (true)
+        while (!cancelTokenSource.Token.IsCancellationRequested)
             ExecuteConsoleCommand();
     }
 
-    public void Stop() => Environment.Exit(0);
     public void Stand() => motionPlanner.SetPosture(MaydayStructurePosture.Standing);
 
     public void Sit() => motionPlanner.SetPosture(MaydayStructurePosture.Sitting);
+
+    public void Stop() => cancelTokenSource.Cancel();
 
     void ExecuteConsoleCommand()
     {
@@ -47,5 +50,4 @@ public class TerminalPostureBehaviorController(MaydayMotionPlanner motionPlanner
         else
             throw new NotSupportedException($"PostureCommand {command} was not implemented yet");
     }
-
 }
