@@ -5,6 +5,7 @@ namespace MaydayDomain;
 public class MaydayLeg(IEnumerable<Joint> joints)
 {
     readonly IEnumerable<Joint> _joints = joints;
+    public const int JointCount = 3;
 
     public MaydayLegPosture GetPosture()
     {
@@ -22,8 +23,8 @@ public class MaydayLeg(IEnumerable<Joint> joints)
     public static MaydayLeg CreateLeg(MaydayLegId legId, JointFactory jointFactory)
     {
         var joints = Enumerable
-            .Range(1, 3)
-            .Select(i => new JointId(legId.Value + i))
+            .Range(1, JointCount)
+            .Select(i => new JointId(legId.Value() + i))
             .Select(jointFactory.Create)
             .ToList();
             

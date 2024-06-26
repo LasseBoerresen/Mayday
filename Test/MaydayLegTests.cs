@@ -10,10 +10,12 @@ namespace Test;
 public class MaydayLegTests
 {
     readonly ITestOutputHelper _testOutputHelper;
+    readonly Mock<JointFactory> _mockJointFactory;
 
     public MaydayLegTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
+        _mockJointFactory = new();
     }
 
     public static TheoryData<string, MaydayLegPosture> DataForGivenLegWithFakeJointsOfAngle_WhenGetPosture_ThenReturnPostureWithThose()
@@ -82,25 +84,38 @@ public class MaydayLegTests
     {
         // Given
         MaydayLegId legId = MaydayLegId.LeftFront;
-        Mock<JointFactory> mockJointFactory = new();
         
         // When
-        _ = MaydayLeg.CreateLeg(legId, mockJointFactory.Object);
+        _ = MaydayLeg.CreateLeg(legId, _mockJointFactory.Object);
 
         // Then
-        mockJointFactory.Verify(jf => jf.Create(new(1)), Times.Once);
-        mockJointFactory.Verify(jf => jf.Create(new(2)), Times.Once);
-        mockJointFactory.Verify(jf => jf.Create(new(3)), Times.Once);
+        _mockJointFactory.Verify(jf => jf.Create(new(1)), Times.Once);
+        _mockJointFactory.Verify(jf => jf.Create(new(2)), Times.Once);
+        _mockJointFactory.Verify(jf => jf.Create(new(3)), Times.Once);
+    }
+    
+    [Fact]
+    void GivenLegIdRightBack_WhenCreateLegWithId_ThenCallsJointFactoryWithIds16And17And18()
+    {
+        // Given
+        MaydayLegId legId = MaydayLegId.RightBack;
+        
+        // When
+        _ = MaydayLeg.CreateLeg(legId, _mockJointFactory.Object);
+
+        // Then
+        _mockJointFactory.Verify(jf => jf.Create(new(16)), Times.Once);
+        _mockJointFactory.Verify(jf => jf.Create(new(17)), Times.Once);
+        _mockJointFactory.Verify(jf => jf.Create(new(18)), Times.Once);
     }
 
     [Fact]
     void GivenMockJointFactory_WhenCreateAll_ThenReturns6Legs()
     {
         // Given
-        Mock<JointFactory> mockJointFactory = new();
         
         // When 
-        var actualLegsDict = MaydayLeg.CreateAll(mockJointFactory.Object);
+        var actualLegsDict = MaydayLeg.CreateAll(_mockJointFactory.Object);
 
         // Then
         Assert.Equal(6, actualLegsDict.Count);
