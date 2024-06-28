@@ -44,4 +44,16 @@ public class AdapterSdkImplTests
             pa => pa.Write(_id, ControlRegister.TorqueEnable, Convert.ToUInt32(true)), 
             Times.Once);
     }
+    
+    [Fact]
+    void Given_WhenInitialize_ThenCallsPortAdapterWriteVelocityLimit()
+    {
+        // When
+        _adapter.Initialize(_id);
+
+        // Then
+        _dynamixelPortAdapterMock.Verify(
+            pa => pa.Write(_id, ControlRegister.ProfileVelocity, It.IsAny<uint>()), 
+            Times.Once);
+    }
 }
