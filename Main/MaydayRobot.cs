@@ -30,6 +30,7 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
     static JointFactory CreateJointFactory()
     {
         PortAdapter portAdapterSdkImpl = new PortAdapterSdkImpl();
+        portAdapterSdkImpl.Initialize();
 
         Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl);
 
