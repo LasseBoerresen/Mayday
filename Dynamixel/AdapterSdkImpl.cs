@@ -24,4 +24,14 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     {
         portAdapter.Write(Id.FromJointId(id), ControlRegister.GoalPosition, angle.ToPositionStep());
     }
+
+    public void Initialize(JointId id)
+    {
+        TorqueEnable(id);
+    }
+
+    void TorqueEnable(JointId id)
+    {
+        portAdapter.Write(Id.FromJointId(id), ControlRegister.TorqueEnable, Convert.ToUInt32(true));
+    }
 }

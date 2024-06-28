@@ -6,6 +6,10 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory
 {
     public Joint Create(JointId id)
     {
-        return new DynamixelJoint(id, adapter);
+        var joint = new DynamixelJoint(id, adapter);
+
+        joint.Initialize();
+
+        return joint;
     }
 }

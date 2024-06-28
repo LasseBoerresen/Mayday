@@ -32,4 +32,16 @@ public class AdapterSdkImplTests
             pa => pa.Write(_id, ControlRegister.GoalPosition, PositionAngle.StepCenter), 
             Times.Once);
     }
+    
+    [Fact]
+    void Given_WhenInitialize_ThenCallsPortAdapterTorqueEnableWithValue1()
+    {
+        // When
+        _adapter.Initialize(_id);
+
+        // Then
+        _dynamixelPortAdapterMock.Verify(
+            pa => pa.Write(_id, ControlRegister.TorqueEnable, Convert.ToUInt32(true)), 
+            Times.Once);
+    }
 }

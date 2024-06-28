@@ -32,4 +32,17 @@ public class DynamixelJointFactoryTests
         // Then
         _mockAdapter.Verify(a => a.SetGoal(id, new(goalAngle)));
     }
+    
+    [Fact]
+    void GivenMockAdapter_WhenCreateJoint_ThenAdapterInitializeCalledWithJointId()
+    {
+        // Given
+        JointId id = new(1);
+    
+        // When
+        _ = _dynamixelJointFactory.Create(id);
+
+        // Then
+        _mockAdapter.Verify(a => a.Initialize(id));
+    }
 }
