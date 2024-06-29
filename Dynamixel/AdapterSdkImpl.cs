@@ -13,7 +13,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static Ratio _LOAD_STEP_SIZE = Ratio.FromDecimalFractions(0.1);
     static TemperatureDelta _TEMPERATURE_STEP_SIZE = TemperatureDelta.FromDegreesCelsius(1.0);
     static Ratio _TORQ_LIMIT_REST = Ratio.FromDecimalFractions(1.0);
-    static Option<RotationalSpeed> _velocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.1);  // AngularVelocity(tau / 8)  // tau / 16;
+    static Option<RotationalSpeed> _velocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     static Option<RotationalAcceleration> _ACC_LIMIT_SLOW = Option<RotationalAcceleration>.None;  // tau / 8;
     static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
     static int _POSITION_I_GAIN_SOFT = 300;
@@ -21,13 +21,45 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
 
     public void Initialize(JointId id)
     {
-        TorqueEnable(id);
+        if(!Ping(id))
+            Reboot(id);
+        
+        ReadHardwareErrorStatus(id);
+        
+        TorqueDisable(id);
         SetVelocityLimit(id);
+        TorqueEnable(id);
+    }
+
+    void ReadHardwareErrorStatus(JointId id)
+    {
+        var hardwareErrorStatus = portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
+        if (hardwareErrorStatus != 0)
+            Console.WriteLine($"HadwareErrorStatus: {hardwareErrorStatus:b8}");
+    }
+
+    void Reboot(JointId id)
+    {
+        Console.WriteLine($"Rebooting {id}");
+        portAdapter.Reboot(id);
+        Thread.Sleep(300);
+        
+        while (Ping(id) != true)
+        {   
+            Console.WriteLine("ping failed, ping again in 100ms");
+            Thread.Sleep(100);    
+        };
+        
+    }
+
+    bool Ping(JointId id)
+    {
+        return portAdapter.Ping(id);
     }
 
     public void SetGoal(JointId id, PositionAngle angle)
     {
-        portAdapter.Write(Id.FromJointId(id), ControlRegister.GoalPosition, angle.ToPositionStep());
+        portAdapter.Write(id, ControlRegister.GoalPosition, angle.ToPositionStep());
     }
 
     void SetVelocityLimit(JointId id)
@@ -36,11 +68,15 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
             .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
-        portAdapter.Write(Id.FromJointId(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
+        portAdapter.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
-    void TorqueEnable(JointId id)
+    void TorqueEnable(JointId id) => SetTorque(id, true);
+
+    void TorqueDisable(JointId id) => SetTorque(id, false);
+
+    void SetTorque(JointId id, bool value)
     {
-        portAdapter.Write(Id.FromJointId(id), ControlRegister.TorqueEnable, Convert.ToUInt32(true));
+        portAdapter.Write(id, ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }
 }

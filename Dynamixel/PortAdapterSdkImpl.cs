@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using LanguageExt;
 using UnitsNet;
 using static System.Console;
 using static Dynamixel.Sdk;
@@ -31,7 +32,7 @@ public class PortAdapterSdkImpl: PortAdapter
     {
         WriteBySize(id, cr, value);
         
-        CheckCommunicationResults(id, cr, "writing");
+        CheckCommunicationResults(id, cr, "writing", value);
     }
 
     public uint Read(Id id, ControlRegister cr)
@@ -41,6 +42,37 @@ public class PortAdapterSdkImpl: PortAdapter
         CheckCommunicationResults(id, cr, "reading");
 
         return result;
+    }
+
+    public void Reboot(Id id)
+    {
+        try
+        {
+            reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+            CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
+        }
+        catch (Exception e)
+        {
+            WriteLine("retrying reboot after 1s");
+            Thread.Sleep(1000);
+            reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+        }
+        
+    }
+
+    public bool Ping(Id id)
+    {
+        ping(_portNumber, ProtocolVersion, (byte)id.Value);
+        try
+        {
+            CheckCommunicationResults(id, Option<ControlRegister>.None, "ping");
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     void WriteBySize(Id id, ControlRegister cr, uint value)
@@ -76,9 +108,11 @@ public class PortAdapterSdkImpl: PortAdapter
         }
     }
 
-    void CheckCommunicationResults(Id id, ControlRegister cr, string mode)
+    void CheckCommunicationResults(Id id, Option<ControlRegister> cr, string mode, Option<uint> value=default)
     {
-        var errorMessage = $"{mode} dxl_id {id} and control register {cr} gave error:\n";
+        var crMessage = cr.Map(s => $"and control register {s}");
+        var valueMessage = value.Map(s => $"and value {s}");
+        var errorMessage = $"{mode} dxl_id {id} {crMessage.IfNone("")} {valueMessage.IfNone("")} gave error:\n";
 
         var lastTxRxResult = getLastTxRxResult(_portNumber, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)

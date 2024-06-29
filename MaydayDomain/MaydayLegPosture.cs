@@ -12,7 +12,7 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     
     public static MaydayLegPosture Neutral => new(0.0, 0.0, 0.0);
     public static MaydayLegPosture Sitting => new(0.0, 0.3, -0.2);
-    public static MaydayLegPosture Standing => new(0.0, 0.2, -0.25);
+    public static MaydayLegPosture Standing => new(0.0, 0.21, -0.26);
     public static MaydayLegPosture StandingHigh => new(0.0, -0.35, 0.3);
     public static MaydayLegPosture StandingWide => new(0.0, 0.1, -0.1);
     
