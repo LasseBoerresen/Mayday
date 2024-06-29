@@ -19,7 +19,7 @@ public class TerminalPostureBehaviorController(
 
     public void WakeUp()
     {
-        Console.WriteLine("Waking up...");
+        Console.WriteLine("\nWaking up...");
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
         Sit();
         Thread.Sleep(TimeSpan.FromSeconds(2));
@@ -113,14 +113,15 @@ public class TerminalPostureBehaviorController(
     static void PrintCommandList()
     {
         Console.Write(
-            $"Commands:\n" +
-            $"WakeUp(1)\n" +
-            $"Sleep(2)\n" +
-            $"Stand(3)\n" +
-            $"StandWide(4)\n" +
-            $"StandHigh(5)\n" +
-            $"Sit(6)\n" +
-            $"Stop(7)\n " +
-            $"\n");
+            "\n" +
+            "Commands:\n" +
+            "WakeUp(1)\n" +
+            "Sleep(2)\n" +
+            "Stand(3)\n" +
+            "StandWide(4)\n" +
+            "StandHigh(5)\n" +
+            "Sit(6)\n" +
+            "Stop(7)\n " +
+            "\n");
     }
 }
