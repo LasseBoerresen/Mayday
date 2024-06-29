@@ -13,7 +13,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static Ratio _LOAD_STEP_SIZE = Ratio.FromDecimalFractions(0.1);
     static TemperatureDelta _TEMPERATURE_STEP_SIZE = TemperatureDelta.FromDegreesCelsius(1.0);
     static Ratio _TORQ_LIMIT_REST = Ratio.FromDecimalFractions(1.0);
-    static Option<RotationalSpeed> _velocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.05);  // AngularVelocity(tau / 8)  // tau / 16;
+    static Option<RotationalSpeed> _velocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.1);  // AngularVelocity(tau / 8)  // tau / 16;
     static Option<RotationalAcceleration> _ACC_LIMIT_SLOW = Option<RotationalAcceleration>.None;  // tau / 8;
     static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
     static int _POSITION_I_GAIN_SOFT = 300;
