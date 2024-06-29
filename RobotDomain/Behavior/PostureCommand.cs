@@ -8,5 +8,7 @@ public enum PostureCommand
     StandWide = 4,
     StandHigh = 5,
     Sit = 6,
-    Stop = 7,
+    SitTall = 7,
+    Stop = 8,
+
 }

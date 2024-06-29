@@ -20,10 +20,12 @@ public class TerminalPostureBehaviorController(
     public void WakeUp()
     {
         Console.WriteLine("\nWaking up...");
+        
+        Sit();
+        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        SitTall();
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
         Sit();
-        Thread.Sleep(TimeSpan.FromSeconds(2));
-        Stand();
     }
     
     public void Sleep()
@@ -52,6 +54,11 @@ public class TerminalPostureBehaviorController(
     public void Sit()
     {
         motionPlanner.SetPosture(MaydayStructurePosture.Sitting);
+    }
+    
+    public void SitTall()
+    {
+        motionPlanner.SetPosture(MaydayStructurePosture.SittingTall);
     }
 
     public void Stop()
@@ -96,6 +103,9 @@ public class TerminalPostureBehaviorController(
             case PostureCommand.Sit:
                 Sit();
                 break;
+            case PostureCommand.SitTall:
+                SitTall();
+                break;
             case PostureCommand.Stop:
                 Stop();
                 break;
@@ -121,7 +131,8 @@ public class TerminalPostureBehaviorController(
             "StandWide(4)\n" +
             "StandHigh(5)\n" +
             "Sit(6)\n" +
-            "Stop(7)\n " +
+            "SitTall(7)\n" +
+            "Stop(8)\n " +
             "\n");
     }
 }

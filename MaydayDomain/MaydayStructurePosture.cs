@@ -12,6 +12,7 @@ public record MaydayStructurePosture(
 {
     public static MaydayStructurePosture Neutral => FromLegPosture(MaydayLegPosture.Neutral);
     public static MaydayStructurePosture Sitting => FromLegPosture(MaydayLegPosture.Sitting);
+    public static MaydayStructurePosture SittingTall => FromLegPosture(MaydayLegPosture.SittingTall);
     public static MaydayStructurePosture Standing => FromLegPosture(MaydayLegPosture.Standing);
     public static MaydayStructurePosture StandingHigh => FromLegPosture(MaydayLegPosture.StandingHigh);
     public static MaydayStructurePosture StandingWide => FromLegPosture(MaydayLegPosture.StandingWide);
