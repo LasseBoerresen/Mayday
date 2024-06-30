@@ -1,4 +1,5 @@
-﻿using RobotDomain.Structures;
+﻿using RobotDomain.Geometry;
+using RobotDomain.Structures;
 
 namespace MaydayDomain;
 
@@ -37,5 +38,25 @@ public class MaydayLeg(IEnumerable<Joint> joints)
             .AllLegIds
             .Select(lId => new KeyValuePair<MaydayLegId, MaydayLeg>(lId, CreateLeg(lId, jointFactory)))
             .ToDictionary();
+    }
+
+    public Pose GetOriginOfCoxaJoint()
+    {
+        return Pose.Zero;
+    }
+
+    public Pose GetOriginOfFemurJoint()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Pose GetOriginOfTibiaJoint()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Pose GetOriginTibiaTip()
+    {
+        throw new NotImplementedException();
     }
 }

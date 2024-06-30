@@ -1,5 +1,6 @@
 ﻿using MaydayDomain;
 using Moq;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
@@ -119,5 +120,35 @@ public class MaydayLegTests
 
         // Then
         Assert.Equal(6, actualLegsDict.Count);
+    }
+
+    [Fact]
+    void GivenLeg_WhenGetCoxaJointOrigin_ThenReturnsPoseX0d03_Y0_Z0_R0_P0_Y0()
+    {
+        // Given
+        Mock<JointFactory> mockJointFactory = new();
+        var leg = MaydayLeg.CreateLeg(new(Side.Left, SidePosition.Center), mockJointFactory.Object);
+        
+        // When
+        var actualOrigin = leg.GetOriginOfCoxaJoint();
+        
+        // Then
+        var expectedOrigin = new Pose(new(0, 0, 0), new(0, 0, 0));
+        Assert.Equal(expectedOrigin, actualOrigin);
+    }
+
+    [Fact]
+    void GivenLegAndCoxaJointStatePositionIs0_WhenGeFemurJointOrigin_ThenReturnsPoseX0d03_Y0_Z0_R0d25_P0_Yn0d25()
+    {
+        // Given
+        Mock<JointFactory> mockJointFactory = new();
+        var leg = MaydayLeg.CreateLeg(new(Side.Left, SidePosition.Center), mockJointFactory.Object);
+        
+        // When
+        var actualOrigin = leg.GetOriginOfFemurJoint();
+        
+        // Then
+        var expectedOrigin = new Pose(new(0.03, 0, 0), new(0.25, 0, 0.25));
+        Assert.Equal(expectedOrigin, actualOrigin);
     }
 }
