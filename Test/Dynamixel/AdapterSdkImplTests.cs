@@ -1,6 +1,7 @@
 ﻿using Dynamixel;
 using JetBrains.Annotations;
 using Moq;
+using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 
@@ -11,7 +12,7 @@ public class AdapterSdkImplTests
 {
     readonly Mock<PortAdapter> _dynamixelPortAdapterMock;
     readonly AdapterSdkImpl _adapter;
-    readonly Id _id;
+    readonly JointId _id;
 
     public AdapterSdkImplTests()
     {
