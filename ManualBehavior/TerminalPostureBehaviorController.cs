@@ -41,12 +41,12 @@ public class TerminalPostureBehaviorController(
         motionPlanner.SetPosture(MaydayStructurePosture.Standing);
     }
 
-    void StandHigh()
+    public void StandHigh()
     {
         motionPlanner.SetPosture(MaydayStructurePosture.StandingHigh);
     }
 
-    void StandWide()
+    public void StandWide()
     {
         motionPlanner.SetPosture(MaydayStructurePosture.StandingWide);
     }
