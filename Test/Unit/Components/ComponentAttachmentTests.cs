@@ -4,13 +4,13 @@ using Xunit.Sdk;
 
 namespace Test.Unit.Components;
 
-public class ComponentTests
+public class ComponentAttachmentTests
 {
     readonly Link _baseLink;
     readonly Link _link;
     readonly Connection _attachment;
 
-    public ComponentTests()
+    public ComponentAttachmentTests()
     {
         _baseLink = Link.New;
         _link = Link.New;
