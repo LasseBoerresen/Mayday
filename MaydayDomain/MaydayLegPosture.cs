@@ -1,4 +1,5 @@
-﻿using UnitsNet;
+﻿using System.Collections.Immutable;
+using UnitsNet;
 
 namespace MaydayDomain;
 
@@ -18,5 +19,5 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     public static MaydayLegPosture StandingHigh => new(0.0, -0.35, 0.3);
     public static MaydayLegPosture StandingWide => new(0.0, 0.1, -0.1);
     
-    public IEnumerable<Angle> AsEnumerable() => [CoxaAngle, FemurAngle, TibiaAngle];
+    public IImmutableList<Angle> AsListOfGoalAngles() => [CoxaAngle, FemurAngle, TibiaAngle];
 }

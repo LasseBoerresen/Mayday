@@ -10,7 +10,7 @@ public class PortAdapterSdkImplTests
     readonly PortAdapterSdkImpl _portAdapter = new();
     Id _id = new(1);
 
-    [Fact]
+    [Fact(Skip="robot not connected")]
     void GivenRobotIsAttached_WhenSetTwoGoalAnglesAndSleep1sBetween_ThenCurrentPositionWithin20()
     {
         // Given

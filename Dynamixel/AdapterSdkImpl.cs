@@ -31,6 +31,11 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         TorqueEnable(id);
     }
 
+    public JointState GetState()
+    {
+        throw new NotImplementedException();
+    }
+
     void ReadHardwareErrorStatus(JointId id)
     {
         var hardwareErrorStatus = portAdapter.Read(id, ControlRegister.HardwareErrorStatus);

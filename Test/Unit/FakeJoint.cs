@@ -1,10 +1,10 @@
-﻿using Dynamixel;
-using RobotDomain.Structures;
+﻿using RobotDomain.Structures;
 using UnitsNet;
 
-namespace Test;
+namespace Test.Unit;
 
-public class FakeJoint(Angle angle) : Joint
+public class FakeJoint(Angle angle) 
+    : Joint(ComponentId.New, Link.New, Link.New)
 {
     public override JointState State => new(
         angle,

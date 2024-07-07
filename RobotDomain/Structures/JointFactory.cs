@@ -2,5 +2,5 @@
 
 public interface JointFactory
 {
-    Joint Create(JointId id);
+    Joint Create(Link parent, Link child, JointId id);
 }

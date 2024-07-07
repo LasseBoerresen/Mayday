@@ -5,10 +5,10 @@ namespace RobotDomain.Structures;
 public class Structure()
 {
 
-    public Pose GetPoseFor(Component component)
+    public Pose GetPoseFor(ComponentId componentId)
     {
 
         // TODO fix cheat and actually do forward kinematics
-        return component.Origin;
+        throw new NotImplementedException();
     }
 }

@@ -10,6 +10,8 @@ public class DynamixelJointFactoryTests
 {
     readonly Mock<Adapter> _mockAdapter;
     readonly DynamixelJointFactory _dynamixelJointFactory;
+    readonly Link _parentLink = Link.New;
+    readonly Link _childLink = Link.New;
 
     public DynamixelJointFactoryTests()
     {
@@ -25,7 +27,7 @@ public class DynamixelJointFactoryTests
         var goalAngle = Angle.FromRevolutions(0.42);
     
         // When
-        var actualJoint = _dynamixelJointFactory.Create(id);
+        var actualJoint = _dynamixelJointFactory.Create(_parentLink, _childLink, id);
         
         actualJoint.SetAngleGoal(goalAngle);
 
@@ -40,7 +42,7 @@ public class DynamixelJointFactoryTests
         JointId id = new(1);
     
         // When
-        _ = _dynamixelJointFactory.Create(id);
+        _ = _dynamixelJointFactory.Create(_parentLink, _childLink, id);
 
         // Then
         _mockAdapter.Verify(a => a.Initialize(id));

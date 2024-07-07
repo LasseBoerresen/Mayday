@@ -1,6 +1,8 @@
 ﻿using Generic;
 using MaydayDomain;
 using Moq;
+using RobotDomain.Structures;
+using Test.Unit;
 using UnitsNet;
 using Xunit;
 using static MaydayDomain.MaydayLegId;
@@ -9,19 +11,21 @@ namespace Test;
 
 public class MaydayStructureTests
 {
-    [Fact] public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
+    [Fact] 
+    public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
     {
         // Given
-        IList<FakeJoint> fakeJoints = [new(Angle.Zero), new(Angle.Zero), new(Angle.Zero)];
+        IList<Joint> joints = [];
+        IList<Link> links = [];
         
         Dictionary<MaydayLegId, MaydayLeg> legs = new()
         {
-            { RightFront, new(fakeJoints) },
-            { RightCenter, new(fakeJoints) },
-            { RightBack, new(fakeJoints) },
-            { LeftFront, new(fakeJoints) },
-            { LeftCenter, new(fakeJoints) },
-            { LeftBack, new(fakeJoints) }
+            { RightFront, new(joints, links) },
+            { RightCenter, new(joints, links) },
+            { RightBack, new(joints, links) },
+            { LeftFront, new(joints, links) },
+            { LeftCenter, new(joints, links) },
+            { LeftBack, new(joints, links) }
         };
 
         // When
@@ -31,11 +35,12 @@ public class MaydayStructureTests
         Assert.True(may != null);
     }
 
-    [Fact] public void GivenMaydayRobotWithMockLegs_WhenSetPosture_ThenCallsSetPostureOnAllLegs()
+    [Fact] 
+    public void GivenMaydayRobotWithMockLegs_WhenSetPosture_ThenCallsSetPostureOnAllLegs()
     {
         // Given
         Dictionary<MaydayLegId, Mock<MaydayLeg>> mockLegsDict = new();
-        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<FakeJoint>())));
+        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Joint>(), new List<Link>())));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
         MaydayStructure may = new(legsDict);
@@ -45,8 +50,8 @@ public class MaydayStructureTests
         may.SetPostureForAllLegs(posture);
 
         // Then
-        mockLegsDict.ToList().ForEach(kvp => kvp.Value.Verify(l => l.SetPosture(posture), Times.Once));
-
-
+        mockLegsDict.ToList().ForEach(kvp => 
+            kvp.Value.Verify(l => l.SetPosture(posture), Times.Once));
+        
     }
 }
