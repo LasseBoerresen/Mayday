@@ -10,6 +10,11 @@ public record Xyz(Length X, Length Y, Length Z)
     public static Xyz Zero => new(0, 0, 0);
     public static Xyz One => new(1, 1, 1);
 
+    public static Xyz operator +(Xyz a, Xyz b)
+    {
+        return new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
+
     public static Xyz operator *(Xyz xyz, double multiplier)
     {
         return new(xyz.X * multiplier, xyz.Y * multiplier, xyz.Z * multiplier);

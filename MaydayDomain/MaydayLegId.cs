@@ -1,4 +1,6 @@
-﻿namespace MaydayDomain;
+﻿using RobotDomain.Structures;
+
+namespace MaydayDomain;
 
 public record MaydayLegId(Side Side, SidePosition SidePosition) : IComparable<MaydayLegId>
 {
@@ -23,6 +25,8 @@ public record MaydayLegId(Side Side, SidePosition SidePosition) : IComparable<Ma
 
         return Value() - other.Value();
     }
+
+    public JointId JointId(int jointNumber) => new(Value() + jointNumber);
 
     static int NumberOfSidePositions()
     {

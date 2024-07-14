@@ -1,10 +1,11 @@
-﻿using RobotDomain.Structures;
+﻿using RobotDomain.Geometry;
+using RobotDomain.Structures;
 using UnitsNet;
 
 namespace Test.Unit;
 
 public class FakeJoint(Angle angle) 
-    : Joint(ComponentId.New, Link.New, Link.New)
+    : Joint(ComponentId.New, Link.New(LinkName.Base), Link.New(LinkName.Thorax))
 {
     public override JointState State => new(
         angle,
@@ -17,4 +18,6 @@ public class FakeJoint(Angle angle)
     {
         throw new NotImplementedException();
     }
+
+    public override Pose Pose => Pose.Zero;
 }

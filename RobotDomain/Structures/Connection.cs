@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using RobotDomain.Geometry;
 
 namespace RobotDomain.Structures;
 
@@ -7,8 +8,16 @@ public abstract class Connection
     public ComponentId Id { get; }
     public Link Parent { get; }
     public Link Child { get; }
+    public abstract Pose Pose { get; }
 
-    // TODO each connection should have a transform, which can be either static or dynamic
+    public string Name => $"{Parent.Name}To{Child.Name}"; 
+
+    public IList<Pose> GetTransformationsTo(ComponentId id, IList<Pose> previousTransformations)
+    {
+        return Child
+            .GetTransformationsTo(id, previousTransformations.Append(Pose)
+            .ToList());
+    }
 
     protected Connection(ComponentId id, Link parent, Link child)
     {
@@ -23,5 +32,10 @@ public abstract class Connection
     {
         Parent.ConnectChild(this);
         Child.ConnectParent(this);
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(Connection)}: ({nameof(Id)}: {Id}, {nameof(Name)}: {Name})";
     }
 }

@@ -40,7 +40,7 @@ public class MaydayLegTests
         _testOutputHelper.WriteLine($"{nameof(testId)}: {testId}");
 
         // Given
-        var fakeJoints = givenPosture.AsListOfGoalAngles().Select(a => (Joint)new FakeJoint(a)).ToList();
+        var fakeJoints = givenPosture.AsListOfGoalAngles().Select(a => (Connection)new FakeJoint(a)).ToList();
         MaydayLeg leg = new(fakeJoints, []);
 
         // When
@@ -72,7 +72,7 @@ public class MaydayLegTests
 
         // Given
         List<Mock<Joint>> mockJoints = [CreateMockJoint(), CreateMockJoint(), CreateMockJoint()];
-        MaydayLeg leg = new(mockJoints.Select(mj => mj.Object).ToList(), []);
+        MaydayLeg leg = new(mockJoints.Select(mj => (Connection)mj.Object).ToList(), []);
 
         // When
         leg.SetPosture(givenPosture);
@@ -91,12 +91,12 @@ public class MaydayLegTests
         MaydayLegId legId = MaydayLegId.LeftFront;
 
         // When
-        _ = MaydayLeg.CreateLeg(legId, _mockJointFactory.Object);
+        _ = new MaydayLegFactory(_mockJointFactory.Object).CreateLeg(legId);
 
         // Then
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(1)), Times.Once);
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(2)), Times.Once);
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(3)), Times.Once);
+        VerifyJointFactoryCreateJointId(new(1));
+        VerifyJointFactoryCreateJointId(new(2));
+        VerifyJointFactoryCreateJointId(new(3));
     }
 
     [Fact]
@@ -106,12 +106,23 @@ public class MaydayLegTests
         MaydayLegId legId = MaydayLegId.RightBack;
 
         // When
-        _ = MaydayLeg.CreateLeg(legId, _mockJointFactory.Object);
+        _ = new MaydayLegFactory(_mockJointFactory.Object).CreateLeg(legId);
 
         // Then
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(16)), Times.Once);
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(17)), Times.Once);
-        _mockJointFactory.Verify(jf => jf.Create(It.IsAny<Link>(), It.IsAny<Link>(), new(18)), Times.Once);
+        VerifyJointFactoryCreateJointId(new(16));
+        VerifyJointFactoryCreateJointId(new(17));
+        VerifyJointFactoryCreateJointId(new(18));
+    }
+
+    void VerifyJointFactoryCreateJointId(JointId id)
+    {
+        _mockJointFactory.Verify(jf => 
+            jf.Create(
+                It.IsAny<Link>(), 
+                It.IsAny<Link>(), 
+                It.IsAny<Pose>(), 
+                id), 
+            Times.Once);
     }
 
     [Fact]
@@ -120,21 +131,22 @@ public class MaydayLegTests
         // Given
 
         // When 
-        var actualLegsDict = MaydayLeg.CreateAll(_mockJointFactory.Object);
+        var actualLegsDict = new MaydayLegFactory(_mockJointFactory.Object).CreateAll();
 
         // Then
         Assert.Equal(6, actualLegsDict.Count);
     }
 
     [Fact]
-    void GivenLeg_WhenGetCoxaJointOrigin_ThenReturnsPose_X0d03_Y0_Z0_R0_P0_Y0()
+    void GivenLeg_WhenGetCoxaMotorPose_ThenReturnsPose_X0_Y0_Z0_R0_P0_Y0()
     {
+        // TODO Ensure mock joint actually sets connections, otherwise the test fails to look up child
         // Given
         Mock<JointFactory> mockJointFactory = new();
-        var leg = MaydayLeg.CreateLeg(new(Side.Left, SidePosition.Center), mockJointFactory.Object);
+        var leg = new MaydayLegFactory(mockJointFactory.Object).CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
-        var actualOrigin = leg.GetOriginOfCoxaJoint();
+        var actualOrigin = leg.CoxaPose;
 
         // Then
         var expectedOrigin = new Pose(new(0, 0, 0), new(0, 0, 0));
@@ -147,10 +159,10 @@ public class MaydayLegTests
         // Given
         Mock<JointFactory> mockJointFactory = new();
         // Set joint states to angle 0
-        var leg = MaydayLeg.CreateLeg(new(Side.Left, SidePosition.Center), mockJointFactory.Object);
+        var leg = new MaydayLegFactory(mockJointFactory.Object).CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
-        var actualOrigin = leg.GetOriginOfFemurJoint();
+        var actualOrigin = leg.FemurPose;
 
         // Then
         var expectedOrigin = new Pose(new(0.03, 0, 0), new(0.25, 0, 0.25));

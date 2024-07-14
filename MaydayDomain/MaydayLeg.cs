@@ -7,13 +7,28 @@ namespace MaydayDomain;
 
 public class MaydayLeg
 {
-    readonly IImmutableList<Joint> _joints;
-    readonly ImmutableList<Link> _links;
+    public Pose CoxaPose => GetPoseOf(Coxa);
+    public Pose FemurPose => GetPoseOf(Femur);
+    public Pose TibiaPose => GetPoseOf(Tibia);
+    public Pose TipPose => GetPoseOf(Tip);
 
-    public MaydayLeg(IList<Joint> joints, IList<Link> links)
+    readonly ImmutableList<Link> _links;
+    readonly IImmutableList<Connection> _connections;
+    readonly IImmutableList<Joint> _joints;
+
+    Link CoxaMotor  => _links[0];
+    Link Coxa       => _links[1];
+    Link FemurMotor => _links[2];
+    Link Femur      => _links[3];
+    Link TibiaMotor => _links[4];
+    Link Tibia      => _links[5];
+    Link Tip        => _links[6]; 
+    
+    public MaydayLeg(IList<Connection> connections, IList<Link> links)
     {
-        _joints = joints.ToImmutableList();
         _links = links.ToImmutableList();
+        _connections = connections.ToImmutableList();
+        _joints = connections.OfType<Joint>().ToImmutableList();
     }
 
     public const int JointCount = 3;
@@ -35,82 +50,5 @@ public class MaydayLeg
         return _joints.Zip(posture.AsListOfGoalAngles(), (joint, angle) => (joint, angle));
     }
 
-    public static MaydayLeg CreateLeg(MaydayLegId legId, JointFactory jointFactory)
-    {
-        var links = CreateLinks();
-        var joints = CreateLinkedJoints(legId, jointFactory, links);
-
-        return new(joints, links);
-    }
-
-    static IList<Link> CreateLinks()
-    {
-        return [Link.CreateBase, Link.CreateCoxa, Link.CreateFemur, Link.CreateTibia];
-    }
-
-    static IList<Joint> CreateLinkedJoints(MaydayLegId legId, JointFactory jointFactory, IList<Link> links)
-    {
-        return JointId_And_ParentChildPairs(legId, links)
-            .Select(pair => CreateLinkedJoint(jointFactory, pair.jointId, pair.parentAndChild))
-            .ToList();
-    }
-
-    static IEnumerable<(JointId jointId, (Link parent, Link child) parentAndChild)> JointId_And_ParentChildPairs(
-        MaydayLegId legId,
-        IList<Link> links)
-    {
-        return GenerateJointIds(legId)
-            .Zip(ParentChildPairs(links), (jointId, parentAndChild) => (jointId, parentAndChild));
-    }
-
-    static Joint CreateLinkedJoint(
-        JointFactory jointFactory, 
-        JointId jointId, 
-        (Link parent, Link child) parentAndChild)
-    {
-        return jointFactory.Create(parentAndChild.parent, parentAndChild.child, jointId);
-    }
-
-    static IEnumerable<JointId> GenerateJointIds(MaydayLegId legId)
-    {
-        return Enumerable
-            .Range(1, JointCount)
-            .Select(i => new JointId(legId.Value() + i));
-    }
-
-    static IEnumerable<(Link parent, Link child)> ParentChildPairs(IList<Link> links)
-    {
-        var parents = links.SkipLast(1);
-        var children = links.Skip(1);
-        
-        return parents.Zip(children, (parent, child) => (parent, child));
-    }
-
-    public static IDictionary<MaydayLegId, MaydayLeg> CreateAll(JointFactory jointFactory)
-    {
-        return MaydayLegId
-            .AllLegIds
-            .Select(lId => new KeyValuePair<MaydayLegId, MaydayLeg>(lId, CreateLeg(lId, jointFactory)))
-            .ToDictionary();
-    }
-
-    public Pose GetOriginOfCoxaJoint()
-    {
-        return Pose.Zero;
-    }
-
-    public Pose GetOriginOfFemurJoint()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Pose GetOriginOfTibiaJoint()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Pose GetOriginTibiaTip()
-    {
-        throw new NotImplementedException();
-    }
+    Pose GetPoseOf(Link link) => CoxaMotor.GetPoseOf(link.Id);
 }

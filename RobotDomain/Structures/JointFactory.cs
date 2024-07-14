@@ -1,6 +1,8 @@
-﻿namespace RobotDomain.Structures;
+﻿using RobotDomain.Geometry;
+
+namespace RobotDomain.Structures;
 
 public interface JointFactory
 {
-    Joint Create(Link parent, Link child, JointId id);
+    Joint Create(Link parent, Link child, Pose pose, JointId id);
 }

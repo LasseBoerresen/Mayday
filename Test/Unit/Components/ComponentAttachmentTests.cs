@@ -1,4 +1,5 @@
-﻿using RobotDomain.Structures;
+﻿using RobotDomain.Geometry;
+using RobotDomain.Structures;
 using Xunit;
 using Xunit.Sdk;
 
@@ -6,15 +7,17 @@ namespace Test.Unit.Components;
 
 public class ComponentAttachmentTests
 {
+    readonly Pose _pose;
     readonly Link _baseLink;
     readonly Link _link;
     readonly Connection _attachment;
 
     public ComponentAttachmentTests()
     {
-        _baseLink = Link.New;
-        _link = Link.New;
-        _attachment = Attachment.NewBetween(_baseLink, _link);
+        _pose = new Pose(new (1, 2, 3), new(5, 7, 11));
+        _baseLink = Link.New(LinkName.Base);
+        _link = Link.New(LinkName.Thorax);
+        _attachment = Attachment.NewBetween(_baseLink, _link, _pose);
     }
 
     [Fact]
@@ -68,4 +71,23 @@ public class ComponentAttachmentTests
         // Then
         Assert.True(actualParent.IsNone);
     }
+
+    [Fact]
+    void GivenBaseLinkAndAttachedLink_WhenGetPoseOfChildId_ThenReturnsPoseOfAttachment()
+    {
+        // When
+        var actualPose = _baseLink.GetPoseOf(_link.Id);
+
+        // Then
+        Assert.Equal(_pose, actualPose);
+    }
+    
+    [Fact]
+    void GivenBaseLinkAndAttachedLink_WhenGetPoseOfNonChildId_ThenThrowsChildNotFoundException()
+    {
+        // When
+        Assert.Throws<ChildNotFoundException>(() => 
+            _baseLink.GetPoseOf(ComponentId.New));
+    }
 }
+

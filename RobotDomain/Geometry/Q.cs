@@ -32,6 +32,11 @@ public record Q(
         // return new Rpy()
     }
 
+    public static Q operator +(Q a, Q b)
+    {
+        var relativeRotation = Quaternion.Multiply(a.ToNumericsQ(), b.ToNumericsQ());
+        return FromNumericsQ(relativeRotation);
+    }
 
     public static Q operator -(Q a, Q b)
     {

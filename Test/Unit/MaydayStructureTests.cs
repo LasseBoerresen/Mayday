@@ -15,17 +15,17 @@ public class MaydayStructureTests
     public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
     {
         // Given
-        IList<Joint> joints = [];
+        IList<Connection> connections = [];
         IList<Link> links = [];
         
         Dictionary<MaydayLegId, MaydayLeg> legs = new()
         {
-            { RightFront, new(joints, links) },
-            { RightCenter, new(joints, links) },
-            { RightBack, new(joints, links) },
-            { LeftFront, new(joints, links) },
-            { LeftCenter, new(joints, links) },
-            { LeftBack, new(joints, links) }
+            { RightFront, new(connections, links) },
+            { RightCenter, new(connections, links) },
+            { RightBack, new(connections, links) },
+            { LeftFront, new(connections, links) },
+            { LeftCenter, new(connections, links) },
+            { LeftBack, new(connections, links) }
         };
 
         // When

@@ -1,12 +1,13 @@
-﻿using RobotDomain.Structures;
+﻿using RobotDomain.Geometry;
+using RobotDomain.Structures;
 
 namespace Dynamixel;
 
 public class DynamixelJointFactory(Adapter adapter) : JointFactory
 {
-    public Joint Create(Link parent, Link child, JointId id)
+    public Joint Create(Link parent, Link child, Pose pose, JointId id)
     {
-        var joint = new DynamixelJoint(parent, child, id, adapter);
+        var joint = new DynamixelJoint(parent, child, pose, id, adapter);
 
         joint.Initialize();
 

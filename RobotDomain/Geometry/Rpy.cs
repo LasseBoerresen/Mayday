@@ -27,6 +27,8 @@ public record Rpy(Angle R, Angle P, Angle Y)
     public Rpy(double r, double p, double y)
         : this(Angle.FromRevolutions(r), Angle.FromRevolutions(p), Angle.FromRevolutions(y)) { }
 
+    public static Rpy operator +(Rpy a, Rpy b) => (Q.FromRpy(a) + Q.FromRpy(b)).ToRpy();
+
     public static Rpy operator -(Rpy a, Rpy b) => (Q.FromRpy(a) - Q.FromRpy(b)).ToRpy();
 
     public static Rpy operator *(Rpy rpy, double multiplier) => (Q.FromRpy(rpy) * multiplier).ToRpy();

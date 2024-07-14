@@ -26,7 +26,7 @@ public class MaydayStructure
 
     public static MaydayStructure Create(JointFactory jointFactory)
     {
-        var legs = MaydayLeg.CreateAll(jointFactory);
+        var legs = new MaydayLegFactory(jointFactory).CreateAll();
         return new(legs);
     }
 }
