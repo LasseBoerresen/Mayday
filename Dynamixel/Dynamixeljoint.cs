@@ -6,14 +6,14 @@ namespace Dynamixel;
 
 public class DynamixelJoint : Joint
 {
-    readonly Pose _hornPose;
+    readonly Pose _passivePose;
     readonly JointId _id;
     readonly Adapter _adapter;
 
-    public DynamixelJoint(Link parent, Link child, Pose hornPose, JointId id, Adapter adapter) 
+    public DynamixelJoint(Link parent, Link child, Pose passivePose, JointId id, Adapter adapter) 
         : base(ComponentId.New, parent, child)
     {
-        _hornPose = hornPose;
+        _passivePose = passivePose;
         _id = id;
         _adapter = adapter;
     }
@@ -23,5 +23,7 @@ public class DynamixelJoint : Joint
 
     public void Initialize() => _adapter.Initialize(_id);
     
-    public override Pose Pose => throw new NotImplementedException("Implement getting pose of child using angle and horn pose");
+    public override Pose Pose => _passivePose + ActivePose;
+
+    Pose ActivePose => Pose.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, State.Angle)));
 }

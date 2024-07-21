@@ -1,4 +1,5 @@
-﻿using MaydayDomain;
+﻿using Dynamixel;
+using MaydayDomain;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -138,34 +139,39 @@ public class MaydayLegTests
     }
 
     [Fact]
-    void GivenLeg_WhenGetCoxaMotorPose_ThenReturnsPose_X0_Y0_Z0_R0_P0_Y0()
+    void GivenLegWithJointsAtZero_WhenGetCoxaPose_ThenReturnsPose_X0_Y0_Z0__R0_P0_Y0()
     {
-        // TODO Ensure mock joint actually sets connections, otherwise the test fails to look up child
         // Given
-        Mock<JointFactory> mockJointFactory = new();
-        var leg = new MaydayLegFactory(mockJointFactory.Object).CreateLeg(new(Side.Left, SidePosition.Center));
+        Mock<Adapter> mockDynamixelAdapter = new();
+        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(JointState.Zero);
+        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
+        MaydayLegFactory maydayLegFactory = new(jointFactory);
+        var leg = maydayLegFactory.CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
         var actualOrigin = leg.CoxaPose;
 
         // Then
-        var expectedOrigin = new Pose(new(0, 0, 0), new(0, 0, 0));
-        Assert.Equal(expectedOrigin, actualOrigin);
+        var expectedOrigin = Pose.Zero;
+        AssertTransformationEqual(expectedOrigin, actualOrigin);
     }
 
     [Fact]
     void GivenLegAndCoxaJointStatePositionIs0_WhenGeFemurJointOrigin_ThenReturnsPose_X0d03_Y0_Z0_R0d25_P0_Yn0d25()
     {
         // Given
-        Mock<JointFactory> mockJointFactory = new();
-        // Set joint states to angle 0
-        var leg = new MaydayLegFactory(mockJointFactory.Object).CreateLeg(new(Side.Left, SidePosition.Center));
+        Mock<Adapter> mockDynamixelAdapter = new();
+        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(JointState.Zero);
+        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
+        MaydayLegFactory maydayLegFactory = new(jointFactory);
+        var leg = maydayLegFactory.CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
         var actualOrigin = leg.FemurPose;
 
         // Then
-        var expectedOrigin = new Pose(new(0.03, 0, 0), new(0.25, 0, 0.25));
-        Assert.Equal(expectedOrigin, actualOrigin);
+        var expectedOrigin = new Pose(new(0.03, 0, 0.01), Q.FromRpy(new(0.25, 0, 0.25)));
+
+        AssertTransformationEqual(expectedOrigin, actualOrigin);
     }
 }

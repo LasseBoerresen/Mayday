@@ -38,31 +38,31 @@ public  class MaydayLegFactory(JointFactory jointFactory)
 
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(links[0], links[1], Pose.FromRpy(new(0, 0, 0)), legId.JointId(0));
+        return jointFactory.Create(links[0], links[1], Pose.FromQ(Q.Unit), legId.JointId(0));
     }
 
     Attachment CreateCoxaToFemurMotorAttachment(List<Link> links)
     {
-        return Attachment.NewBetween(links[1], links[2], new(new(0.03, 0, 0.01), new(0.25, 0, -0.25)));
+        return Attachment.NewBetween(links[1], links[2], new(new(0.03, 0, 0.01), Q.FromRpy(new(0.25, 0, -0.25))));
     }
 
     Joint CreateFemurMotorToFemurJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(links[2], links[3], Pose.FromRpy(new(-0.25, 0.25, 0)), legId.JointId(1));
+        return jointFactory.Create(links[2], links[3], Pose.FromQ(Q.FromRpy(new(-0.25, 0.25, 0))), legId.JointId(1));
     }
 
     Joint CreateFemurToTibiaMotorJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(links[3], links[4], Pose.FromRpy(new(0.25, 0.40, 0)), legId.JointId(2));
+        return jointFactory.Create(links[3], links[4], Pose.FromQ(Q.FromRpy(new(0.25, 0.40, 0))), legId.JointId(2));
     }
 
     Attachment CreateTibiaMotorToTibiaAttachment(List<Link> links)
     {
-        return Attachment.NewBetween(links[4], links[5], new(new(-0.015, 0.02, 0), new(0.25, 0.5, 0)));
+        return Attachment.NewBetween(links[4], links[5], new(new(-0.015, 0.02, 0), Q.FromRpy(new(0.25, 0.5, 0))));
     }
 
     Attachment CrateTibiaToTipAttachment(List<Link> links)
     {
-        return Attachment.NewBetween(links[5], links[6], new(new(0.2, 0, -0.05), new(0, -0.125, 0)));
+        return Attachment.NewBetween(links[5], links[6], new(new(0.2, 0, -0.05), Q.FromRpy(new(0, -0.125, 0))));
     }
 }

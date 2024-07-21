@@ -28,4 +28,8 @@
       <Folder Include="Structures\MaydayStructure\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Generic\Generic.csproj" />
+    </ItemGroup>
+
 </Project>

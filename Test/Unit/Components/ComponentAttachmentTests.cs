@@ -14,7 +14,7 @@ public class ComponentAttachmentTests
 
     public ComponentAttachmentTests()
     {
-        _pose = new Pose(new (1, 2, 3), new(5, 7, 11));
+        _pose = new Pose(new (1, 2, 3), Q.FromRpy(new(5, 7, 11)));
         _baseLink = Link.New(LinkName.Base);
         _link = Link.New(LinkName.Thorax);
         _attachment = Attachment.NewBetween(_baseLink, _link, _pose);
