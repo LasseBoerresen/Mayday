@@ -55,6 +55,11 @@ public record Q(double W, double X, double Y, double Z)
         var relativeRotation = Quaternion.Multiply(Quaternion.Inverse(a.ToNumericsQ()), b.ToNumericsQ());
         return FromNumericsQ(relativeRotation);
     }
+    
+    public static Q operator -(Q q)
+    {
+        return new Q(-q.W, -q.X, -q.Y, -q.Z);
+    }
 
     public static Q operator *(Q q, double multiplier)
     {
@@ -72,17 +77,40 @@ public record Q(double W, double X, double Y, double Z)
         return new(W / magnitude, X / magnitude, Y / magnitude, Z / magnitude);
     }
 
-    public bool IsAlmostEqual(Q other, Angle precision)
+    /// <summary>
+    /// Just because it hasn't been mentioned. Since quaternions used for spatial orientation are always unit length
+    /// (or should be), the following will also work.
+    ///
+    ///    |q1⋅q2|>1−ϵ
+    ///
+    /// where ϵ (epsilon) is some fudge factor to allow for small errors due to limited floating point precision.
+    /// If (and only if) both quaternions represent the same orientation then q1=±q2, and thus q1⋅q2=±.
+    /// If you want to make sure they're the same rotation (rather than just orientation), then remove the absolute value.
+    ///
+    /// Inspired by: https://gamedev.stackexchange.com/a/75108
+    /// </summary>
+    public bool IsOrientationAlmostEqual(Q other, double precision = 0.00001)
     {
-        return IsAlmostEqualSingleRotation(Angle.FromRevolutions(W), Angle.FromRevolutions(other.W), precision)  
-            && IsAlmostEqualSingleRotation(Angle.FromRevolutions(X), Angle.FromRevolutions(other.X), precision)
-            && IsAlmostEqualSingleRotation(Angle.FromRevolutions(Y), Angle.FromRevolutions(other.Y), precision)
-            && IsAlmostEqualSingleRotation(Angle.FromRevolutions(Z), Angle.FromRevolutions(other.Z), precision);
+        return Abs(Dot(other)) > 1.0 - precision;
+    }
+
+    public bool IsRotationAlmostEqual(Q other, double precision = 0.00001)
+    {
+        return Dot(other) > 1.0 - precision;
+    }
+
+    public float Dot(Q other)
+    {
+        return Quaternion.Dot(ToNumericsQ(), other.ToNumericsQ());
     }
 
     static Q FromNumericsQ(Quaternion nq)
     {
-        return new(W: nq.W, X: nq.X, Y: nq.Y, Z: nq.Z);
+        return new(
+            W: nq.W, 
+            X: nq.X, 
+            Y: nq.Y, 
+            Z: nq.Z);
     }
 
     Quaternion ToNumericsQ()

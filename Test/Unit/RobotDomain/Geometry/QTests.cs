@@ -58,7 +58,7 @@ public class QTests
         _testOutputHelper.WriteLine(TestMessage(testId, expectedQ, actualQ));
         
         Assert.True(
-            expectedQ.IsAlmostEqual(actualQ, precision: Angle.FromRadians(0.001)), 
+            expectedQ.IsOrientationAlmostEqual(actualQ, precision: 0.001), 
             TestMessage(testId, expectedQ, actualQ));
     }
     
@@ -105,7 +105,7 @@ public class QTests
         _testOutputHelper.WriteLine(TestMessage(testId, expectedQ, actualQ));
 
         Assert.True(
-            expectedQ.IsAlmostEqual(actualQ, precision: Angle.FromRadians(0.001)), 
+            expectedQ.IsOrientationAlmostEqual(actualQ, precision: 0.001), 
             TestMessage(testId, expectedQ, actualQ));
     }
 }

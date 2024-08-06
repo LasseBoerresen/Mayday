@@ -6,6 +6,7 @@ using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
+using static MaydayDomain.MaydayLink;
 using static Test.Unit.TestObjectFactory;
 
 namespace Test.Unit;
@@ -138,40 +139,42 @@ public class MaydayLegTests
         Assert.Equal(6, actualLegsDict.Count);
     }
 
-    [Fact]
-    void GivenLegWithJointsAtZero_WhenGetCoxaPose_ThenReturnsPose_X0_Y0_Z0__R0_P0_Y0()
+    public static TheoryData<string, MaydayLink, Pose>
+        DataFor_GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected()
     {
-        // Given
-        Mock<Adapter> mockDynamixelAdapter = new();
-        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(JointState.Zero);
-        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
-        MaydayLegFactory maydayLegFactory = new(jointFactory);
-        var leg = maydayLegFactory.CreateLeg(new(Side.Left, SidePosition.Center));
-
-        // When
-        var actualOrigin = leg.CoxaPose;
-
-        // Then
-        var expectedOrigin = Pose.Zero;
-        AssertTransformationEqual(expectedOrigin, actualOrigin);
+        return new()
+        {
+            { "0", CoxaMotor, Pose.Zero},
+            { "1", Coxa, Pose.Zero},
+            { "2", FemurMotor, new(new(0.03, 0, 0.01), Q.FromRpy(new(-0.25, 0.25, 0 )))},
+            { "3", Femur, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))},
+            { "4", TibiaMotor, new(new(0.109047, 0, 0.042494), Q.FromRpy(new(-0.25, -0.1, 0.5)))},
+            { "5", Tibia, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))},
+            { "6", Tip, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))}, 
+        };
     }
 
-    [Fact]
-    void GivenLegAndCoxaJointStatePositionIs0_WhenGeFemurJointOrigin_ThenReturnsPose_X0d03_Y0_Z0_R0d25_P0_Yn0d25()
+    [Theory]
+    [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected))]
+    void GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected(string testId, MaydayLink linkName, Pose expectedPose)
     {
         // Given
-        Mock<Adapter> mockDynamixelAdapter = new();
-        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(JointState.Zero);
-        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
-        MaydayLegFactory maydayLegFactory = new(jointFactory);
-        var leg = maydayLegFactory.CreateLeg(new(Side.Left, SidePosition.Center));
+        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+            .CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
-        var actualOrigin = leg.FemurPose;
+        var actualPose = leg.GetPoseOf(leg.LinkFromName(linkName));
 
         // Then
-        var expectedOrigin = new Pose(new(0.03, 0, 0.01), Q.FromRpy(new(0.25, 0, 0.25)));
+        AssertTransformationEqual(testId, expectedPose, actualPose);
+    }
 
-        AssertTransformationEqual(expectedOrigin, actualOrigin);
+    static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)
+    {
+        Mock<Adapter> mockDynamixelAdapter = new();
+        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(jointState);
+        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
+        MaydayLegFactory maydayLegFactory = new(jointFactory);
+        return maydayLegFactory;
     }
 }

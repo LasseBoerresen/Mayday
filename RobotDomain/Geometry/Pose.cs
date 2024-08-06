@@ -26,7 +26,7 @@ public record Pose(Xyz Xyz, Q Q)
     public bool IsAlmostEqual(Pose other, Length translationPrecision, Angle rotationalPrecision)
     {
         var translation = Xyz.IsAlmostEqual(other.Xyz, translationPrecision);
-        var rotation = Q.IsAlmostEqual(other.Q, rotationalPrecision);
+        var rotation = Q.IsOrientationAlmostEqual(other.Q, rotationalPrecision.Revolutions);
         
         return translation && rotation;
     }

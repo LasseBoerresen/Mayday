@@ -7,22 +7,17 @@ namespace MaydayDomain;
 
 public class MaydayLeg
 {
-    public Pose CoxaPose => GetPoseOf(Coxa);
-    public Pose FemurPose => GetPoseOf(Femur);
-    public Pose TibiaPose => GetPoseOf(Tibia);
-    public Pose TipPose => GetPoseOf(Tip);
-
     readonly ImmutableList<Link> _links;
     readonly IImmutableList<Connection> _connections;
     readonly IImmutableList<Joint> _joints;
 
-    Link CoxaMotor  => _links[0];
-    Link Coxa       => _links[1];
-    Link FemurMotor => _links[2];
-    Link Femur      => _links[3];
-    Link TibiaMotor => _links[4];
-    Link Tibia      => _links[5];
-    Link Tip        => _links[6]; 
+    public Link CoxaMotor  => _links[0];
+    public Link Coxa       => _links[1];
+    public Link FemurMotor => _links[2];
+    public Link Femur      => _links[3];
+    public Link TibiaMotor => _links[4];
+    public Link Tibia      => _links[5];
+    public Link Tip        => _links[6]; 
     
     public MaydayLeg(IList<Connection> connections, IList<Link> links)
     {
@@ -50,5 +45,20 @@ public class MaydayLeg
         return _joints.Zip(posture.AsListOfGoalAngles(), (joint, angle) => (joint, angle));
     }
 
-    Pose GetPoseOf(Link link) => CoxaMotor.GetPoseOf(link.Id);
+    public Pose GetPoseOf(Link link) => CoxaMotor.GetPoseOf(link.Id);
+    
+    public Link LinkFromName(MaydayLink name)
+    {
+        return name switch
+        {
+            MaydayLink.CoxaMotor => CoxaMotor,
+            MaydayLink.Coxa => Coxa,
+            MaydayLink.FemurMotor => FemurMotor,
+            MaydayLink.Femur => Femur,
+            MaydayLink.TibiaMotor => TibiaMotor,
+            MaydayLink.Tibia => Tibia,
+            MaydayLink.Tip => Tip,
+            _ => throw new NotSupportedException($"Link name '{name}' not supported")
+        };
+    }
 }
