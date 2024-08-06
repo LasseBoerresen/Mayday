@@ -13,7 +13,7 @@ public record Pose(Xyz Xyz, Q Q)
         return new(pose.Xyz * multiplier, pose.Q * multiplier);
     }
     
-    public static Pose operator +(Pose a, Pose b)
+    public static Pose operator +(Pose a, Pose b)   
     {
         return new(a.Xyz + b.Xyz, a.Q + b.Q);
     }

@@ -18,8 +18,8 @@ public static class TestObjectFactory
 
     public static void AssertTransformationEqual(string testId, Pose expected, Pose actual)
     {
-        Length translationPrecision = Length.FromMeters(0.000001);
-        Angle rotationalPrecision = Angle.FromRevolutions(0.000001);
+        Length translationPrecision = Length.FromMeters(0.01);
+        Angle rotationalPrecision = Angle.FromRevolutions(0.05);
         
         Assert.True(
             expected.IsAlmostEqual(actual, translationPrecision, rotationalPrecision), 

@@ -146,11 +146,11 @@ public class MaydayLegTests
         {
             { "0", CoxaMotor, Pose.Zero},
             { "1", Coxa, Pose.Zero},
-            { "2", FemurMotor, new(new(0.03, 0, 0.01), Q.FromRpy(new(-0.25, 0.25, 0 )))},
-            { "3", Femur, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))},
-            { "4", TibiaMotor, new(new(0.109047, 0, 0.042494), Q.FromRpy(new(-0.25, -0.1, 0.5)))},
-            { "5", Tibia, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))},
-            { "6", Tip, new(new(0.03, 0, 0.01), Q.FromRpy(new(0.0, 0.0, 0.0)))}, 
+            { "2", FemurMotor, new(new(0.033, 0, -0.013), Q.FromRpy(new(-0.25, 0.25, 0 )))},
+            { "3", Femur,      new(new(0.033, 0, -0.013), Q.FromRpy(new(0.0, 0.0, 0.0)))},
+            { "4", TibiaMotor, new(new(0.115, 0, 0.02), Q.FromRpy(new(-0.25, -0.1, 0.5)))},
+            { "5", Tibia,      new(new(0.135, 0, 0.02), Q.FromRpy(new(0.0, 0.125 , 0.0)))},
+            { "6", Tip,        new(new(0.165, 0, -0.11), Q.FromRpy(new(0.0, 0.29166, 0.0)))}, 
         };
     }
 
