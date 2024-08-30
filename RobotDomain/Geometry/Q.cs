@@ -77,6 +77,15 @@ public record Q(double W, double X, double Y, double Z)
         return new(W / magnitude, X / magnitude, Y / magnitude, Z / magnitude);
     }
 
+    public Xyz Rotate(Xyz xyz)
+    {
+        var xyzAsQ = new Q(0, xyz.X.Meters, xyz.Y.Meters, xyz.Z.Meters);
+        
+        var xyzAsRotatedQ = ToNumericsQ() * xyzAsQ.ToNumericsQ() * Quaternion.Inverse(ToNumericsQ());
+        
+        return new Xyz(xyzAsRotatedQ.X, xyzAsRotatedQ.Y, xyzAsRotatedQ.Z);
+    }
+
     /// <summary>
     /// Just because it hasn't been mentioned. Since quaternions used for spatial orientation are always unit length
     /// (or should be), the following will also work.
