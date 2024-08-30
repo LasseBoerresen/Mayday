@@ -166,7 +166,7 @@ public class MaydayLegTests
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
 
         // Then
-        AssertTransformationEqual(testId, expectedTransform, actualTransform);
+        AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
 
     static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)

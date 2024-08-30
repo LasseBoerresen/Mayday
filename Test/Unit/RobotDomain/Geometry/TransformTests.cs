@@ -39,6 +39,6 @@ public class TransformTests
         var actual = a + b;
         
         // Then
-        Assert.Equal(expected, actual);
+        TestObjectFactory.AssertTransformEqual(testId, expected, actual);
     }
 }
