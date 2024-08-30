@@ -24,9 +24,5 @@ public static class TestObjectFactory
         Assert.True(
             expected.IsAlmostEqual(actual, translationPrecision, rotationalPrecision), 
             TestMessage(testId, expected, actual));
-            
-        Assert.True(
-            expected.Q.IsOrientationAlmostEqual(actual.Q, precision: 0.001), 
-            TestMessage(testId, expected.Q, actual.Q));
     }
 }
