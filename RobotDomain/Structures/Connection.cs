@@ -8,14 +8,14 @@ public abstract class Connection
     public ComponentId Id { get; }
     public Link Parent { get; }
     public Link Child { get; }
-    public abstract Pose Pose { get; }
+    public abstract Transform Transform { get; }
 
     public string Name => $"{Parent.Name}To{Child.Name}"; 
 
-    public IList<Pose> GetTransformationsTo(ComponentId id, IList<Pose> previousTransformations)
+    public IList<Transform> GetTransformationsTo(ComponentId id, IList<Transform> previousTransformations)
     {
         return Child
-            .GetTransformationsTo(id, previousTransformations.Append(Pose)
+            .GetTransformationsTo(id, previousTransformations.Append(Transform)
             .ToList());
     }
 

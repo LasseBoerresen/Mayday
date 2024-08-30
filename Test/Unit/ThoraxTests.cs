@@ -7,7 +7,7 @@ namespace Test;
 public class ThoraxTests
 {
     [Fact]
-    public void GivenThorax_WhenGetOrigin_ThenReturnsZeroPose()
+    public void GivenThorax_WhenGetOrigin_ThenReturnsZeroTransform()
     {
         // Given
         Thorax thorax = new();
@@ -16,11 +16,11 @@ public class ThoraxTests
         var actualOrigin = thorax.Origin;
 
         // Then
-        Assert.Equal(Pose.Zero, actualOrigin);
+        Assert.Equal(Transform.Zero, actualOrigin);
     }
     
     // [Fact]
-    // public void GivenThorax_WhenGetLegOrigins_ThenReturnsPosesOnCircleInCorrectOrder()
+    // public void GivenThorax_WhenGetLegOrigins_ThenReturnsTransformsOnCircleInCorrectOrder()
     // {
     //     // Given
     //     Thorax thorax = new();
@@ -29,6 +29,6 @@ public class ThoraxTests
     //     var actualOrigin = thorax.LegOrigins;
     //
     //     // Then
-    //     Assert.Equal(Pose.Zero, actualOrigin);
+    //     Assert.Equal(Transform.Zero, actualOrigin);
     // }
 }

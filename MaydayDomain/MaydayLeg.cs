@@ -45,7 +45,7 @@ public class MaydayLeg
         return _joints.Zip(posture.AsListOfGoalAngles(), (joint, angle) => (joint, angle));
     }
 
-    public Pose GetPoseOf(Link link) => CoxaMotor.GetPoseOf(link.Id);
+    public Transform GetTransformOf(Link link) => CoxaMotor.GetTransformOf(link.Id);
     
     public Link LinkFromName(MaydayLink name)
     {

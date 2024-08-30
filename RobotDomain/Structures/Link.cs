@@ -39,13 +39,13 @@ public class Link
     
     public void ConnectChild(Connection connection) => Child = connection;
 
-    public Pose GetPoseOf(ComponentId childId)
+    public Transform GetTransformOf(ComponentId childId)
     {
-        return GetTransformationsTo(childId, previousTransformations: [Pose.Zero])
-            .Reduce(Pose.Add);
+        return GetTransformationsTo(childId, previousTransformations: [Transform.Zero])
+            .Reduce(Transform.Add);
     }
 
-    public IList<Pose> GetTransformationsTo(ComponentId id, IList<Pose> previousTransformations)
+    public IList<Transform> GetTransformationsTo(ComponentId id, IList<Transform> previousTransformations)
     {
         if (Id == id)
             return previousTransformations;

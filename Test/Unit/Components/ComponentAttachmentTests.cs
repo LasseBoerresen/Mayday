@@ -7,17 +7,17 @@ namespace Test.Unit.Components;
 
 public class ComponentAttachmentTests
 {
-    readonly Pose _pose;
+    readonly Transform _transform;
     readonly Link _baseLink;
     readonly Link _link;
     readonly Connection _attachment;
 
     public ComponentAttachmentTests()
     {
-        _pose = new Pose(new (1, 2, 3), Q.FromRpy(new(5, 7, 11)));
+        _transform = new Transform(new (1, 2, 3), Q.FromRpy(new(5, 7, 11)));
         _baseLink = Link.New(LinkName.Base);
         _link = Link.New(LinkName.Thorax);
-        _attachment = Attachment.NewBetween(_baseLink, _link, _pose);
+        _attachment = Attachment.NewBetween(_baseLink, _link, _transform);
     }
 
     [Fact]
@@ -73,21 +73,21 @@ public class ComponentAttachmentTests
     }
 
     [Fact]
-    void GivenBaseLinkAndAttachedLink_WhenGetPoseOfChildId_ThenReturnsPoseOfAttachment()
+    void GivenBaseLinkAndAttachedLink_WhenGetTransformOfChildId_ThenReturnsTransformOfAttachment()
     {
         // When
-        var actualPose = _baseLink.GetPoseOf(_link.Id);
+        var actualTransform = _baseLink.GetTransformOf(_link.Id);
 
         // Then
-        Assert.Equal(_pose, actualPose);
+        Assert.Equal(_transform, actualTransform);
     }
     
     [Fact]
-    void GivenBaseLinkAndAttachedLink_WhenGetPoseOfNonChildId_ThenThrowsChildNotFoundException()
+    void GivenBaseLinkAndAttachedLink_WhenGetTransformOfNonChildId_ThenThrowsChildNotFoundException()
     {
         // When
         Assert.Throws<ChildNotFoundException>(() => 
-            _baseLink.GetPoseOf(ComponentId.New));
+            _baseLink.GetTransformOf(ComponentId.New));
     }
 }
 

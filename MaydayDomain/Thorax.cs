@@ -4,5 +4,5 @@ namespace MaydayDomain;
 
 public class Thorax
 {
-    public Pose Origin => Pose.Zero;
+    public Transform Origin => Transform.Zero;
 }

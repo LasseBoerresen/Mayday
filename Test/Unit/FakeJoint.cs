@@ -19,5 +19,5 @@ public class FakeJoint(Angle angle)
         throw new NotImplementedException();
     }
 
-    public override Pose Pose => Pose.Zero;
+    public override Transform Transform => Transform.Zero;
 }

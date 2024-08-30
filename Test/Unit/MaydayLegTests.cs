@@ -122,7 +122,7 @@ public class MaydayLegTests
             jf.Create(
                 It.IsAny<Link>(), 
                 It.IsAny<Link>(), 
-                It.IsAny<Pose>(), 
+                It.IsAny<Transform>(), 
                 id), 
             Times.Once);
     }
@@ -139,13 +139,13 @@ public class MaydayLegTests
         Assert.Equal(6, actualLegsDict.Count);
     }
 
-    public static TheoryData<string, MaydayLink, Pose>
-        DataFor_GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected()
+    public static TheoryData<string, MaydayLink, Transform>
+        DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {
         return new()
         {
-            { "0", CoxaMotor, Pose.Zero},
-            { "1", Coxa, Pose.Zero},
+            { "0", CoxaMotor, Transform.Zero},
+            { "1", Coxa, Transform.Zero},
             { "2", FemurMotor, new(new(0.033, 0, -0.013), Q.FromRpy(new(-0.25, 0.25, 0 )))},
             { "3", Femur,      new(new(0.033, 0, -0.013), Q.FromRpy(new(0.0, 0.0, 0.0)))},
             { "4", TibiaMotor, new(new(0.115, 0, 0.02), Q.FromRpy(new(-0.25, -0.1, 0.5)))},
@@ -155,18 +155,18 @@ public class MaydayLegTests
     }
 
     [Theory]
-    [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected))]
-    void GivenLegWithJointsAtZero_WhenGetLinkPose_ThenReturnsExpected(string testId, MaydayLink linkName, Pose expectedPose)
+    [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
+    void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(string testId, MaydayLink linkName, Transform expectedTransform)
     {
         // Given
         var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
-        var actualPose = leg.GetPoseOf(leg.LinkFromName(linkName));
+        var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
 
         // Then
-        AssertTransformationEqual(testId, expectedPose, actualPose);
+        AssertTransformationEqual(testId, expectedTransform, actualTransform);
     }
 
     static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)

@@ -16,7 +16,7 @@ public static class TestObjectFactory
         return $"TestId: {testId}, \nExpected: {expected}\nActual:   {actual}";
     }
 
-    public static void AssertTransformationEqual(string testId, Pose expected, Pose actual)
+    public static void AssertTransformationEqual(string testId, Transform expected, Transform actual)
     {
         Length translationPrecision = Length.FromMeters(0.01);
         Angle rotationalPrecision = Angle.FromRevolutions(0.05);

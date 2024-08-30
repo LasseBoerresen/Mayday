@@ -6,14 +6,14 @@ namespace Dynamixel;
 
 public class DynamixelJoint : Joint
 {
-    readonly Pose _passivePose;
+    readonly Transform _passiveTransform;
     readonly JointId _id;
     readonly Adapter _adapter;
 
-    public DynamixelJoint(Link parent, Link child, Pose passivePose, JointId id, Adapter adapter) 
+    public DynamixelJoint(Link parent, Link child, Transform passiveTransform, JointId id, Adapter adapter) 
         : base(ComponentId.New, parent, child)
     {
-        _passivePose = passivePose;
+        _passiveTransform = passiveTransform;
         _id = id;
         _adapter = adapter;
     }
@@ -23,7 +23,7 @@ public class DynamixelJoint : Joint
 
     public void Initialize() => _adapter.Initialize(_id);
     
-    public override Pose Pose => _passivePose + ActivePose;
+    public override Transform Transform => _passiveTransform + ActiveTransform;
 
-    Pose ActivePose => Pose.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, State.Angle)));
+    Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, State.Angle)));
 }

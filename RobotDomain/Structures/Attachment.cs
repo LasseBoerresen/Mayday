@@ -5,16 +5,16 @@ namespace RobotDomain.Structures;
 
 public class Attachment : Connection
 {
-    readonly Pose _pose;
+    readonly Transform _transform;
 
-    public override Pose Pose => _pose;
+    public override Transform Transform => _transform;
 
-    Attachment(ComponentId id, Link parent, Link child, Pose pose) 
+    Attachment(ComponentId id, Link parent, Link child, Transform transform) 
         : base(id, parent, child)
     {
-        _pose = pose;
+        _transform = transform;
     }
 
-    public static Attachment NewBetween(Link parent, Link child, Pose pose) => 
-        new(ComponentId.New, parent, child, pose);
+    public static Attachment NewBetween(Link parent, Link child, Transform transform) => 
+        new(ComponentId.New, parent, child, transform);
 }

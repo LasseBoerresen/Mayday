@@ -42,7 +42,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return jointFactory.Create(
             links[0], 
             links[1], 
-            Pose.FromQ(Q.Unit), 
+            Transform.FromQ(Q.Unit), 
             legId.JointId(1));
     }
 
@@ -51,7 +51,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return Attachment.NewBetween(
             links[1], 
             links[2], 
-            new Pose(Coxa.FemurMotorMountTranslation, Q.FromRpy(new(0.0, 0.25, 0.25))));
+            new Transform(Coxa.FemurMotorMountTranslation, Q.FromRpy(new(0.0, 0.25, 0.25))));
     }
 
     Joint CreateFemurMotorToFemurJoint(MaydayLegId legId, List<Link> links)
@@ -59,7 +59,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return jointFactory.Create(
             links[2], 
             links[3], 
-            pose: Pose.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
+            transform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
             legId.JointId(2));
     }
 
@@ -77,7 +77,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return Attachment.NewBetween(
             links[4], 
             links[5],   
-            new Pose(Tibia.TibiaMountTranslation, Q.FromRpy(new(0.25, 0.5, 0))));
+            new Transform(Tibia.TibiaMountTranslation, Q.FromRpy(new(0.25, 0.5, 0))));
     }
 
     Attachment CrateTibiaToTipAttachment(List<Link> links)
@@ -85,6 +85,6 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return Attachment.NewBetween(
             links[5], 
             links[6], 
-            new Pose(new(0.2, 0, -0.05), Q.FromRpy(new(0, 0.16666, 0))));
+            new Transform(new(0.2, 0, -0.05), Q.FromRpy(new(0, 0.16666, 0))));
     }
 }
