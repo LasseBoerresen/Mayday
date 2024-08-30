@@ -14,7 +14,7 @@ public class TransformTests
     }
 
     public static TheoryData<string, Transform, Transform, Transform>
-        DataFor_GivenTwoZeroTransforms__WhenAdd__ThenReturnsZeroTransform()
+        DataFor_GivenTwoTransforms__WhenAdd__ThenReturnsExpectedTransform()
     {
         return new()
         {
@@ -30,7 +30,7 @@ public class TransformTests
     }
 
     [Theory]
-    [MemberData(nameof(DataFor_GivenTwoZeroTransforms__WhenAdd__ThenReturnsZeroTransform))]
+    [MemberData(nameof(DataFor_GivenTwoTransforms__WhenAdd__ThenReturnsExpectedTransform))]
     void GivenTwoTransforms__WhenAdd__ThenReturnsExpectedTransform(string testId, Transform a, Transform b, Transform expected)
     {
         _testOutputHelper.WriteLine(testId);
