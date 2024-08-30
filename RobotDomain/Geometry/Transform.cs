@@ -15,13 +15,12 @@ public record Transform(Xyz Xyz, Q Q)
     
     public static Transform operator +(Transform a, Transform b)   
     {
-        return new(a.Xyz + b.Xyz, a.Q + b.Q);
+        return Add(a, b);
     }
-
 
     public static Transform Add(Transform a, Transform b)
     {
-        return new(a.Xyz + b.Xyz, a.Q + b.Q);
+        return new(a.Xyz + a.Q.Rotate(b.Xyz), a.Q + b.Q);
     }
 
     public bool IsAlmostEqual(Transform other, Length translationPrecision, Angle rotationalPrecision)
