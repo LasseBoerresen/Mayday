@@ -40,7 +40,7 @@ public class MaydayStructureTests
     {
         // Given
         Dictionary<MaydayLegId, Mock<MaydayLeg>> mockLegsDict = new();
-        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Joint>(), new List<Link>())));
+        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Connection>(), new List<Link>())));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
         MaydayStructure may = new(legsDict);
