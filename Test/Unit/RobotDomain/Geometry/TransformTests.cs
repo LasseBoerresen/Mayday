@@ -35,10 +35,37 @@ public class TransformTests
     [MemberData(nameof(DataFor_GivenTwoTransforms__WhenAdd__ThenReturnsExpectedTransform))]
     void GivenTwoTransforms__WhenAdd__ThenReturnsExpectedTransform(string testId, Transform a, Transform b, Transform expected)
     {
-        _testOutputHelper.WriteLine(testId);
-    
         // When
         var actual = a + b;
+        
+        // Then
+        TestObjectFactory.AssertTransformEqual(testId, expected, actual);
+    }
+    
+    public static TheoryData<string, Transform, Transform, Transform, Transform>
+        DataFor_GivenThreeTransforms__WhenAddAndAdd__ThenReturnsExpectedTransform()
+    {
+        return new()
+        {
+            {"0", Transform.Zero, Transform.Zero, Transform.Zero, Transform.Zero},
+            {"1", Transform.FromXyz(new(1, 0, 0)), Transform.Zero, Transform.Zero, Transform.FromXyz(new(1, 0, 0))},
+            {"2", Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(3, 0, 0))},
+            {
+                "3, quarter yaw, 1x:  1y -> ", 
+                new Transform(new(1, 0, 0), Q.FromRpy(new(0, 0, 0.25))), 
+                new Transform(new(2, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
+                new Transform(new(3, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
+                new Transform(new(-2, 2, 0), Q.FromRpy(new(0, 0, 0.75)))},
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(DataFor_GivenThreeTransforms__WhenAddAndAdd__ThenReturnsExpectedTransform))]
+    void GivenThreeTransforms__WhenAddAndAdd__ThenReturnsExpectedTransform(
+        string testId, Transform a, Transform b, Transform c, Transform expected)
+    {
+        // When
+        var actual = a + b + c;
         
         // Then
         TestObjectFactory.AssertTransformEqual(testId, expected, actual);
