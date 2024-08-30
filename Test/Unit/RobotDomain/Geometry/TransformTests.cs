@@ -1,9 +1,11 @@
-﻿using RobotDomain.Geometry;
+﻿using JetBrains.Annotations;
+using RobotDomain.Geometry;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Test.Unit.RobotDomain.Geometry;
 
+[TestSubject(typeof(Transform))]
 public class TransformTests
 {
     readonly ITestOutputHelper _testOutputHelper;
