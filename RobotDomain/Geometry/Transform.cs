@@ -20,7 +20,10 @@ public record Transform(Xyz Xyz, Q Q)
 
     public static Transform Add(Transform a, Transform b)
     {
-        return new(a.Xyz + a.Q.Rotate(b.Xyz), a.Q + b.Q);
+        Xyz bXyzRotated = a.Q.Rotate(b.Xyz);
+        
+        Transform sum = new(a.Xyz + bXyzRotated, a.Q + b.Q);
+        return sum;
     }
 
     public bool IsAlmostEqual(Transform other, Length translationPrecision, Angle rotationalPrecision)

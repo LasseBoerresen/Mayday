@@ -12,6 +12,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=23ffafe4_002Dbebd_002D4045_002D905b_002De51c15d58df9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Test&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\fiffi_m4jrsay\RiderProjects\Mayday\Test" Presentation="&amp;lt;Test&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=45277500_002D6ec7_002D4bf8_002Da770_002De9dd75bf9d71/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="QTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.Unit.RobotDomain.Geometry.QTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c872c6b6_002D74dc_002D4798_002D939b_002Daed7a22eed93/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;And&gt;&#xD;
     &lt;Project Location="C:\Users\fiffi_m4jrsay\RiderProjects\Mayday\Test" Presentation="&amp;lt;Test&amp;gt;" /&gt;&#xD;

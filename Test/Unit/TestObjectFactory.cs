@@ -19,7 +19,7 @@ public static class TestObjectFactory
     public static void AssertTransformEqual(string testId, Transform expected, Transform actual)
     {
         Length translationPrecision = Length.FromMeters(0.01);
-        Angle rotationalPrecision = Angle.FromRevolutions(0.05);
+        Angle rotationalPrecision = Angle.FromRevolutions(0.01);
         
         Assert.True(
             expected.IsAlmostEqual(actual, translationPrecision, rotationalPrecision), 

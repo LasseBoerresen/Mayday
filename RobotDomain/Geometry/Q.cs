@@ -79,9 +79,12 @@ public record Q(double W, double X, double Y, double Z)
 
     public Xyz Rotate(Xyz xyz)
     {
+        var thisNormalized = Normalize();
+        var thisAsNumericsQ = thisNormalized.ToNumericsQ();
+        
         var xyzAsQ = new Q(0, xyz.X.Meters, xyz.Y.Meters, xyz.Z.Meters);
         
-        var xyzAsRotatedQ = ToNumericsQ() * xyzAsQ.ToNumericsQ() * Quaternion.Inverse(ToNumericsQ());
+        var xyzAsRotatedQ = thisAsNumericsQ * xyzAsQ.ToNumericsQ() * Quaternion.Inverse(thisAsNumericsQ);
         
         return new Xyz(xyzAsRotatedQ.X, xyzAsRotatedQ.Y, xyzAsRotatedQ.Z);
     }
