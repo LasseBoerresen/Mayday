@@ -6,5 +6,5 @@ public interface Adapter
 {
     void SetGoal(JointId id, PositionAngle angle);
     void Initialize(JointId id);
-    JointState GetState();
+    JointState GetState(JointId id);
 }

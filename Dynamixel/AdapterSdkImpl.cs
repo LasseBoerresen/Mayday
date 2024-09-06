@@ -31,9 +31,9 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         TorqueEnable(id);
     }
 
-    public JointState GetState()
+    public JointState GetState(JointId id)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException($"{nameof(AdapterSdkImpl)}.{nameof(GetState)} is not implemented");
     }
 
     void ReadHardwareErrorStatus(JointId id)
