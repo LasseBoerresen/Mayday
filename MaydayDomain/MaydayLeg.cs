@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Generic;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
@@ -36,7 +37,6 @@ public class MaydayLeg
     public virtual void SetPosture(MaydayLegPosture posture)
     {
         JointAndGoalAnglePairs(posture)
-            .ToList()
             .ForEach(pair => pair.joint.SetAngleGoal(pair.angle));
     }
 
