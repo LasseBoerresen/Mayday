@@ -205,9 +205,8 @@ public class MaydayLegTests
 
     static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)
     {
-        Mock<Adapter> mockDynamixelAdapter = new();
-        mockDynamixelAdapter.Setup(a => a.GetState()).Returns(jointState);
-        DynamixelJointFactory jointFactory = new(mockDynamixelAdapter.Object);
+        EchoAdapter echoAdapter = new(jointState);
+        DynamixelJointFactory jointFactory = new(echoAdapter);
         MaydayLegFactory maydayLegFactory = new(jointFactory);
         return maydayLegFactory;
     }
