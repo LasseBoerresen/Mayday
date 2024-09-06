@@ -41,21 +41,21 @@ public class Link
 
     public Transform GetTransformOf(ComponentId childId)
     {
-        return GetTransformationsTo(childId)
+        return GetTransformsTo(childId)
             .Reduce(Transform.Add);
     }
 
-    IList<Transform> GetTransformationsTo(ComponentId id) => 
-        GetTransformationsTo(id, [Transform.Zero]); 
+    IList<Transform> GetTransformsTo(ComponentId id) => 
+        GetTransformsTo(id, [Transform.Zero]); 
 
-    public IList<Transform> GetTransformationsTo(ComponentId id, IList<Transform> previousTransformations)
+    public IList<Transform> GetTransformsTo(ComponentId id, IList<Transform> previousTransforms)
     {
         if (Id == id)
-            return previousTransformations;
+            return previousTransforms;
         
         return Child
             .IfNone(() => throw new ChildNotFoundException(this, id))
-            .GetTransformationsTo(id, previousTransformations);
+            .GetTransformsTo(id, previousTransforms);
     }
 
     public override string ToString()

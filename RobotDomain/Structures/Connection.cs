@@ -12,10 +12,10 @@ public abstract class Connection
 
     public string Name => $"{Parent.Name}To{Child.Name}"; 
 
-    public IList<Transform> GetTransformationsTo(ComponentId id, IList<Transform> previousTransformations)
+    public IList<Transform> GetTransformsTo(ComponentId id, IList<Transform> previousTransforms)
     {
         return Child
-            .GetTransformationsTo(id, previousTransformations.Append(Transform)
+            .GetTransformsTo(id, previousTransforms.Append(Transform)
             .ToList());
     }
 
