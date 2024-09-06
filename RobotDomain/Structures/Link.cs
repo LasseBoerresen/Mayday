@@ -41,9 +41,12 @@ public class Link
 
     public Transform GetTransformOf(ComponentId childId)
     {
-        return GetTransformationsTo(childId, previousTransformations: [Transform.Zero])
+        return GetTransformationsTo(childId)
             .Reduce(Transform.Add);
     }
+
+    IList<Transform> GetTransformationsTo(ComponentId id) => 
+        GetTransformationsTo(id, [Transform.Zero]); 
 
     public IList<Transform> GetTransformationsTo(ComponentId id, IList<Transform> previousTransformations)
     {
