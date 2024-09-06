@@ -156,12 +156,46 @@ public class MaydayLegTests
 
     [Theory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
-    void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(string testId, MaydayLink linkName, Transform expectedTransform)
+    void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(
+    string testId, MaydayLink linkName, Transform expectedTransform)
     {
         // Given
         var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
+        // When
+        var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
+
+        // Then
+        AssertTransformEqual(testId, expectedTransform, actualTransform);
+    }
+    
+    public static TheoryData<string, MaydayLink, Transform>
+        DataFor_GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected()
+    {
+        return new()
+        {
+            { "0", CoxaMotor, Transform.Zero},
+            { "1", Coxa,       new(new(0, 0, 0), Q.FromRpy(new(0, 0, 0.25 )))},
+            { "2", FemurMotor, new(new(0, 0.033, -0.013), Q.FromRpy(new(-0.25, 0.25, 0.25 )))},
+            { "3", Femur,      new(new(0, 0.033, -0.013), Q.FromRpy(new(0.0, 0.0, 0.25)))},
+            { "4", TibiaMotor, new(new(0, 0.115, 0.02), Q.FromRpy(new(0.25, -0.125, 0.75)))},
+            { "5", Tibia,      new(new(0, 0.135, 0.02), Q.FromRpy(new(0.0, 0.125 , 0.25)))},
+            { "6", Tip,        new(new(0, 0.165, -0.125), Q.FromRpy(new(0.0, 0.29166, 0.25)))}, 
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(DataFor_GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected))]
+    void GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected(
+        string testId, MaydayLink linkName, Transform expectedTransform)
+    {
+        // Given
+        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+            .CreateLeg(new(Side.Left, SidePosition.Center));
+
+        leg.SetPosture(leg.GetPosture() with {CoxaAngle = Angle.FromRevolutions(0.25)});
+        
         // When
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
 
