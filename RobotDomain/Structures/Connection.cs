@@ -8,7 +8,7 @@ public abstract class Connection
     public ComponentId Id { get; }
     public Link Parent { get; }
     public Link Child { get; }
-    public abstract Transform Transform { get; }
+    protected abstract Transform Transform { get; }
 
     public string Name => $"{Parent.Name}To{Child.Name}"; 
 

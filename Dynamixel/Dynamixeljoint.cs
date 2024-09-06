@@ -22,8 +22,8 @@ public class DynamixelJoint : Joint
     public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, new(goal));
 
     public void Initialize() => _adapter.Initialize(_id);
-    
-    public override Transform Transform => _passiveTransform + ActiveTransform;
+
+    protected override Transform Transform => _passiveTransform + ActiveTransform;
 
     Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, State.Angle)));
 }

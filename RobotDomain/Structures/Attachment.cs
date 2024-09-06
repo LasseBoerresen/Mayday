@@ -7,7 +7,7 @@ public class Attachment : Connection
 {
     readonly Transform _transform;
 
-    public override Transform Transform => _transform;
+    protected override Transform Transform => _transform;
 
     Attachment(ComponentId id, Link parent, Link child, Transform transform) 
         : base(id, parent, child)
