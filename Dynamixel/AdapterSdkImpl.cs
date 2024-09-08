@@ -10,7 +10,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
 {
     static int DXL_BROADCAST_ID = 254;
     
-    static Option<RotationalSpeed> _velocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
+    static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
     static int _POSITION_I_GAIN_SOFT = 300;
     static int _POSITION_D_GAIN_SOFT = 4000;
@@ -106,7 +106,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
 
     void SetVelocityLimit(JointId id)
     {
-        var dynamixelVelocity = _velocityLimitSlow
+        var dynamixelVelocity = VelocityLimitSlow
             .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
