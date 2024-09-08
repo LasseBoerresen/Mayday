@@ -1,6 +1,4 @@
-﻿using RobotDomain.Structures;
-
-namespace MaydayDomain;
+﻿namespace MaydayDomain;
 
 public record MaydayStructurePosture(
     MaydayLegPosture RF,
@@ -8,35 +6,13 @@ public record MaydayStructurePosture(
     MaydayLegPosture RB,
     MaydayLegPosture LF,
     MaydayLegPosture LC,
-    MaydayLegPosture LB) : Posture
+    MaydayLegPosture LB) 
+    : MaydayStructureSet<MaydayLegPosture>(RF, RC, RB, LF, LC, LB)
 {
-    public static MaydayStructurePosture Neutral => FromLegPosture(MaydayLegPosture.Neutral);
-    public static MaydayStructurePosture Sitting => FromLegPosture(MaydayLegPosture.Sitting);
-    public static MaydayStructurePosture SittingTall => FromLegPosture(MaydayLegPosture.SittingTall);
-    public static MaydayStructurePosture Standing => FromLegPosture(MaydayLegPosture.Standing);
-    public static MaydayStructurePosture StandingHigh => FromLegPosture(MaydayLegPosture.StandingHigh);
-    public static MaydayStructurePosture StandingWide => FromLegPosture(MaydayLegPosture.StandingWide);
-
-    public IDictionary<MaydayLegId, MaydayLegPosture> ToLegDict()
-    {
-        return new Dictionary<MaydayLegId, MaydayLegPosture>
-        {
-            { MaydayLegId.LeftFront, LF },
-            { MaydayLegId.LeftCenter, LC },
-            { MaydayLegId.LeftBack, LB },
-            { MaydayLegId.RightFront, RF },
-            { MaydayLegId.RightCenter, RC },
-            { MaydayLegId.RightBack, RB },
-        };
-    }
-
-    static MaydayStructurePosture FromLegPosture(MaydayLegPosture legPosture)
-    {
-        return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
-    }
-
-    public override string ToString()
-    {
-        return $"MaydayPosture:\n\tRF: {RF},\n\tRC: {RC},\n\tRB: {RB},\n\tLF: {LF},\n\tLC: {LC},\n\tLB: {LB}";
-    }
+    public static MaydayStructurePosture Neutral => FromSingle(MaydayLegPosture.Neutral);
+    public static MaydayStructurePosture Sitting => FromSingle(MaydayLegPosture.Sitting);
+    public static MaydayStructurePosture SittingTall => FromSingle(MaydayLegPosture.SittingTall);
+    public static MaydayStructurePosture Standing => FromSingle(MaydayLegPosture.Standing);
+    public static MaydayStructurePosture StandingHigh => FromSingle(MaydayLegPosture.StandingHigh);
+    public static MaydayStructurePosture StandingWide => FromSingle(MaydayLegPosture.StandingWide);
 }

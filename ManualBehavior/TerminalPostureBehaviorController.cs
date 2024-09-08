@@ -72,6 +72,7 @@ public class TerminalPostureBehaviorController(
         var command = GetCommand();
         ExecuteCommand(command);
         Console.WriteLine(motionPlanner.GetPosture());
+        Console.WriteLine(motionPlanner.GetTipPositions());
     }
 
     static PostureCommand GetCommand()

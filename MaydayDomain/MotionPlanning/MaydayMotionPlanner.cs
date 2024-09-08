@@ -1,7 +1,11 @@
-﻿namespace MaydayDomain.MotionPlanning;
+﻿using RobotDomain.Geometry;
 
-public abstract class MaydayMotionPlanner
+namespace MaydayDomain.MotionPlanning;
+
+public interface MaydayMotionPlanner
 {
-    public abstract MaydayStructurePosture GetPosture();
-    public abstract void SetPosture(MaydayStructurePosture posture);
+    MaydayStructureSet<MaydayLegPosture> GetPosture();
+    void SetPosture(MaydayStructurePosture posture);
+    MaydayStructureSet<Xyz> GetTipPositions();
+
 }

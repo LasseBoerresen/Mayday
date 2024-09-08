@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Generic;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
-using static MaydayDomain.MaydayLegId;
 
 namespace MaydayDomain;
 
@@ -13,21 +13,21 @@ public class MaydayStructure
     {
         _legs = legs.ToImmutableSortedDictionary();
     }
-    
+
+    public MaydayStructureSet<Xyz> GetTipPoints()
+    {
+        return MaydayStructureSet<Xyz>.FromLegDict(_legs.MapValue(l => l.GetTransformOf(l.Tip).Xyz));
+    }
+
     public void SetPosture(MaydayStructurePosture posture)
     {
         _legs.ForEach(kvp => kvp.Value.SetPosture(posture.ToLegDict()[kvp.Key]));
     }
 
-    public MaydayStructurePosture GetPosture()
+    public MaydayStructureSet<MaydayLegPosture> GetPosture()
     {
-        return new MaydayStructurePosture(
-            RF: _legs[RightFront].GetPosture(),
-            RC: _legs[RightCenter].GetPosture(),
-            RB: _legs[RightBack].GetPosture(),
-            LF: _legs[LeftFront].GetPosture(),
-            LC: _legs[LeftCenter].GetPosture(),
-            LB: _legs[LeftBack].GetPosture());
+        return MaydayStructureSet<MaydayLegPosture>
+            .FromLegDict(_legs.MapValue(l => l.GetPosture()));
     }
 
     public void SetPostureForAllLegs(MaydayLegPosture posture)
