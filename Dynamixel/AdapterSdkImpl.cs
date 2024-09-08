@@ -33,9 +33,52 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
 
     public JointState GetState(JointId id)
     {
-        throw new NotImplementedException($"{nameof(AdapterSdkImpl)}.{nameof(GetState)} is not implemented");
+        return new JointState(
+            ReadAngle(id),
+            ReadSpeed(id),
+            ReadTorque(id),
+            ReadTemperature(id),
+            ReadAngleGoal(id));
     }
 
+    Angle ReadAngle(JointId id)
+    {
+        var positionSteps = portAdapter.Read(id, ControlRegister.PresentPosition);
+        
+        return PositionAngle.FromPositionStep(positionSteps).Value;
+    }
+
+    Angle ReadAngleGoal(JointId id)
+    {
+        var positionSteps = portAdapter.Read(id, ControlRegister.GoalPosition);
+        
+        return PositionAngle.FromPositionStep(positionSteps).Value;
+    }
+
+    RotationalSpeed ReadSpeed(JointId id)
+    {
+        throw new NotImplementedException("impment rest of read methods");
+        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentVelocity);
+        //
+        // return PositionAngle.FromPositionStep(positionSteps).Value;
+    }
+
+    Torque ReadTorque(JointId id)
+    {
+        throw new NotImplementedException("impment rest of read methods");
+        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentLoad);
+        
+        // return PositionAngle.FromPositionStep(positionSteps).Value;
+    }
+    
+    UnitsNet.Temperature ReadTemperature(JointId id)
+    {
+        throw new NotImplementedException("impment rest of read methods");
+        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentTemperature);
+        
+        // return PositionAngle.FromPositionStep(positionSteps).Value;
+    }
+    
     void ReadHardwareErrorStatus(JointId id)
     {
         var hardwareErrorStatus = portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
