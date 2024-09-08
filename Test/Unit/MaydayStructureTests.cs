@@ -2,12 +2,10 @@
 using MaydayDomain;
 using Moq;
 using RobotDomain.Structures;
-using Test.Unit;
-using UnitsNet;
 using Xunit;
 using static MaydayDomain.MaydayLegId;
 
-namespace Test;
+namespace Test.Unit;
 
 public class MaydayStructureTests
 {

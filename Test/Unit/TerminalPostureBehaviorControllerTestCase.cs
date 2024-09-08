@@ -5,7 +5,7 @@ using MaydayDomain.MotionPlanning;
 using Moq;
 using Xunit;
 
-namespace Test;
+namespace Test.Unit;
 
 [TestSubject(typeof(TerminalPostureBehaviorController))]
 public class TerminalPostureBehaviorControllerTestCase

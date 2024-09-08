@@ -2,7 +2,7 @@
 using RobotDomain.Geometry;
 using Xunit;
 
-namespace Test;
+namespace Test.Unit;
 
 public class ThoraxTests
 {

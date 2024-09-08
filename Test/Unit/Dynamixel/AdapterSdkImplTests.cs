@@ -5,7 +5,7 @@ using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 
-namespace Test.Dynamixel;
+namespace Test.Unit.Dynamixel;
 
 [TestSubject(typeof(AdapterSdkImpl))]
 public class AdapterSdkImplTests
