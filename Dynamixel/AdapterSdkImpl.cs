@@ -73,10 +73,9 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     
     UnitsNet.Temperature ReadTemperature(JointId id)
     {
-        throw new NotImplementedException("impment rest of read methods");
-        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentTemperature);
-        
-        // return PositionAngle.FromPositionStep(positionSteps).Value;
+        var temperatureSteps = portAdapter.Read(id, ControlRegister.PresentTemperature);
+
+        return StepTemperature.ToTemperature(temperatureSteps);
     }
     
     void ReadHardwareErrorStatus(JointId id)

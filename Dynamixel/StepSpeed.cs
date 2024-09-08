@@ -1,5 +1,4 @@
 using UnitsNet;
-using UnitsNet.Units;
 
 namespace Dynamixel;
 
