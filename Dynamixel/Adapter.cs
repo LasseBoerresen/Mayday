@@ -4,7 +4,7 @@ namespace Dynamixel;
 
 public interface Adapter
 {
-    void SetGoal(JointId id, PositionAngle angle);
+    void SetGoal(JointId id, StepAngle angle);
     void Initialize(JointId id);
     JointState GetState(JointId id);
 }

@@ -45,14 +45,14 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     {
         var positionSteps = portAdapter.Read(id, ControlRegister.PresentPosition);
         
-        return PositionAngle.FromPositionStep(positionSteps).Value;
+        return StepAngle.FromPositionStep(positionSteps).Value;
     }
 
     Angle ReadAngleGoal(JointId id)
     {
         var positionSteps = portAdapter.Read(id, ControlRegister.GoalPosition);
         
-        return PositionAngle.FromPositionStep(positionSteps).Value;
+        return StepAngle.FromPositionStep(positionSteps).Value;
     }
 
     RotationalSpeed ReadSpeed(JointId id)
@@ -104,7 +104,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         return portAdapter.Ping(id);
     }
 
-    public void SetGoal(JointId id, PositionAngle angle)
+    public void SetGoal(JointId id, StepAngle angle)
     {
         portAdapter.Write(id, ControlRegister.GoalPosition, angle.ToPositionStep());
     }

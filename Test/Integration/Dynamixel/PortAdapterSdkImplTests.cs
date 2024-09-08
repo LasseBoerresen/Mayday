@@ -23,14 +23,14 @@ public class PortAdapterSdkImplTests
             _portAdapter.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
             
             // When
-            var goal = PositionAngle.StepCenter - 100;
+            var goal = StepAngle.StepCenter - 100;
             SetAndWaitForGoal(goal);
 
             // Then
             AssertGoalReached(goal);
 
             // When Again
-            goal = PositionAngle.StepCenter;
+            goal = StepAngle.StepCenter;
             SetAndWaitForGoal(goal);
             
             // Then again

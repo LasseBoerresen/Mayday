@@ -10,7 +10,7 @@ public class EchoAdapter : Adapter
 
     public EchoAdapter(JointState state) => InitialState = state;
 
-    public void SetGoal(JointId id, PositionAngle angle)
+    public void SetGoal(JointId id, StepAngle angle)
     {
         _states.TryAdd(id, InitialState);
 

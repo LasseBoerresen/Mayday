@@ -26,12 +26,12 @@ public class AdapterSdkImplTests
     void Given_WhenSetGoalToZeroAngle_ThenCallsPortAdapterCorrectly()
     {
         // When
-        PositionAngle goalAngle = new(Angle.Zero);
+        StepAngle goalAngle = new(Angle.Zero);
         _adapter.SetGoal(_id, goalAngle);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
-            pa => pa.Write(_id, ControlRegister.GoalPosition, PositionAngle.StepCenter), 
+            pa => pa.Write(_id, ControlRegister.GoalPosition, StepAngle.StepCenter), 
             Times.Once);
     }
     
