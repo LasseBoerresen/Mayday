@@ -7,19 +7,19 @@ public record PositionAngle(Angle Value)
 {
     public static readonly uint StepCenter = 2048;
     static readonly uint StepExtreme = 2047; // TODO create PostitionStep class to encapsulate 
-    static readonly Angle StepAngle = Angle.FromRadians(Math.Tau / (StepExtreme * 2));
+    static readonly Angle StepSize = Angle.FromRadians(Math.Tau / (StepExtreme * 2));
 
     public static PositionAngle FromRevs(double value) => new(Angle.FromRevolutions(value));
 
     public static PositionAngle FromPositionStep(uint value)
     {
-        return new(((int)value - StepCenter) * StepAngle.ToUnit(AngleUnit.Revolution));
+        return new(((int)value - StepCenter) * StepSize.ToUnit(AngleUnit.Revolution));
     }
 
     public uint ToPositionStep()
     {
         ThrowIfNotWithinSemiCircle(Value);
-        return (uint)(Value  / StepAngle ) + StepCenter;
+        return (uint)(Value  / StepSize ) + StepCenter;
     }
 
     void ThrowIfNotWithinSemiCircle(Angle angle)
