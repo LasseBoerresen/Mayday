@@ -3,26 +3,25 @@ using UnitsNet.Units;
 
 namespace Dynamixel;
 
-public record StepAngle(Angle Value)
+public static class StepAngle
 {
     public static readonly uint StepCenter = 2048;
     static readonly uint StepExtreme = 2047; // TODO create PostitionStep class to encapsulate 
     static readonly Angle StepSize = Angle.FromRadians(Math.Tau / (StepExtreme * 2));
 
-    public static StepAngle FromRevs(double value) => new(Angle.FromRevolutions(value));
-
-    public static StepAngle FromPositionStep(uint value)
+    public static Angle ToAngle(uint steps)
     {
-        return new(((int)value - StepCenter) * StepSize.ToUnit(AngleUnit.Revolution));
+        return ((int)steps - StepCenter) * StepSize.ToUnit(AngleUnit.Revolution);
     }
 
-    public uint ToPositionStep()
+    public static uint ToSteps(Angle angle)
     {
-        ThrowIfNotWithinSemiCircle(Value);
-        return (uint)(Value  / StepSize ) + StepCenter;
+        ThrowIfNotWithinSemiCircle(angle);
+        
+        return (uint)(angle  / StepSize ) + StepCenter;
     }
 
-    void ThrowIfNotWithinSemiCircle(Angle angle)
+    static void ThrowIfNotWithinSemiCircle(Angle angle)
     {
         if (angle < Angle.FromRevolutions(-0.5) || angle >= Angle.FromRevolutions(0.5))
             throw new ArgumentException($"Angle bigger than a semicircle, got: '{angle}'");

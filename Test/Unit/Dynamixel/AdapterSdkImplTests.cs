@@ -26,7 +26,7 @@ public class AdapterSdkImplTests
     void Given_WhenSetGoalToZeroAngle_ThenCallsPortAdapterCorrectly()
     {
         // When
-        StepAngle goalAngle = new(Angle.Zero);
+        Angle goalAngle = Angle.Zero;
         _adapter.SetGoal(_id, goalAngle);
 
         // Then

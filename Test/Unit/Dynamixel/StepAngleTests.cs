@@ -16,30 +16,30 @@ public class StepAngleTests
         _testOutputHelper = testOutputHelper;
     }
 
-    public static TheoryData<string, uint, StepAngle> DataFor_GivenPositionSteps_WhenFromPositionStep_ThenReturnsExpectedAngle()
+    public static TheoryData<string, uint, Angle> DataFor_GivenPositionSteps_WhenFromPositionStep_ThenReturnsExpectedAngle()
     {
         return new() 
         {
-            {"0",    1, StepAngle.FromRevs(-0.50)},
-            {"1", 1024, StepAngle.FromRevs(-0.25)},
-            {"2", 2048, StepAngle.FromRevs( 0.00)},
-            {"3", 3072, StepAngle.FromRevs( 0.25)},
-            {"4", 4095, StepAngle.FromRevs( 0.50)},
+            {"0",    1, Angle.FromRevolutions(-0.50)},
+            {"1", 1024, Angle.FromRevolutions(-0.25)},
+            {"2", 2048, Angle.FromRevolutions( 0.00)},
+            {"3", 3072, Angle.FromRevolutions( 0.25)},
+            {"4", 4095, Angle.FromRevolutions( 0.50)},
         };
     }
 
     [Theory]
     [MemberData(nameof(DataFor_GivenPositionSteps_WhenFromPositionStep_ThenReturnsExpectedAngle))]
     void GivenPositionSteps_WhenFromPositionStep_ThenReturnsExpectedAngle(
-        string testId, uint positionAngleSteps, StepAngle expectedAngle)
+        string testId, uint positionAngleSteps, Angle expectedAngle)
     {
         _testOutputHelper.WriteLine(testId);
     
         // When
-        StepAngle actualAngle = StepAngle.FromPositionStep(positionAngleSteps);
+        Angle actualAngle = StepAngle.ToAngle(positionAngleSteps);
             
         // Then
         var toleranceOfDynamixel = 1/4096.0;
-        Assert.Equal(expectedAngle.Value.Value, actualAngle.Value.Value, toleranceOfDynamixel);
+        Assert.Equal(expectedAngle.Value, actualAngle.Value, toleranceOfDynamixel);
     }
 }

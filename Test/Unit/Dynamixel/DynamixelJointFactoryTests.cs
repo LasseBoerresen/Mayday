@@ -33,7 +33,7 @@ public class DynamixelJointFactoryTests
         actualJoint.SetAngleGoal(goalAngle);
 
         // Then
-        _mockAdapter.Verify(a => a.SetGoal(id, new(goalAngle)));
+        _mockAdapter.Verify(a => a.SetGoal(id, goalAngle));
     }
     
     [Fact]

@@ -19,7 +19,7 @@ public class DynamixelJoint : Joint
     }
     
     public override JointState State => _adapter.GetState(_id); 
-    public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, new(goal));
+    public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, goal);
 
     public void Initialize() => _adapter.Initialize(_id);
 
