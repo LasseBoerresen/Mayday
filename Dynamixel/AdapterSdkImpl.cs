@@ -1,5 +1,6 @@
 ﻿using Generic;
 using LanguageExt;
+using RobotDomain.Physics;
 using RobotDomain.Structures;
 using UnitsNet;
 
@@ -36,7 +37,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         return new JointState(
             ReadAngle(id),
             ReadSpeed(id),
-            ReadTorque(id),
+            ReadLoadRatio(id),
             ReadTemperature(id),
             ReadAngleGoal(id));
     }
@@ -62,12 +63,12 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         return StepSpeed.ToSpeed(speedSteps);
     }
 
-    Torque ReadTorque(JointId id)
+    LoadRatio ReadLoadRatio(JointId id)
     {
-        throw new NotImplementedException("impment rest of read methods");
-        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentLoad);
+        var loadSteps = portAdapter.Read(id, ControlRegister.PresentLoad);
         
-        // return PositionAngle.FromPositionStep(positionSteps).Value;
+        // TODO Test with real dynamixels, that -1000:1000 range is converted correctly, from uint to int...
+        return LoadRatio.FromSteps((int)loadSteps);
     }
     
     UnitsNet.Temperature ReadTemperature(JointId id)

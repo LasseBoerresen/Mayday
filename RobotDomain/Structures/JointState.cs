@@ -1,18 +1,19 @@
-﻿using UnitsNet;
+﻿using RobotDomain.Physics;
+using UnitsNet;
 
 namespace RobotDomain.Structures;
 
 public record JointState(
     Angle Angle,
     RotationalSpeed RotationalSpeed,
-    Torque Torque,
+    LoadRatio Torque,
     UnitsNet.Temperature Temperature,
     Angle? AngleGoal)
 {
     public static JointState Zero => new(
         Angle.Zero,
         RotationalSpeed.Zero,
-        Torque.Zero,
+        LoadRatio.Zero,
         UnitsNet.Temperature.Zero,
         Angle.Zero);
 };
