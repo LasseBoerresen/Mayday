@@ -57,10 +57,9 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
 
     RotationalSpeed ReadSpeed(JointId id)
     {
-        throw new NotImplementedException("impment rest of read methods");
-        // var positionSteps = portAdapter.Read(id, ControlRegister.PresentVelocity);
-        //
-        // return PositionAngle.FromPositionStep(positionSteps).Value;
+        var speedSteps = portAdapter.Read(id, ControlRegister.PresentVelocity);
+        
+        return StepSpeed.ToSpeed(speedSteps);
     }
 
     Torque ReadTorque(JointId id)
