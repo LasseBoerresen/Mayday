@@ -1,4 +1,5 @@
-﻿using RobotDomain.Geometry;
+﻿using Dynamixel;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 
 namespace MaydayDomain.MotionPlanning;
@@ -14,4 +15,16 @@ public class InstantPostureMaydayMotionPlanner(MaydayStructure structure) : Mayd
     public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName) => structure.GetPositionsOf(linkName);
 
     public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName) => structure.GetOrientationsOf(linkName);
+    
+    public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => structure.GetTransformsOf(linkName);
+
+    public static MaydayMotionPlanner Create()
+    {
+        JointFactory jointFactory = DynamixelJointFactory.CreateWithDynamixelJoints();
+
+        var structure = MaydayStructure.Create(jointFactory);
+
+        MaydayMotionPlanner maydayMotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
+        return maydayMotionPlanner;
+    }
 }

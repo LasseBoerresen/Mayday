@@ -119,7 +119,7 @@ public class MaydayLegTests
     void VerifyJointFactoryCreateJointId(JointId id)
     {
         _mockJointFactory.Verify(jf => 
-            jf.Create(
+            jf.New(
                 It.IsAny<Link>(), 
                 It.IsAny<Link>(), 
                 It.IsAny<Transform>(), 
@@ -143,16 +143,7 @@ public class MaydayLegTests
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {
-        return new()
-        {
-            { "0", CoxaMotor, Transform.Zero},
-            { "1", Coxa, Transform.Zero},
-            { "2", FemurMotor, new(new(0.033, 0, -0.013), Q.FromRpy(new(-0.25, 0.25, 0 )))},
-            { "3", Femur,      new(new(0.033, 0, -0.013), Q.FromRpy(new(0.0, 0.0, 0.0)))},
-            { "4", TibiaMotor, new(new(0.115, 0, 0.02), Q.FromRpy(new(0.25, -0.125, 0.5)))},
-            { "5", Tibia,      new(new(0.135, 0, 0.02), Q.FromRpy(new(0.0, 0.125 , 0.0)))},
-            { "6", Tip,        new(new(0.165, 0, -0.125), Q.FromRpy(new(0.0, 0.29166, 0.0)))}, 
-        };
+        return TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected();
     }
 
     [Theory]

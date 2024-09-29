@@ -4,5 +4,5 @@ namespace RobotDomain.Structures;
 
 public interface JointFactory
 {
-    Joint Create(Link parent, Link child, Transform transform, JointId id, Side side);
+    Joint New(Link parent, Link child, Transform transform, JointId id, Side side);
 }

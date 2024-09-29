@@ -10,4 +10,5 @@ public interface MaydayMotionPlanner
     void SetPosture(MaydayLegPosture posture);
     MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName);
     MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName);
+    MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName);
 }

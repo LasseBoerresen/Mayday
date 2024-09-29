@@ -39,7 +39,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
 
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(
+        return jointFactory.New(
             links[0], 
             links[1], 
             Transform.FromQ(Q.Unit), 
@@ -57,7 +57,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
 
     Joint CreateFemurMotorToFemurJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(
+        return jointFactory.New(
             links[2], 
             links[3], 
             transform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
@@ -67,7 +67,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
 
     Joint CreateFemurToTibiaMotorJoint(MaydayLegId legId, List<Link> links)
     {
-        return jointFactory.Create(
+        return jointFactory.New(
             links[3],
             links[4],
             new(Femur.TibiaMotorMountTranslation, Q.FromRpy(new(0.25, -0.125, 0.5))),

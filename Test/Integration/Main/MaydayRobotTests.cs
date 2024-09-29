@@ -7,7 +7,7 @@ namespace Test.Integration.Main;
 [TestSubject(typeof(MaydayRobot))]
 public class MaydayRobotTests
 {
-    [Fact(Skip="robot not connected")]
+    [Fact] // [Fact(Skip="robot not connected")]
     void GivenMay_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given

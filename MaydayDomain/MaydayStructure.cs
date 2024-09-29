@@ -28,6 +28,13 @@ public class MaydayStructure
         return MaydayStructureSet<Q>.FromLegDict(legQs);
     }
 
+    public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName)
+    {
+        var legTransforms = _legs.MapValue(l => l.GetTransformOf(linkName));
+        
+        return MaydayStructureSet<Transform>.FromLegDict(legTransforms);
+    }
+
     public void SetPosture(MaydayStructurePosture posture)
     {
         _legs.ForEach(kvp => kvp.Value.SetPosture(posture.ToLegDict()[kvp.Key]));
