@@ -1,6 +1,8 @@
-﻿using MaydayDomain;
+﻿using LanguageExt;
+using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
+using RobotDomain.Structures;
 
 namespace ManualBehavior;
 
@@ -17,62 +19,17 @@ public class TerminalPostureBehaviorController(
             ExecuteConsoleCommand();
     }
 
-    public void WakeUp()
-    {
-        Console.WriteLine("\nWaking up...");
-        
-        Sit();
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        SitTall();
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        Sit();
-    }
-    
-    public void Sleep()
-    {
-        Console.WriteLine("Going to sleep...");
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        Sit();
-        Thread.Sleep(TimeSpan.FromSeconds(2));
-    }
-
-    public void Stand()
-    {
-        motionPlanner.SetPosture(MaydayStructurePosture.Standing);
-    }
-
-    public void StandHigh()
-    {
-        motionPlanner.SetPosture(MaydayStructurePosture.StandingHigh);
-    }
-
-    public void StandWide()
-    {
-        motionPlanner.SetPosture(MaydayStructurePosture.StandingWide);
-    }
-
-    public void Sit()
-    {
-        motionPlanner.SetPosture(MaydayStructurePosture.Sitting);
-    }
-    
-    public void SitTall()
-    {
-        motionPlanner.SetPosture(MaydayStructurePosture.SittingTall);
-    }
-
-    public void Stop()
-    {
-        Sleep();
-        cancelTokenSource.Cancel();
-    }
-
     void ExecuteConsoleCommand()
     {
         var command = GetCommand();
         ExecuteCommand(command);
-        Console.WriteLine(motionPlanner.GetPosture());
-        Console.WriteLine(motionPlanner.GetTipPositions());
+        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        // Console.WriteLine(motionPlanner.GetPosture());
+        Console.WriteLine("TibiaMotor positions");
+        Console.WriteLine(motionPlanner.GetPositionsOf(LinkName.TibiaMotor));
+        
+        // Console.WriteLine("Coxa Orientations");
+        // Console.WriteLine(motionPlanner.GetOrientationsOf(LinkName.Femur));
     }
 
     static PostureCommand GetCommand()
@@ -81,7 +38,6 @@ public class TerminalPostureBehaviorController(
         var commandString = Console.ReadLine()?.ToLower() ?? "";
         if (!Enum.TryParse<PostureCommand>(commandString, ignoreCase: true, out var command))
         {
-            
             Console.WriteLine($"Invalid command: '{commandString}'");
             return GetCommand();
         }
@@ -91,23 +47,32 @@ public class TerminalPostureBehaviorController(
 
     void ExecuteCommand(PostureCommand command)
     {
+        LookForLegPosture(command)
+            .Some(motionPlanner.SetPosture)
+            .None(() => DoComplexCommand(command));
+    }
+
+    static Option<MaydayLegPosture> LookForLegPosture(PostureCommand command)
+    {
+        return command switch
+        {
+            PostureCommand.Stand => MaydayLegPosture.Standing,
+            PostureCommand.StandHigh => MaydayLegPosture.StandingHigh,
+            PostureCommand.StandWide => MaydayLegPosture.StandingWide,
+            PostureCommand.Sit => MaydayLegPosture.Sitting,
+            PostureCommand.SitTall => MaydayLegPosture.SittingTall,
+            PostureCommand.Neutral => MaydayLegPosture.Neutral,
+            PostureCommand.NeutralWithBackTwist => MaydayLegPosture.NeutralWithBackTwist,
+            PostureCommand.Straight => MaydayLegPosture.Straight,
+            PostureCommand.StraightWithBackTwist => MaydayLegPosture.StraightWithBackTwist,
+            _ => Option<MaydayLegPosture>.None
+        };
+    }
+
+    void DoComplexCommand(PostureCommand command)
+    {
         switch (command)
         {
-            case PostureCommand.Stand:
-                Stand();
-                break;
-            case PostureCommand.StandHigh:
-                StandHigh();
-                break;
-            case PostureCommand.StandWide:
-                StandWide();
-                break; 
-            case PostureCommand.Sit:
-                Sit();
-                break;
-            case PostureCommand.SitTall:
-                SitTall();
-                break;
             case PostureCommand.Stop:
                 Stop();
                 break;
@@ -116,25 +81,42 @@ public class TerminalPostureBehaviorController(
                 break;
             case PostureCommand.Wake:
                 WakeUp();
-                break; 
-            default:
-                throw new NotSupportedException($"PostureCommand {command} was not implemented yet");
+                break;
         }
+    }
+
+    void WakeUp()
+    {
+        Console.WriteLine("\nWaking up...");
+        
+        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
+        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        motionPlanner.SetPosture(MaydayLegPosture.SittingTall);
+        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
+    }
+
+    void Sleep()
+    {
+        Console.WriteLine("Going to sleep...");
+        
+        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
+    }
+
+    void Stop()
+    {
+        Sleep();
+        Thread.Sleep(TimeSpan.FromSeconds(2));
+        cancelTokenSource.Cancel();
     }
 
     static void PrintCommandList()
     {
-        Console.Write(
-            "\n" +
-            "Commands:\n" +
-            "WakeUp(1)\n" +
-            "Sleep(2)\n" +
-            "Stand(3)\n" +
-            "StandWide(4)\n" +
-            "StandHigh(5)\n" +
-            "Sit(6)\n" +
-            "SitTall(7)\n" +
-            "Stop(8)\n " +
-            "\n");
+        var commandListString = Enum
+            .GetValues<PostureCommand>()
+            .Aggregate("\n", (s, pc) => s + $"{(int)pc}: {pc}\n");
+     
+        Console.Write(commandListString);
     }
 }

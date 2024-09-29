@@ -28,11 +28,6 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
         };
     }
 
-    protected static MaydayStructurePosture FromSingle(MaydayLegPosture legPosture)
-    {
-        return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
-    }
-
     public override string ToString()
     {
         return $"{GetType().Name}:\n" 

@@ -14,9 +14,18 @@ public class MaydayStructure
         _legs = legs.ToImmutableSortedDictionary();
     }
 
-    public MaydayStructureSet<Xyz> GetTipPoints()
+    public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName)
     {
-        return MaydayStructureSet<Xyz>.FromLegDict(_legs.MapValue(l => l.GetTransformOf(l.Tip).Xyz));
+        var legXyzs = _legs.MapValue(l => l.GetTransformOf(linkName).Xyz);
+        
+        return MaydayStructureSet<Xyz>.FromLegDict(legXyzs);
+    }
+
+    public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName)
+    {
+        var legQs = _legs.MapValue(l => l.GetTransformOf(linkName).Q);
+        
+        return MaydayStructureSet<Q>.FromLegDict(legQs);
     }
 
     public void SetPosture(MaydayStructurePosture posture)

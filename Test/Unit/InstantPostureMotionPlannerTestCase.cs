@@ -23,7 +23,7 @@ public class InstantPostureMotionPlannerTestCase
         // Given
         
         // When
-        _instantPostureMaydayMotionPlanner.SetPosture(MaydayStructurePosture.Sitting);
+        _instantPostureMaydayMotionPlanner.SetPosture(MaydayLegPosture.Sitting);
         
         // Then
         

@@ -43,7 +43,8 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[0], 
             links[1], 
             Transform.FromQ(Q.Unit), 
-            legId.JointId(1));
+            legId.JointId(1),
+            legId.Side);
     }
 
     Attachment CreateCoxaToFemurMotorAttachment(List<Link> links)
@@ -60,7 +61,8 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[2], 
             links[3], 
             transform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
-            legId.JointId(2));
+            id: legId.JointId(2),
+            legId.Side);
     }
 
     Joint CreateFemurToTibiaMotorJoint(MaydayLegId legId, List<Link> links)
@@ -69,7 +71,8 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[3],
             links[4],
             new(Femur.TibiaMotorMountTranslation, Q.FromRpy(new(0.25, -0.125, 0.5))),
-            legId.JointId(3));
+            legId.JointId(3),
+            legId.Side);
     }
 
     Attachment CreateTibiaMotorToTibiaAttachment(List<Link> links)

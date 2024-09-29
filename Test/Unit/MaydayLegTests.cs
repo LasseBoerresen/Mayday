@@ -6,7 +6,7 @@ using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
-using static MaydayDomain.MaydayLink;
+using static RobotDomain.Structures.LinkName;
 using static Test.Unit.TestObjectFactory;
 
 namespace Test.Unit;
@@ -123,7 +123,8 @@ public class MaydayLegTests
                 It.IsAny<Link>(), 
                 It.IsAny<Link>(), 
                 It.IsAny<Transform>(), 
-                id), 
+                id,
+                It.IsAny<Side>()), 
             Times.Once);
     }
 
@@ -139,7 +140,7 @@ public class MaydayLegTests
         Assert.Equal(6, actualLegsDict.Count);
     }
 
-    public static TheoryData<string, MaydayLink, Transform>
+    public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {
         return new()
@@ -157,7 +158,7 @@ public class MaydayLegTests
     [Theory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
     void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(
-    string testId, MaydayLink linkName, Transform expectedTransform)
+    string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
         var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
@@ -170,7 +171,7 @@ public class MaydayLegTests
         AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
     
-    public static TheoryData<string, MaydayLink, Transform>
+    public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected()
     {
         return new()
@@ -188,7 +189,7 @@ public class MaydayLegTests
     [Theory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected))]
     void GivenLegWithJointsAtZeroButFirstAt0_25_WhenGetLinkTransform_ThenReturnsExpected(
-        string testId, MaydayLink linkName, Transform expectedTransform)
+        string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
         var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)

@@ -16,9 +16,9 @@ namespace RobotDomain.Geometry;
 public record Q(double W, double X, double Y, double Z)
 {
     // Note: angle of a quaternion is only half a rotation by that quaternion!
-    Angle Angle => Angle.FromRadians(2.0 * Acos(W));
+    public Angle Angle => Angle.FromRadians(2.0 * Acos(W)).ToUnit(AngleUnit.Revolution);
 
-    Vector3 Axis => Vector3.Normalize(Xyz);
+    public Vector3 Axis => Vector3.Normalize(Xyz);
 
     Vector3 Xyz => new((float)X, (float)Y, (float)Z);
     public static Q Unit => new(W: 1.0, X: 0.0, Y: 0.0, Z: 0.0);

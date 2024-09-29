@@ -5,9 +5,9 @@ namespace Dynamixel;
 
 public class DynamixelJointFactory(Adapter adapter) : JointFactory
 {
-    public Joint Create(Link parent, Link child, Transform transform, JointId id)
+    public Joint Create(Link parent, Link child, Transform transform, JointId id, Side side)
     {
-        var joint = new DynamixelJoint(parent, child, transform, id, adapter);
+        var joint = new DynamixelJoint(parent, child, transform, id, side, adapter);
 
         joint.Initialize();
 

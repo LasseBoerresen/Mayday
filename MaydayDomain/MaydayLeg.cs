@@ -12,13 +12,13 @@ public class MaydayLeg
     readonly IImmutableList<Connection> _connections;
     readonly IImmutableList<Joint> _joints;
 
-    public Link CoxaMotor  => _links[0];
-    public Link Coxa       => _links[1];
-    public Link FemurMotor => _links[2];
-    public Link Femur      => _links[3];
-    public Link TibiaMotor => _links[4];
-    public Link Tibia      => _links[5];
-    public Link Tip        => _links[6]; 
+    Link CoxaMotor  => _links[0];
+    Link Coxa       => _links[1];
+    Link FemurMotor => _links[2];
+    Link Femur      => _links[3];
+    Link TibiaMotor => _links[4];
+    Link Tibia      => _links[5];
+    Link Tip        => _links[6]; 
     
     public MaydayLeg(IList<Connection> connections, IList<Link> links)
     {
@@ -45,19 +45,21 @@ public class MaydayLeg
         return _joints.Zip(posture.AsListOfGoalAngles(), (joint, angle) => (joint, angle));
     }
 
+    public Transform GetTransformOf(LinkName linkName) => GetTransformOf(LinkFromName(linkName));
+
     public Transform GetTransformOf(Link link) => CoxaMotor.GetTransformOf(link.Id);
     
-    public Link LinkFromName(MaydayLink name)
+    public Link LinkFromName(LinkName name)
     {
         return name switch
         {
-            MaydayLink.CoxaMotor => CoxaMotor,
-            MaydayLink.Coxa => Coxa,
-            MaydayLink.FemurMotor => FemurMotor,
-            MaydayLink.Femur => Femur,
-            MaydayLink.TibiaMotor => TibiaMotor,
-            MaydayLink.Tibia => Tibia,
-            MaydayLink.Tip => Tip,
+            LinkName.CoxaMotor => CoxaMotor,
+            LinkName.Coxa => Coxa,
+            LinkName.FemurMotor => FemurMotor,
+            LinkName.Femur => Femur,
+            LinkName.TibiaMotor => TibiaMotor,
+            LinkName.Tibia => Tibia,
+            LinkName.Tip => Tip,
             _ => throw new NotSupportedException($"Link name '{name}' not supported")
         };
     }
