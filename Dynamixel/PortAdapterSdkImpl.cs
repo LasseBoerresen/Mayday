@@ -144,5 +144,6 @@ public class PortAdapterSdkImpl: PortAdapter
     public void Dispose()
     {
         closePort(_portNumber);
+        GC.SuppressFinalize(this);
     }
 }

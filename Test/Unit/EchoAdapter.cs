@@ -26,4 +26,9 @@ public class EchoAdapter : Adapter
         
         return _states[id];
     }
+
+    public void Dispose()
+    {
+       
+    }
 }

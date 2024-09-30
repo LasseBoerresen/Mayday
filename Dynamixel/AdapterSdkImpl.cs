@@ -121,4 +121,9 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     {
         portAdapter.Write(id, ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }
+
+    public void Dispose()
+    {
+        portAdapter.Dispose();
+    }
 }

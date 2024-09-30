@@ -3,7 +3,7 @@ using RobotDomain.Structures;
 
 namespace Dynamixel;
 
-public class DynamixelJointFactory(Adapter adapter) : JointFactory
+public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
 {
     public Joint New(Link parent, Link child, Transform transform, JointId id, Side side)
     {
@@ -22,5 +22,11 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory
         Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl);
 
         return new DynamixelJointFactory(jointAdapter);
+    }
+
+    public void Dispose()
+    {
+        adapter.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

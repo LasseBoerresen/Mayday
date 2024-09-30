@@ -4,11 +4,14 @@ using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using Test.Unit;
 using Xunit;
+using static Test.Unit.TestObjectFactory;
 
 namespace Test.Integration.Main;
 
 public class MaydayLegTests
 {
+    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create();
+
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {
@@ -21,11 +24,10 @@ public class MaydayLegTests
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        MaydayMotionPlanner motionPlanner = InstantPostureMaydayMotionPlanner.Create();
-        motionPlanner.SetPosture(MaydayLegPosture.Neutral);
+        MotionPlanner.SetPosture(MaydayLegPosture.Neutral);
 
         // When
-        var actualTransform = motionPlanner.GetTransformsOf(linkName).LF;
+        var actualTransform = MotionPlanner.GetTransformsOf(linkName).LF;
 
         // Then
         AssertTransformEqual(testId, expectedTransform, actualTransform);
