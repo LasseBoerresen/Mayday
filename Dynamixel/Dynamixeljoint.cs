@@ -32,7 +32,7 @@ public class DynamixelJoint : Joint
 
     public void Initialize() => _adapter.Initialize(_id);
 
-    protected override Transform Transform => _passiveTransform + ActiveTransform;
+    protected override Transform Transform => ActiveTransform + _passiveTransform;
 
     Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
 
