@@ -124,7 +124,8 @@ public class MaydayLegTests
                 It.IsAny<Link>(), 
                 It.IsAny<Transform>(), 
                 id,
-                It.IsAny<RotationDirection>()), 
+                It.IsAny<RotationDirection>(),
+                It.IsAny<AttachmentOrder>()), 
             Times.Once);
     }
 

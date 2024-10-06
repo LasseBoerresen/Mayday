@@ -1,4 +1,4 @@
-﻿namespace Dynamixel;
+﻿namespace RobotDomain.Structures;
 
 public enum RotationDirection
 {

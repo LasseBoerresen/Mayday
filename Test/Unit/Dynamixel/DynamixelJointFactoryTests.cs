@@ -4,7 +4,8 @@ using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
-using static Dynamixel.RotationDirection;
+using static RobotDomain.Structures.AttachmentOrder;
+using static RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit.Dynamixel;
 
@@ -29,7 +30,7 @@ public class DynamixelJointFactoryTests
         var goalAngle = Angle.FromRevolutions(0.42);
     
         // When
-        var actualJoint = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward);
+        var actualJoint = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward, LinkLast);
         
         actualJoint.SetAngleGoal(goalAngle);
 
@@ -44,7 +45,7 @@ public class DynamixelJointFactoryTests
         JointId id = new(1);
     
         // When
-        _ = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward);
+        _ = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward, LinkLast);
 
         // Then
         _mockAdapter.Verify(a => a.Initialize(id));

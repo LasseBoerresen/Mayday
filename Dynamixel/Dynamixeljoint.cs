@@ -9,20 +9,23 @@ public class DynamixelJoint : Joint
     readonly Transform _passiveTransform;
     readonly JointId _id;
     readonly RotationDirection _rotationDirection;
+    readonly AttachmentOrder _attachmentOrder; 
     readonly Adapter _adapter;
 
     public DynamixelJoint(
-        Link parent, 
-        Link child, 
-        Transform passiveTransform, 
-        JointId id, 
+        Link parent,
+        Link child,
+        Transform passiveTransform,
+        JointId id,
         RotationDirection rotationDirection,
+        AttachmentOrder attachmentOrder,
         Adapter adapter) 
         : base(ComponentId.New, parent, child)
     {
         _passiveTransform = passiveTransform;
         _id = id;
         _rotationDirection = rotationDirection;
+        _attachmentOrder = attachmentOrder;
         _adapter = adapter;
     }
     
@@ -32,7 +35,10 @@ public class DynamixelJoint : Joint
 
     public void Initialize() => _adapter.Initialize(_id);
 
-    protected override Transform Transform => ActiveTransform + _passiveTransform;
+    protected override Transform Transform => 
+        _attachmentOrder == AttachmentOrder.LinkLast 
+            ? ActiveTransform + _passiveTransform
+            : _passiveTransform + ActiveTransform;
 
     Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
 
