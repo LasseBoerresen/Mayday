@@ -34,7 +34,7 @@ public class DynamixelJoint : Joint
 
     protected override Transform Transform => _passiveTransform + ActiveTransform;
 
-    Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(UnitsNet.Angle.Zero, UnitsNet.Angle.Zero, Angle)));
+    Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
 
     Angle Angle => State.Angle * RotationDirectionMultiplier;
 
