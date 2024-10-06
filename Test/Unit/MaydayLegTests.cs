@@ -213,14 +213,14 @@ public class MaydayLegTests
 
     [Theory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZeroButFemurAtNeg0_0625_WhenGetLinkTransform_ThenReturnsExpected))]
-    void GivenLegWithJointsAtZeroButFemurAtNeg0_0625_WhenGetLinkTransform_ThenReturnsExpected(
+    void GivenLegWithJointsAtZeroButFemurAt0_0625_WhenGetLinkTransform_ThenReturnsExpected(
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
         var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
-        leg.SetPosture(leg.GetPosture() with {FemurAngle =  Angle.FromRevolutions(-0.0625)});
+        leg.SetPosture(leg.GetPosture() with {FemurAngle =  Angle.FromRevolutions(0.0625)});
         
         // When
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
