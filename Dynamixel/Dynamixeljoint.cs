@@ -8,7 +8,7 @@ public class DynamixelJoint : Joint
 {
     readonly Transform _passiveTransform;
     readonly JointId _id;
-    readonly Side _side;
+    readonly RotationDirection _rotationDirection;
     readonly Adapter _adapter;
 
     public DynamixelJoint(
@@ -16,13 +16,13 @@ public class DynamixelJoint : Joint
         Link child, 
         Transform passiveTransform, 
         JointId id, 
-        Side side, 
+        RotationDirection rotationDirection,
         Adapter adapter) 
         : base(ComponentId.New, parent, child)
     {
         _passiveTransform = passiveTransform;
         _id = id;
-        _side = side;
+        _rotationDirection = rotationDirection;
         _adapter = adapter;
     }
     
@@ -36,7 +36,5 @@ public class DynamixelJoint : Joint
 
     Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
 
-    Angle Angle => State.Angle * RotationDirectionMultiplier;
-
-    double RotationDirectionMultiplier => _side == Side.Left ? 1 : -1;
+    Angle Angle => State.Angle * (int)_rotationDirection;
 }

@@ -1,6 +1,8 @@
 ﻿using MaydayDomain.Components;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using static Dynamixel.RotationDirection;
+using static RobotDomain.Structures.Side;
 
 namespace MaydayDomain;
 
@@ -44,7 +46,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[1], 
             Transform.FromQ(Q.Unit), 
             legId.JointId(1),
-            legId.Side);
+            legId.Side == Left ? Forward : Reverse);
     }
 
     Attachment CreateCoxaToFemurMotorAttachment(List<Link> links)
@@ -62,7 +64,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[3], 
             transform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
             id: legId.JointId(2),
-            legId.Side);
+            Forward);
     }
 
     Joint CreateFemurToTibiaMotorJoint(MaydayLegId legId, List<Link> links)
@@ -72,7 +74,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
             links[4],
             new(Femur.TibiaMotorMountTranslation, Q.FromRpy(new(0.25, -0.125, 0.5))),
             legId.JointId(3),
-            legId.Side);
+            Forward);
     }
 
     Attachment CreateTibiaMotorToTibiaAttachment(List<Link> links)
