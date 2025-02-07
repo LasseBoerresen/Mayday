@@ -1,5 +1,36 @@
 ﻿# Development Log
 
+### Back on the horse. Or spider... 
+#### 2025-02-07 19:07 +01:00 @Home
+Ran the test suite. Everything works, except, the integration tests can only run one at a time manually.
+
+Starting up with my first project in linear. Making mayday sway. No walking. Just inverse kinematics.
+Could be cool to train it. Input vs output. Simply one leg at a time. To learn what joint angles give 
+what leg positions. Or body position. It should be doable. Record some movements. And learn a mapping.
+As long as I have forward kinematics. I can get the results. Then the backwards kinematics and dynamics can be learned,
+presumably. For known tasks, like swaying. 
+
+So, where should I start? Lets assume I have forward kinematics to work. I neeed to tdd, that I can record some data
+to train on. 
+
+So, start simple, with learning the movements of a single leg. Simply record its joint angles, calculate the tibia tip,
+add a random small vector to it. Run the network for new joint angles. Actually move. Record the new tip position and 
+calculate the error. Then add it to the data set and do an epoch. Sampling from newest data first, because it has been 
+trained on less, but never forget the old samples. We can even do 6 legs at a time, because from their own perspective, 
+they are equal. And we try to make the robot more robust. Because motors will fail. Stuff will happen. 
+
+If it goes well, we can add not just position goal, but how quickly it should get there. Dynamics. It will learn from
+the real world robot, auto calibrate to the weight etc. 
+
+With that, we can do the sway. Calculating body position from leg ground plane. Lots of stuff to do. But we can also 
+just do gamepad movement of all legs together. 
+
+Maybe we can start by simply iterating through some grid positions of the joints, and learning from those. That way, the
+legs will know the basic possible positions and their theoretical ground truth tip positions. But then with real world 
+data, we will get much more realistic data. Actually, I will just skip this step. I think going to real world data is 
+better. 
+ 
+
 
 ### Restarting implementing of mayday in c#
 #### 2024-03-29 11:25 +01:00 @Bed with ivy sleeping
