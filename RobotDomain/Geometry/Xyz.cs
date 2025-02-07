@@ -29,4 +29,9 @@ public record Xyz(Length X, Length Y, Length Z)
             && UnitsNetExtensions.IsAlmostEqual(Y, other.Y, precision)
             && UnitsNetExtensions.IsAlmostEqual(Z, other.Z, precision);
     }
+    
+    public override string ToString()
+    {
+        return $"X: {X.Meters,6:F3}, Y: {Y.Meters,6:F3}, Z: {Z.Meters,6:F3}";
+    }
 }
