@@ -17,10 +17,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="LanguageExt.Core" Version="5.0.0-alpha.11" />
-      <PackageReference Include="LanguageExt.FSharp" Version="5.0.0-alpha.11" />
+      <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-46" />
+      <PackageReference Include="LanguageExt.FSharp" Version="5.0.0-beta-46" />
       <PackageReference Include="LanguageExt.Transformers" Version="4.4.8" />
-      <PackageReference Include="UnitsNet" Version="5.43.0" />
+      <PackageReference Include="UnitsNet" Version="6.0.0-pre013" />
     </ItemGroup>
 
     <ItemGroup>
