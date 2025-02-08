@@ -12,6 +12,16 @@ public record Xyz(Length X, Length Y, Length Z)
 
     public static Xyz Zero => new(0, 0, 0);
     public static Xyz One => new(1, 1, 1);
+    
+    /// <summary>
+    /// Every coordinate has random value between [-1:1]
+    /// </summary>
+    public static Xyz Random()
+    {
+        Random random = new();
+        
+        return new(random.NextDouble()*2-1, random.NextDouble()*2-1, random.NextDouble()*2-1);
+    }
 
     public static Xyz operator +(Xyz a, Xyz b)
     {
