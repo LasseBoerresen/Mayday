@@ -15,13 +15,16 @@ public class BabyLegsBehaviorController(
         var kickSize = Length.FromMeters(0.01);
     
         while (!cancelTokenSource.Token.IsCancellationRequested)
-        {
-            var tipPositions = MotionPlanner
-                .GetPositionsOf(LinkName.Tip)
-                .Map(position => position + Xyz.Random() * kickSize.Meters);
-                
-            MotionPlanner.SetTipPositions(tipPositions);
-        }
+            Kick(kickSize);
+    }
+
+    private void Kick(Length kickSize)
+    {
+        var tipPositions = MotionPlanner
+            .GetPositionsOf(LinkName.Tip)
+            .Map(position => position + Xyz.Random() * kickSize.Meters);
+
+        MotionPlanner.SetTipPositions(tipPositions);
     }
 }
 
