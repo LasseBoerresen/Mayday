@@ -17,6 +17,17 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
         return new(behaviorController, cancellationTokenSource);
     }
 
+    public static MaydayRobot CreateWithBabyLegsBehaviorController()
+    {
+        MaydayMotionPlanner maydayMotionPlanner = StepByStepLearningInstantPostureMaydayMotionPlanner.Create();
+        CancellationTokenSource cancellationTokenSource = new();
+
+        BehaviorController behaviorController = new BabyLegsBehaviorController(
+            maydayMotionPlanner, cancellationTokenSource);
+
+        return new(behaviorController, cancellationTokenSource);
+    }
+
     public void Start() => behaviorController.Start();
 
     public void Stop() => cancelTokenSource.Cancel();
