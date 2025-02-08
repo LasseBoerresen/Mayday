@@ -9,11 +9,12 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
     public static MaydayRobot CreateWithTerminalPostureBehaviorController()
     {
         MaydayMotionPlanner maydayMotionPlanner = InstantPostureMaydayMotionPlanner.Create();
-        CancellationTokenSource cts = new();
+        CancellationTokenSource cancellationTokenSource = new();
 
-        BehaviorController behaviorController = new TerminalPostureBehaviorController(maydayMotionPlanner, cts);
+        BehaviorController behaviorController = new TerminalPostureBehaviorController(
+            maydayMotionPlanner, cancellationTokenSource);
 
-        return new(behaviorController, cts);
+        return new(behaviorController, cancellationTokenSource);
     }
 
     public void Start() => behaviorController.Start();
