@@ -18,13 +18,19 @@ public class InstantPostureMaydayMotionPlanner(MaydayStructure structure) : Mayd
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => structure.GetTransformsOf(linkName);
 
-    public static MaydayMotionPlanner Create()
+    public static InstantPostureMaydayMotionPlanner Create()
+    {
+        MaydayStructure structure = CreateMaydayStructure();
+
+        InstantPostureMaydayMotionPlanner maydayMotionPlanner = new(structure);
+        return maydayMotionPlanner;
+    }
+
+    protected static MaydayStructure CreateMaydayStructure()
     {
         JointFactory jointFactory = DynamixelJointFactory.CreateWithDynamixelJoints();
 
         var structure = MaydayStructure.Create(jointFactory);
-
-        MaydayMotionPlanner maydayMotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
-        return maydayMotionPlanner;
+        return structure;
     }
 }
