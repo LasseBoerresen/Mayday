@@ -2,6 +2,12 @@
 
 namespace RobotDomain.Geometry;
 
+
+/// <summary>
+/// A transform represents the combination of a translation and rotation 
+/// </summary>
+/// <param name="Xyz">Translation component</param>
+/// <param name="Q">Rotation component represented as a quarternion</param>
 public record Transform(Xyz Xyz, Q Q)
 {
     public static Transform Zero => new(Xyz.Zero, Q.Unit);
