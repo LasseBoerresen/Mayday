@@ -7,6 +7,12 @@ namespace MaydayDomain.MotionPlanning;
 public class InstantPostureMaydayMotionPlanner(MaydayStructure structure) : MaydayMotionPlanner
 {
     public MaydayStructureSet<MaydayLegPosture> GetPosture() => structure.GetPosture();
+    
+    public virtual void SetTipPositions(MaydayStructureSet<Xyz> tipPositions)
+    {
+        throw new NotSupportedException(
+            "This naive motion planner does not support setting tip positions, only joint angles.");
+    }
 
     public void SetPosture(MaydayStructurePosture posture) => structure.SetPosture(posture);
     
