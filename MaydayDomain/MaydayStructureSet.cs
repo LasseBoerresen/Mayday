@@ -1,3 +1,4 @@
+using Generic;
 using static MaydayDomain.MaydayLegId;
 
 namespace MaydayDomain;
@@ -26,6 +27,11 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
             { RightCenter, RC },
             { RightBack, RB },
         };
+    }
+
+    public MaydayStructureSet<U> Map<U>(Func<T, U> mapper)
+    {
+        return MaydayStructureSet<U>.FromLegDict(ToLegDict().MapValue(mapper));
     }
 
     public override string ToString()
