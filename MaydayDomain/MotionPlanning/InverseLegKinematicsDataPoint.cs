@@ -2,4 +2,5 @@
 
 public record InverseLegKinematicsDataPoint(
     InverseLegKinematicsInput Input, 
-    InverseLegKinematicsOutput Output);
+    InverseLegKinematicsOutput Output,
+    InverseLegKinematicsError Error);

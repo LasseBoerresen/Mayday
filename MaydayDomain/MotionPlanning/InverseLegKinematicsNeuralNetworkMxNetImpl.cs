@@ -6,17 +6,13 @@ public class InverseLegKinematicsNeuralNetworkMxNetImpl
     : InverseLegKinematicsNeuralNetwork
 {
     private readonly MLContext _context;
-    private readonly LegLossEvaluator _lossEvaluator;
 
-    public InverseLegKinematicsNeuralNetworkMxNetImpl(
-        MLContext context,
-        LegLossEvaluator lossEvaluator)
+    public InverseLegKinematicsNeuralNetworkMxNetImpl(MLContext context)
     {
         _context = context;
-        _lossEvaluator = lossEvaluator;
     }
     
-    public void Train(IEnumerable<InverseLegKinematicsInput> inputs)
+    public void Train(IEnumerable<InverseLegKinematicsDataPoint> dataPoints)
     {
         throw new NotImplementedException();
     }
@@ -26,12 +22,10 @@ public class InverseLegKinematicsNeuralNetworkMxNetImpl
         throw new NotImplementedException();
     }
 
-    public static InverseLegKinematicsNeuralNetworkMxNetImpl Create(
-        LegLossEvaluator lossEvaluator)
+    public static InverseLegKinematicsNeuralNetworkMxNetImpl Create()
     {
         MLContext context = new(seed: 42);
 
-    
-        return new(context, lossEvaluator);
+        return new(context);
     }
 }

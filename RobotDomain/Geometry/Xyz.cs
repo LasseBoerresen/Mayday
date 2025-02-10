@@ -1,5 +1,6 @@
 ﻿using Generic;
 using LanguageExt;
+using static System.Math;
 using static Generic.UnitsNetExtensions;
 using Length = UnitsNet.Length;
 
@@ -13,7 +14,20 @@ public record Xyz(Length X, Length Y, Length Z)
 
     public static Xyz Zero => new(0, 0, 0);
     public static Xyz One => new(1, 1, 1);
-    
+
+    public Length Length
+    {
+        get
+        {
+            return Length.FromMeters(
+                Pow(
+                    Pow(X.Meters, 2)
+                    + Pow(X.Meters, 2)
+                    + Pow(X.Meters, 2),
+                    1 / 2.0));
+        }
+    }
+
     /// <summary>
     /// Every coordinate has random value between [-1:1]
     /// </summary>
@@ -27,6 +41,11 @@ public record Xyz(Length X, Length Y, Length Z)
     public static Xyz operator +(Xyz a, Xyz b)
     {
         return new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
+    
+    public static Xyz operator -(Xyz a, Xyz b)
+    {
+        return new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
 
     public static Xyz operator *(Xyz xyz, double multiplier)

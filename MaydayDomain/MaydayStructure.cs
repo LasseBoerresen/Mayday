@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Generic;
+using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 
@@ -44,6 +45,11 @@ public class MaydayStructure
     public void SetPosture(MaydayStructurePosture posture)
     {
         _legs.ForEach(kvp => kvp.Value.SetPosture(posture.ToLegDict()[kvp.Key]));
+    }
+    
+    public void SetPosture(LegProperty<MaydayLegPosture> posture)
+    {
+        _legs[posture.LegId].SetPosture(posture.Value);
     }
 
     public MaydayStructureSet<MaydayLegPosture> GetPostures()

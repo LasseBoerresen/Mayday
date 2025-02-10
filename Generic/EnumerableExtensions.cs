@@ -36,6 +36,18 @@ public static class EnumerableExtensions
         return enumerable.Zip(enumerable.Skip(1), (current, next) => (current, next));
     }
 
+    public static IEnumerable<(T, U, Y)> ZipWithTwo<T, U, Y>(
+        this IEnumerable<T> enumerable0,
+        IEnumerable<U> enumerable1,
+        IEnumerable<Y> enumerable2)
+    {
+        return enumerable0.Zip(enumerable1).Zip(enumerable2)
+            .Select(tuple => (
+                First: tuple.First.First, 
+                Second: tuple.First.Second, 
+                Third: tuple.Second));
+    }
+
     public static IEnumerable<(T, T)> ZipWithNext<T>(this IEnumerable<T> enumerable)
     {
         var enumerableOfFirsts = Enumerable.SkipLast(enumerable, 1);

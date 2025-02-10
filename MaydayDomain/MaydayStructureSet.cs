@@ -1,11 +1,25 @@
+using System.Collections;
 using Generic;
 using MaydayDomain.MotionPlanning;
 using static MaydayDomain.MaydayLegId;
 
 namespace MaydayDomain;
 
-public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
+public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnumerable<T>
 {
+    public static MaydayStructureSet<T> FromEnumerable(IEnumerable<T> valuesPerleg)
+    {
+        var valuesPerLegList = valuesPerleg.ToList();
+    
+        return new(
+            RF: valuesPerLegList[0],
+            RC: valuesPerLegList[1],
+            RB: valuesPerLegList[2],
+            LF: valuesPerLegList[3],
+            LC: valuesPerLegList[4],
+            LB: valuesPerLegList[5]);
+    }
+
     public static MaydayStructureSet<T> FromLegDict(IDictionary<MaydayLegId, T> legDict)
     {
         return new(
@@ -69,6 +83,11 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
             .ToMaydayStructureSet();
     }
 
+    public IEnumerator<T> GetEnumerator()
+    {
+        return ToLegProperties().Select(lp => lp.Value).GetEnumerator();
+    }
+
     public override string ToString()
     {
         return $"{GetType().Name}:\n" 
@@ -78,5 +97,10 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
             + $"\tLF: {LF},\n" 
             + $"\tLC: {LC},\n" 
             + $"\tLB: {LB}";
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 };

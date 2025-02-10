@@ -1,5 +1,3 @@
-﻿using RobotDomain.Geometry;
-
-namespace MaydayDomain.MotionPlanning;
+﻿namespace MaydayDomain.MotionPlanning;
 
 public record InverseLegKinematicsOutput(MaydayLegPosture EndPosture);

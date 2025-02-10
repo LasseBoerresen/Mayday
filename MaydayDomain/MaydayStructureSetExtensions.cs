@@ -15,4 +15,10 @@ public static class MaydayStructureSetExtensions
     {
         return MaydayStructureSet<T>.FromLegProperties(propertyList);
     }
+    
+    public static MaydayStructureSet<T> ToMaydayStructureSet<T>(
+        this IEnumerable<T> list)
+    {
+        return MaydayStructureSet<T>.FromEnumerable(list);
+    }
 }
