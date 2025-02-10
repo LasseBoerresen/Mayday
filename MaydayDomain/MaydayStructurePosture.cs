@@ -13,4 +13,9 @@ public record MaydayStructurePosture(
     {
         return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
     }
+
+    public static MaydayStructurePosture FromSet(MaydayStructureSet<MaydayLegPosture> legPostures)
+    {
+        return new(legPostures.RF, legPostures.RC, legPostures.RB, legPostures.LF, legPostures.LC, legPostures.LB);
+    }
 }

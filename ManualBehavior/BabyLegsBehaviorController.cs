@@ -1,7 +1,7 @@
-﻿using MaydayDomain.MotionPlanning;
+﻿using MaydayDomain;
+using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 using RobotDomain.Geometry;
-using RobotDomain.Structures;
 using UnitsNet;
 
 namespace ManualBehavior;
@@ -13,18 +13,25 @@ public class BabyLegsBehaviorController(
     public void Start()
     {
         var kickSize = Length.FromMeters(0.01);
-    
-        while (!cancelTokenSource.Token.IsCancellationRequested)
-            Kick(kickSize);
-    }
 
+        while (!cancelTokenSource.Token.IsCancellationRequested)
+        {
+            Kick(kickSize);
+            Thread.Sleep(TimeSpan.FromSeconds(1.0));
+        }
+    }
+    
     private void Kick(Length kickSize)
     {
-        var tipPositions = MotionPlanner
-            .GetPositionsOf(LinkName.Tip)
-            .Map(position => position + Xyz.Random() * kickSize.Meters);
-
-        MotionPlanner.SetTipPositions(tipPositions);
+        var tipDeltas = new MaydayStructureSet<Xyz>(
+            Xyz.Random() * kickSize.Meters,
+            Xyz.Random() * kickSize.Meters,
+            Xyz.Random() * kickSize.Meters,
+            Xyz.Random() * kickSize.Meters,
+            Xyz.Random() * kickSize.Meters,
+            Xyz.Random() * kickSize.Meters);
+            
+        MotionPlanner.MoveTipPositions(tipDeltas);
     }
 }
 

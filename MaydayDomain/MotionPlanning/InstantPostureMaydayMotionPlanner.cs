@@ -4,25 +4,38 @@ using RobotDomain.Structures;
 
 namespace MaydayDomain.MotionPlanning;
 
-public class InstantPostureMaydayMotionPlanner(MaydayStructure structure) : MaydayMotionPlanner
+public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
-    public MaydayStructureSet<MaydayLegPosture> GetPosture() => structure.GetPosture();
+    protected readonly MaydayStructure Structure;
     
-    public virtual void SetTipPositions(MaydayStructureSet<Xyz> tipPositions)
+    public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
-        throw new NotSupportedException(
-            "This naive motion planner does not support setting tip positions, only joint angles.");
+        Structure = structure;
     }
 
-    public void SetPosture(MaydayStructurePosture posture) => structure.SetPosture(posture);
+    public MaydayStructureSet<MaydayLegPosture> GetPostures() => Structure.GetPostures();
+
+    public MaydayLegPosture GetPostureOf(MaydayLegId legId) => Structure.GetPostureOf(legId);
+    
+    public virtual void MoveTipPositions(MaydayStructureSet<Xyz> tipDeltas)
+    {
+        throw new NotSupportedException(
+            "This naive motion planner does not support Moving tip positions, only setting joint angles.");
+    }
+
+    public MaydayLegPosture GetPosture(MaydayLegId legId) => Structure.GetPostureOf(legId);
+
+    public void SetPosture(MaydayStructurePosture posture) => Structure.SetPosture(posture);
     
     public void SetPosture(MaydayLegPosture posture) => SetPosture(MaydayStructurePosture.FromSingle(posture));
 
-    public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName) => structure.GetPositionsOf(linkName);
+    public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName) => Structure.GetPositionsOf(linkName);
 
-    public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName) => structure.GetOrientationsOf(linkName);
+    public Xyz GetPositionOf(LinkName linkName, MaydayLegId legId) => Structure.GetPositionOf(linkName, legId);
+
+    public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName) => Structure.GetOrientationsOf(linkName);
     
-    public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => structure.GetTransformsOf(linkName);
+    public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
     public static InstantPostureMaydayMotionPlanner Create()
     {

@@ -7,6 +7,7 @@ namespace RobotDomain.Geometry;
 
 public record Xyz(Length X, Length Y, Length Z)
 {
+    // TODO Refactor this meters constructor to factoryMethod Called Meters
     public Xyz(double x, double y, double z)
         : this(Length.FromMeters(x), Length.FromMeters(y), Length.FromMeters(z)) {}
 

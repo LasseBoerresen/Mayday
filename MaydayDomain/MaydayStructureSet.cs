@@ -1,4 +1,5 @@
 using Generic;
+using MaydayDomain.MotionPlanning;
 using static MaydayDomain.MaydayLegId;
 
 namespace MaydayDomain;
@@ -16,6 +17,20 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
             LB: legDict[LeftBack]);
     }
 
+    public static MaydayStructureSet<T> FromLegProperties(
+        IEnumerable<LegProperty<T>> properties)
+    {
+        var propertyList = properties.ToList();
+    
+        return new(
+            RF: propertyList[0].Value,
+            RC: propertyList[1].Value,
+            RB: propertyList[2].Value,
+            LF: propertyList[3].Value,
+            LC: propertyList[4].Value,
+            LB: propertyList[5].Value);
+    }
+
     public IDictionary<MaydayLegId, T> ToLegDict()
     {
         return new Dictionary<MaydayLegId, T>
@@ -29,9 +44,29 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB)
         };
     }
 
+    public IEnumerable<LegProperty<T>> ToLegProperties()
+    {
+        return
+        [
+            new(LeftFront, LF),
+            new(LeftCenter, LC),
+            new(LeftBack, LB),
+            new(RightFront, RF),
+            new(RightCenter, RC),
+            new(RightBack, RB)
+        ];
+    }
+
     public MaydayStructureSet<U> Map<U>(Func<T, U> mapper)
     {
         return MaydayStructureSet<U>.FromLegDict(ToLegDict().MapValue(mapper));
+    }
+
+    public MaydayStructureSet<U> Map<U>(Func<LegProperty<T>, LegProperty<U>> mapper)
+    {
+        return ToLegProperties()
+            .Map(mapper)
+            .ToMaydayStructureSet();
     }
 
     public override string ToString()

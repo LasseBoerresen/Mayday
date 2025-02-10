@@ -29,6 +29,11 @@ public class DynamixelJoint : Joint
         _adapter = adapter;
     }
     
+    // TODO: create state proxy, that simply updates at a base frequency,
+    //  to decouple queries from communication with dynamixel, and always
+    //  just returns the current value.
+    //  I could add a "boost" functionality, where whenever cache is hit, we
+    //  double the frequency, but it decays on its own. 
     public override JointState State => _adapter.GetState(_id); 
     
     public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, goal);

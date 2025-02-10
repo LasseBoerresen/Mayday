@@ -3,5 +3,5 @@
 public interface InverseLegKinematicsNeuralNetwork
 {
     void Train(IEnumerable<InverseLegKinematicsDataPoint> dataPoints);
-    InverseLegKinematicsOutput Predict(IEnumerable<InverseLegKinematicsInput> inputs);
+    InverseLegKinematicsOutput Predict(InverseLegKinematicsInput input);
 }

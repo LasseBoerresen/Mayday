@@ -7,6 +7,7 @@ namespace MaydayDomain;
 
 public class MaydayStructure
 {
+    // TODO this should probably just be a structure set. More object oriented. 
     readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legs;
 
     public MaydayStructure(IDictionary<MaydayLegId, MaydayLeg> legs)
@@ -16,23 +17,28 @@ public class MaydayStructure
 
     public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName)
     {
-        var legXyzs = _legs.MapValue(l => l.GetTransformOf(linkName).Xyz);
-        
-        return MaydayStructureSet<Xyz>.FromLegDict(legXyzs);
+        return _legs
+            .MapValue(l => l.GetTransformOf(linkName).Xyz)
+            .ToMaydayStructureSet();
+    }
+
+    public Xyz GetPositionOf(LinkName linkName, MaydayLegId legId)
+    {
+        return _legs[legId].GetTransformOf(linkName).Xyz;
     }
 
     public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName)
     {
-        var legQs = _legs.MapValue(l => l.GetTransformOf(linkName).Q);
-        
-        return MaydayStructureSet<Q>.FromLegDict(legQs);
+        return _legs
+            .MapValue(l => l.GetTransformOf(linkName).Q)
+            .ToMaydayStructureSet();
     }
 
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName)
     {
-        var legTransforms = _legs.MapValue(l => l.GetTransformOf(linkName));
-        
-        return MaydayStructureSet<Transform>.FromLegDict(legTransforms);
+        return _legs
+            .MapValue(l => l.GetTransformOf(linkName))
+            .ToMaydayStructureSet();
     }
 
     public void SetPosture(MaydayStructurePosture posture)
@@ -40,10 +46,16 @@ public class MaydayStructure
         _legs.ForEach(kvp => kvp.Value.SetPosture(posture.ToLegDict()[kvp.Key]));
     }
 
-    public MaydayStructureSet<MaydayLegPosture> GetPosture()
+    public MaydayStructureSet<MaydayLegPosture> GetPostures()
     {
-        return MaydayStructureSet<MaydayLegPosture>
-            .FromLegDict(_legs.MapValue(l => l.GetPosture()));
+        return _legs
+            .MapValue(l => l.GetPosture())
+            .ToMaydayStructureSet();
+    }
+
+    public MaydayLegPosture GetPostureOf(MaydayLegId legId)
+    {
+        return _legs[legId].GetPosture();
     }
 
     public void SetPostureForAllLegs(MaydayLegPosture posture)
@@ -54,6 +66,7 @@ public class MaydayStructure
     public static MaydayStructure Create(JointFactory jointFactory)
     {
         var legs = new MaydayLegFactory(jointFactory).CreateAll();
+        
         return new(legs);
     }
 }

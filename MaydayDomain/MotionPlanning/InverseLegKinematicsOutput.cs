@@ -2,4 +2,4 @@
 
 namespace MaydayDomain.MotionPlanning;
 
-public record InverseLegKinematicsOutput(Rpy EndRpy);
+public record InverseLegKinematicsOutput(MaydayLegPosture EndPosture);
