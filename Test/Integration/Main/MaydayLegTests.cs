@@ -18,6 +18,9 @@ public class MaydayLegTests
         return TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected();
     }
 
+    /// <summary>
+    /// Tests basic movements of legs, on real robot.
+    /// </summary>
     [Theory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
     void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(
