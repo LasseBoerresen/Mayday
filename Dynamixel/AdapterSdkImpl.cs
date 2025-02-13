@@ -87,10 +87,12 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         portAdapter.Reboot(id);
         Thread.Sleep(300);
         
+        var delay = TimeSpan.FromSeconds(0.1);
         while (Ping(id) != true)
         {   
-            Console.WriteLine("ping failed, ping again in 100ms");
-            Thread.Sleep(100);    
+            Console.WriteLine($"ping failed, ping again in {delay}");
+            Thread.Sleep(delay);
+            delay *= 2;
         };
         
     }
