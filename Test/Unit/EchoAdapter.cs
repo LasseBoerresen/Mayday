@@ -1,6 +1,7 @@
 using Dynamixel;
 using RobotDomain.Structures;
 using UnitsNet;
+using RotationDirection = RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit;
 
@@ -18,7 +19,7 @@ public class EchoAdapter : Adapter
         _states[id] = _states[id] with { Angle = angle };
     }
 
-    public void Initialize(JointId id) {}
+    public void Initialize(JointId id, RotationDirection rotationDirection) {}
 
     public JointState GetState(JointId id)
     {

@@ -15,7 +15,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static int _POSITION_I_GAIN_SOFT = 300;
     static int _POSITION_D_GAIN_SOFT = 4000;
 
-    public void Initialize(JointId id)
+    public void Initialize(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         if(!Ping(id))
             Reboot(id);
@@ -24,6 +24,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         
         TorqueDisable(id);
         SetVelocityLimit(id);
+        SetRotationDirection(id, rotationDirection);
         TorqueEnable(id);
     }
 
@@ -65,14 +66,14 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         // TODO Test with real dynamixels, that -1000:1000 range is converted correctly, from uint to int...
         return LoadRatio.FromSteps((int)loadSteps);
     }
-    
+
     UnitsNet.Temperature ReadTemperature(JointId id)
     {
         var temperatureSteps = portAdapter.Read(id, ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
     }
-    
+
     void ReadHardwareErrorStatus(JointId id)
     {
         var hardwareErrorStatus = portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
@@ -111,6 +112,23 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
         portAdapter.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
+    }
+
+    private void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
+    {
+        var driveMode = GetDriveMode(id);
+        var driveModeUpdated = driveMode & RotationDirection.FromDomain(rotationDirection).Value;
+        SetDriveMode(id, driveModeUpdated);
+    }
+    
+    private uint GetDriveMode(JointId id)
+    {
+        return portAdapter.Read(id, ControlRegister.DriveMode);
+    }
+    
+    private void SetDriveMode(JointId id, uint driveMode)
+    {
+        portAdapter.Write(id, ControlRegister.DriveMode, driveMode);
     }
 
     void TorqueEnable(JointId id) => SetTorque(id, true);

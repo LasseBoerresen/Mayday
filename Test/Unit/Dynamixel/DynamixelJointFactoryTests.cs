@@ -43,11 +43,12 @@ public class DynamixelJointFactoryTests
     {
         // Given
         JointId id = new(1);
+        var rotationDirection = Forward;
     
         // When
-        _ = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward, LinkLast);
+        _ = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, rotationDirection, LinkLast);
 
         // Then
-        _mockAdapter.Verify(a => a.Initialize(id));
+        _mockAdapter.Verify(a => a.Initialize(id, rotationDirection));
     }
 }

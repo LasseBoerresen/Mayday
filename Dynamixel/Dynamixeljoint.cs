@@ -8,7 +8,7 @@ public class DynamixelJoint : Joint
 {
     readonly Transform _passiveTransform;
     readonly JointId _id;
-    readonly RotationDirection _rotationDirection;
+    readonly RobotDomain.Structures.RotationDirection _rotationDirection;
     readonly AttachmentOrder _attachmentOrder; 
     readonly Adapter _adapter;
 
@@ -17,7 +17,7 @@ public class DynamixelJoint : Joint
         Link child,
         Transform passiveTransform,
         JointId id,
-        RotationDirection rotationDirection,
+        RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder,
         Adapter adapter) 
         : base(ComponentId.New, parent, child)
@@ -38,7 +38,7 @@ public class DynamixelJoint : Joint
     
     public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, goal);
 
-    public void Initialize() => _adapter.Initialize(_id);
+    public void Initialize() => _adapter.Initialize(_id, _rotationDirection);
 
     protected override Transform Transform => 
         _attachmentOrder == AttachmentOrder.LinkLast 

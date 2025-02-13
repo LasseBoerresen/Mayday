@@ -4,6 +4,7 @@ using Moq;
 using RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
+using RotationDirection = RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit.Dynamixel;
 
@@ -39,7 +40,7 @@ public class AdapterSdkImplTests
     void Given_WhenInitialize_ThenCallsPortAdapterTorqueEnableWithValue1()
     {
         // When
-        _adapter.Initialize(_id);
+        _adapter.Initialize(_id, RotationDirection.Forward);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
@@ -51,7 +52,7 @@ public class AdapterSdkImplTests
     void Given_WhenInitialize_ThenCallsPortAdapterWriteVelocityLimit()
     {
         // When
-        _adapter.Initialize(_id);
+        _adapter.Initialize(_id, RotationDirection.Forward);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
