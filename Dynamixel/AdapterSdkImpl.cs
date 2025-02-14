@@ -11,6 +11,8 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     static int DXL_BROADCAST_ID = 254;
     
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
+    
+    // TODO use PID values or remove them!
     static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
     static int _POSITION_I_GAIN_SOFT = 300;
     static int _POSITION_D_GAIN_SOFT = 4000;
