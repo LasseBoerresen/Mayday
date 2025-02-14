@@ -14,4 +14,5 @@ public enum PostureCommand
     NeutralWithBackTwist = 9,
     Straight = 10,
     StraightWithBackTwist = 11,
+    NeutralWithStraightFemur = 12,
 }

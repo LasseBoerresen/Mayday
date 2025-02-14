@@ -65,6 +65,7 @@ public class TerminalPostureBehaviorController(
             PostureCommand.NeutralWithBackTwist => MaydayLegPosture.NeutralWithBackTwist,
             PostureCommand.Straight => MaydayLegPosture.Straight,
             PostureCommand.StraightWithBackTwist => MaydayLegPosture.StraightWithBackTwist,
+            PostureCommand.NeutralWithStraightFemur => MaydayLegPosture.NeutralWithStraightFemur,
             _ => Option<MaydayLegPosture>.None
         };
     }
