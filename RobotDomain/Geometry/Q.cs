@@ -136,6 +136,6 @@ public record Q(double W, double X, double Y, double Z)
     
     public override string ToString()
     {
-        return $"W: {W ,6:F3}, X: {X ,6:F3}, Y: {Y,6:F3}, Z: {Z,6:F3}";
+        return $"W: {W ,6:F3}, X: {X ,6:F3}, Y: {Y,6:F3}, Z: {Z,6:F3}, Angle: {Angle,6:F3}, Axis: {Axis.ToShortString()}";
     }
 }
