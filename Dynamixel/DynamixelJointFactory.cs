@@ -13,7 +13,7 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder)
     {
-        var joint = new DynamixelJoint(
+        DynamixelJoint joint = new(
             parent, 
             child, 
             transform, 
