@@ -47,5 +47,5 @@ public class DynamixelJoint : Joint
 
     Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
 
-    Angle Angle => State.Angle * (int)_rotationDirection;
+    Angle Angle => State.Angle * (int)_rotationDirection * (int)_attachmentOrder;
 }
