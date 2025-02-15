@@ -30,7 +30,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
         var actualPositions = Structure.GetPositionsOf(LinkName.Tip);
 
-        var errors = FromLegProperties(expectedPositions, actualPositions);
+        var errors = CalculateErrors(expectedPositions, actualPositions);
         var trainingDataPoints = ToTrainingDataPoints(inputs, outputs, errors);
         // Just predicting for now, to get the model started.
         // Once it can predict random values, they we can start training 
@@ -60,14 +60,14 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
         var actualPositions = Structure.GetPositionsOf(LinkName.Tip);
 
-        var errors = FromLegProperties(expectedPositions, actualPositions);
+        var errors = CalculateErrors(expectedPositions, actualPositions);
         // var trainingDataPoints = ToTrainingDataPoints(inputs, outputs, errors);
         // Just predicting for now, to get the model started.
         // Once it can predict random values, they we can start training 
         // _neuralNetwork.Train(trainingDataPoints);
     }
 
-    private static MaydayStructureSet<InverseLegKinematicsError> FromLegProperties(
+    private static MaydayStructureSet<InverseLegKinematicsError> CalculateErrors(
         MaydayStructureSet<Xyz> expectedPositions, 
         MaydayStructureSet<Xyz> actualPositions)
     {
