@@ -20,7 +20,7 @@ public class InverseLegKinematicsNeuralNetworkMxNetImpl
         var inputs = keras.Input(shape: InverseLegKinematicsInput.Shape, name: "input");
         
         // Combination layers
-        var combinationlayer0 = layers.Dense(layerSizes[0], activation: "gelu").Apply(inputs);
+        var combinationlayer0 = layers.Dense(layerSizes[0], activation: "relu").Apply(inputs);
         var dropOutLayer = layers.Dropout(0.5f).Apply(combinationlayer0);
         
         // output layer
