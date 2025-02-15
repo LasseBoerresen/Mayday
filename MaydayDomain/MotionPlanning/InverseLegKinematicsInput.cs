@@ -13,12 +13,16 @@ public record InverseLegKinematicsInput(
 {
     public static Shape Shape => new(InputColumnNames.Length); 
     public Xyz EndXyz => new(EndX, EndY, EndZ);
+    
+    /// <summary>
+    /// must have first dimension = 1, representing a batch size of 1
+    /// </summary>
     public NDArray ToNdArray
     {
         get
         {
-            return np.array(
-            [
+            return np.array(new[,]
+            {{
                 EndX,
                 EndY,
                 EndZ,
@@ -30,8 +34,7 @@ public record InverseLegKinematicsInput(
                 StartTibiaSin,
                 StartCoxaCos,
                 StartFemurCos,
-                StartTibiaCos
-            ]);
+                StartTibiaCos}});
         }
     }
 

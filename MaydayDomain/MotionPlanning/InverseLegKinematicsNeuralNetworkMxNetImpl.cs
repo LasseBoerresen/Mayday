@@ -46,7 +46,8 @@ public class InverseLegKinematicsNeuralNetworkMxNetImpl
     public InverseLegKinematicsOutput Predict(InverseLegKinematicsInput input)
     {
         // Perform prediction
-        var prediction = _model.predict(input.ToNdArray);
+        var inputAsNdArray = input.ToNdArray;
+        var prediction = _model.predict(inputAsNdArray);
         
         // Convert output tensor to InverseLegKinematicsOutput
         var output = prediction.First().ToArray<float>();
