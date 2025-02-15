@@ -31,7 +31,9 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
         var errors = FromLegProperties(expectedPositions, actualPositions);
         var trainingDataPoints = ToTrainingDataPoints(inputs, outputs, errors);
-        _neuralNetwork.Train(trainingDataPoints);
+        // Just predicting for now, to get the model started.
+        // Once it can predict random values, they we can start training 
+        // _neuralNetwork.Train(trainingDataPoints);
     }
 
     private static MaydayStructureSet<InverseLegKinematicsError> FromLegProperties(
@@ -56,7 +58,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
     private void SetPostures(MaydayStructureSet<InverseLegKinematicsOutput> outputs)
     {
-        Structure.SetPosture(MaydayStructurePosture.FromSet(outputs.Map(o => o.EndPosture)));
+        Structure.SetPosture(MaydayStructurePosture.FromSet(outputs.Map(o => o.ToPosture())));
     }
 
     private static void WaitForMovementToFinish()
@@ -67,10 +69,10 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     private LegProperty<InverseLegKinematicsInput> CreateInput(LegProperty<Xyz> deltaXyzs)
     {
         return deltaXyzs.Map(
-            deltaXyz => new InverseLegKinematicsInput(
-                EndXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId) + deltaXyz,
-                StartXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId),
-                StartPosture: GetPostureOf(deltaXyzs.LegId)));
+            deltaXyz => InverseLegKinematicsInput.Create(
+                endXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId) + deltaXyz,
+                startXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId),
+                startPosture: GetPostureOf(deltaXyzs.LegId)));
     }
     
     public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create()
