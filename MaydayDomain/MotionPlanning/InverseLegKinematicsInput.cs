@@ -1,4 +1,6 @@
 ﻿using RobotDomain.Geometry;
+using Tensorflow;
+using Tensorflow.NumPy;
 using static System.Math;
 
 namespace MaydayDomain.MotionPlanning;
@@ -9,6 +11,52 @@ public record InverseLegKinematicsInput(
     float StartCoxaSin, float StartFemurSin, float StartTibiaSin,
     float StartCoxaCos, float StartFemurCos, float StartTibiaCos)
 {
+    public static Shape Shape => new(InputColumnNames.Length); 
+    public Xyz EndXyz => new(EndX, EndY, EndZ);
+    public NDArray ToNdArray
+    {
+        get
+        {
+            return np.array(
+            [
+                EndX,
+                EndY,
+                EndZ,
+                StartX,
+                StartY,
+                StartZ,
+                StartCoxaSin,
+                StartFemurSin,
+                StartTibiaSin,
+                StartCoxaCos,
+                StartFemurCos,
+                StartTibiaCos
+            ]);
+        }
+    }
+
+    public static string[] InputColumnNames
+    {
+        get
+        {
+            return
+            [
+                nameof(EndX),
+                nameof(EndY),
+                nameof(EndZ),
+                nameof(StartX),
+                nameof(StartY),
+                nameof(StartZ),
+                nameof(StartCoxaSin),
+                nameof(StartFemurSin),
+                nameof(StartTibiaSin),
+                nameof(StartCoxaCos),
+                nameof(StartFemurCos),
+                nameof(StartTibiaCos)
+            ];
+        }
+    }
+
     public static InverseLegKinematicsInput Create(
         Xyz endXyz,
         Xyz startXyz,
@@ -28,22 +76,4 @@ public record InverseLegKinematicsInput(
             (float)Cos(startPosture.FemurAngle.Radians),
             (float)Cos(startPosture.TibiaAngle.Radians));
     }
-
-    public static string[] InputColumnNames =
-    [
-        nameof(EndX),
-        nameof(EndY),
-        nameof(EndZ),
-        nameof(StartX),
-        nameof(StartY),
-        nameof(StartZ),
-        nameof(StartCoxaSin),
-        nameof(StartFemurSin),
-        nameof(StartTibiaSin),
-        nameof(StartCoxaCos),
-        nameof(StartFemurCos),
-        nameof(StartTibiaCos)
-    ];
-    
-    public Xyz EndXyz => new(EndX, EndY, EndZ);
 };

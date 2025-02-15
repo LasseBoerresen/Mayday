@@ -25,6 +25,8 @@ public class InverseLegKinematicsOutput
     public float TibiaSin { get; init; }
     public float TibiaCos { get; init; }
     
+    public static int Length => OutputColumnNames.Length;
+    
     public static InverseLegKinematicsOutput Create(MaydayLegPosture p)
     {
         return new(
@@ -55,4 +57,9 @@ public class InverseLegKinematicsOutput
          nameof(TibiaSin),
          nameof(TibiaCos)
      ];
+
+     public static InverseLegKinematicsOutput FromArray(float[] output)
+     {
+         return new(output[0], output[1], output[2], output[3], output[4], output[5]);
+     }
 };
