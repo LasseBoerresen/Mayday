@@ -20,7 +20,7 @@ public class BabyLegsBehaviorController(
         while (!cancelTokenSource.Token.IsCancellationRequested)
         {
             Kick(kickSize);
-            Thread.Sleep(TimeSpan.FromSeconds(1.0));
+            Thread.Sleep(TimeSpan.FromSeconds(0.1));
         }
     }
     
