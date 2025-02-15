@@ -12,6 +12,9 @@ public class BabyLegsBehaviorController(
 {
     public void Start()
     {
+        MotionPlanner.SetPosture(MaydayLegPosture.Sitting);
+        Thread.Sleep(TimeSpan.FromSeconds(1.0));
+    
         var kickSize = Length.FromMeters(0.01);
 
         while (!cancelTokenSource.Token.IsCancellationRequested)
