@@ -24,12 +24,9 @@ public class TerminalPostureBehaviorController(
         var command = GetCommand();
         ExecuteCommand(command);
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        // Console.WriteLine(motionPlanner.GetPosture());
-        Console.WriteLine("TibiaMotor positions");
-        Console.WriteLine(motionPlanner.GetPositionsOf(LinkName.TibiaMotor));
-        
-        // Console.WriteLine("Coxa Orientations");
-        // Console.WriteLine(motionPlanner.GetOrientationsOf(LinkName.Femur));
+        Console.WriteLine("Tip positions");
+        Console.WriteLine(motionPlanner.GetPositionsOf(LinkName.Tip));
+        Console.WriteLine(motionPlanner.GetOrientationsOf(LinkName.Tip));
     }
 
     static PostureCommand GetCommand()
