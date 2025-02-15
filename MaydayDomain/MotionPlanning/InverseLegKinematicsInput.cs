@@ -13,7 +13,22 @@ public record InverseLegKinematicsInput(
 {
     public static Shape Shape => new(InputColumnNames.Length); 
     public Xyz EndXyz => new(EndX, EndY, EndZ);
-    
+
+    public MaydayLegPosture StartPosture
+    {
+        get
+        {
+            return MaydayLegPosture.FromSines(
+                StartCoxaSin,
+                StartCoxaCos,
+                StartFemurSin,
+                StartFemurCos,
+                StartTibiaSin,
+                StartTibiaCos);
+        }
+    }
+
+
     /// <summary>
     /// must have first dimension = 1, representing a batch size of 1
     /// </summary>

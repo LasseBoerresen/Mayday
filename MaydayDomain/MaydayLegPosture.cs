@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using UnitsNet;
+using static System.Math;
 
 namespace MaydayDomain;
 
@@ -23,6 +24,17 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     public static MaydayLegPosture StandingWide => new(0.0, 0.1, -0.1);
 
     public IImmutableList<Angle> AsListOfGoalAngles() => [CoxaAngle, FemurAngle, TibiaAngle];
+
+    public static MaydayLegPosture FromSines(
+        float coxaSin, float coxaCos, 
+        float femurSin, float femurCos, 
+        float tibiaSin, float tibiaCos)
+    {
+        return new(
+            CoxaAngle: Angle.FromRadians(Atan2(coxaSin, coxaCos)),
+            FemurAngle: Angle.FromRadians(Atan2(femurSin, femurCos)),
+            TibiaAngle: Angle.FromRadians(Atan2(tibiaSin, tibiaCos)));
+    }
     
     public override string ToString() => $"[Coxa: {CoxaAngle,6:F3}, Femur: {FemurAngle,6:F3}, Tibia: {TibiaAngle,6:F3}]";
 }

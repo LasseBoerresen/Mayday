@@ -41,11 +41,13 @@ public class InverseLegKinematicsOutput
 
     public MaydayLegPosture ToPosture()
      {
-         return new MaydayLegPosture(
-             CoxaAngle: Angle.FromRadians(Atan2(CoxaSin, CoxaCos)),
-             FemurAngle: Angle.FromRadians(Atan2(FemurSin, FemurCos)),
-             TibiaAngle: Angle.FromRadians(Atan2(TibiaSin, TibiaCos))
-         );
+         return MaydayLegPosture.FromSines(
+            CoxaSin,
+            CoxaCos,
+            FemurSin,
+            FemurCos,
+            TibiaSin,
+            TibiaCos);
      }
      
      public static string[] OutputColumnNames =
