@@ -109,7 +109,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create()
     {
         MaydayStructure structure = CreateMaydayStructure();
-        var nn = InverseLegKinematicsNeuralNetworkMxNetImpl.Create(); 
+        var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create(); 
 
         return new(structure, nn);
     }

@@ -6,12 +6,12 @@ using Tensorflow.NumPy;
 
 namespace MaydayDomain.MotionPlanning;
 
-public class InverseLegKinematicsNeuralNetworkMxNetImpl 
+public class InverseLegKinematicsNeuralNetwortTensorflowNetImpl 
     : InverseLegKinematicsNeuralNetwork
 {
     private IModel _model;
     
-    public InverseLegKinematicsNeuralNetworkMxNetImpl()
+    public InverseLegKinematicsNeuralNetwortTensorflowNetImpl()
     {
         List<int> layerSizes = [32];
         var layers = keras.layers;
@@ -142,7 +142,7 @@ public class InverseLegKinematicsNeuralNetworkMxNetImpl
         return InverseLegKinematicsOutput.FromArray(output);
     }
 
-    public static InverseLegKinematicsNeuralNetworkMxNetImpl Create()
+    public static InverseLegKinematicsNeuralNetwortTensorflowNetImpl Create()
     {
         return new();
     }
