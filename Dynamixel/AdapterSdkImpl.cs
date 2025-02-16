@@ -31,25 +31,32 @@ public class AdapterSdkImpl : Adapter
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
-            foreach (var id in _jointStateCache.GetIds())
+            try
             {
-                try
+                foreach (var id in _jointStateCache.GetIds())
                 {
-                    _jointStateCache.SetFor(id, GetNewState(id));
+                    try
+                    {
+                        _jointStateCache.SetFor(id, GetNewState(id));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error updating state cache for joint {id}: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error updating state cache for joint {id}: {ex.Message}");
-                }
-
-                try
-                {
-                    await Task.Delay(_updateInterval, _cancellationTokenSource.Token);
-                }
-                catch (TaskCanceledException)
-                {
-                    // Ignore exception when the task is canceled.
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting ids from the cache: {ex.Message}");
+            }
+            
+            try
+            {
+                await Task.Delay(_updateInterval, _cancellationTokenSource.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                // Ignore exception when the task is canceled.
             }
         }
     }
