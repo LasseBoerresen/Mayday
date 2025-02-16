@@ -6,7 +6,7 @@ using UnitsNet;
 
 namespace Dynamixel;
 
-public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
+public class AdapterSdkImpl(PortAdapter portAdapter, JointStateCache JointStateCache) : Adapter
 {
     static int DXL_BROADCAST_ID = 254;
     
@@ -28,6 +28,9 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         SetVelocityLimit(id);
         SetRotationDirection(id, rotationDirection);
         TorqueEnable(id);
+        
+        // Ensure a state value is always available post initialization. 
+        JointStateCache.SetFor(id, GetState(id));
     }
 
     public JointState GetState(JointId id)
@@ -118,19 +121,19 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
         portAdapter.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
-    private void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
+    void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         var driveMode = GetDriveMode(id);
         var driveModeUpdated = driveMode & RotationDirection.FromDomain(rotationDirection).Value;
         SetDriveMode(id, driveModeUpdated);
     }
     
-    private uint GetDriveMode(JointId id)
+    uint GetDriveMode(JointId id)
     {
         return portAdapter.Read(id, ControlRegister.DriveMode);
     }
     
-    private void SetDriveMode(JointId id, uint driveMode)
+    void SetDriveMode(JointId id, uint driveMode)
     {
         portAdapter.Write(id, ControlRegister.DriveMode, driveMode);
     }

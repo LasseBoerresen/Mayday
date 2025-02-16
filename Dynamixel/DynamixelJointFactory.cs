@@ -32,7 +32,9 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         PortAdapter portAdapterSdkImpl = new PortAdapterSdkImpl();
         portAdapterSdkImpl.Initialize();
 
-        Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl);
+        JointStateCacheDictImpl jointStateCache = new();
+
+        Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl, jointStateCache);
 
         return new DynamixelJointFactory(jointAdapter);
     }
