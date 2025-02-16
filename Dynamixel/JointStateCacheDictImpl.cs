@@ -1,10 +1,11 @@
-﻿using RobotDomain.Structures;
+﻿using System.Collections.Concurrent;
+using RobotDomain.Structures;
 
 namespace Dynamixel;
 
 public class JointStateCacheDictImpl : JointStateCache
 {
-    readonly IDictionary<JointId, JointState> _cacheDict = new Dictionary<JointId, JointState>();
+    readonly IDictionary<JointId, JointState> _cacheDict = new ConcurrentDictionary<JointId, JointState>();
 
     public IEnumerable<JointId> GetIds() => _cacheDict.Keys;
 
