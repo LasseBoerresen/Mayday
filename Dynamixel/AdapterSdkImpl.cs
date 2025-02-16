@@ -80,7 +80,7 @@ public class AdapterSdkImpl(PortAdapter portAdapter) : Adapter
     {
         var hardwareErrorStatus = portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
         if (hardwareErrorStatus != 0)
-            Console.WriteLine($"HadwareErrorStatus: {hardwareErrorStatus:b8}");
+            Console.WriteLine($"HardwareErrorStatus: {hardwareErrorStatus:b8}");
     }
 
     void Reboot(JointId id)
