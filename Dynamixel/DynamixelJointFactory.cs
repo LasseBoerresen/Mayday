@@ -27,14 +27,14 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         return joint;
     }
     
-    public static JointFactory CreateWithDynamixelJoints()
+    public static JointFactory CreateWithDynamixelJoints(CancellationTokenSource cancellationTokenSource)
     {
         PortAdapter portAdapterSdkImpl = new PortAdapterSdkImpl();
         portAdapterSdkImpl.Initialize();
 
         JointStateCacheDictImpl jointStateCache = new();
 
-        Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl, jointStateCache);
+        Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl, jointStateCache, cancellationTokenSource);
 
         return new DynamixelJointFactory(jointAdapter);
     }

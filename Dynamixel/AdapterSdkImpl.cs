@@ -10,12 +10,50 @@ public class AdapterSdkImpl : Adapter
 {
     readonly PortAdapter _portAdapter;
     readonly JointStateCache _jointStateCache;
+    readonly CancellationTokenSource _cancellationTokenSource;
+    readonly Task _updateTask;
+    readonly TimeSpan _updateInterval = TimeSpan.FromMilliseconds(100);
 
-    public AdapterSdkImpl(PortAdapter portAdapter, JointStateCache jointStateCache)
+    public AdapterSdkImpl(
+        PortAdapter portAdapter,
+        JointStateCache jointStateCache,
+        CancellationTokenSource cancellationTokenSource)
     {
         _portAdapter = portAdapter;
         _jointStateCache = jointStateCache;
+        _cancellationTokenSource = cancellationTokenSource;
+        
+        _updateTask = Task.Run(UpdateLoopAsync);
+
     }
+
+    async Task UpdateLoopAsync()
+    {
+        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        {
+            foreach (var id in _jointStateCache.GetIds())
+            {
+                try
+                {
+                    _jointStateCache.SetFor(id, GetNewState(id));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating state cache for joint {id}: {ex.Message}");
+                }
+
+                try
+                {
+                    await Task.Delay(_updateInterval, _cancellationTokenSource.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore exception when the task is canceled.
+                }
+            }
+        }
+    }
+
 
     static int DXL_BROADCAST_ID = 254;
     
@@ -39,17 +77,25 @@ public class AdapterSdkImpl : Adapter
         TorqueEnable(id);
         
         // Ensure a state value is always available post initialization. 
-        _jointStateCache.SetFor(id, GetState(id));
+        _jointStateCache.SetFor(id, GetNewState(id));
     }
 
     public JointState GetState(JointId id)
     {
-        return new JointState(
+        return _jointStateCache.GetFor(id);
+    }
+    
+    JointState GetNewState(JointId id)
+    {
+        JointState jointState = new JointState(
             ReadAngle(id),
             ReadSpeed(id),
             ReadLoadRatio(id),
             ReadTemperature(id),
             ReadAngleGoal(id));
+            
+        Console.WriteLine("new joint state: " + jointState);    
+        return jointState;
     }
 
     Angle ReadAngle(JointId id)
@@ -159,5 +205,20 @@ public class AdapterSdkImpl : Adapter
     public void Dispose()
     {
         _portAdapter.Dispose();
+        CancelAndDisposeUpdateTask();
+    }
+
+    void CancelAndDisposeUpdateTask()
+    {
+        _cancellationTokenSource.Cancel();
+        try
+        {
+            _updateTask.Wait();
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
+        {
+            // Ignore cancellation exceptions.
+        }
+        _cancellationTokenSource.Dispose();
     }
 }

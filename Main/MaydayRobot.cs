@@ -8,8 +8,8 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
 {
     public static MaydayRobot CreateWithTerminalPostureBehaviorController()
     {
-        MaydayMotionPlanner maydayMotionPlanner = InstantPostureMaydayMotionPlanner.Create();
         CancellationTokenSource cancellationTokenSource = new();
+        MaydayMotionPlanner maydayMotionPlanner = InstantPostureMaydayMotionPlanner.Create(cancellationTokenSource);
 
         BehaviorController behaviorController = new TerminalPostureBehaviorController(
             maydayMotionPlanner, cancellationTokenSource);
@@ -19,8 +19,8 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
 
     public static MaydayRobot CreateWithBabyLegsBehaviorController()
     {
-        var maydayMotionPlanner = StepByStepLearningInstantPostureMaydayMotionPlanner.Create();
         CancellationTokenSource cancellationTokenSource = new();
+        var maydayMotionPlanner = StepByStepLearningInstantPostureMaydayMotionPlanner.Create(cancellationTokenSource);
 
         var behaviorController = new BabyLegsBehaviorController(maydayMotionPlanner, cancellationTokenSource);
 

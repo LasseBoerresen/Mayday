@@ -10,7 +10,7 @@ namespace Test.Integration.Main;
 
 public class MaydayLegTests
 {
-    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create();
+    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create(new CancellationTokenSource());
 
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()

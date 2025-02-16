@@ -19,7 +19,7 @@ public class AdapterSdkImplTests
     {
          _dynamixelPortAdapterMock = new();
          _dynamixelPortAdapterMock.Setup(pa => pa.Ping(It.IsAny<Id>())).Returns(true);
-         _adapter = new(_dynamixelPortAdapterMock.Object, new Mock<JointStateCache>().Object);
+         _adapter = new(_dynamixelPortAdapterMock.Object, new Mock<JointStateCache>().Object, new CancellationTokenSource());
          _id = new(1);  
     }
 

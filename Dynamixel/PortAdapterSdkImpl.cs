@@ -12,6 +12,7 @@ public class PortAdapterSdkImpl: PortAdapter
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
     int _portNumber;
+    readonly object _lock = new();
 
     static readonly BitRate BitRate = BitRate.FromBitsPerSecond(4000000); 
      
@@ -30,14 +31,18 @@ public class PortAdapterSdkImpl: PortAdapter
 
     public void Write(Id id, ControlRegister cr, uint value)
     {
-        WriteBySize(id, cr, value);
+        lock(_lock)
+            WriteBySize(id, cr, value);
         
         CheckCommunicationResults(id, cr, "writing", value);
     }
 
     public uint Read(Id id, ControlRegister cr)
     {
-        var result = ReadBySize(id, cr);
+        uint result;
+    
+        lock(_lock)
+            result = ReadBySize(id, cr);
         
         CheckCommunicationResults(id, cr, "reading");
 
@@ -48,21 +53,25 @@ public class PortAdapterSdkImpl: PortAdapter
     {
         try
         {
-            reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+            lock(_lock)
+                reboot(_portNumber, ProtocolVersion, (byte)id.Value);
             CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
         }
         catch (Exception e)
         {
             WriteLine("retrying reboot after 1s");
             Thread.Sleep(1000);
-            reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+            lock(_lock)
+                reboot(_portNumber, ProtocolVersion, (byte)id.Value);
         }
         
     }
 
     public bool Ping(Id id)
     {
-        ping(_portNumber, ProtocolVersion, (byte)id.Value);
+        lock(_lock)
+            ping(_portNumber, ProtocolVersion, (byte)id.Value);
+            
         try
         {
             CheckCommunicationResults(id, Option<ControlRegister>.None, "ping");
@@ -114,11 +123,16 @@ public class PortAdapterSdkImpl: PortAdapter
         var valueMessage = value.Map(s => $"and value {s}");
         var errorMessage = $"{mode} dxl_id {id} {crMessage.IfNone("")} {valueMessage.IfNone("")} gave error:\n";
 
-        var lastTxRxResult = getLastTxRxResult(_portNumber, ProtocolVersion);
+
+        int lastTxRxResult;
+        lock(_lock)
+            lastTxRxResult = getLastTxRxResult(_portNumber, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
 
-        var lastRxPacketError = getLastRxPacketError(_portNumber, ProtocolVersion);
+        byte lastRxPacketError;
+        lock(_lock) 
+            lastRxPacketError = getLastRxPacketError(_portNumber, ProtocolVersion);
         if (lastRxPacketError != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
     }

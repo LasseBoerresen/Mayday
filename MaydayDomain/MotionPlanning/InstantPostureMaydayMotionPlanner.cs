@@ -37,17 +37,17 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    public static InstantPostureMaydayMotionPlanner Create()
+    public static InstantPostureMaydayMotionPlanner Create(CancellationTokenSource cancellationTokenSource)
     {
-        MaydayStructure structure = CreateMaydayStructure();
+        MaydayStructure structure = CreateMaydayStructure(cancellationTokenSource);
 
         InstantPostureMaydayMotionPlanner maydayMotionPlanner = new(structure);
         return maydayMotionPlanner;
     }
 
-    protected static MaydayStructure CreateMaydayStructure()
+    protected static MaydayStructure CreateMaydayStructure(CancellationTokenSource cancellationTokenSource)
     {
-        JointFactory jointFactory = DynamixelJointFactory.CreateWithDynamixelJoints();
+        JointFactory jointFactory = DynamixelJointFactory.CreateWithDynamixelJoints(cancellationTokenSource);
 
         var structure = MaydayStructure.Create(jointFactory);
         return structure;

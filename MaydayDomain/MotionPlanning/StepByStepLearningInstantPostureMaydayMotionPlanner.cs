@@ -106,9 +106,10 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
                 startPosture: GetPostureOf(deltaXyzs.LegId)));
     }
     
-    public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create()
+    public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create(
+        CancellationTokenSource cancellationTokenSource)
     {
-        MaydayStructure structure = CreateMaydayStructure();
+        MaydayStructure structure = CreateMaydayStructure(cancellationTokenSource);
         var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create(); 
 
         return new(structure, nn);
