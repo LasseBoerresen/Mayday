@@ -11,8 +11,10 @@ public class AdapterSdkImpl : Adapter
     readonly PortAdapter _portAdapter;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
-    readonly Task _updateTask;
-    readonly TimeSpan _updateInterval = TimeSpan.FromMilliseconds(100);
+    readonly Task _updateStateTask;
+    readonly Task _updateAngleTask;
+    readonly TimeSpan _updateStatePeriod = TimeSpan.FromMilliseconds(500);
+    readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(100);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
@@ -23,11 +25,12 @@ public class AdapterSdkImpl : Adapter
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
         
-        _updateTask = Task.Run(UpdateLoopAsync);
+        _updateStateTask = Task.Run(() => UpdateLoopAsync(UpdateJointStateCache, _updateStatePeriod));
+        _updateAngleTask = Task.Run(() => UpdateLoopAsync(UpdateJointAngleCache, _updateAnglePeriod));
 
     }
 
-    async Task UpdateLoopAsync()
+    async Task UpdateLoopAsync(Action<JointId> cacheUpdateAction, TimeSpan updatePeriod)
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
@@ -37,11 +40,11 @@ public class AdapterSdkImpl : Adapter
                 {
                     try
                     {
-                        _jointStateCache.SetFor(id, GetNewState(id));
+                        cacheUpdateAction(id);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error updating state cache for joint {id}: {ex.Message}");
+                        Console.WriteLine($"Error updating cache for joint {id}: {ex.Message}");
                     }
                 }
             }
@@ -52,7 +55,7 @@ public class AdapterSdkImpl : Adapter
             
             try
             {
-                await Task.Delay(_updateInterval, _cancellationTokenSource.Token);
+                await Task.Delay(updatePeriod, _cancellationTokenSource.Token);
             }
             catch (TaskCanceledException)
             {
@@ -61,6 +64,15 @@ public class AdapterSdkImpl : Adapter
         }
     }
 
+    private void UpdateJointStateCache(JointId id)
+    {
+        _jointStateCache.SetFor(id, GetNewState(id));
+    }
+
+    private void UpdateJointAngleCache(JointId id)
+    {
+        _jointStateCache.SetAngleFor(id, ReadAngle(id));
+    }
 
     static int DXL_BROADCAST_ID = 254;
     
@@ -101,15 +113,18 @@ public class AdapterSdkImpl : Adapter
             ReadTemperature(id),
             ReadAngleGoal(id));
             
-        Console.WriteLine("new joint state: " + jointState);    
+        // Console.WriteLine("new joint state: " + jointState);    
         return jointState;
     }
 
     Angle ReadAngle(JointId id)
     {
         var positionSteps = _portAdapter.Read(id, ControlRegister.PresentPosition);
+
+        var angle = StepAngle.ToAngle(positionSteps);
         
-        return StepAngle.ToAngle(positionSteps);
+        // Console.WriteLine("new Angle: " + angle);
+        return angle;
     }
 
     Angle ReadAngleGoal(JointId id)
@@ -220,12 +235,22 @@ public class AdapterSdkImpl : Adapter
         _cancellationTokenSource.Cancel();
         try
         {
-            _updateTask.Wait();
+            _updateStateTask.Wait();
         }
         catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
         {
             // Ignore cancellation exceptions.
         }
+        
+        try
+        {
+            _updateAngleTask.Wait();
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
+        {
+            // Ignore cancellation exceptions.
+        }
+        
         _cancellationTokenSource.Dispose();
     }
 }
