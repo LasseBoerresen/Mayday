@@ -136,7 +136,7 @@ public record Q(double W, double X, double Y, double Z)
     
     public override string ToString()
     {
-        return $"[[Angle: {Angle,6:F3}, Axis: {Axis.ToShortString()}]\n"
+        return $"[[Angle: {Angle,6:F3}, Axis: {Axis.ToShortString()}] "
             + $"[W: {W ,6:F3}, X: {X ,6:F3}, Y: {Y,6:F3}, Z: {Z,6:F3}]]";
     }
 }
