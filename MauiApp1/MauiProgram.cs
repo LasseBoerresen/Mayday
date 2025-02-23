@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Main;
+using Microsoft.Extensions.Logging;
 
 namespace MauiApp1;
 
@@ -13,10 +14,16 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
 
-#if DEBUG
+        #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
-#endif
+        #endif
+
+        var may = MaydayRobot.CreateWithBabyLegsBehaviorController();
+        may.Start();
+        
+        builder.Services.AddSingleton(may);
+
 
         return builder.Build();
     }
