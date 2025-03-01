@@ -1,8 +1,7 @@
-﻿using ManualBehavior;
-using MaydayDomain.MotionPlanning;
+﻿using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 
-namespace Main;
+namespace ManualBehavior;
 
 public class MaydayRobot(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
 {

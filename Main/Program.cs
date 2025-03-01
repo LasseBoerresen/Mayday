@@ -1,5 +1,5 @@
 ﻿using LanguageExt;
-using Main;
+using ManualBehavior;
 
 StartupMode startupMode = Enum.Parse<StartupMode>(Environment.GetEnvironmentVariable("mayday_startup_mode") ?? "");
 

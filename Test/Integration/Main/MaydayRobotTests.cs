@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-using Main;
+using ManualBehavior;
 using Xunit;
 
 namespace Test.Integration.Main;
