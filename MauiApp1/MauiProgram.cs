@@ -1,4 +1,5 @@
-﻿using ManualBehavior;
+﻿using Dynamixel;
+using ManualBehavior;
 using Microsoft.Extensions.Logging;
 
 namespace MauiApp1;
@@ -19,12 +20,17 @@ public static class MauiProgram
         builder.Logging.AddDebug();
         #endif
 
-        var may = MaydayRobot.CreateWithBabyLegsBehaviorController();
-        may.Start();
+        try
+        {
+            var may = MaydayRobot.CreateWithBabyLegsBehaviorController();
+            may.Start();
+            builder.Services.AddSingleton(may);
+        }
+        catch (FailedToOpenPortException e)
+        {
+            Console.WriteLine(e);
+        } 
         
-        builder.Services.AddSingleton(may);
-
-
         return builder.Build();
     }
 }

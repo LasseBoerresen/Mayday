@@ -11,7 +11,7 @@ public class PortAdapterSdkImpl: PortAdapter
 {
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
-    int _portNumber;
+    PortNumber? _portNumber;
     readonly object _lock = new();
 
     static readonly BitRate BitRate = BitRate.FromBitsPerSecond(4000000); 
@@ -22,7 +22,7 @@ public class PortAdapterSdkImpl: PortAdapter
 
     public void Initialize()
     {
-        _portNumber = portHandler(DeviceName);
+        _portNumber = new(portHandler(DeviceName));
         packetHandler();
         
         OpenPort();
@@ -54,7 +54,7 @@ public class PortAdapterSdkImpl: PortAdapter
         try
         {
             lock(_lock)
-                reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
             CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
         }
         catch (Exception e)
@@ -62,7 +62,7 @@ public class PortAdapterSdkImpl: PortAdapter
             WriteLine("retrying reboot after 1s");
             Thread.Sleep(1000);
             lock(_lock)
-                reboot(_portNumber, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
         }
         
     }
@@ -70,7 +70,7 @@ public class PortAdapterSdkImpl: PortAdapter
     public bool Ping(Id id)
     {
         lock(_lock)
-            ping(_portNumber, ProtocolVersion, (byte)id.Value);
+            ping(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
             
         try
         {
@@ -89,13 +89,13 @@ public class PortAdapterSdkImpl: PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                write1ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address, (byte)value);
+                write1ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, (byte)value);
                 break;
             case 2:
-                write2ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address, (ushort)value);
+                write2ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, (ushort)value);
                 break;
             case 4:
-                write4ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address, value);
+                write4ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, value);
                 break;
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
@@ -107,11 +107,11 @@ public class PortAdapterSdkImpl: PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                return read1ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read1ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             case 2:
-                return read2ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read2ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             case 4:
-                return read4ByteTxRx(_portNumber, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read4ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
         }
@@ -126,29 +126,29 @@ public class PortAdapterSdkImpl: PortAdapter
 
         int lastTxRxResult;
         lock(_lock)
-            lastTxRxResult = getLastTxRxResult(_portNumber, ProtocolVersion);
+            lastTxRxResult = getLastTxRxResult(_portNumber!.Value, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
 
         byte lastRxPacketError;
         lock(_lock) 
-            lastRxPacketError = getLastRxPacketError(_portNumber, ProtocolVersion);
+            lastRxPacketError = getLastRxPacketError(_portNumber!.Value, ProtocolVersion);
         if (lastRxPacketError != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
     }
     
     void OpenPort()
     {
-        var wasSuccess = openPort(_portNumber);
+        var wasSuccess = openPort(_portNumber!.Value);
         if (wasSuccess)
-            WriteLine($"Succeeded to open the port with number: '{_portNumber}'!");
+            WriteLine($"Succeeded to open the port with: '{_portNumber}'!");
         else
-            ThrowExceptionOnAnyKey($"Failed to open port with number: '{_portNumber}'");
+            throw new FailedToOpenPortException(_portNumber);
     }
 
     void SetPortBaudrate()
     {
-        var wasSuccess = setBaudRate(_portNumber, (int)BitRate.BitsPerSecond);
+        var wasSuccess = setBaudRate(_portNumber!.Value, (int)BitRate.BitsPerSecond);
         if (wasSuccess)
             WriteLine($"Succeeded to set the port handler baudrate to '{BitRate}'!");
         else
@@ -157,7 +157,7 @@ public class PortAdapterSdkImpl: PortAdapter
 
     public void Dispose()
     {
-        closePort(_portNumber);
+        closePort(_portNumber!.Value);
         GC.SuppressFinalize(this);
     }
 }
