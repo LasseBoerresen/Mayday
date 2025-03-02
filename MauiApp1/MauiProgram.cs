@@ -20,6 +20,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
         #endif
 
+        // todo: show the mayday component, no matter if the robot is connected or not. 
+        //       with an option to press a button to reconnect. 
         try
         {
             var may = MaydayRobot.CreateWithBabyLegsBehaviorController();
