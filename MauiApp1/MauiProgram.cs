@@ -24,8 +24,8 @@ public static class MauiProgram
         // todo: show the mayday component, no matter if the robot is connected or not. 
         //       with an option to press a button to reconnect. 
          var mayFin = MaydayRobot.CreateWithBabyLegsBehaviorController()
-                .Map(robot => robot.Start())
-                .Run();
+            .Map(robot => robot.Start())
+            .Run();
         
         builder.Services.AddSingleton(mayFin);
         
