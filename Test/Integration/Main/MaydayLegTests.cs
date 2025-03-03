@@ -1,4 +1,5 @@
-﻿using MaydayDomain;
+﻿using LanguageExt;
+using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -10,7 +11,9 @@ namespace Test.Integration.Main;
 
 public class MaydayLegTests
 {
-    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create(new CancellationTokenSource());
+    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner
+        .Create(new CancellationTokenSource())
+        .RunUnsafe();
 
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()

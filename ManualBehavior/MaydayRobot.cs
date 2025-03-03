@@ -1,32 +1,32 @@
-﻿using MaydayDomain.MotionPlanning;
+﻿using LanguageExt;
+using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 
 namespace ManualBehavior;
 
 public class MaydayRobot(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
 {
-    public static MaydayRobot CreateWithTerminalPostureBehaviorController()
+    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController()
     {
         CancellationTokenSource cancellationTokenSource = new();
-        MaydayMotionPlanner maydayMotionPlanner = InstantPostureMaydayMotionPlanner.Create(cancellationTokenSource);
 
-        BehaviorController behaviorController = new TerminalPostureBehaviorController(
-            maydayMotionPlanner, cancellationTokenSource);
-
-        return new(behaviorController, cancellationTokenSource);
+        return InstantPostureMaydayMotionPlanner
+            .Create(cancellationTokenSource)
+            .Map(mp => new TerminalPostureBehaviorController(mp, cancellationTokenSource))
+            .Map(bc => new MaydayRobot(bc, cancellationTokenSource));
     }
 
-    public static MaydayRobot CreateWithBabyLegsBehaviorController()
+    public static Eff<MaydayRobot> CreateWithBabyLegsBehaviorController()
     {
         CancellationTokenSource cancellationTokenSource = new();
-        var maydayMotionPlanner = StepByStepLearningInstantPostureMaydayMotionPlanner.Create(cancellationTokenSource);
-
-        var behaviorController = new BabyLegsBehaviorController(maydayMotionPlanner, cancellationTokenSource);
-
-        return new(behaviorController, cancellationTokenSource);
+        
+        return StepByStepLearningInstantPostureMaydayMotionPlanner
+            .Create(cancellationTokenSource)
+            .Map(mp => new BabyLegsBehaviorController(mp, cancellationTokenSource))
+            .Map(bc => new MaydayRobot(bc, cancellationTokenSource));
     }
 
-    public void Start() => behaviorController.Start();
+    public Unit Start() => behaviorController.Start();
 
     public void Stop() => cancelTokenSource.Cancel();
 }

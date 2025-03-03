@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using LanguageExt;
 using ManualBehavior;
 using Xunit;
 
@@ -11,7 +12,7 @@ public class MaydayRobotTests
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithTerminalPostureBehaviorController();
+        var may = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe();
 
         // When
         Task.Run(() => may.Start());
@@ -28,7 +29,7 @@ public class MaydayRobotTests
     void GivenMayWithBabyLegsBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithBabyLegsBehaviorController();
+        var may = MaydayRobot.CreateWithBabyLegsBehaviorController().RunUnsafe();
 
         // When
         Task.Run(() => may.Start());

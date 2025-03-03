@@ -1,8 +1,9 @@
-﻿using MaydayDomain;
+﻿using LanguageExt;
+using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 using RobotDomain.Geometry;
-using UnitsNet;
+using Length = UnitsNet.Length;
 
 namespace ManualBehavior;
 
@@ -10,7 +11,7 @@ public class BabyLegsBehaviorController(
     MaydayMotionPlanner MotionPlanner,
     CancellationTokenSource cancelTokenSource) : BehaviorController
 {
-    public void Start()
+    public Unit Start()
     {
         MotionPlanner.SetPosture(MaydayLegPosture.Neutral);
         Thread.Sleep(TimeSpan.FromSeconds(1.0));
@@ -22,6 +23,8 @@ public class BabyLegsBehaviorController(
             Kick(kickSize);
             Thread.Sleep(TimeSpan.FromSeconds(0.0));
         }
+        
+        return Unit.Default;
     }
     
     private void Kick(Length kickSize)

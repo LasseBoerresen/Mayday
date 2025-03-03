@@ -1,5 +1,6 @@
 ﻿using Dynamixel;
 using JetBrains.Annotations;
+using LanguageExt;
 using Xunit;
 
 namespace Test.Integration.Dynamixel;
@@ -7,14 +8,13 @@ namespace Test.Integration.Dynamixel;
 [TestSubject(typeof(PortAdapterSdkImpl))]
 public class PortAdapterSdkImplTests
 {
-    readonly PortAdapterSdkImpl _portAdapter = new();
+    readonly PortAdapterSdkImpl _portAdapter = PortAdapterSdkImpl.CreateInitialized().RunUnsafe();
     Id _id = new(1);
 
     [Fact] // [Fact(Skip="robot not connected")]
     void GivenRobotIsAttached_WhenSetTwoGoalAnglesAndSleep1sBetween_ThenCurrentPositionWithin20()
     {
         // Given
-        _portAdapter.Initialize();
         _portAdapter.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
     
         foreach (var i in Enumerable.Range(1, 18))

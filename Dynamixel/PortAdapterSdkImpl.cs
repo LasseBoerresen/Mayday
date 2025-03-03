@@ -1,33 +1,30 @@
 ﻿using System.Runtime.InteropServices;
 using LanguageExt;
+using LanguageExt.Common;
 using UnitsNet;
 using static System.Console;
 using static Dynamixel.Sdk;
-using static Generic.ExceptionHelper;
+using Error = LanguageExt.Common.Error;
 
 namespace Dynamixel;
 
-public class PortAdapterSdkImpl: PortAdapter
+public class PortAdapterSdkImpl : PortAdapter
 {
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
-    PortNumber? _portNumber;
+    readonly PortNumber _portNumber;
     readonly object _lock = new();
+
+    private PortAdapterSdkImpl(PortNumber portNumber)
+    {
+        _portNumber = portNumber;
+    }
 
     static readonly BitRate BitRate = BitRate.FromBitsPerSecond(4000000); 
      
     // Check which port is being used on your controller
     // ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
     const string DeviceName = "COM9";
-
-    public void Initialize()
-    {
-        _portNumber = new(portHandler(DeviceName));
-        packetHandler();
-        
-        OpenPort();
-        SetPortBaudrate();
-    }
 
     public void Write(Id id, ControlRegister cr, uint value)
     {
@@ -54,7 +51,7 @@ public class PortAdapterSdkImpl: PortAdapter
         try
         {
             lock(_lock)
-                reboot(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber.Value, ProtocolVersion, (byte)id.Value);
             CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
         }
         catch (Exception e)
@@ -62,7 +59,7 @@ public class PortAdapterSdkImpl: PortAdapter
             WriteLine("retrying reboot after 1s");
             Thread.Sleep(1000);
             lock(_lock)
-                reboot(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber.Value, ProtocolVersion, (byte)id.Value);
         }
         
     }
@@ -70,7 +67,7 @@ public class PortAdapterSdkImpl: PortAdapter
     public bool Ping(Id id)
     {
         lock(_lock)
-            ping(_portNumber!.Value, ProtocolVersion, (byte)id.Value);
+            ping(_portNumber.Value, ProtocolVersion, (byte)id.Value);
             
         try
         {
@@ -89,13 +86,13 @@ public class PortAdapterSdkImpl: PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                write1ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, (byte)value);
+                write1ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, (byte)value);
                 break;
             case 2:
-                write2ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, (ushort)value);
+                write2ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, (ushort)value);
                 break;
             case 4:
-                write4ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address, value);
+                write4ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, value);
                 break;
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
@@ -107,11 +104,11 @@ public class PortAdapterSdkImpl: PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                return read1ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read1ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             case 2:
-                return read2ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read2ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             case 4:
-                return read4ByteTxRx(_portNumber!.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read4ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
         }
@@ -126,38 +123,74 @@ public class PortAdapterSdkImpl: PortAdapter
 
         int lastTxRxResult;
         lock(_lock)
-            lastTxRxResult = getLastTxRxResult(_portNumber!.Value, ProtocolVersion);
+            lastTxRxResult = getLastTxRxResult(_portNumber.Value, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
 
         byte lastRxPacketError;
         lock(_lock) 
-            lastRxPacketError = getLastRxPacketError(_portNumber!.Value, ProtocolVersion);
+            lastRxPacketError = getLastRxPacketError(_portNumber.Value, ProtocolVersion);
         if (lastRxPacketError != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
     }
     
-    void OpenPort()
+    static Eff<Unit> OpenPort(PortNumber portNumber)
     {
-        var wasSuccess = openPort(_portNumber!.Value);
-        if (wasSuccess)
-            WriteLine($"Succeeded to open the port with: '{_portNumber}'!");
-        else
-            throw new FailedToOpenPortException(_portNumber);
+        var wasSuccess = openPort(portNumber.Value);
+        if (!wasSuccess)
+            return new FailedToOpenPortException(portNumber);
+        
+        WriteLine($"Succeeded to open the port with: '{portNumber}'!");
+        
+        return Eff<Unit>.Pure(Unit.Default);
     }
 
-    void SetPortBaudrate()
+    static Eff<Unit> SetPortBaudrate(PortNumber portNumber)
     {
-        var wasSuccess = setBaudRate(_portNumber!.Value, (int)BitRate.BitsPerSecond);
-        if (wasSuccess)
-            WriteLine($"Succeeded to set the port handler baudrate to '{BitRate}'!");
-        else
-            ThrowExceptionOnAnyKey($"Failed to set the port handler baudrate to: '{BitRate}'");
+        var wasSuccess = setBaudRate(portNumber.Value, (int)BitRate.BitsPerSecond);
+        if (!wasSuccess)
+            return Error.New($"Failed to set the port handler baudrate to: '{BitRate}'");
+         
+        WriteLine($"Succeeded to set the port handler baudrate to '{BitRate}'!");
+        
+        return Eff<Unit>.Pure(Unit.Default);
     }
 
     public void Dispose()
     {
-        closePort(_portNumber!.Value);
+        closePort(_portNumber.Value);
         GC.SuppressFinalize(this);
+    }
+
+    public static Eff<PortAdapterSdkImpl> CreateInitialized()
+    {
+        return InitializePortHandlerAndGetNumber()
+            .Bind(portNumber => InitializePacketHandler()
+                .Bind(_ => OpenPort(portNumber))
+                .Bind(_ => SetPortBaudrate(portNumber))
+                .Map(_ => new PortAdapterSdkImpl(portNumber)));
+    }
+
+    private static Eff<Unit> InitializePacketHandler()
+    {
+        try
+        {
+            packetHandler();
+        }
+        catch (Exception e)
+        {
+            return Error.New($"Failed to initialize packet handler: {e.Message}");
+        }
+        
+        return Eff<Unit>.Pure(Unit.Default);
+    }
+
+    private static Eff<PortNumber> InitializePortHandlerAndGetNumber()
+    {
+        var portNumber = new PortNumber(portHandler(DeviceName));
+        if(!portNumber.PortIsOpen)
+            return Error.New($"Failed to initialize port handler for device '{DeviceName}'");
+        
+        return Eff<PortNumber>.Pure(portNumber);
     }
 }

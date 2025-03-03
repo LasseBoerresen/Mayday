@@ -1,10 +1,12 @@
-﻿namespace Dynamixel;
+﻿using LanguageExt.Common;
 
-public class FailedToOpenPortException : Exception
+namespace Dynamixel;
+
+public record FailedToOpenPortException : Expected
 {
     public FailedToOpenPortException(PortNumber? portNumber) 
-        : base(Message(portNumber)) {}
+        : base(CreateMessage(portNumber), Code: 0) {}
 
-    private static string Message(PortNumber? portNumber)
+    private static string CreateMessage(PortNumber? portNumber)
         => $"Failed to open port with: {portNumber}";
 }

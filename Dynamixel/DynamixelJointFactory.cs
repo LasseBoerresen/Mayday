@@ -1,4 +1,5 @@
-﻿using RobotDomain.Geometry;
+﻿using LanguageExt;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 
 namespace Dynamixel;
@@ -27,14 +28,18 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         return joint;
     }
     
-    public static JointFactory CreateWithDynamixelJoints(CancellationTokenSource cancellationTokenSource)
+    public static Eff<DynamixelJointFactory> Create(CancellationTokenSource cancellationTokenSource)
     {
-        PortAdapter portAdapterSdkImpl = new PortAdapterSdkImpl();
-        portAdapterSdkImpl.Initialize();
+        var portAdapterEff = PortAdapterSdkImpl.CreateInitialized();
+        
+        return portAdapterEff.Map(portAdapter => Create(portAdapter, cancellationTokenSource));
+    }
 
+    static DynamixelJointFactory Create(PortAdapter portAdapter, CancellationTokenSource cancellationTokenSource)
+    {
         JointStateCacheDictImpl jointStateCache = new();
 
-        Adapter jointAdapter = new AdapterSdkImpl(portAdapterSdkImpl, jointStateCache, cancellationTokenSource);
+        Adapter jointAdapter = new AdapterSdkImpl(portAdapter, jointStateCache, cancellationTokenSource);
 
         return new DynamixelJointFactory(jointAdapter);
     }

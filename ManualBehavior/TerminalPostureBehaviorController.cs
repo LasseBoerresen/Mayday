@@ -10,13 +10,15 @@ public class TerminalPostureBehaviorController(
     MaydayMotionPlanner motionPlanner,
     CancellationTokenSource cancelTokenSource) : BehaviorController
 {
-    public void Start()
+    public Unit Start()
     {
         WakeUp();
 
         PrintCommandList();
         while (!cancelTokenSource.Token.IsCancellationRequested)
             ExecuteConsoleCommand();
+            
+        return Unit.Default;
     }
 
     void ExecuteConsoleCommand()

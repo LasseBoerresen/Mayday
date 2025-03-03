@@ -1,6 +1,8 @@
-﻿namespace RobotDomain.Behavior;
+﻿using LanguageExt;
+
+namespace RobotDomain.Behavior;
 
 public interface BehaviorController
 {
-    void Start();
+    Unit Start();
 }

@@ -1,4 +1,5 @@
 ﻿using Dynamixel;
+using LanguageExt;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 
@@ -37,19 +38,19 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    public static InstantPostureMaydayMotionPlanner Create(CancellationTokenSource cancellationTokenSource)
+    public static Eff<InstantPostureMaydayMotionPlanner> Create(CancellationTokenSource cancellationTokenSource)
     {
-        MaydayStructure structure = CreateMaydayStructure(cancellationTokenSource);
+        var structureEff = CreateMaydayStructure(cancellationTokenSource);
 
-        InstantPostureMaydayMotionPlanner maydayMotionPlanner = new(structure);
+        var maydayMotionPlanner = structureEff.Map(structure => new InstantPostureMaydayMotionPlanner(structure));
         return maydayMotionPlanner;
     }
 
-    protected static MaydayStructure CreateMaydayStructure(CancellationTokenSource cancellationTokenSource)
+    protected static Eff<MaydayStructure> CreateMaydayStructure(CancellationTokenSource cancellationTokenSource)
     {
-        JointFactory jointFactory = DynamixelJointFactory.CreateWithDynamixelJoints(cancellationTokenSource);
+        var jointFactoryEff = DynamixelJointFactory.Create(cancellationTokenSource);
 
-        var structure = MaydayStructure.Create(jointFactory);
+        var structure = jointFactoryEff.Map(MaydayStructure.Create);
         return structure;
     }
 }
