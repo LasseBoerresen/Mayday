@@ -11,7 +11,7 @@ namespace Test.Unit.Dynamixel;
 [TestSubject(typeof(AdapterSdkImpl))]
 public class AdapterSdkImplTests
 {
-    readonly Mock<PortAdapter> _dynamixelPortAdapterMock;
+    readonly Mock<DynamixelIO> _dynamixelPortAdapterMock;
     readonly AdapterSdkImpl _adapter;
     readonly JointId _id;
 

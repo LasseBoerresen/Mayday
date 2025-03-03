@@ -10,6 +10,10 @@ public class JointStateCacheDictImpl : JointStateCache
 
     public IEnumerable<JointId> GetIds() => _cacheDict.Keys;
 
+    // TODO: Save timestamps for the values, and return extrapolated value
+    //       based on time since recording. This means we can potentially
+    //       sample much less often, by estimating the position. Effectively
+    //       trading of accuracy for less congestion  
     public JointState GetFor(JointId id) => _cacheDict[id];
 
     public void SetFor(JointId id, JointState state) => _cacheDict[id] = state;

@@ -8,7 +8,7 @@ namespace Dynamixel;
 
 public class AdapterSdkImpl : Adapter
 {
-    readonly PortAdapter _portAdapter;
+    readonly DynamixelIO _dynamixelIo;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly Task _updateStateTask;
@@ -17,11 +17,11 @@ public class AdapterSdkImpl : Adapter
     readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(100);
 
     public AdapterSdkImpl(
-        PortAdapter portAdapter,
+        DynamixelIO dynamixelIo,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource)
     {
-        _portAdapter = portAdapter;
+        _dynamixelIo = dynamixelIo;
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
         
@@ -119,7 +119,7 @@ public class AdapterSdkImpl : Adapter
 
     Angle ReadAngle(JointId id)
     {
-        var positionSteps = _portAdapter.Read(id, ControlRegister.PresentPosition);
+        var positionSteps = _dynamixelIo.Read(id, ControlRegister.PresentPosition);
 
         var angle = StepAngle.ToAngle(positionSteps);
         
@@ -129,21 +129,21 @@ public class AdapterSdkImpl : Adapter
 
     Angle ReadAngleGoal(JointId id)
     {
-        var positionSteps = _portAdapter.Read(id, ControlRegister.GoalPosition);
+        var positionSteps = _dynamixelIo.Read(id, ControlRegister.GoalPosition);
         
         return StepAngle.ToAngle(positionSteps);
     }
 
     RotationalSpeed ReadSpeed(JointId id)
     {
-        var speedSteps = _portAdapter.Read(id, ControlRegister.PresentVelocity);
+        var speedSteps = _dynamixelIo.Read(id, ControlRegister.PresentVelocity);
         
         return StepSpeed.ToSpeed(speedSteps);
     }
 
     LoadRatio ReadLoadRatio(JointId id)
     {
-        var loadSteps = _portAdapter.Read(id, ControlRegister.PresentLoad);
+        var loadSteps = _dynamixelIo.Read(id, ControlRegister.PresentLoad);
         
         // TODO Test with real dynamixels, that -1000:1000 range is converted correctly, from uint to int...
         return LoadRatio.FromSteps((int)loadSteps);
@@ -151,14 +151,14 @@ public class AdapterSdkImpl : Adapter
 
     UnitsNet.Temperature ReadTemperature(JointId id)
     {
-        var temperatureSteps = _portAdapter.Read(id, ControlRegister.PresentTemperature);
+        var temperatureSteps = _dynamixelIo.Read(id, ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
     }
 
     void ReadHardwareErrorStatus(JointId id)
     {
-        var hardwareErrorStatus = _portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
+        var hardwareErrorStatus = _dynamixelIo.Read(id, ControlRegister.HardwareErrorStatus);
         if (hardwareErrorStatus != 0)
             Console.WriteLine($"HardwareErrorStatus: {hardwareErrorStatus:b8}");
     }
@@ -166,7 +166,7 @@ public class AdapterSdkImpl : Adapter
     void Reboot(JointId id)
     {
         Console.WriteLine($"Rebooting {id}");
-        _portAdapter.Reboot(id);
+        _dynamixelIo.Reboot(id);
         Thread.Sleep(300);
         
         var delay = TimeSpan.FromSeconds(0.1);
@@ -181,12 +181,12 @@ public class AdapterSdkImpl : Adapter
 
     bool Ping(JointId id)
     {
-        return _portAdapter.Ping(id);
+        return _dynamixelIo.Ping(id);
     }
 
     public void SetGoal(JointId id, Angle angle)
     {
-        _portAdapter.Write(id, ControlRegister.GoalPosition, StepAngle.ToSteps(angle));
+        _dynamixelIo.Write(id, ControlRegister.GoalPosition, StepAngle.ToSteps(angle));
     }
 
     void SetVelocityLimit(JointId id)
@@ -195,7 +195,7 @@ public class AdapterSdkImpl : Adapter
             .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
-        _portAdapter.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
+        _dynamixelIo.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
     void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
@@ -207,12 +207,12 @@ public class AdapterSdkImpl : Adapter
     
     uint GetDriveMode(JointId id)
     {
-        return _portAdapter.Read(id, ControlRegister.DriveMode);
+        return _dynamixelIo.Read(id, ControlRegister.DriveMode);
     }
     
     void SetDriveMode(JointId id, uint driveMode)
     {
-        _portAdapter.Write(id, ControlRegister.DriveMode, driveMode);
+        _dynamixelIo.Write(id, ControlRegister.DriveMode, driveMode);
     }
 
     void TorqueEnable(JointId id) => SetTorque(id, true);
@@ -221,12 +221,12 @@ public class AdapterSdkImpl : Adapter
 
     void SetTorque(JointId id, bool value)
     {
-        _portAdapter.Write(id, ControlRegister.TorqueEnable, Convert.ToUInt32(value));
+        _dynamixelIo.Write(id, ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }
 
     public void Dispose()
     {
-        _portAdapter.Dispose();
+        _dynamixelIo.Dispose();
         CancelAndDisposeUpdateTask();
     }
 

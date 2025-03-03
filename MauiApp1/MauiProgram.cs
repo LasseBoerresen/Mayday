@@ -28,7 +28,7 @@ public static class MauiProgram
             may.Start();
             builder.Services.AddSingleton(may);
         }
-        catch (FailedToOpenPortException e)
+        catch (FailedToOpenPortError e)
         {
             Console.WriteLine(e);
         } 

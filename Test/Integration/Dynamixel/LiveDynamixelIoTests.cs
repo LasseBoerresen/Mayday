@@ -4,23 +4,23 @@ using Xunit;
 
 namespace Test.Integration.Dynamixel;
 
-[TestSubject(typeof(PortAdapterSdkImpl))]
-public class PortAdapterSdkImplTests
+[TestSubject(typeof(DynamixelIoSdkImpl))]
+public class LiveDynamixelIoTests
 {
-    readonly PortAdapterSdkImpl _portAdapter = new();
+    readonly DynamixelIoSdkImpl _liveDynamixelIo = new();
     Id _id = new(1);
 
     [Fact] // [Fact(Skip="robot not connected")]
     void GivenRobotIsAttached_WhenSetTwoGoalAnglesAndSleep1sBetween_ThenCurrentPositionWithin20()
     {
         // Given
-        _portAdapter.Initialize();
-        _portAdapter.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
+        _liveDynamixelIo.Initialize();
+        _liveDynamixelIo.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
     
         foreach (var i in Enumerable.Range(1, 18))
         {
             _id = new(i);
-            _portAdapter.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
+            _liveDynamixelIo.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
             
             // When
             var goal = StepAngle.StepCenter - 100;
@@ -40,7 +40,7 @@ public class PortAdapterSdkImplTests
 
     void SetAndWaitForGoal(uint goal)
     {
-        _portAdapter.Write(_id, ControlRegister.GoalPosition, goal);
+        _liveDynamixelIo.Write(_id, ControlRegister.GoalPosition, goal);
         
         Thread.Sleep(TimeSpan.FromSeconds(0.1));
     }
@@ -49,7 +49,7 @@ public class PortAdapterSdkImplTests
     {
         const int toleranceInAngleSteps = 30;
         
-        var currentPosition = _portAdapter.Read(_id, ControlRegister.GoalPosition);
+        var currentPosition = _liveDynamixelIo.Read(_id, ControlRegister.GoalPosition);
         var absoluteDifference = Math.Abs((int)currentPosition - goal);
         
         Assert.True(absoluteDifference < toleranceInAngleSteps);
