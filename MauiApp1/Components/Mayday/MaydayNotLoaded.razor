@@ -1,0 +1,12 @@
+﻿<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">@Message</h4>
+    <button class="btn btn-primary" @onclick="OnRetry">Retry</button>
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+}

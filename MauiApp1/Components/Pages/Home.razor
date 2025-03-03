@@ -1,6 +1,41 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using LanguageExt
+@using ManualBehavior
+@using MauiApp1.Components.Mayday
 
-Welcome to your new app.
+@if (robotFin.IsNull())
+{
+    <p>
+        <em>Mayday is starting...</em>
+    </p>
+}
+else
+{
+    <MaydayNotLoaded Message="@robotFin!.ToString()" OnRetry="RestartMayday" />
+}
 
+
+@code {
+    private Fin<MaydayRobot>? robotFin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        robotFin = StartMayday();
+    }
+
+    private static Fin<MaydayRobot> StartMayday()
+    {
+        return MaydayRobot
+            .CreateWithBabyLegsBehaviorController()
+            .Map(robot => { robot.Start(); return robot;})
+            .Run();
+    }
+
+    private async Task RestartMayday()
+    {
+        robotFin = null;
+        await Task.Delay(1500);
+        robotFin = StartMayday();
+    }
+}
