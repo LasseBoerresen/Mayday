@@ -19,6 +19,6 @@ The architecture is based on clean architecture, with an emphasis on decoupling 
 ![Architechture and domain model](https://github.com/LasseBoerresen/Mayday/blob/master/Media/Mayday%20Architecture.jpg)
 
 ## The Code
-The code itself is also following clean code priciples and is a usion of object oriented structure with highly functional computations. The current pure C# version is a total rebuild, closely inspiered of the first python version. Both were test-driven to a high degree. 
+The code itself is also following clean code priciples and is a fusion of object oriented structure with highly functional computations. The current pure C# version is a total rebuild, closely inspiered of the first python version. Both were test-driven to a high degree. 
 
 [Demo Video](https://youtu.be/liucpPML-Sw)
