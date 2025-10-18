@@ -1,6 +1,3 @@
 ﻿namespace Dynamixel;
 
-public record PortNumber(int Value)
-{
-    public bool PortIsOpen => Value != 0;
-};
+public record PortNumber(int Value);

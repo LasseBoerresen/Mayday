@@ -188,8 +188,6 @@ public class PortAdapterSdkImpl : PortAdapter
     private static Eff<PortNumber> InitializePortHandlerAndGetNumber()
     {
         var portNumber = new PortNumber(portHandler(DeviceName));
-        if(!portNumber.PortIsOpen)
-            return Error.New($"Failed to initialize port handler for device '{DeviceName}'");
         
         return Eff<PortNumber>.Pure(portNumber);
     }
