@@ -3,7 +3,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using UnitsNet;
 using static System.Console;
-using static Dynamixel.Sdk;
+using static Dynamixel.DynamixelCommunication;
 using Error = LanguageExt.Common.Error;
 
 namespace Dynamixel;

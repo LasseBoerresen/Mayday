@@ -17,7 +17,7 @@ namespace Dynamixel;
 /// Added by following this guide: 
 /// https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/overview/#dynamixel-sdk
 /// </remarks>
-public static class Sdk
+public static class DynamixelCommunication
 {
     const string dll_path = @"Lib\dxl_x64_c.dll";
 
