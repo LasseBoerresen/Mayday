@@ -2,12 +2,24 @@
 
 namespace Dynamixel;
 
+/// <summary>
+/// Dynamixel Communication C# interop bindings to C library
+/// </summary>
+/// <remarks>
+/// v.3.8.4
+///
+/// Includes both PacketHandler and PortHandler
+///
+/// Both this c# class and the .dll was copied manually from the whole Dynamixel SDK bundle. 
+///
+/// OBS: Dynamixel sdk for C# specifically only supports Windows.
+///
+/// Added by following this guide: 
+/// https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/overview/#dynamixel-sdk
+/// </remarks>
 public static class Sdk
 {
-    // const string dll_path = "../../../../../../../../c/build/win64/output/dxl_x64_c.dll"; 
-    // private const string dll_path = "../DynamixelSDK/c/build/win64/output/dxl_x64_c.dll";
-    const string dll_path =
-        "C:/Users/fiffi_m4jrsay/RiderProjects/DynamixelSDK/c/build/win64/output/dxl_x64_c.dll";
+    const string dll_path = @"Lib\dxl_x64_c.dll";
 
     #region PortHandler
 
