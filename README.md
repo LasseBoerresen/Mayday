@@ -7,6 +7,7 @@ Hexapod robot designed from the bottom up to look organic, with smooth curves an
 The sofware running Mayday is custom built from first principles, at least within the robotics domain, from high level behavior and decisions design, through kinematics to low level actuator control. 
 
 The software is grouped in 6 main layers, as detailed on the diagram below
+
 0. Main
 1. Behavior Control
 2. Motion Planning
