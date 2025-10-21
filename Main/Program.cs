@@ -5,16 +5,13 @@ using ManualBehavior;
 StartupMode startupMode = Enum.Parse<StartupMode>(Environment.GetEnvironmentVariable("mayday_startup_mode") ?? "");
 
 if (startupMode == StartupMode.Run)
-{
-    MaydayRobot.CreateWithTerminalPostureBehaviorController()
-        .Map(robot => robot.Start())
-        .Run()
-        .BindFail(error => PrintErrorToConsole(error));
-}
+    Run(MaydayRobot.CreateWithTerminalPostureBehaviorController());
 else if (startupMode == StartupMode.Train)
+    Run(MaydayRobot.CreateWithBabyLegsBehaviorController());
+
+void Run(Eff<MaydayRobot> maydayRobotEffect)
 {
-    MaydayRobot
-        .CreateWithBabyLegsBehaviorController()
+    maydayRobotEffect
         .Map(robot => robot.Start())
         .Run()
         .BindFail(error => PrintErrorToConsole(error));
@@ -26,4 +23,3 @@ Unit PrintErrorToConsole(Error error)
     
     return Unit.Default;
 }
-
