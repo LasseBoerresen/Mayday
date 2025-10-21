@@ -1,6 +1,7 @@
 ﻿using Dynamixel;
 using JetBrains.Annotations;
 using LanguageExt;
+using Test.Utilities;
 using Xunit;
 
 namespace Test.Integration.Dynamixel;
@@ -11,7 +12,7 @@ public class PortAdapterSdkImplTests
     readonly PortAdapterSdkImpl _portAdapter = PortAdapterSdkImpl.CreateInitialized().RunUnsafe();
     Id _id = new(1);
 
-    [Fact] // [Fact(Skip="robot not connected")]
+    [PhysicalRobotFact]
     void GivenRobotIsAttached_WhenSetTwoGoalAnglesAndSleep1sBetween_ThenCurrentPositionWithin20()
     {
         // Given

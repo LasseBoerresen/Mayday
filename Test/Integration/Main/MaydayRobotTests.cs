@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using LanguageExt;
 using ManualBehavior;
+using Test.Utilities;
 using Xunit;
 
 namespace Test.Integration.Main;
@@ -8,7 +9,7 @@ namespace Test.Integration.Main;
 [TestSubject(typeof(MaydayRobot))]
 public class MaydayRobotTests
 {
-    [Fact] // [Fact(Skip="robot not connected")]
+    [PhysicalRobotFact]
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
@@ -25,7 +26,7 @@ public class MaydayRobotTests
         // Succeeds
     }
     
-    [Fact] // [Fact(Skip="robot not connected")]
+    [PhysicalRobotFact]
     void GivenMayWithBabyLegsBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given

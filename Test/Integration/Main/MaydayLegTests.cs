@@ -4,6 +4,7 @@ using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using Test.Unit;
+using Test.Utilities;
 using Xunit;
 using static Test.Unit.TestObjectFactory;
 
@@ -24,7 +25,7 @@ public class MaydayLegTests
     /// <summary>
     /// Tests basic movements of legs, on real robot.
     /// </summary>
-    [Theory]
+    [PhysicalRobotTheory]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
     void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(
         string testId, LinkName linkName, Transform expectedTransform)
