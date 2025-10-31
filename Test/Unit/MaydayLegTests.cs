@@ -197,6 +197,39 @@ public class MaydayLegTests
         AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
 
+    public static TheoryData<string, LinkName, Transform> 
+        DataFor_GivenStraightLeg__WhenGetLinkTransform__ThenReturnsExpected()
+    {
+        return new()
+        {
+            { "0", CoxaMotor, Transform.Zero},
+            { "1", Coxa, Transform.Zero},
+            { "2", FemurMotor, new(new(0.033, 0, -0.013), Q.FromRpy(new(-0.25, 0.2500, 0.0 )))},
+            { "3", Femur,      new(new(0.033, 0, -0.013), Q.FromRpy(new( 0.00, 0.0625, 0.0)))},
+            { "4", TibiaMotor, new(new(0.115, 0, -0.013), Q.FromRpy(new( 0.25, 0.0000, 0.5)))},
+            { "5", Tibia,      new(new(0.135, 0,  0.010), Q.FromRpy(new( 0.00, 0.0000, 0.0)))},
+            { "6", Tip,        new(new(0.260, 0, -0.080), Q.FromRpy(new( 0.00, 0.1666, 0.0)))}, 
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(DataFor_GivenStraightLeg__WhenGetLinkTransform__ThenReturnsExpected))]
+    void GivenStraightLeg__WhenGetLinkTransform__ThenReturnsExpected(
+        string testId, LinkName linkName, Transform expectedTransform)
+    {
+        // Given
+        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+            .CreateLeg(new(Side.Left, SidePosition.Center));
+
+        leg.SetPosture(MaydayLegPosture.Straight);
+        
+        // When
+        var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
+
+        // Then
+        AssertTransformEqual(testId, expectedTransform, actualTransform);
+    }
+    
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZeroButFemurAtNeg0_0625_WhenGetLinkTransform_ThenReturnsExpected()
     {
