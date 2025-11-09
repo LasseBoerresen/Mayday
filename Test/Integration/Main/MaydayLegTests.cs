@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using JetBrains.Annotations;
+using LanguageExt;
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
@@ -10,6 +11,7 @@ using static Test.Unit.TestObjectFactory;
 
 namespace Test.Integration.Main;
 
+[TestSubject(typeof(MaydayLeg))]
 public class MaydayLegTests
 {
     static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner

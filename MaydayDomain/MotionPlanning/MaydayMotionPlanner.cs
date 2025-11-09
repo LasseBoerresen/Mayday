@@ -3,7 +3,7 @@ using RobotDomain.Structures;
 
 namespace MaydayDomain.MotionPlanning;
 
-public interface MaydayMotionPlanner
+public interface MaydayMotionPlanner : IDisposable
 {
     MaydayStructureSet<MaydayLegPosture> GetPostures();
     MaydayLegPosture GetPostureOf(MaydayLegId legId);

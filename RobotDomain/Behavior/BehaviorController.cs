@@ -2,7 +2,7 @@
 
 namespace RobotDomain.Behavior;
 
-public interface BehaviorController
+public interface BehaviorController : IDisposable
 {
     Unit Start();
 }

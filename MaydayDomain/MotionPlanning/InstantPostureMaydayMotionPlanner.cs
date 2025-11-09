@@ -53,4 +53,9 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
         var structure = jointFactoryEff.Map(MaydayStructure.Create);
         return structure;
     }
+
+    public void Dispose()
+    {
+        Structure.Dispose();
+    }
 }

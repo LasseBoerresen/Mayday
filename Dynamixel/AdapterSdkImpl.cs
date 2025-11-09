@@ -226,13 +226,12 @@ public class AdapterSdkImpl : Adapter
 
     public void Dispose()
     {
+        DisposeUpdateTasks();
         _portAdapter.Dispose();
-        CancelAndDisposeUpdateTask();
     }
 
-    void CancelAndDisposeUpdateTask()
+    void DisposeUpdateTasks()
     {
-        _cancellationTokenSource.Cancel();
         try
         {
             _updateStateTask.Wait();
@@ -250,7 +249,5 @@ public class AdapterSdkImpl : Adapter
         {
             // Ignore cancellation exceptions.
         }
-        
-        _cancellationTokenSource.Dispose();
     }
 }

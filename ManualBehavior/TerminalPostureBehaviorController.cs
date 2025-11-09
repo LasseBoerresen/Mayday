@@ -8,7 +8,8 @@ namespace ManualBehavior;
 
 public class TerminalPostureBehaviorController(
     MaydayMotionPlanner motionPlanner,
-    CancellationTokenSource cancelTokenSource) : BehaviorController
+    CancellationTokenSource cancelTokenSource) 
+    : BehaviorController
 {
     public Unit Start()
     {
@@ -118,5 +119,11 @@ public class TerminalPostureBehaviorController(
             .Aggregate("\n", (s, pc) => s + $"{(int)pc}: {pc}\n");
      
         Console.Write(commandListString);
+    }
+
+    public void Dispose()
+    {
+        motionPlanner.Dispose();
+        cancelTokenSource.Dispose();
     }
 }

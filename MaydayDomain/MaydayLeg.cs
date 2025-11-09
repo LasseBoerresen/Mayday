@@ -6,7 +6,7 @@ using UnitsNet;
 
 namespace MaydayDomain;
 
-public class MaydayLeg
+public class MaydayLeg : IDisposable
 {
     readonly ImmutableList<Link> _links;
     readonly IImmutableList<Connection> _connections;
@@ -62,5 +62,10 @@ public class MaydayLeg
             LinkName.Tip => Tip,
             _ => throw new NotSupportedException($"Link name '{name}' not supported")
         };
+    }
+
+    public void Dispose()
+    {
+        _joints.ForEach(j => j.Dispose());
     }
 }

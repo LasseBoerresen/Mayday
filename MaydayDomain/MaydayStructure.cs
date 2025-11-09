@@ -6,7 +6,7 @@ using RobotDomain.Structures;
 
 namespace MaydayDomain;
 
-public class MaydayStructure
+public class MaydayStructure : IDisposable
 {
     // TODO this should probably just be a structure set. More object oriented. 
     readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legs;
@@ -74,5 +74,10 @@ public class MaydayStructure
         var legs = new MaydayLegFactory(jointFactory).CreateAll();
         
         return new(legs);
+    }
+
+    public void Dispose()
+    {
+        _legs.ForEach(kvp => kvp.Value.Dispose()); 
     }
 }

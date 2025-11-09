@@ -4,7 +4,10 @@ using RobotDomain.Behavior;
 
 namespace ManualBehavior;
 
-public class MaydayRobot(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
+public class MaydayRobot(
+    BehaviorController behaviorController, 
+    CancellationTokenSource cancelTokenSource) 
+    : IDisposable
 {
     public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController()
     {
@@ -29,4 +32,10 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
     public Unit Start() => behaviorController.Start();
 
     public void Stop() => cancelTokenSource.Cancel();
+
+    public void Dispose()
+    {
+        behaviorController.Dispose();
+        cancelTokenSource.Dispose();
+    }
 }

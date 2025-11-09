@@ -2,7 +2,6 @@
 using LanguageExt;
 using ManualBehavior;
 using Test.Utilities;
-using Xunit;
 
 namespace Test.Integration.Main;
 
@@ -13,7 +12,7 @@ public class MaydayRobotTests
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe();
+        using var may = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe();
 
         // When
         Task.Run(() => may.Start());
@@ -30,7 +29,7 @@ public class MaydayRobotTests
     void GivenMayWithBabyLegsBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithBabyLegsBehaviorController().RunUnsafe();
+        using var may = MaydayRobot.CreateWithBabyLegsBehaviorController().RunUnsafe();
 
         // When
         Task.Run(() => may.Start());
@@ -38,6 +37,27 @@ public class MaydayRobotTests
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
 
         may.Stop();
+
+        // Then
+        // Succeeds
+    }
+    
+    [PhysicalRobotFact]
+    void ShouldBeAbleToCreateAndStopAndCreateNew()
+    {
+        // Given
+        // Nothing
+
+        // When
+        using (var may0 = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe())
+        {
+            may0.Stop();
+        }
+
+        using (var may1 = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe())
+        {
+            may1.Stop();
+        }
 
         // Then
         // Succeeds

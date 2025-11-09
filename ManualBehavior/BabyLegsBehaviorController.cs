@@ -39,5 +39,11 @@ public class BabyLegsBehaviorController(
             
         MotionPlanner.MoveTipPositions(tipDeltas);
     }
+
+    public void Dispose()
+    {
+        MotionPlanner.Dispose();
+        cancelTokenSource.Dispose();
+    }
 }
 

@@ -7,7 +7,7 @@ using Xunit;
 namespace Test.Integration.Dynamixel;
 
 [TestSubject(typeof(PortAdapterSdkImpl))]
-public class PortAdapterSdkImplTests
+public class PortAdapterSdkImplTests : IDisposable
 {
     readonly PortAdapterSdkImpl _portAdapter = PortAdapterSdkImpl.CreateInitialized().RunUnsafe();
     Id _id = new(1);
@@ -54,5 +54,10 @@ public class PortAdapterSdkImplTests
         var absoluteDifference = Math.Abs((int)currentPosition - goal);
         
         Assert.True(absoluteDifference < toleranceInAngleSteps);
+    }
+
+    public void Dispose()
+    {
+        _portAdapter.Dispose();
     }
 }
