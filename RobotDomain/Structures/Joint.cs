@@ -1,4 +1,5 @@
-﻿using UnitsNet;
+﻿using RobotDomain.Geometry;
+using UnitsNet;
 
 namespace RobotDomain.Structures;
 
@@ -12,6 +13,3 @@ public abstract class Joint : Connection
     public abstract JointState State { get; }
     public abstract void SetAngleGoal(Angle goal);
 }
-
-
-

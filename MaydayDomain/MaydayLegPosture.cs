@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Numerics;
 using UnitsNet;
 using static System.Math;
 
@@ -37,4 +38,26 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     }
     
     public override string ToString() => $"[Coxa: {CoxaAngle,6:F3}, Femur: {FemurAngle,6:F3}, Tibia: {TibiaAngle,6:F3}]";
+
+    public static MaydayLegPosture operator -(MaydayLegPosture a, MaydayLegPosture b)
+    {
+        return new(a.CoxaAngle - b.CoxaAngle, a.FemurAngle - b.FemurAngle, a.TibiaAngle - b.TibiaAngle);
+    }
+
+    public Angle DistanceTo(MaydayLegPosture other)
+    {
+        // Not sure if this is the right way to compare two 3d angles. 
+        var squaredRadiansSum = 
+              Pow(Sin(CoxaAngle.Radians - other.CoxaAngle.Radians), 2)
+            + Pow(Sin(FemurAngle.Radians - other.FemurAngle.Radians), 2)
+            + Pow(Sin(TibiaAngle.Radians - other.TibiaAngle.Radians), 2)
+            + Pow(Cos(CoxaAngle.Radians - other.CoxaAngle.Radians), 2)
+            + Pow(Cos(FemurAngle.Radians - other.FemurAngle.Radians), 2)
+            + Pow(Cos(TibiaAngle.Radians - other.TibiaAngle.Radians), 2);
+
+        // Not sure if this is actually radians anymore 
+        var radiansDistance = Pow(squaredRadiansSum, 1 / 2.0);
+        
+        return Angle.FromRadians(radiansDistance);
+    }
 }

@@ -3,6 +3,7 @@ using MaydayDomain;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using Test.Unit.Dynamixel;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -154,7 +155,7 @@ public class MaydayLegTests
     string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+        var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
         // When
@@ -185,7 +186,7 @@ public class MaydayLegTests
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+        var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
         leg.SetPosture(leg.GetPosture() with {CoxaAngle = Angle.FromRevolutions(0.25)});
@@ -218,7 +219,7 @@ public class MaydayLegTests
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+        var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
         leg.SetPosture(MaydayLegPosture.Straight);
@@ -252,7 +253,7 @@ public class MaydayLegTests
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        var leg = CreateMaydayLegFactoryWithJointsAt(JointState.Zero)
+        var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
         leg.SetPosture(leg.GetPosture() with {FemurAngle =  Angle.FromRevolutions(0.0625)});
@@ -264,7 +265,7 @@ public class MaydayLegTests
         AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
 
-    internal static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)
+    internal static MaydayLegFactory CreateEchoMaydayLegFactoryWithJointsAt(JointState jointState)
     {
         EchoAdapter echoAdapter = new(jointState);
         DynamixelJointFactory jointFactory = new(echoAdapter);

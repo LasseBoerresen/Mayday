@@ -38,7 +38,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
 
         return new(connections, links);
     }
-
+    
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
     {
         return jointFactory.New(

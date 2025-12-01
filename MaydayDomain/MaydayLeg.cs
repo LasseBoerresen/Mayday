@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using Generic;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -8,6 +9,8 @@ namespace MaydayDomain;
 
 public class MaydayLeg
 {
+    public static readonly Length Length = Length.FromMeters(0.26); 
+
     readonly ImmutableList<Link> _links;
     readonly IImmutableList<Connection> _connections;
     readonly IImmutableList<Joint> _joints;
@@ -18,8 +21,8 @@ public class MaydayLeg
     Link Femur      => _links[3];
     Link TibiaMotor => _links[4];
     Link Tibia      => _links[5];
-    Link Tip        => _links[6]; 
-    
+    Link Tip        => _links[6];
+
     public MaydayLeg(IList<Connection> connections, IList<Link> links)
     {
         _links = links.ToImmutableList();
@@ -64,8 +67,25 @@ public class MaydayLeg
         };
     }
 
+    public Xyz GetTipPosition()
+    {
+        return GetTransformOf(LinkName.Tip).Xyz;
+    }
+
     public void SetTipPositionTo(Xyz tipPosition)
     {
-        throw new NotImplementedException();
+        var posture = DictLegPostureByPositionMap.GetFor(tipPosition, GetPosture());
+        
+        SetPosture(posture);
+    }
+    
+    public static void ApplyForJointAngleRanges(Action<MaydayLegPosture> action, Angle angleStep)
+    {
+        JointLimits limits = JointLimits.Defaults;
+    
+        for (var coxa = limits.CoxaMin; coxa < limits.CoxaMax; coxa += angleStep)
+        for (var femur = limits.FemurMin; femur < limits.FemurMax; femur += angleStep)
+        for (var tibia = limits.TibiaMin; tibia < limits.TibiaMax; tibia += angleStep)
+            action(new MaydayLegPosture(coxa, femur, tibia));
     }
 }

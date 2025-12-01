@@ -3,7 +3,7 @@ using RobotDomain.Structures;
 using UnitsNet;
 using RotationDirection = RobotDomain.Structures.RotationDirection;
 
-namespace Test.Unit;
+namespace Test.Unit.Dynamixel;
 
 public class EchoAdapter : Adapter
 {
