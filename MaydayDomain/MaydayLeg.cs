@@ -63,4 +63,9 @@ public class MaydayLeg
             _ => throw new NotSupportedException($"Link name '{name}' not supported")
         };
     }
+
+    public void SetTipPositionTo(Xyz tipPosition)
+    {
+        throw new NotImplementedException();
+    }
 }

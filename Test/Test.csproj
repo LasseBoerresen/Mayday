@@ -23,6 +23,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="FluentAssertions" Version="8.8.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-46" />
         <PackageReference Include="LanguageExt.FSharp" Version="5.0.0-beta-46" />

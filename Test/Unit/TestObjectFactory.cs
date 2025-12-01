@@ -9,6 +9,8 @@ namespace Test.Unit;
 
 public static class TestObjectFactory
 {
+    static readonly Length translationPrecision = Length.FromMeters(0.01);
+    static readonly Angle rotationalPrecision = Angle.FromRevolutions(0.01);
 
     public static Mock<Joint> CreateMockJoint() => new (ComponentId.New, Link.New(Base), Link.New(Thorax));
     
@@ -19,11 +21,15 @@ public static class TestObjectFactory
 
     public static void AssertTransformEqual(string testId, Transform expected, Transform actual)
     {
-        Length translationPrecision = Length.FromMeters(0.01);
-        Angle rotationalPrecision = Angle.FromRevolutions(0.01);
-        
         Assert.True(
             expected.IsAlmostEqual(actual, translationPrecision, rotationalPrecision), 
+            TestMessage(testId, expected, actual));
+    }
+    
+    public static void AssertXyzEqual(string testId, Xyz expected, Xyz actual)
+    {
+        Assert.True(
+            expected.IsAlmostEqual(actual, translationPrecision), 
             TestMessage(testId, expected, actual));
     }
     

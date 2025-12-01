@@ -264,7 +264,7 @@ public class MaydayLegTests
         AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
 
-    static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)
+    internal static MaydayLegFactory CreateMaydayLegFactoryWithJointsAt(JointState jointState)
     {
         EchoAdapter echoAdapter = new(jointState);
         DynamixelJointFactory jointFactory = new(echoAdapter);
