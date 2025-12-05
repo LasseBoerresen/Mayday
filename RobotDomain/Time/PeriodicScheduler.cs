@@ -1,6 +1,6 @@
 ﻿using UnitsNet;
 
-namespace ManualBehavior;
+namespace RobotDomain.Time;
 
 public class PeriodicScheduler
 {

@@ -3,6 +3,7 @@ using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 using RobotDomain.Geometry;
+using RobotDomain.Time;
 using UnitsNet;
 using Length = UnitsNet.Length;
 
