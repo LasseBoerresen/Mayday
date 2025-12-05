@@ -8,6 +8,8 @@ namespace MaydayDomain.MotionPlanning;
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
+    Option<Movement> _goalMovement = default; 
+    
     
     public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
@@ -37,6 +39,12 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName) => Structure.GetOrientationsOf(linkName);
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
+
+    public Option<Movement> GetGoal() => _goalMovement;
+    
+    public void SetGoal(Movement movement) => _goalMovement = movement;
+
+    public void UnsetGoal() => _goalMovement = Option<Movement>.None;
 
     public static Eff<InstantPostureMaydayMotionPlanner> Create(CancellationTokenSource cancellationTokenSource)
     {

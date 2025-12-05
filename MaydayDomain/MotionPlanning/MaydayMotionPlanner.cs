@@ -1,4 +1,5 @@
-﻿using RobotDomain.Geometry;
+﻿using LanguageExt;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 
 namespace MaydayDomain.MotionPlanning;
@@ -14,4 +15,20 @@ public interface MaydayMotionPlanner
     Xyz GetPositionOf(LinkName linkName, MaydayLegId legId);
     MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName);
     MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName);
+    
+    /// <summary>
+    /// Gets the current goal 
+    /// </summary>
+    Option<Movement> GetGoal();
+    
+    /// <summary>
+    /// Sets goal for the motion planner to continuously pursue 
+    /// </summary>
+    /// <param name="movement"></param>
+    void SetGoal(Movement movement);
+    
+    /// <summary>
+    /// Removes the movement goal, effectively stopping the motion planner.  
+    /// </summary>
+    void UnsetGoal();
 }

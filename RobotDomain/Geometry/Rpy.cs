@@ -36,6 +36,13 @@ public record Rpy
 
     public static Rpy One => new(1, 1, 1);
 
+    public static Rpy Random()
+    {
+        Random random = new();
+        
+        return new(random.NextDouble()*2-1, random.NextDouble()*2-1, random.NextDouble()*2-1);
+    } 
+
     public bool IsAlmostEqual(Rpy other, Angle precision)
     {
         return UnitsNetExtensions.IsAlmostEqualSingleRotation(R, other.R, precision)  

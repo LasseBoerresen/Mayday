@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using Generic;
 using UnitsNet;
 using UnitsNet.Units;
 using static System.Math;
@@ -138,5 +139,21 @@ public record Q(double W, double X, double Y, double Z)
     {
         return $"[[Angle: {Angle,6:F3}, Axis: {Axis.ToShortString()}] "
             + $"[W: {W ,6:F3}, X: {X ,6:F3}, Y: {Y,6:F3}, Z: {Z,6:F3}]]";
+    }
+
+    public static Q Random(Angle maxRotation)
+    {
+        var truncatedMaxRevolutions = maxRotation.Revolutions % 1.0;
+        Random random = new();
+
+        Quaternion randomRotationQuaternion = new(
+            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
+            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
+            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
+            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()));
+            
+        var normalizedRandomRotationQuaternion = Quaternion.Normalize(randomRotationQuaternion);
+        
+        return FromNumericsQ(normalizedRandomRotationQuaternion);
     }
 }

@@ -29,13 +29,21 @@ public record Xyz(Length X, Length Y, Length Z)
     }
 
     /// <summary>
-    /// Every coordinate has random value between [-1:1]
+    /// Every coordinate has random value between [-1m:1m]
     /// </summary>
     public static Xyz Random()
     {
+        return Random(max: Length.FromMeters(1));
+    }
+    
+    public static Xyz Random(Length max)
+    {
         Random random = new();
         
-        return new(random.NextDouble()*2-1, random.NextDouble()*2-1, random.NextDouble()*2-1);
+        return new(
+            X: max * random.NextDoubleNeg1ToPos1(), 
+            Y: max * random.NextDoubleNeg1ToPos1(), 
+            Z: max * random.NextDoubleNeg1ToPos1());
     }
 
     public static Xyz operator +(Xyz a, Xyz b)

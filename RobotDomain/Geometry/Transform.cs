@@ -11,6 +11,14 @@ namespace RobotDomain.Geometry;
 public record Transform(Xyz Xyz, Q Q)
 {
     public static Transform Zero => new(Xyz.Zero, Q.Unit);
+    
+    public static Transform Random(Length maxTranslation, Angle maxRotation)
+    {
+        return new(Xyz.Random(maxTranslation), Q.Random(maxRotation));
+    }
+
+    public static Transform Random() => new(Xyz.Random(), Q.FromRpy(Rpy.Random()));
+
     public static Transform FromXyz(Xyz xyz) => new(xyz, Q.Unit);
     public static Transform FromQ(Q q) => new(Xyz.Zero, q);
 
@@ -32,11 +40,34 @@ public record Transform(Xyz Xyz, Q Q)
         return sum;
     }
 
+    public static Transform operator -(Transform a, Transform b)   
+    {
+        return Subtract(a, b);
+    }
+
+    public static Transform Subtract(Transform a, Transform b)
+    {
+        Xyz bXyzRotated = a.Q.Rotate(b.Xyz);
+        
+        Transform antisum = new(a.Xyz - bXyzRotated, a.Q - b.Q);
+        return antisum;
+    }
+
     public bool IsAlmostEqual(Transform other, Length translationPrecision, Angle rotationalPrecision)
     {
         var translation = Xyz.IsAlmostEqual(other.Xyz, translationPrecision);
         var rotation = Q.IsOrientationAlmostEqual(other.Q, rotationalPrecision.Revolutions);
         
         return translation && rotation;
+    }
+
+    public Transform HalfWayTo(Transform other)
+    {
+        return this + DistanceTo(other) * 0.5;
+    }
+
+    Transform DistanceTo(Transform other)
+    {
+        return this - other;
     }
 }

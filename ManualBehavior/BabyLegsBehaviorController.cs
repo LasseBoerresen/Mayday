@@ -40,4 +40,3 @@ public class BabyLegsBehaviorController(
         MotionPlanner.MoveTipPositions(tipDeltas);
     }
 }
-

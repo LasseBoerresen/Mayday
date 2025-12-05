@@ -68,7 +68,7 @@ public class MaydayStructure
     {
         _legs.ForEach(kvp => kvp.Value.SetPosture(posture));
     }
-
+    
     public static MaydayStructure Create(JointFactory jointFactory)
     {
         var legs = new MaydayLegFactory(jointFactory).CreateAll();
