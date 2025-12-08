@@ -2,18 +2,23 @@
 using LanguageExt;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 
 namespace MaydayDomain.MotionPlanning;
 
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
-    Option<Movement> _goalMovement = default; 
-    
-    
-    public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
+    PeriodicScheduler _scheduler;
+    Option<Movement> _goalMovement = Option<Movement>.None;
+
+
+    public InstantPostureMaydayMotionPlanner(
+        MaydayStructure structure,
+        PeriodicScheduler scheduler)
     {
         Structure = structure;
+        _scheduler = scheduler;
     }
 
     public MaydayStructureSet<MaydayLegPosture> GetPostures() => Structure.GetPostures();
@@ -40,6 +45,20 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
+    public Task Start(CancellationToken ct)
+    {
+        return _scheduler.RunAsync(() => 
+            _goalMovement.IfSome(gm => TrackGoalOnce(gm, ct)), ct);
+    }
+
+    void TrackGoalOnce(Movement goalMovement, CancellationToken ct)
+    {
+        // Note: To start with, only the thorax lean is tracked, because the
+        // other movement components require stepping.
+        
+        Structure.MoveThoraxTo(goalMovement.Lean, goalMovement.Duration, ct);
+    }
+
     public Option<Movement> GetGoal() => _goalMovement;
     
     public void SetGoal(Movement movement) => _goalMovement = movement;
@@ -49,8 +68,11 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     public static Eff<InstantPostureMaydayMotionPlanner> Create(CancellationTokenSource cancellationTokenSource)
     {
         var structureEff = CreateMaydayStructure(cancellationTokenSource);
+        PeriodicScheduler scheduler = new(TimeProvider.System, UnitsNet.Duration.FromSeconds(0.1));
 
-        var maydayMotionPlanner = structureEff.Map(structure => new InstantPostureMaydayMotionPlanner(structure));
+        var maydayMotionPlanner = structureEff.Map(structure =>  
+            new InstantPostureMaydayMotionPlanner(structure, scheduler));
+        
         return maydayMotionPlanner;
     }
 

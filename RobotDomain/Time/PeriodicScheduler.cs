@@ -1,4 +1,5 @@
-﻿using UnitsNet;
+﻿using LanguageExt;
+using Duration = UnitsNet.Duration;
 
 namespace RobotDomain.Time;
 
@@ -13,13 +14,22 @@ public class PeriodicScheduler
         Duration = duration;
     }
 
+    public Task RunAsync(Action action, CancellationToken ct)
+    {
+        return Task.Run(() => Run(action, ct), ct);
+    }
+
     public void Run(Action action, CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
+        {
             action();
+            WaitForNext();
+        }
+            
     }
 
-    public void WaitForNext()
+    void WaitForNext()
     {
         // TODO WIP actually calculate how much time to wait, in order to not wait too long. 
         // _timeProvider.GetUtcNow() _duration.
@@ -27,5 +37,4 @@ public class PeriodicScheduler
     }
 
     public DateTimeOffset CurrentTimeStamp => _timeProvider.GetUtcNow();
-
 }

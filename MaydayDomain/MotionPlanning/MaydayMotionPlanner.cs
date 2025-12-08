@@ -17,6 +17,11 @@ public interface MaydayMotionPlanner
     MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName);
     
     /// <summary>
+    /// Start tracking the goal 
+    /// </summary>
+    Task Start(CancellationToken ct);
+    
+    /// <summary>
     /// Gets the current goal 
     /// </summary>
     Option<Movement> GetGoal();
@@ -28,7 +33,7 @@ public interface MaydayMotionPlanner
     void SetGoal(Movement movement);
     
     /// <summary>
-    /// Removes the movement goal, effectively stopping the motion planner.  
+    /// Removes the movement goal, effectively pausing the motion planner.  
     /// </summary>
     void UnsetGoal();
 }

@@ -12,14 +12,15 @@ namespace ManualBehavior;
 public class SwayBehaviorController(
     MaydayMotionPlanner MotionPlanner,
     PeriodicScheduler PeriodicScheduler,
-    CancellationToken ct) 
+    CancellationToken Ct) 
     : BehaviorController
 {
     public Unit Start()
     {
         WakeUp();
+        
 
-        PeriodicScheduler.Run(SwayOnce, ct);
+        PeriodicScheduler.Run(SwayOnce, Ct);
         
         return Unit.Default;
     }
@@ -34,6 +35,8 @@ public class SwayBehaviorController(
         
         MotionPlanner.SetPosture(MaydayLegPosture.Standing);
         Thread.Sleep(TimeSpan.FromSeconds(1.0));
+
+        MotionPlanner.Start(Ct);
     }
 
     Movement CenteredMovement => Movement.Zero(PeriodicScheduler.CurrentTimeStamp);

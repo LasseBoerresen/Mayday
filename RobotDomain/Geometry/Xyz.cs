@@ -55,6 +55,11 @@ public record Xyz(Length X, Length Y, Length Z)
     {
         return new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
+    
+    public static Xyz operator -(Xyz a)
+    {
+        return new(-a.X, -a.Y, -a.Z);
+    }
 
     public static Xyz operator *(Xyz xyz, double multiplier)
     {

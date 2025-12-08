@@ -79,6 +79,13 @@ public class MaydayLeg
         SetPosture(posture);
     }
     
+    public void MoveTipPositionBy(Xyz tipOffset)
+    {
+        var posture = DictLegPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture());
+        
+        SetPosture(posture);
+    }
+    
     public static void ApplyForJointAngleRanges(Action<MaydayLegPosture> action, Angle angleStep)
     {
         JointLimits limits = JointLimits.Defaults;

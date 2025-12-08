@@ -42,12 +42,12 @@ public  class MaydayLegFactory(JointFactory jointFactory)
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
     {
         return jointFactory.New(
-            links[0], 
-            links[1], 
-            Transform.FromQ(Q.Unit), 
-            legId.JointId(1),
-            legId.Side == Left ? Forward : Reverse, 
-            AttachmentOrder.LinkLast);
+            parent: links[0], 
+            child: links[1], 
+            transform: Transform.FromQ(Q.Unit), 
+            id: legId.JointId(1),
+            rotationDirection: legId.Side == Left ? Forward : Reverse, 
+            attachmentOrder: AttachmentOrder.LinkLast);
     }
 
     Attachment CreateCoxaToFemurMotorAttachment(List<Link> links)
