@@ -24,7 +24,7 @@ public class Link
     }
 
     public static Link CreateBase => New(Base);
-    public static Link CreateThorax => New(Thorax);
+    public static Link CreateThorax => New(Thorax); // TODO needs multiple children, one for each coxa dynamixel
     public static Link CreateCoxaMotor => New(CoxaMotor);
     public static Link CreateCoxa => New(Coxa);
     public static Link CreateFemurMotor => New(FemurMotor);
