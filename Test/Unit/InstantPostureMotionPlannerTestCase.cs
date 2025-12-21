@@ -2,6 +2,7 @@
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using Moq;
+using RobotDomain.Time;
 using Xunit;
 
 namespace Test.Unit;
@@ -10,11 +11,11 @@ namespace Test.Unit;
 public class InstantPostureMotionPlannerTestCase
 {
     readonly Mock<MaydayStructure> _mockStructure = new();
-    readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
+    // readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
 
     public InstantPostureMotionPlannerTestCase()
     {
-        _instantPostureMaydayMotionPlanner = new(_mockStructure.Object);
+        // _instantPostureMaydayMotionPlanner = new(_mockStructure.Object, new PeriodicScheduler());
     }
 
     [Fact(Skip = "not sure how the motion planner architecture should be")]
@@ -23,7 +24,7 @@ public class InstantPostureMotionPlannerTestCase
         // Given
         
         // When
-        _instantPostureMaydayMotionPlanner.SetPosture(MaydayLegPosture.Sitting);
+        // _instantPostureMaydayMotionPlanner.SetPosture(MaydayLegPosture.Sitting);
         
         // Then
         

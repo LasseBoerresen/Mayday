@@ -2,7 +2,9 @@
 using LanguageExt;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
+using Duration = UnitsNet.Duration;
 
 namespace MaydayDomain.MotionPlanning;
 
@@ -13,8 +15,9 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
     private StepByStepLearningInstantPostureMaydayMotionPlanner(
         MaydayStructure structure,
+        PeriodicScheduler periodicScheduler,
         InverseLegKinematicsNeuralNetwork neuralNetwork) 
-        : base(structure)
+        : base(structure, periodicScheduler)
     {
         _neuralNetwork = neuralNetwork;
     }
@@ -110,10 +113,11 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     public new static Eff<StepByStepLearningInstantPostureMaydayMotionPlanner> Create(
         CancellationTokenSource cancellationTokenSource)
     {
-        var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
         var structureEff = CreateMaydayStructure(cancellationTokenSource);
-
+        var scheduler = new PeriodicScheduler(TimeProvider.System, Duration.FromSeconds(0.1));
+        var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
+        
         return structureEff.Map(structure => 
-            new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, nn));
+            new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, scheduler, nn));
     }
 }
