@@ -47,14 +47,17 @@ public class MaydayLegInverseKinematicsTests
     {
         var newDict = DictLegPostureByPositionMap.BuildDictionary(_leg);
 
+        Print(newDict);
+
+        DictLegPostureByPositionMap.StoreToFile(newDict);
+    }
+
+    private void Print(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> newDict)
+    {
         foreach (var keyValuePair in newDict)
         {
             var posturesString = String.Join(",\n", keyValuePair.Value.Select(p => p.ToString()));
             _testOutputHelper.WriteLine($"{keyValuePair.Key}: \n{posturesString}");
         }
-            
-
-        // DictLegPostureByPositionMap.StoreToFile(newDict);
     }
-    
 }

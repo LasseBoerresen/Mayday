@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Collections.Immutable;
+using System.Text.Json;
 using Generic;
 using RobotDomain.Geometry;
 using UnitsNet;
@@ -9,22 +10,53 @@ namespace MaydayDomain;
 
 public class DictLegPostureByPositionMap
 {
+    const string FilePath = "MaydayLegPostureMap.json";
+    static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        WriteIndented = true,
+        Converters =
+        {
+            new LengthJsonConverter(),
+            new AngleJsonConverter()
+        }
+    };
     static readonly IReadOnlyDictionary<Xyz, IImmutableSet<MaydayLegPosture>> Map;
 
     static DictLegPostureByPositionMap()
     {
-        // TODO: LoadFromFile().ToFrozenDictionary();
-        Map = new Dictionary<Xyz, IImmutableSet<MaydayLegPosture>>(); 
+        Map = File.Exists(FilePath) 
+            ? LoadFromFile().ToFrozenDictionary() 
+            : new Dictionary<Xyz, IImmutableSet<MaydayLegPosture>>().ToFrozenDictionary();
     }
 
     static IDictionary<Xyz, IImmutableSet<MaydayLegPosture>> LoadFromFile()
     {
-        throw new NotImplementedException();
+        var json = File.ReadAllText(FilePath);
+        var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<MaydayLegPosture>>>(json, SerializerOptions)
+            ?? throw new InvalidOperationException($"Failed to deserialize file {FilePath}");
+
+        return deserialized.ToDictionary(
+            kvp => JsonSerializer.Deserialize<Xyz>(kvp.Key, SerializerOptions) 
+                   ?? throw new InvalidOperationException($"Failed to deserialize Xyz key: {kvp.Key}"),
+            kvp => (IImmutableSet<MaydayLegPosture>)kvp.Value.ToImmutableHashSet());
     }
 
     public static void StoreToFile(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> dict)
     {
-        throw new NotImplementedException();
+
+        var oneMeterString =  JsonSerializer.Serialize(Xyz.One, SerializerOptions);
+        var oneMeterLength =  JsonSerializer.Deserialize<Xyz>(oneMeterString, SerializerOptions);
+            
+        var serializable = dict
+            .OrderBy(kvp => kvp.Key.X.Meters)
+            .ThenBy(kvp => kvp.Key.Y.Meters)
+            .ThenBy(kvp => kvp.Key.Z.Meters)
+            .ToDictionary(
+                kvp => JsonSerializer.Serialize(kvp.Key),
+                kvp => kvp.Value);
+
+        var json = JsonSerializer.Serialize(serializable, SerializerOptions);
+        File.WriteAllText(FilePath, json);
     }
 
     public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
