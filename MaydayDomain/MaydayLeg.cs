@@ -74,14 +74,14 @@ public class MaydayLeg
 
     public void SetTipPositionTo(Xyz tipPosition)
     {
-        var posture = DictLegPostureByPositionMap.GetFor(tipPosition, GetPosture());
+        var posture = LegPostureByPositionMap.GetFor(tipPosition, GetPosture());
         
         SetPosture(posture);
     }
     
     public void MoveTipPositionBy(Xyz tipOffset)
     {
-        var posture = DictLegPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture());
+        var posture = LegPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture());
         
         SetPosture(posture);
     }

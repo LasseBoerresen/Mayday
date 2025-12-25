@@ -40,16 +40,16 @@ public class MaydayLegInverseKinematicsTests
     }
     
     /// <summary>
-    /// Not a test, but a builder of new <see cref="DictLegPostureByPositionMap"/>
+    /// Not a test, but a builder of new <see cref="LegPostureByPositionMap"/>
     /// </summary>
     [Fact] //(Skip = $"Run only to rebuild and store {nameof(DictLegPostureByPositionMap)}")]
     public void RebuildDictLegPostureByPositionMap()
     {
-        var newDict = DictLegPostureByPositionMap.BuildDictionary(_leg);
+        var newDict = LegPostureByPositionMap.BuildDictionary(_leg);
 
         Print(newDict);
 
-        DictLegPostureByPositionMap.StoreToFile(newDict);
+        LegPostureByPositionMap.StoreToFile(newDict);
     }
 
     private void Print(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> newDict)

@@ -8,7 +8,7 @@ using Length = UnitsNet.Length;
 
 namespace MaydayDomain;
 
-public class DictLegPostureByPositionMap
+public class LegPostureByPositionMap
 {
     const string FilePath = "MaydayLegPostureMap.json";
     static readonly JsonSerializerOptions SerializerOptions = new()
@@ -22,7 +22,7 @@ public class DictLegPostureByPositionMap
     };
     static readonly IReadOnlyDictionary<Xyz, IImmutableSet<MaydayLegPosture>> Map;
 
-    static DictLegPostureByPositionMap()
+    static LegPostureByPositionMap()
     {
         Map = File.Exists(FilePath) 
             ? LoadFromFile().ToFrozenDictionary() 
