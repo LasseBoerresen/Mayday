@@ -1,2 +1,12 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AJsonConverter_00601_002Ecs_002Fl_003AC_0021_003FUsers_003Flasse_0020boerresen_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Faecdd8d0340b468999543f20aa110ed59d308_003F6a_003F0e992d54_003FJsonConverter_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AOption_00601_002Ecs_002Fl_003AC_0021_003FUsers_003Flasse_0020boerresen_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fcbeef63b7ce74030bf94e286e31e14e83a7000_003F2f_003Fda160f67_003FOption_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1281789c_002Dba0b_002D4e6f_002D83c0_002D05a0c29fb087/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="WhenSetReachableTipPositionTo_TheReachesThatPosition" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::78D4CC1D-A43E-4083-BA0B-C4177CDB0F17::net8.0::Test.Unit.MaydayDomain.MaydayLegInverseKinematicsTests.WhenSetReachableTipPositionTo_TheReachesThatPosition&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e3ca3917_002Ddb67_002D4b5e_002Dbea7_002D5a59c7fa99a3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=7f8e6686_002Dc99d_002D4039_002Da7f5_002Decc4de0f6e5d_0023MauiApp1/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

@@ -9,19 +9,12 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
     public Joint New(
         Link parent,
         Link child,
-        Transform transform,
+        Transform passiveTransform,
         JointId id,
         RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder)
     {
-        DynamixelJoint joint = new(
-            parent, 
-            child, 
-            transform, 
-            id, 
-            rotationDirection, 
-            attachmentOrder, 
-            adapter);
+        DynamixelJoint joint = new(id, adapter, passiveTransform, rotationDirection, attachmentOrder, parent, child);
 
         joint.Initialize();
 

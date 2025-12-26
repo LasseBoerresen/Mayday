@@ -6,26 +6,26 @@ namespace Dynamixel;
 
 public class DynamixelJoint : Joint
 {
-    readonly Transform _passiveTransform;
     readonly JointId _id;
-    readonly RobotDomain.Structures.RotationDirection _rotationDirection;
-    readonly AttachmentOrder _attachmentOrder; 
     readonly Adapter _adapter;
 
     public DynamixelJoint(
-        Link parent,
-        Link child,
-        Transform passiveTransform,
         JointId id,
+        Adapter adapter,
+        Transform passiveTransform,
         RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder,
-        Adapter adapter) 
-        : base(ComponentId.New, parent, child)
+        Link parent,
+        Link child) 
+        : base(
+            passiveTransform,
+            rotationDirection,
+            attachmentOrder,
+            ComponentId.New, 
+            parent, 
+            child)
     {
-        _passiveTransform = passiveTransform;
         _id = id;
-        _rotationDirection = rotationDirection;
-        _attachmentOrder = attachmentOrder;
         _adapter = adapter;
     }
     
@@ -38,14 +38,5 @@ public class DynamixelJoint : Joint
     
     public override void SetAngleGoal(Angle goal) => _adapter.SetGoal(_id, goal);
 
-    public void Initialize() => _adapter.Initialize(_id, _rotationDirection);
-
-    protected override Transform Transform => 
-        _attachmentOrder == AttachmentOrder.LinkLast 
-            ? ActiveTransform + _passiveTransform
-            : _passiveTransform + ActiveTransform;
-
-    Transform ActiveTransform => Transform.FromQ(Q.FromRpy(new(Angle.Zero, Angle.Zero, Angle)));
-
-    Angle Angle => State.Angle * (int)_rotationDirection * (int)_attachmentOrder;
+    public void Initialize() => _adapter.Initialize(_id, RotationDirection);
 }

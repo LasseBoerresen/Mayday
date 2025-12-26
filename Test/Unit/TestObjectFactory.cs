@@ -12,7 +12,13 @@ public static class TestObjectFactory
     static readonly Length translationPrecision = Length.FromMeters(0.01);
     static readonly Angle rotationalPrecision = Angle.FromRevolutions(0.01);
 
-    public static Mock<Joint> CreateMockJoint() => new (ComponentId.New, Link.New(Base), Link.New(Thorax));
+    public static Mock<Joint> CreateMockJoint() => new(
+        Transform.Zero,
+        RotationDirection.Forward,
+        AttachmentOrder.LinkFirst,
+        ComponentId.New, 
+        Link.New(Base), 
+        Link.New(Thorax));
     
     public static string TestMessage(string testId, object expected, object actual)
     {

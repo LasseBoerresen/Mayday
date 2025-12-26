@@ -7,7 +7,7 @@ public interface JointFactory
     Joint New(
         Link parent, 
         Link child, 
-        Transform transform, 
+        Transform passiveTransform, 
         JointId id, 
         RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder);

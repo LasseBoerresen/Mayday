@@ -29,7 +29,7 @@ public class MaydayLegInverseKinematicsTests
         var testId = nameof(WhenSetReachableTipPositionTo_TheReachesThatPosition);
     
         // When
-        var expectedTipPosition = Xyz.Zero with { X = Length.FromMeters(0.1) };
+        var expectedTipPosition = Xyz.Zero with { X = Length.FromMeters(0.2) };
         
         _leg.SetTipPositionTo(expectedTipPosition);
         
@@ -42,7 +42,7 @@ public class MaydayLegInverseKinematicsTests
     /// <summary>
     /// Not a test, but a builder of new <see cref="LegPostureByPositionMap"/>
     /// </summary>
-    [Fact] //(Skip = $"Run only to rebuild and store {nameof(DictLegPostureByPositionMap)}")]
+    [Fact(Skip = $"Run only to rebuild and store {nameof(LegPostureByPositionMap)}")]
     public void RebuildDictLegPostureByPositionMap()
     {
         var newDict = LegPostureByPositionMap.BuildDictionary(_leg);
@@ -52,7 +52,7 @@ public class MaydayLegInverseKinematicsTests
         LegPostureByPositionMap.StoreToFile(newDict);
     }
 
-    private void Print(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> newDict)
+    void Print(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> newDict)
     {
         foreach (var keyValuePair in newDict)
         {

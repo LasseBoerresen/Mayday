@@ -6,7 +6,13 @@ using UnitsNet;
 namespace Test.Unit;
 
 public class FakeJoint(Angle angle) 
-    : Joint(ComponentId.New, Link.New(LinkName.Base), Link.New(LinkName.Thorax))
+    : Joint(
+        Transform.Zero, 
+        RotationDirection.Forward, 
+        AttachmentOrder.LinkFirst, 
+        ComponentId.New, 
+        Link.New(LinkName.Base), 
+        Link.New(LinkName.Thorax))
 {
     public override JointState State => JointState.Zero with { Angle = angle };
 

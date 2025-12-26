@@ -267,9 +267,8 @@ public class MaydayLegTests
 
     internal static MaydayLegFactory CreateEchoMaydayLegFactoryWithJointsAt(JointState jointState)
     {
-        EchoAdapter echoAdapter = new(jointState);
-        DynamixelJointFactory jointFactory = new(echoAdapter);
-        MaydayLegFactory maydayLegFactory = new(jointFactory);
+        EchoJointFactory echoJointFactory = new();
+        MaydayLegFactory maydayLegFactory = new(echoJointFactory);
         return maydayLegFactory;
     }
 }

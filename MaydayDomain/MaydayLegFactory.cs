@@ -6,7 +6,7 @@ using static RobotDomain.Structures.Side;
 
 namespace MaydayDomain;
 
-public  class MaydayLegFactory(JointFactory jointFactory)
+public class MaydayLegFactory(JointFactory jointFactory)
 {
     
     public IDictionary<MaydayLegId, MaydayLeg> CreateAll()
@@ -44,7 +44,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return jointFactory.New(
             parent: links[0], 
             child: links[1], 
-            transform: Transform.FromQ(Q.Unit), 
+            passiveTransform: Transform.FromQ(Q.Unit), 
             id: legId.JointId(1),
             rotationDirection: legId.Side == Left ? Forward : Reverse, 
             attachmentOrder: AttachmentOrder.LinkLast);
@@ -63,7 +63,7 @@ public  class MaydayLegFactory(JointFactory jointFactory)
         return jointFactory.New(
             links[2], 
             links[3], 
-            transform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
+            passiveTransform: Transform.FromQ(Q.FromRpy(new(0.25, 0.0, -0.25))), 
             id: legId.JointId(2),
             Forward,
             AttachmentOrder.LinkLast);

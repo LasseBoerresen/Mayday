@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using Generic;
 using RobotDomain.Geometry;
+using RobotDomain.Structures;
 using UnitsNet;
 using Length = UnitsNet.Length;
 
@@ -20,13 +21,22 @@ public class LegPostureByPositionMap
             new AngleJsonConverter()
         }
     };
-    static readonly IReadOnlyDictionary<Xyz, IImmutableSet<MaydayLegPosture>> Map;
+    static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
+    private static readonly Length CellSize = Length.FromMeters(0.005);
 
     static LegPostureByPositionMap()
     {
-        Map = File.Exists(FilePath) 
-            ? LoadFromFile().ToFrozenDictionary() 
-            : new Dictionary<Xyz, IImmutableSet<MaydayLegPosture>>().ToFrozenDictionary();
+        var leg = CreateEchoLeg();
+
+        Map = BuildDictionary(leg).ToFrozenDictionary();
+    }
+
+    static MaydayLeg CreateEchoLeg()
+    {
+        MaydayLegFactory legFactory = new(new EchoJointFactory());
+       
+        var leg = legFactory.CreateLeg(MaydayLegId.LeftBack);
+        return leg;
     }
 
     static IDictionary<Xyz, IImmutableSet<MaydayLegPosture>> LoadFromFile()
@@ -61,8 +71,8 @@ public class LegPostureByPositionMap
 
     public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
     {
-        var angleStep = Angle.FromRevolutions(1.0/10);
-        var cellSize = Length.FromMeters(0.005);
+        var angleStep = Angle.FromRevolutions(1.0 / 100);
+        
         
         var map = new Dictionary<Xyz, List<MaydayLegPosture>>();
 
@@ -76,25 +86,25 @@ public class LegPostureByPositionMap
             leg.SetPosture(posture);
                     
             var position = leg.GetTipPosition();
-            var cellPosition = GetCellPositionFor(position, cellSize);
+            var cellPosition = GetCellPositionFor(position);
 
             map.AppendElement(key: cellPosition, element: posture);
         }
     }
 
-    static Xyz GetCellPositionFor(Xyz position, Length cellSize)
+    static Xyz GetCellPositionFor(Xyz position)
     {
         return new Xyz(
-            GetCellCoordinate(position.X, cellSize), 
-            GetCellCoordinate(position.Y, cellSize), 
-            GetCellCoordinate(position.Z, cellSize));
+            GetCellCoordinate(position.X), 
+            GetCellCoordinate(position.Y), 
+            GetCellCoordinate(position.Z));
     }
 
-    static Length GetCellCoordinate(Length position, Length cellSize)
+    static Length GetCellCoordinate(Length position)
     {
-        var residual = Length.FromMeters(position.Meters % cellSize.Meters);
+        var residual = Length.FromMeters(position.Meters % CellSize.Meters);
         
-        return position - residual + cellSize / 2.0;
+        return position - residual + CellSize / 2.0;
     }
 
     /// <summary>
@@ -107,8 +117,9 @@ public class LegPostureByPositionMap
         // TODO For higher precision, linear interpolation between two nearest
         //  cells could be implemented, which would be simpler than a
         //  minimization step.
+        var cellPosition = GetCellPositionFor(tipPosition);
         var possiblePostures = Map
-            .LookFor(tipPosition)
+            .LookFor(cellPosition)
             .IfNone(() => throw new InvalidOperationException($"No leg posture for tip position {tipPosition}"));
             
         return possiblePostures
