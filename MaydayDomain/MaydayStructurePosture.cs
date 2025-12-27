@@ -9,7 +9,7 @@ public record MaydayStructurePosture(
     MaydayLegPosture LB) 
     : MaydayStructureSet<MaydayLegPosture>(RF, RC, RB, LF, LC, LB)
 {
-    public static MaydayStructurePosture FromSingle(MaydayLegPosture legPosture)
+    public new static MaydayStructurePosture FromSingle(MaydayLegPosture legPosture)
     {
         return new(legPosture, legPosture, legPosture, legPosture, legPosture, legPosture);
     }

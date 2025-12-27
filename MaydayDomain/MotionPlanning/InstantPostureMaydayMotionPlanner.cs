@@ -4,6 +4,8 @@ using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 
+using Duration = UnitsNet.Duration;
+
 namespace MaydayDomain.MotionPlanning;
 
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
@@ -29,6 +31,11 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     {
         throw new NotSupportedException(
             "This naive motion planner does not support Moving tip positions, only setting joint angles.");
+    }
+
+    public void SetTipPositionsForLegs(MaydayStructureSet<Xyz> tipPositions)
+    {
+        Structure.MoveTipsTo(tipPositions, Duration.FromSeconds(1.0), CancellationToken.None);
     }
 
     public MaydayLegPosture GetPosture(MaydayLegId legId) => Structure.GetPostureOf(legId);

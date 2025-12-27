@@ -24,7 +24,7 @@ public class PortAdapterSdkImpl : PortAdapter
      
     // Check which port is being used on your controller
     // ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
-    const string DeviceName = "COM9";
+    const string DeviceName = "COM3";
 
     public void Write(Id id, ControlRegister cr, uint value)
     {

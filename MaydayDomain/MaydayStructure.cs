@@ -78,6 +78,7 @@ public class MaydayStructure
         
         return new(legs);
     }
+
     /// <summary>
     /// To lean the thorax, move all tips opposite direction. Rotational lean
     /// results in some translation of the tip around the thorax origo 
@@ -91,7 +92,8 @@ public class MaydayStructure
         //  target angle goals, which return immediately, and the adapter should
         //  then run at an appropriate frequency to set new goals for all
         //  updated joints.   
-        _legs.ForEach(legAndId => MoveThoraxBy(extraLeanRequired, legAndId.Value));
+        _legs.ForEach(legAndId => 
+            MoveThoraxBy(extraLeanRequired, legAndId.Value));
     }
 
     static void MoveThoraxBy(Transform lean, MaydayLeg leg)
@@ -99,6 +101,22 @@ public class MaydayStructure
         // Adding/subtracting two transforms effectively translates and rotates
         // the lhs which is exactly what is required for tip movement. 
         leg.MoveTipPositionBy((GetTransformOfTipFor(leg) - lean).Xyz);
+    }
+
+    public void MoveTipsTo(MaydayStructureSet<Xyz> tipPositions, Duration duration, CancellationToken ct)
+    {
+        _legs
+            .Select(legAndId => legAndId.Value)
+            .Zip(tipPositions)
+            .ForEach(legAndTipPosition =>
+                MoveTipTo(legAndTipPosition.Second, legAndTipPosition.First));
+    }
+    
+    static void MoveTipTo(Xyz position, MaydayLeg leg)
+    {
+        // Adding/subtracting two transforms effectively translates and rotates
+        // the lhs which is exactly what is required for tip movement. 
+        leg.MoveTipPositionTo(position);
     }
 
     static Transform GetTransformOfTipFor(MaydayLeg leg)

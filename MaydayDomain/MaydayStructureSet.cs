@@ -7,6 +7,8 @@ namespace MaydayDomain;
 
 public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnumerable<T>
 {
+    public static MaydayStructureSet<T> FromSingle(T value) => new(value, value, value, value, value, value);
+    
     public static MaydayStructureSet<T> FromEnumerable(IEnumerable<T> valuesPerleg)
     {
         var valuesPerLegList = valuesPerleg.ToList();

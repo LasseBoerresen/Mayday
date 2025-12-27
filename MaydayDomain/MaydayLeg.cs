@@ -78,17 +78,24 @@ public class MaydayLeg
         
         SetPosture(posture);
     }
-    
+
     public void MoveTipPositionBy(Xyz tipOffset)
     {
         var posture = LegPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture());
         
         SetPosture(posture);
     }
-    
+
+    public void MoveTipPositionTo(Xyz tipPosition)
+    {
+        var posture = LegPostureByPositionMap.GetFor(tipPosition, GetPosture());
+        
+        SetPosture(posture);
+    }
+
     public static void ApplyForJointAngleRanges(Action<MaydayLegPosture> action, Angle angleStep)
     {
-        JointLimits limits = JointLimits.Defaults;
+        var limits = JointLimits.Defaults;
     
         for (var coxa = limits.CoxaMin; coxa < limits.CoxaMax; coxa += angleStep)
         for (var femur = limits.FemurMin; femur < limits.FemurMax; femur += angleStep)

@@ -48,12 +48,12 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     {
         // Not sure if this is the right way to compare two 3d angles. 
         var squaredRadiansSum = 
-              Pow(Sin(CoxaAngle.Radians - other.CoxaAngle.Radians), 2)
-            + Pow(Sin(FemurAngle.Radians - other.FemurAngle.Radians), 2)
-            + Pow(Sin(TibiaAngle.Radians - other.TibiaAngle.Radians), 2)
-            + Pow(Cos(CoxaAngle.Radians - other.CoxaAngle.Radians), 2)
-            + Pow(Cos(FemurAngle.Radians - other.FemurAngle.Radians), 2)
-            + Pow(Cos(TibiaAngle.Radians - other.TibiaAngle.Radians), 2);
+              Pow(Sin(CoxaAngle.Radians) - Sin(other.CoxaAngle.Radians), 2)
+            + Pow(Sin(FemurAngle.Radians) - Sin(other.FemurAngle.Radians), 2)
+            + Pow(Sin(TibiaAngle.Radians) - Sin(other.TibiaAngle.Radians), 2)
+            + Pow(Cos(CoxaAngle.Radians) - Cos(other.CoxaAngle.Radians), 2)
+            + Pow(Cos(FemurAngle.Radians) - Cos(other.FemurAngle.Radians), 2)
+            + Pow(Cos(TibiaAngle.Radians) - Cos(other.TibiaAngle.Radians), 2);
 
         // Not sure if this is actually radians anymore 
         var radiansDistance = Pow(squaredRadiansSum, 1 / 2.0);

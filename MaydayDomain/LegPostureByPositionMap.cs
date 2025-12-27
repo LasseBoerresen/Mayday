@@ -71,7 +71,7 @@ public class LegPostureByPositionMap
 
     public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
     {
-        var angleStep = Angle.FromRevolutions(1.0 / 100);
+        var angleStep = Angle.FromRevolutions(1.0 / 256);
         
         
         var map = new Dictionary<Xyz, List<MaydayLegPosture>>();

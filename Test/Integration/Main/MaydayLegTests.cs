@@ -7,6 +7,7 @@ using Test.Unit;
 using Test.Utilities;
 using Xunit;
 using static Test.Unit.TestObjectFactory;
+using Length = UnitsNet.Length;
 
 namespace Test.Integration.Main;
 
@@ -38,5 +39,39 @@ public class MaydayLegTests
 
         // Then
         AssertTransformEqual(testId, expectedTransform, actualTransform);
+    }
+    
+    /// <summary>
+    /// Tests basic inverse kinematics of legs, on real robot.
+    /// </summary>
+    [PhysicalRobotFact]
+    void GivenLegsWithTipAtX015_WhenGetTipPosition_ThenReturnsX015()
+    {
+        // Given
+        var minX = Length.FromMeters(-0.22);
+        var maxX = Length.FromMeters(0.20);
+        var deltaX = Length.FromMeters(0.005);
+        
+        for (var x = maxX; x > minX; x -= deltaX)
+        {
+            MotionPlanner.SetTipPositionsForLegs(MaydayStructureSet<Xyz>.FromSingle(
+                new(Length.FromMeters(0.12), Length.Zero, x)));
+
+            Thread.Sleep(TimeSpan.FromSeconds(0.1));    
+        }
+        
+        for (var x = minX; x < maxX; x += deltaX)
+        {
+            MotionPlanner.SetTipPositionsForLegs(MaydayStructureSet<Xyz>.FromSingle(
+                new(Length.FromMeters(0.12), Length.Zero, x)));
+
+            Thread.Sleep(TimeSpan.FromSeconds(0.1));    
+        }
+        
+        // When
+        // var actualPosition = MotionPlanner.GetPositionsOf(LinkName.Tip).LF;
+
+        // Then
+        // AssertXyzEqual(testId: "bla", expectedPosition, actualPosition); 
     }
 }

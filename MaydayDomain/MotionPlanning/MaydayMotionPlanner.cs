@@ -9,6 +9,7 @@ public interface MaydayMotionPlanner
     MaydayStructureSet<MaydayLegPosture> GetPostures();
     MaydayLegPosture GetPostureOf(MaydayLegId legId);
     void MoveTipPositions(MaydayStructureSet<Xyz> tipDeltas);
+    void SetTipPositionsForLegs(MaydayStructureSet<Xyz> tipPositions);
     void SetPosture(MaydayStructurePosture posture);
     void SetPosture(MaydayLegPosture posture);
     MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName);
