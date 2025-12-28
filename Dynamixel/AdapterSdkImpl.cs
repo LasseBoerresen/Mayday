@@ -13,8 +13,8 @@ public class AdapterSdkImpl : Adapter
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly Task _updateAngleTask;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(100);
-    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(100);
+    readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(10);
+    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
@@ -33,14 +33,7 @@ public class AdapterSdkImpl : Adapter
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
-            try
-            {
-                cacheUpdateAction();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating cache: {ex.Message}");
-            }
+            cacheUpdateAction();
             
             try
             {
@@ -131,7 +124,7 @@ public class AdapterSdkImpl : Adapter
     void SetGoalAngles()
     {
         var goalAngleById = _jointStateCache.GetById()
-            .Select(kvp => ((Id)kvp.Key, StepAngle.ToSteps(kvp.Value.AngleGoal)))
+            .Select(kvp => (Id.FromBase(kvp.Key), StepAngle.ToSteps(kvp.Value.AngleGoal)))
             .ToDictionary();
         
         _portAdapter.Write(goalAngleById, ControlRegister.GoalPosition);

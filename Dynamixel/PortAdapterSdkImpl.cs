@@ -37,16 +37,24 @@ public class PortAdapterSdkImpl : PortAdapter
 
     public void Write(IReadOnlyDictionary<Id, uint> valuesById, ControlRegister cr)
     {
+        if (!valuesById.Any())
+            return;
+        
         lock (_lock)
         {
             var group = GetWriteGroupFor(cr);
 
             groupSyncWriteClearParam(group.Value);
             
-            valuesById.ForEach(kvp => 
-                groupSyncWriteAddParam(group.Value, (byte)kvp.Key.Value, kvp.Value, cr.SizeInBytes));
+            valuesById.ForEach(kvp =>
+            {
+                var dxl_addparam_result = groupSyncWriteAddParam(group.Value, kvp.Key, kvp.Value, cr.SizeInBytes);
+                if (dxl_addparam_result != true)
+                    throw new Exception($"[ID: {kvp.Key}] groupSyncWrite addparam failed");
+            });
             
             groupSyncWriteTxPacket(group.Value);
+            CheckCommunicationResults(mode: nameof(Write), cr: cr);
         }
     }
 
@@ -54,16 +62,24 @@ public class PortAdapterSdkImpl : PortAdapter
     {
         // TODO should probably check communication results of every command. 
         
+        if(!ids.Any())
+            return new Dictionary<Id, uint>();
+        
         lock (_lock)
         {
             var group = GetReadGroupFor(cr);
 
             groupSyncReadClearParam(group.Value);
             
-            ids.ForEach(id => 
-                groupSyncReadAddParam(group.Value, id));
+            ids.ForEach(id =>
+            {
+                var dxl_addparam_result = groupSyncReadAddParam(group.Value, id);
+                if (dxl_addparam_result != true)
+                    throw new Exception($"[ID: {id}] groupSyncRead addparam failed");
+            });
             
             groupSyncReadTxRxPacket(group.Value);
+            CheckCommunicationResults(mode: nameof(Read), cr: cr);
 
             ids.ForEach(
                 EnsureDataIsAvailableFor);
@@ -86,17 +102,23 @@ public class PortAdapterSdkImpl : PortAdapter
     GroupNumber GetWriteGroupFor(ControlRegister cr)
     {
         if (!_writeGroupsByControlRegister.ContainsKey(cr))
-            groupSyncWrite(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
+        {
+            var groupId = groupSyncWrite(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
+            _writeGroupsByControlRegister[cr] = new GroupNumber(groupId);
+        }
 
         var group = _writeGroupsByControlRegister[cr];
         return group;
     }
 
-    private GroupNumber GetReadGroupFor(ControlRegister cr)
+    GroupNumber GetReadGroupFor(ControlRegister cr)
     {
         if (!_readGroupsByControlRegister.ContainsKey(cr))
-            groupSyncRead(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
-
+        {
+            var groupId = groupSyncRead(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
+            _readGroupsByControlRegister[cr] = new GroupNumber(groupId);
+        }
+        
         var group = _readGroupsByControlRegister[cr];
         return group;
     }
@@ -104,56 +126,60 @@ public class PortAdapterSdkImpl : PortAdapter
     public void Write(Id id, ControlRegister cr, uint value)
     {
         lock(_lock)
+        {
             WriteBySize(id, cr, value);
-        
-        CheckCommunicationResults(id, cr, "writing", value);
+
+            CheckCommunicationResults(nameof(Write), id, cr, value);
+        }
     }
 
     public uint Read(Id id, ControlRegister cr)
     {
-        uint result;
-    
-        lock(_lock)
-            result = ReadBySize(id, cr);
-        
-        CheckCommunicationResults(id, cr, "reading");
+        lock (_lock)
+        {
+            var result = ReadBySize(id, cr);
 
-        return result;
+            CheckCommunicationResults(nameof(Read), id, cr);
+
+            return result;
+        }
     }
 
     public void Reboot(Id id)
     {
-        try
+        lock (_lock)
         {
-            lock(_lock)
+            try
+            {
                 reboot(_portNumber.Value, ProtocolVersion, id);
-            CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
-        }
-        catch (Exception e)
-        {
-            WriteLine("retrying reboot after 1s");
-            Thread.Sleep(1000);
-            lock(_lock)
+                CheckCommunicationResults(nameof(Reboot), id, Option<ControlRegister>.None);
+            }
+            catch (Exception e)
+            {
+                WriteLine("retrying reboot after 1s");
+                Thread.Sleep(1000);
                 reboot(_portNumber.Value, ProtocolVersion, id);
+            }
         }
-        
     }
 
     public bool Ping(Id id)
     {
-        lock(_lock)
+        lock (_lock)
+        {
             ping(_portNumber.Value, ProtocolVersion, id);
-            
-        try
-        {
-            CheckCommunicationResults(id, Option<ControlRegister>.None, "ping");
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
 
-        return true;
+            try
+            {
+                CheckCommunicationResults(nameof(Ping), id, Option<ControlRegister>.None);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     void WriteBySize(Id id, ControlRegister cr, uint value)
@@ -189,22 +215,25 @@ public class PortAdapterSdkImpl : PortAdapter
         }
     }
 
-    void CheckCommunicationResults(Id id, Option<ControlRegister> cr, string mode, Option<uint> value=default)
+    /// <remarks>
+    /// Must be used withing the lock of the original communication
+    /// </remarks>
+    void CheckCommunicationResults(
+        string mode,
+        Option<Id> id = default,
+        Option<ControlRegister> cr = default,
+        Option<uint> value = default)
     {
         var crMessage = cr.Map(s => $"and control register {s}");
         var valueMessage = value.Map(s => $"and value {s}");
-        var errorMessage = $"{mode} dxl_id {id} {crMessage.IfNone("")} {valueMessage.IfNone("")} gave error:\n";
-
-
-        int lastTxRxResult;
-        lock(_lock)
-            lastTxRxResult = getLastTxRxResult(_portNumber.Value, ProtocolVersion);
+        var idMessage = id.Map(id => $"dxl_id {id}");
+        var errorMessage = $"{mode} {idMessage.IfNone("all ids")} {crMessage.IfNone("")} {valueMessage.IfNone("")} gave error:\n";
+        
+        var lastTxRxResult = getLastTxRxResult(_portNumber.Value, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
 
-        byte lastRxPacketError;
-        lock(_lock) 
-            lastRxPacketError = getLastRxPacketError(_portNumber.Value, ProtocolVersion);
+        var lastRxPacketError = getLastRxPacketError(_portNumber.Value, ProtocolVersion);
         if (lastRxPacketError != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
     }
