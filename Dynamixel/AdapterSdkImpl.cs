@@ -11,10 +11,10 @@ public class AdapterSdkImpl : Adapter
     readonly PortAdapter _portAdapter;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
-    readonly Task _updateStateTask;
     readonly Task _updateAngleTask;
-    readonly TimeSpan _updateStatePeriod = TimeSpan.FromMilliseconds(500);
+    readonly Task _setGoalAngleTask;
     readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(100);
+    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(100);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
@@ -25,32 +25,21 @@ public class AdapterSdkImpl : Adapter
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
         
-        _updateStateTask = Task.Run(() => UpdateLoopAsync(UpdateJointStateCache, _updateStatePeriod));
         _updateAngleTask = Task.Run(() => UpdateLoopAsync(UpdateJointAngleCache, _updateAnglePeriod));
-
+        _setGoalAngleTask = Task.Run(() => UpdateLoopAsync(SetGoalAngleFromCache, _setGoalAnglePeriod));
     }
 
-    async Task UpdateLoopAsync(Action<JointId> cacheUpdateAction, TimeSpan updatePeriod)
+    async Task UpdateLoopAsync(Action cacheUpdateAction, TimeSpan updatePeriod)
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
             try
             {
-                foreach (var id in _jointStateCache.GetIds())
-                {
-                    try
-                    {
-                        cacheUpdateAction(id);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error updating cache for joint {id}: {ex.Message}");
-                    }
-                }
+                cacheUpdateAction();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting ids from the cache: {ex.Message}");
+                Console.WriteLine($"Error updating cache: {ex.Message}");
             }
             
             try
@@ -64,17 +53,15 @@ public class AdapterSdkImpl : Adapter
         }
     }
 
-    private void UpdateJointStateCache(JointId id)
+    void UpdateJointAngleCache()
     {
-        _jointStateCache.SetFor(id, GetNewState(id));
+        _jointStateCache.SetAnglesFor(ReadAngles());
     }
 
-    private void UpdateJointAngleCache(JointId id)
+    void SetGoalAngleFromCache()
     {
-        _jointStateCache.SetAngleFor(id, ReadAngle(id));
+        SetGoalAngles();
     }
-
-    static int DXL_BROADCAST_ID = 254;
     
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     
@@ -119,7 +106,7 @@ public class AdapterSdkImpl : Adapter
 
     Angle ReadAngle(JointId id)
     {
-        var positionSteps = _portAdapter.Read(id, ControlRegister.PresentPosition);
+        var positionSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentPosition);
 
         var angle = StepAngle.ToAngle(positionSteps);
         
@@ -127,23 +114,48 @@ public class AdapterSdkImpl : Adapter
         return angle;
     }
 
+    IDictionary<JointId, Angle> ReadAngles()
+    {
+        var positionStepsById = _portAdapter.Read(GetDynamixelIds(), ControlRegister.PresentPosition);
+
+        return positionStepsById
+            .Select(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
+            .ToDictionary();
+    }
+
+    private IEnumerable<Id> GetDynamixelIds()
+    {
+        return _jointStateCache.GetIds().Select(id => Id.FromBase(id));
+    }
+
+    void SetGoalAngles()
+    {
+        var goalAngleById = _jointStateCache.GetById()
+            .Select(kvp => ((Id)kvp.Key, StepAngle.ToSteps(kvp.Value.AngleGoal)))
+            .ToDictionary();
+        
+        _portAdapter.Write(goalAngleById, ControlRegister.GoalPosition);
+        
+        // _portAdapter.Write(id, ControlRegister.GoalPosition, StepAngle.ToSteps(angle));
+    }
+    
     Angle ReadAngleGoal(JointId id)
     {
-        var positionSteps = _portAdapter.Read(id, ControlRegister.GoalPosition);
+        var positionSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.GoalPosition);
         
         return StepAngle.ToAngle(positionSteps);
     }
 
     RotationalSpeed ReadSpeed(JointId id)
     {
-        var speedSteps = _portAdapter.Read(id, ControlRegister.PresentVelocity);
+        var speedSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
         
         return StepSpeed.ToSpeed(speedSteps);
     }
 
     LoadRatio ReadLoadRatio(JointId id)
     {
-        var loadSteps = _portAdapter.Read(id, ControlRegister.PresentLoad);
+        var loadSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentLoad);
         
         // TODO Test with real dynamixels, that -1000:1000 range is converted correctly, from uint to int...
         return LoadRatio.FromSteps((int)loadSteps);
@@ -151,14 +163,14 @@ public class AdapterSdkImpl : Adapter
 
     UnitsNet.Temperature ReadTemperature(JointId id)
     {
-        var temperatureSteps = _portAdapter.Read(id, ControlRegister.PresentTemperature);
+        var temperatureSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
     }
 
     void ReadHardwareErrorStatus(JointId id)
     {
-        var hardwareErrorStatus = _portAdapter.Read(id, ControlRegister.HardwareErrorStatus);
+        var hardwareErrorStatus = _portAdapter.Read(Id.FromBase(id), ControlRegister.HardwareErrorStatus);
         if (hardwareErrorStatus != 0)
             Console.WriteLine($"HardwareErrorStatus: {hardwareErrorStatus:b8}");
     }
@@ -166,7 +178,7 @@ public class AdapterSdkImpl : Adapter
     void Reboot(JointId id)
     {
         Console.WriteLine($"Rebooting {id}");
-        _portAdapter.Reboot(id);
+        _portAdapter.Reboot(Id.FromBase(id));
         Thread.Sleep(300);
         
         var delay = TimeSpan.FromSeconds(0.1);
@@ -181,21 +193,21 @@ public class AdapterSdkImpl : Adapter
 
     bool Ping(JointId id)
     {
-        return _portAdapter.Ping(id);
+        return _portAdapter.Ping(Id.FromBase(id));
     }
 
-    public void SetGoal(JointId id, Angle angle)
+    public void SetGoalAngleFor(JointId id, Angle angle)
     {
-        _portAdapter.Write(id, ControlRegister.GoalPosition, StepAngle.ToSteps(angle));
+        _jointStateCache.SetAngleGoalFor(id, angle);
     }
-
+    
     void SetVelocityLimit(JointId id)
     {
         var dynamixelVelocity = VelocityLimitSlow
             .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
-        _portAdapter.Write(id, ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
     void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
@@ -207,12 +219,12 @@ public class AdapterSdkImpl : Adapter
     
     uint GetDriveMode(JointId id)
     {
-        return _portAdapter.Read(id, ControlRegister.DriveMode);
+        return _portAdapter.Read(Id.FromBase(id), ControlRegister.DriveMode);
     }
     
     void SetDriveMode(JointId id, uint driveMode)
     {
-        _portAdapter.Write(id, ControlRegister.DriveMode, driveMode);
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.DriveMode, driveMode);
     }
 
     void TorqueEnable(JointId id) => SetTorque(id, true);
@@ -221,7 +233,7 @@ public class AdapterSdkImpl : Adapter
 
     void SetTorque(JointId id, bool value)
     {
-        _portAdapter.Write(id, ControlRegister.TorqueEnable, Convert.ToUInt32(value));
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }
 
     public void Dispose()
@@ -233,9 +245,10 @@ public class AdapterSdkImpl : Adapter
     void CancelAndDisposeUpdateTask()
     {
         _cancellationTokenSource.Cancel();
+        
         try
         {
-            _updateStateTask.Wait();
+            _updateAngleTask.Wait();
         }
         catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
         {
@@ -244,7 +257,7 @@ public class AdapterSdkImpl : Adapter
         
         try
         {
-            _updateAngleTask.Wait();
+            _setGoalAngleTask.Wait();
         }
         catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
         {

@@ -4,7 +4,7 @@ public record ControlRegister(
     string Name,
     string Area,
     ushort Address,
-    int SizeInBytes,
+    ushort SizeInBytes,
     string Access,
     int? InitialValue)
 {

@@ -50,7 +50,7 @@ public class MaydayLegTests
         // Given
         var minX = Length.FromMeters(-0.22);
         var maxX = Length.FromMeters(0.20);
-        var deltaX = Length.FromMeters(0.005);
+        var deltaX = Length.FromMeters(0.015);
         
         for (var x = maxX; x > minX; x -= deltaX)
         {

@@ -8,7 +8,7 @@ public record JointState(
     RotationalSpeed RotationalSpeed,
     LoadRatio Torque,
     Temperature Temperature,
-    Angle? AngleGoal)
+    Angle AngleGoal)
 {
     public static JointState Zero => new(
         Angle.Zero,

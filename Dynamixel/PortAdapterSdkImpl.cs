@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
+using Generic;
 using LanguageExt;
 using LanguageExt.Common;
 using UnitsNet;
@@ -8,12 +10,19 @@ using Error = LanguageExt.Common.Error;
 
 namespace Dynamixel;
 
+// TODO this class should be a singleton, since it represents a single port. Also the dynamixel adapter.
 public class PortAdapterSdkImpl : PortAdapter
 {
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
     readonly PortNumber _portNumber;
     readonly object _lock = new();
+    readonly IDictionary<ControlRegister, GroupNumber> _writeGroupsByControlRegister 
+        = new Dictionary<ControlRegister, GroupNumber>();
+    readonly IDictionary<ControlRegister, GroupNumber> _readGroupsByControlRegister 
+        = new Dictionary<ControlRegister, GroupNumber>();
+        
+        
 
     private PortAdapterSdkImpl(PortNumber portNumber)
     {
@@ -25,6 +34,72 @@ public class PortAdapterSdkImpl : PortAdapter
     // Check which port is being used on your controller
     // ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
     const string DeviceName = "COM3";
+
+    public void Write(IReadOnlyDictionary<Id, uint> valuesById, ControlRegister cr)
+    {
+        lock (_lock)
+        {
+            var group = GetWriteGroupFor(cr);
+
+            groupSyncWriteClearParam(group.Value);
+            
+            valuesById.ForEach(kvp => 
+                groupSyncWriteAddParam(group.Value, (byte)kvp.Key.Value, kvp.Value, cr.SizeInBytes));
+            
+            groupSyncWriteTxPacket(group.Value);
+        }
+    }
+
+    public IReadOnlyDictionary<Id, uint> Read(IEnumerable<Id> ids, ControlRegister cr)
+    {
+        // TODO should probably check communication results of every command. 
+        
+        lock (_lock)
+        {
+            var group = GetReadGroupFor(cr);
+
+            groupSyncReadClearParam(group.Value);
+            
+            ids.ForEach(id => 
+                groupSyncReadAddParam(group.Value, id));
+            
+            groupSyncReadTxRxPacket(group.Value);
+
+            ids.ForEach(
+                EnsureDataIsAvailableFor);
+            
+            var result = ids
+                .Select(id => (id, groupSyncReadGetData(group.Value, id, cr.Address, cr.SizeInBytes)))
+                .ToDictionary();
+
+            return result;
+
+            // Local func
+            void EnsureDataIsAvailableFor(Id id)
+            {
+                if (!groupSyncReadIsAvailable(group.Value, id, cr.Address, cr.SizeInBytes)) 
+                    throw new Exception($"No data available for dxl_id {id} and control register {cr}");
+            }
+        }
+    }
+
+    GroupNumber GetWriteGroupFor(ControlRegister cr)
+    {
+        if (!_writeGroupsByControlRegister.ContainsKey(cr))
+            groupSyncWrite(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
+
+        var group = _writeGroupsByControlRegister[cr];
+        return group;
+    }
+
+    private GroupNumber GetReadGroupFor(ControlRegister cr)
+    {
+        if (!_readGroupsByControlRegister.ContainsKey(cr))
+            groupSyncRead(_portNumber.Value, ProtocolVersion, cr.Address, cr.SizeInBytes);
+
+        var group = _readGroupsByControlRegister[cr];
+        return group;
+    }
 
     public void Write(Id id, ControlRegister cr, uint value)
     {
@@ -51,7 +126,7 @@ public class PortAdapterSdkImpl : PortAdapter
         try
         {
             lock(_lock)
-                reboot(_portNumber.Value, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber.Value, ProtocolVersion, id);
             CheckCommunicationResults(id, Option<ControlRegister>.None, "reboot");
         }
         catch (Exception e)
@@ -59,7 +134,7 @@ public class PortAdapterSdkImpl : PortAdapter
             WriteLine("retrying reboot after 1s");
             Thread.Sleep(1000);
             lock(_lock)
-                reboot(_portNumber.Value, ProtocolVersion, (byte)id.Value);
+                reboot(_portNumber.Value, ProtocolVersion, id);
         }
         
     }
@@ -67,7 +142,7 @@ public class PortAdapterSdkImpl : PortAdapter
     public bool Ping(Id id)
     {
         lock(_lock)
-            ping(_portNumber.Value, ProtocolVersion, (byte)id.Value);
+            ping(_portNumber.Value, ProtocolVersion, id);
             
         try
         {
@@ -86,13 +161,13 @@ public class PortAdapterSdkImpl : PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                write1ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, (byte)value);
+                write1ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address, (byte)value);
                 break;
             case 2:
-                write2ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, (ushort)value);
+                write2ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address, (ushort)value);
                 break;
             case 4:
-                write4ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address, value);
+                write4ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address, value);
                 break;
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
@@ -104,11 +179,11 @@ public class PortAdapterSdkImpl : PortAdapter
         switch (cr.SizeInBytes)
         {
             case 1:
-                return read1ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read1ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address);
             case 2:
-                return read2ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read2ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address);
             case 4:
-                return read4ByteTxRx(_portNumber.Value, ProtocolVersion, (byte)id.Value, cr.Address);
+                return read4ByteTxRx(_portNumber.Value, ProtocolVersion, id, cr.Address);
             default:
                 throw new NotSupportedException($"ControlRegister size not supported, got: {cr}");
         }

@@ -28,11 +28,11 @@ public class AdapterSdkImplTests
     {
         // When
         Angle goalAngle = Angle.Zero;
-        _adapter.SetGoal(_id, goalAngle);
+        _adapter.SetGoalAngleFor(_id, goalAngle);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
-            pa => pa.Write(_id, ControlRegister.GoalPosition, StepAngle.StepCenter), 
+            pa => pa.Write(Id.FromBase(_id), ControlRegister.GoalPosition, StepAngle.StepCenter), 
             Times.Once);
     }
     
@@ -44,7 +44,7 @@ public class AdapterSdkImplTests
 
         // Then
         _dynamixelPortAdapterMock.Verify(
-            pa => pa.Write(_id, ControlRegister.TorqueEnable, Convert.ToUInt32(true)), 
+            pa => pa.Write(Id.FromBase(_id), ControlRegister.TorqueEnable, Convert.ToUInt32(true)), 
             Times.Once);
     }
     
@@ -56,7 +56,7 @@ public class AdapterSdkImplTests
 
         // Then
         _dynamixelPortAdapterMock.Verify(
-            pa => pa.Write(_id, ControlRegister.ProfileVelocity, It.IsAny<uint>()), 
+            pa => pa.Write(Id.FromBase(_id), ControlRegister.ProfileVelocity, It.IsAny<uint>()), 
             Times.Once);
     }
 }

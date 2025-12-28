@@ -13,6 +13,15 @@ public static class DictionaryExtentions
             .ToDictionary();
     }
     
+    public static IReadOnlyDictionary<TKey, TValueNew> MapValueToReadonly<TKey, TValue, TValueNew>(
+        this IReadOnlyDictionary<TKey, TValue> dictionary,
+        Func<TValue, TValueNew> mapper) where TKey : notnull
+    {
+        return dictionary
+            .Select(kvp => new KeyValuePair<TKey,TValueNew>(kvp.Key, mapper(kvp.Value)))
+            .ToDictionary();
+    }
+    
     public static Option<TValue> LookFor<Tkey, TValue>(
         this IDictionary<Tkey, TValue> dictionary, 
         Tkey key)

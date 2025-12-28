@@ -27,7 +27,6 @@
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-46" />
         <PackageReference Include="LanguageExt.FSharp" Version="5.0.0-beta-46" />
-        <PackageReference Include="LanguageExt.Transformers" Version="4.4.8" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
