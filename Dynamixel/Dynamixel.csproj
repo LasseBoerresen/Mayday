@@ -16,9 +16,9 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<None Include="Lib\dxl_x64_c.dll">
+		<None Include="Lib\dxl_x64_c_4_0_2.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Lib\dxl_x64_c.dll</Link>
+			<Link>Lib\dxl_x64_c_4_0_2.dll</Link>
 		</None>
 	</ItemGroup>
 

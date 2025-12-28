@@ -19,7 +19,7 @@ namespace Dynamixel;
 /// </remarks>
 public static class DynamixelCommunication
 {
-    const string dll_path = @"Lib\dxl_x64_c.dll";
+    const string dll_path = @"Lib\dxl_x64_c_4_0_2.dll";
 
     #region PortHandler
 
