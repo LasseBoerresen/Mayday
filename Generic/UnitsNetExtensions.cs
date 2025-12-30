@@ -23,4 +23,12 @@ public static class UnitsNetExtensions
     {
         return Abs((length - other).Meters) < precision.Meters;
     }
+    
+    /// <Remarks>
+    /// Remainder, i.e. '%' on floats gave precision problems, therefore calculating residual manually
+    /// </Remarks>
+    public static Length Modulo(Length a, Length b)
+    {
+        return a - b * Floor(a / b);
+    }
 }

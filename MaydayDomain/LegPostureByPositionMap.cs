@@ -6,6 +6,7 @@ using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
 using static System.Math;
+using static Generic.UnitsNetExtensions;
 using Length = UnitsNet.Length;
 
 namespace MaydayDomain;
@@ -23,13 +24,13 @@ public class LegPostureByPositionMap
         }
     };
     static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
-    private static readonly Length CellSize = Length.FromMeters(0.01);
+    private static readonly Length CellSize = Length.FromMeters(1.0 / 128.0); // binary number for 100% float accuracy
 
     static LegPostureByPositionMap()
     {
         var leg = CreateEchoLeg();
 
-        Map = BuildDictionary(leg).ToFrozenDictionary();
+        Map = new Dictionary<Xyz, List<MaydayLegPosture>>(); //BuildDictionary(leg).ToFrozenDictionary();
     }
 
     static MaydayLeg CreateEchoLeg()
@@ -72,7 +73,7 @@ public class LegPostureByPositionMap
 
     public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
     {
-        var angleStep = Angle.FromRevolutions(1.0 / 256);
+        var angleStep = Angle.FromRevolutions(1.0 / 128);
         
         
         var map = new Dictionary<Xyz, List<MaydayLegPosture>>();
@@ -140,25 +141,13 @@ public class LegPostureByPositionMap
 
     static Length GetCellCenterCoordinate(Length position)
     {
-        // Use decimals to avoid precision problems with floats
-        var positionMeters = (decimal)position.Meters;
-        var cellSizeMeters = (decimal)CellSize.Meters;
-        
         // Offsetting so coordinates are not halfway between two cells.  
-        var offsetPositionMeters = positionMeters + cellSizeMeters / (decimal)2.0;
+        var offsetPosition = position + CellSize / 2.0;
 
-        var residualMeters = Modulo(offsetPositionMeters, cellSizeMeters);
+        var residual = Modulo(offsetPosition, CellSize);
 
-        var cellCenterCoordinate = Length.FromMeters((double)(offsetPositionMeters - residualMeters));
+        var cellCenterCoordinate = offsetPosition - residual;
         return cellCenterCoordinate;
-    }
-    
-    /// <Remarks>
-    /// Remainder, i.e. '%' on floats gave precision problems, therefore calculating residual manually
-    /// </Remarks>
-    public static decimal Modulo(decimal a, decimal b)
-    {
-        return a - b * Floor(a / b);
     }
 
     /// <summary>
