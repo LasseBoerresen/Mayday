@@ -30,7 +30,7 @@ public class LegPostureByPositionMap
     {
         var leg = CreateEchoLeg();
 
-        Map = new Dictionary<Xyz, List<MaydayLegPosture>>(); //BuildDictionary(leg).ToFrozenDictionary();
+        Map = BuildDictionary(leg).ToFrozenDictionary();
     }
 
     static MaydayLeg CreateEchoLeg()
@@ -80,7 +80,7 @@ public class LegPostureByPositionMap
 
         MaydayLeg.ApplyForJointAngleRanges(AppendPosture, angleStep);
 
-        EnsureCellDensity(map);
+        // EnsureCellDensity(map);
 
         return map;
 
@@ -105,6 +105,36 @@ public class LegPostureByPositionMap
     }
 
     static Xyz GetNeighborCellCenterPositionFor(Xyz tipPosition)
+    {
+        var centerCellPos = GetCellCenterPositionFor(tipPosition);
+
+        List<Length> offsets = [-CellSize, Length.FromMeters(0.0), CellSize];
+        
+        Dictionary<Xyz, Length> distancesByPositions = new(); 
+        
+        foreach (var x in offsets)
+        foreach (var y in offsets)
+        foreach (var z in offsets)
+            AddDistanceFor(new Xyz(x, y, z));
+
+        var distancesByPositionsOrdered = distancesByPositions.OrderBy(kvp => kvp.Value);
+        var neighborCellCenterPosition = distancesByPositionsOrdered.First().Key;
+        
+        return neighborCellCenterPosition;
+
+        void AddDistanceFor(Xyz xyzOffset)
+        {
+            if (xyzOffset == Xyz.Zero) 
+                return;
+            
+            var xyz = centerCellPos + xyzOffset;
+            var distance = tipPosition.DistanceToLineSegmentBetween(centerCellPos, xyz);
+           
+            distancesByPositions[xyz] = distance;
+        }
+    }
+    
+    static Xyz GetNeighborCellCenterPositionForFast(Xyz tipPosition)
     {
         var centerCellPos = GetCellCenterPositionFor(tipPosition);
 
@@ -158,14 +188,14 @@ public class LegPostureByPositionMap
     public static MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
     {
         var cellPosition = GetCellCenterPositionFor(tipPosition);
-        var neighborCellPosition = GetNeighborCellCenterPositionFor(tipPosition);
-        var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, neighborCellPosition);
-        
+        var cellPositionNeighbor = GetNeighborCellCenterPositionFor(tipPosition);
+        var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, cellPositionNeighbor);
+     
         var posture = GetClosestFor(cellPosition, currentPosture);
-        var neighborPosture = GetClosestFor(neighborCellPosition , currentPosture);
-        var interpolatedPosture = MaydayLegPosture.InterpolateBetween(posture, neighborPosture, fractionOfProgressBetweenCells);
+        var postureNeighbor = GetClosestFor(cellPositionNeighbor , currentPosture);
+        var postureInterpolated = MaydayLegPosture.InterpolateBetween(posture, postureNeighbor, fractionOfProgressBetweenCells);
 
-        return interpolatedPosture;
+        return postureInterpolated;
     }
 
     static MaydayLegPosture GetClosestFor(Xyz cellPosition, MaydayLegPosture posture)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Numerics;
 using UnitsNet;
+using UnitsNet.Units;
 using static System.Math;
 
 namespace MaydayDomain;
@@ -70,7 +71,7 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
         
         var t = fraction.DecimalFractions;
 
-        return FromSines(
+        var interpolated = FromSines(
             coxaSin: LinearInterpolate(Sin(start.CoxaAngle.Radians), Sin(end.CoxaAngle.Radians), t),
             coxaCos: LinearInterpolate(Cos(start.CoxaAngle.Radians), Cos(end.CoxaAngle.Radians), t),
             femurSin: LinearInterpolate(Sin(start.FemurAngle.Radians), Sin(end.FemurAngle.Radians), t),
@@ -78,6 +79,20 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
             tibiaSin: LinearInterpolate(Sin(start.TibiaAngle.Radians), Sin(end.TibiaAngle.Radians), t),
             tibiaCos: LinearInterpolate(Cos(start.TibiaAngle.Radians), Cos(end.TibiaAngle.Radians), t)
         );
+        
+        // So the display unit is revolutions, not radians
+        return interpolated.ToRevolutions();
+    }
+
+    /// <summary>
+    /// After intermediate calculations, the unit can end up as something else than revolutions, which can be confusing. 
+    /// </summary>
+    MaydayLegPosture ToRevolutions()
+    {
+        return new(
+            CoxaAngle.ToUnit(AngleUnit.Revolution),
+            FemurAngle.ToUnit(AngleUnit.Revolution),
+            TibiaAngle.ToUnit(AngleUnit.Revolution));
     }
 
     private static double LinearInterpolate(double start, double end, double t) => start + (end - start) * t;

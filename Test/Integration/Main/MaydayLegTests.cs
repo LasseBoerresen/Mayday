@@ -58,7 +58,7 @@ public class MaydayLegTests
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, z));
             MotionPlanner.SetTipPositionsForLegs(tipPositions);
 
-            Thread.Sleep(TimeSpan.FromSeconds(0.5));    
+            Thread.Sleep(TimeSpan.FromSeconds(0.01));    
         }
         
         for (var x = minZ; x < maxZ; x += deltaZ)
@@ -66,7 +66,7 @@ public class MaydayLegTests
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, x));
             MotionPlanner.SetTipPositionsForLegs(tipPositions);
 
-            Thread.Sleep(TimeSpan.FromSeconds(0.05));    
+            Thread.Sleep(TimeSpan.FromSeconds(0.01));    
         }
         
         // When

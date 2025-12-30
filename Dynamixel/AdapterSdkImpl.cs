@@ -175,13 +175,13 @@ public class AdapterSdkImpl : Adapter
         Thread.Sleep(300);
         
         var delay = TimeSpan.FromSeconds(0.1);
-        while (Ping(id) != true)
+        var maxDelay = TimeSpan.FromSeconds(5);
+        while (Ping(id) != true && delay < maxDelay)
         {   
             Console.WriteLine($"ping failed, ping again in {delay}");
             Thread.Sleep(delay);
             delay *= 2;
-        };
-        
+        }
     }
 
     bool Ping(JointId id)

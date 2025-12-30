@@ -93,7 +93,7 @@ public record Xyz(Length X, Length Y, Length Z)
         var bVec = b.AsVector3Meters();
         var pVec = AsVector3Meters();
         
-        var direction = aVec - bVec;
+        var direction = bVec - aVec;
         var lengthSquared = direction.LengthSquared();
 
         if (lengthSquared == 0f) 
