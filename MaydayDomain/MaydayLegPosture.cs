@@ -27,9 +27,9 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     public IImmutableList<Angle> AsListOfGoalAngles() => [CoxaAngle, FemurAngle, TibiaAngle];
 
     public static MaydayLegPosture FromSines(
-        float coxaSin, float coxaCos, 
-        float femurSin, float femurCos, 
-        float tibiaSin, float tibiaCos)
+        double coxaSin, double coxaCos, 
+        double femurSin, double femurCos, 
+        double tibiaSin, double tibiaCos)
     {
         return new(
             CoxaAngle: Angle.FromRadians(Atan2(coxaSin, coxaCos)),
@@ -59,5 +59,32 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
         var radiansDistance = Pow(squaredRadiansSum, 1 / 2.0);
         
         return Angle.FromRadians(radiansDistance);
+    }
+
+    /// <summary>
+    /// Interpolate between two rpy taking the circular nature of the angles into account
+    /// </summary>
+    public static MaydayLegPosture InterpolateBetween(MaydayLegPosture start, MaydayLegPosture end, Ratio fraction)
+    {
+        ValidateFractionRange(fraction);
+        
+        var t = fraction.DecimalFractions;
+
+        return FromSines(
+            coxaSin: LinearInterpolate(Sin(start.CoxaAngle.Radians), Sin(end.CoxaAngle.Radians), t),
+            coxaCos: LinearInterpolate(Cos(start.CoxaAngle.Radians), Cos(end.CoxaAngle.Radians), t),
+            femurSin: LinearInterpolate(Sin(start.FemurAngle.Radians), Sin(end.FemurAngle.Radians), t),
+            femurCos: LinearInterpolate(Cos(start.FemurAngle.Radians), Cos(end.FemurAngle.Radians), t),
+            tibiaSin: LinearInterpolate(Sin(start.TibiaAngle.Radians), Sin(end.TibiaAngle.Radians), t),
+            tibiaCos: LinearInterpolate(Cos(start.TibiaAngle.Radians), Cos(end.TibiaAngle.Radians), t)
+        );
+    }
+
+    private static double LinearInterpolate(double start, double end, double t) => start + (end - start) * t;
+
+    private static void ValidateFractionRange(Ratio fraction)
+    {
+        if (fraction.DecimalFractions < 0.0 || fraction.DecimalFractions > 1.0)
+            throw new ArgumentException($"Fraction must be between 0.0 and 1.0, got: {fraction}");
     }
 }

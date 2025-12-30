@@ -1,5 +1,7 @@
-﻿using Generic;
+﻿using System.Numerics;
+using Generic;
 using LanguageExt;
+using UnitsNet;
 using static System.Math;
 using static Generic.UnitsNetExtensions;
 using Length = UnitsNet.Length;
@@ -15,18 +17,13 @@ public record Xyz(Length X, Length Y, Length Z)
     public static Xyz Zero => new(0, 0, 0);
     public static Xyz One => new(1, 1, 1);
 
-    public Length Length
-    {
-        get
-        {
-            return Length.FromMeters(
-                Pow(
-                    Pow(X.Meters, 2)
-                    + Pow(X.Meters, 2)
-                    + Pow(X.Meters, 2),
-                    1 / 2.0));
-        }
-    }
+    public Length Length =>
+        Length.FromMeters(
+            Pow(
+                Pow(X.Meters, 2)
+                + Pow(Y.Meters, 2)
+                + Pow(Z.Meters, 2),
+                1 / 2.0));
 
     /// <summary>
     /// Every coordinate has random value between [-1m:1m]
@@ -77,4 +74,48 @@ public record Xyz(Length X, Length Y, Length Z)
     {
         return $"[X: {X.Meters,6:F3}, Y: {Y.Meters,6:F3}, Z: {Z.Meters,6:F3}]";
     }
+
+    public Ratio GetFractionOfProgressBetween(Xyz start, Xyz end)
+    {
+        var closest = ClosestPointOnLineSegmentBetween(start, end);
+        
+        var totalDistance = (end - start).Length;
+        if (totalDistance.Meters == 0.0)
+            return Ratio.FromDecimalFractions(0.0);
+
+        var distanceSoFar = (closest - start).Length;
+        return Ratio.FromDecimalFractions(distanceSoFar / totalDistance);
+    }
+
+    Xyz ClosestPointOnLineSegmentBetween(Xyz a, Xyz b)
+    {
+        var aVec = a.AsVector3Meters();
+        var bVec = b.AsVector3Meters();
+        var pVec = AsVector3Meters();
+        
+        var direction = aVec - bVec;
+        var lengthSquared = direction.LengthSquared();
+
+        if (lengthSquared == 0f) 
+            return a;
+
+        var projectionFactor = Vector3.Dot(pVec - aVec, direction) / lengthSquared;
+        projectionFactor = Clamp(projectionFactor, 0f, 1f);
+
+        return FromVector3Meters(aVec + projectionFactor * direction);
+    }
+
+    public Length DistanceBetween(Xyz a, Xyz b)
+    {
+        return Length.FromMeters(Vector3.Distance(a.AsVector3Meters(), b.AsVector3Meters()));
+    }
+    
+    public Length DistanceToLineSegmentBetween(Xyz a, Xyz b)
+    {
+        return DistanceBetween(this, ClosestPointOnLineSegmentBetween(a, b));
+    }
+
+    Vector3 AsVector3Meters() => new((float)X.Meters, (float)Y.Meters, (float)Z.Meters);
+
+    static Xyz FromVector3Meters(Vector3 v) => new(v.X, v.Y, v.Z);
 }

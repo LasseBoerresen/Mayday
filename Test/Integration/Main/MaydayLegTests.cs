@@ -48,24 +48,26 @@ public class MaydayLegTests
     void GivenLegsWithTipAtX015_WhenGetTipPosition_ThenReturnsX015()
     {
         // Given
-        var minX = Length.FromMeters(-0.22);
-        var maxX = Length.FromMeters(0.20);
-        var deltaX = Length.FromMeters(0.015);
+        var minZ = Length.FromMeters(-0.22); // -0.22
+        var maxZ = Length.FromMeters(0.18); // 0.2
+        var deltaZ = Length.FromMeters(0.001);
+        var stanceWidth = Length.FromMeters(0.12);
         
-        for (var x = maxX; x > minX; x -= deltaX)
+        for (var z = maxZ; z > minZ; z -= deltaZ)
         {
+            
             MotionPlanner.SetTipPositionsForLegs(MaydayStructureSet<Xyz>.FromSingle(
-                new(Length.FromMeters(0.12), Length.Zero, x)));
+                new(stanceWidth, Length.Zero, z)));
 
-            Thread.Sleep(TimeSpan.FromSeconds(0.1));    
+            Thread.Sleep(TimeSpan.FromSeconds(0.5));    
         }
         
-        for (var x = minX; x < maxX; x += deltaX)
+        for (var x = minZ; x < maxZ; x += deltaZ)
         {
             MotionPlanner.SetTipPositionsForLegs(MaydayStructureSet<Xyz>.FromSingle(
-                new(Length.FromMeters(0.12), Length.Zero, x)));
+                new(stanceWidth, Length.Zero, x)));
 
-            Thread.Sleep(TimeSpan.FromSeconds(0.1));    
+            Thread.Sleep(TimeSpan.FromSeconds(0.05));    
         }
         
         // When

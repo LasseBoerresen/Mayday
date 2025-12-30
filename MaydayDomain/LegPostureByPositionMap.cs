@@ -5,6 +5,7 @@ using Generic;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
+using static System.Math;
 using Length = UnitsNet.Length;
 
 namespace MaydayDomain;
@@ -22,7 +23,7 @@ public class LegPostureByPositionMap
         }
     };
     static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
-    private static readonly Length CellSize = Length.FromMeters(0.005);
+    private static readonly Length CellSize = Length.FromMeters(0.01);
 
     static LegPostureByPositionMap()
     {
@@ -78,6 +79,8 @@ public class LegPostureByPositionMap
 
         MaydayLeg.ApplyForJointAngleRanges(AppendPosture, angleStep);
 
+        EnsureCellDensity(map);
+
         return map;
 
         // local func
@@ -86,25 +89,76 @@ public class LegPostureByPositionMap
             leg.SetPosture(posture);
                     
             var position = leg.GetTipPosition();
-            var cellPosition = GetCellPositionFor(position);
+            var cellPosition = GetCellCenterPositionFor(position);
 
             map.AppendElement(key: cellPosition, element: posture);
         }
     }
 
-    static Xyz GetCellPositionFor(Xyz position)
+    private static void EnsureCellDensity(Dictionary<Xyz, List<MaydayLegPosture>> map)
     {
-        return new Xyz(
-            GetCellCoordinate(position.X), 
-            GetCellCoordinate(position.Y), 
-            GetCellCoordinate(position.Z));
+        var minimumPosturesPerCell = 1;
+        
+        if (map.Any(kvp => kvp.Value.Count < minimumPosturesPerCell))
+            throw new Exception($"Not enough postures for each cell, min: {minimumPosturesPerCell}.");
     }
 
-    static Length GetCellCoordinate(Length position)
+    static Xyz GetNeighborCellCenterPositionFor(Xyz tipPosition)
     {
-        var residual = Length.FromMeters(position.Meters % CellSize.Meters);
+        var centerCellPos = GetCellCenterPositionFor(tipPosition);
+
+        List<Length> offsets = [-CellSize, Length.FromMeters(0.0), CellSize];
         
-        return position - residual + CellSize / 2.0;
+        Xyz? closestCellPos = null;
+        var closestDistance = Length.FromMeters(double.MaxValue);
+        
+        foreach (var x in offsets)
+        foreach (var y in offsets)
+        foreach (var z in offsets)
+        {
+            var xyz = centerCellPos + new Xyz(x, y, z);
+            var distance = tipPosition.DistanceToLineSegmentBetween(centerCellPos, xyz);
+
+            if (distance >= closestDistance || xyz == centerCellPos) 
+                continue;
+            
+            closestCellPos = xyz;
+            closestDistance = distance;
+        }
+        
+        return closestCellPos ?? throw new InvalidOperationException("No cell found.");
+        
+    }
+    
+    static Xyz GetCellCenterPositionFor(Xyz position)
+    {
+        return new Xyz(
+            GetCellCenterCoordinate(position.X), 
+            GetCellCenterCoordinate(position.Y), 
+            GetCellCenterCoordinate(position.Z));
+    }
+
+    static Length GetCellCenterCoordinate(Length position)
+    {
+        // Use decimals to avoid precision problems with floats
+        var positionMeters = (decimal)position.Meters;
+        var cellSizeMeters = (decimal)CellSize.Meters;
+        
+        // Offsetting so coordinates are not halfway between two cells.  
+        var offsetPositionMeters = positionMeters + cellSizeMeters / (decimal)2.0;
+
+        var residualMeters = Modulo(offsetPositionMeters, cellSizeMeters);
+
+        var cellCenterCoordinate = Length.FromMeters((double)(offsetPositionMeters - residualMeters));
+        return cellCenterCoordinate;
+    }
+    
+    /// <Remarks>
+    /// Remainder, i.e. '%' on floats gave precision problems, therefore calculating residual manually
+    /// </Remarks>
+    public static decimal Modulo(decimal a, decimal b)
+    {
+        return a - b * Floor(a / b);
     }
 
     /// <summary>
@@ -114,17 +168,30 @@ public class LegPostureByPositionMap
     /// <exception cref="InvalidOperationException">If the tip position is unreachable</exception>
     public static MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
     {
-        // TODO For higher precision, linear interpolation between two nearest
-        //  cells could be implemented, which would be simpler than a
-        //  minimization step.
-        var cellPosition = GetCellPositionFor(tipPosition);
+        var cellPosition = GetCellCenterPositionFor(tipPosition);
+        var neighborCellPosition = GetNeighborCellCenterPositionFor(tipPosition);
+        var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, neighborCellPosition);
+        
+        var posture = GetClosestFor(cellPosition, currentPosture);
+        var neighborPosture = GetClosestFor(neighborCellPosition , currentPosture);
+        var interpolatedPosture = MaydayLegPosture.InterpolateBetween(posture, neighborPosture, fractionOfProgressBetweenCells);
+
+        return interpolatedPosture;
+    }
+
+    static MaydayLegPosture GetClosestFor(Xyz cellPosition, MaydayLegPosture posture)
+    {
         var possiblePostures = Map
             .LookFor(cellPosition)
-            .IfNone(() => throw new InvalidOperationException($"No leg posture for tip position {tipPosition}"));
+            .IfNone(() => throw new InvalidOperationException($"No leg posture for cell position {cellPosition}"));
             
         return possiblePostures
-            .OrderBy(p => p.DistanceTo(currentPosture))
+            .OrderBy(p => p.DistanceTo(posture))
             .FirstOption()
-            .IfNone(() => throw new NotSupportedException($"All 'some' tip position sets should be non-empty."));
+            .IfNone(() => throw new NotSupportedException($"All 'some' cell position sets should be non-empty."));
+        
+        // return Map[cellPosition]
+        //     .OrderBy(p => p.DistanceTo(posture))
+        //     .First();
     }
 }
