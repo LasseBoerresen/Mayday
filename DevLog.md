@@ -1,5 +1,9 @@
 ﻿# Development Log
 
+### Adding duration to movement commands for pacing
+#### 2025-12-31 11:37 +01:00 @Home
+My plan was to have the dynamixel communication adapter update the goal position at the update frequency, but really, setting different goals is the job of the motion planner. If we dont set goals only in the joint domain, the movement will not follow the trajectory, because different parts of the trajectory needs joints moving at different speeds. My thougts we centering on the fact, that only the specific dynamixel joints know how strong the motor is, and thus it could be the responsibility of the joint to pace itself for a given goal angle and destination time. And that might still be the case. Because if not, the motor will try to move to the goal destination, however far it is, at max speed. We could mitigate that, with frequent motion planning updates, but decoupling them would probably be better. Then the motion planner is free to chose any appropriate update requencey to determine how accurately it will follow its planned trajectory. So I want all these components to have a datetimeprovider, in order to both set destination timestamps and compare that to the current time. I mean... Humans do not know the absolute timestamp of anything, but estimate how long something will take. Like, I want to get up from this chair in like a few seconds. Or, do we even do that. We just move at our "regular pace". 
+
 ### Back on the horse. Or spider... 
 #### 2025-02-07 19:07 +01:00 @Home
 Ran the test suite. Everything works, except, the integration tests can only run one at a time manually.
