@@ -12,7 +12,7 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
     PeriodicScheduler _scheduler;
-    Option<Movement> _goalMovement = Option<Movement>.None;
+    Option<Timed<Movement>> _goalMovement = Option<Timed<Movement>>.None;
 
 
     public InstantPostureMaydayMotionPlanner(
@@ -27,22 +27,23 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public MaydayLegPosture GetPostureOf(MaydayLegId legId) => Structure.GetPostureOf(legId);
     
-    public virtual void MoveTipPositions(MaydayStructureSet<Xyz> tipDeltas)
+    public virtual void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)
     {
         throw new NotSupportedException(
             "This naive motion planner does not support Moving tip positions, only setting joint angles.");
     }
 
-    public void SetTipPositionsForLegs(MaydayStructureSet<Xyz> tipPositions)
+    public void SetTipPositionsForLegs(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed)
     {
-        Structure.MoveTipsTo(tipPositions, Duration.FromSeconds(1.0), CancellationToken.None);
+        Structure.MoveTipsTo(tipPositionsTimed, CancellationToken.None);
     }
 
     public MaydayLegPosture GetPosture(MaydayLegId legId) => Structure.GetPostureOf(legId);
 
-    public void SetPosture(MaydayStructurePosture posture) => Structure.SetPosture(posture);
+    public void SetPosture(Timed<MaydayStructurePosture> postureTimed) => Structure.SetPosture(postureTimed);
     
-    public void SetPosture(MaydayLegPosture posture) => SetPosture(MaydayStructurePosture.FromSingle(posture));
+    public void SetPosture(Timed<MaydayLegPosture> postureTimed) 
+        => SetPosture(postureTimed.Map(MaydayStructurePosture.FromSingle));
 
     public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName) => Structure.GetPositionsOf(linkName);
 
@@ -58,24 +59,26 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
             _goalMovement.IfSome(gm => TrackGoalOnce(gm, ct)), ct);
     }
 
-    void TrackGoalOnce(Movement goalMovement, CancellationToken ct)
+    void TrackGoalOnce(Timed<Movement> goalMovementTimed, CancellationToken ct)
     {
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
         
-        Structure.MoveThoraxTo(goalMovement.Lean, goalMovement.Duration, ct);
+        Structure.MoveThoraxTo(goalMovementTimed.Map(m => m.Lean), ct);
     }
 
-    public Option<Movement> GetGoal() => _goalMovement;
+    public Option<Timed<Movement>> GetGoal() => _goalMovement;
     
-    public void SetGoal(Movement movement) => _goalMovement = movement;
+    public void SetGoal(Timed<Movement> movementTimed) => _goalMovement = movementTimed;
 
-    public void UnsetGoal() => _goalMovement = Option<Movement>.None;
+    public void UnsetGoal() => _goalMovement = Option<Timed<Movement>>.None;
 
-    public static Eff<InstantPostureMaydayMotionPlanner> Create(CancellationTokenSource cancellationTokenSource)
+    public static Eff<InstantPostureMaydayMotionPlanner> Create(
+        CancellationTokenSource cancellationTokenSource,
+        TimeProvider timeProvider)
     {
-        var structureEff = CreateMaydayStructure(cancellationTokenSource);
-        PeriodicScheduler scheduler = new(TimeProvider.System, UnitsNet.Duration.FromSeconds(0.1));
+        var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
+        PeriodicScheduler scheduler = new(timeProvider, Duration.FromSeconds(0.1));
 
         var maydayMotionPlanner = structureEff.Map(structure =>  
             new InstantPostureMaydayMotionPlanner(structure, scheduler));
@@ -83,9 +86,11 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
         return maydayMotionPlanner;
     }
 
-    protected static Eff<MaydayStructure> CreateMaydayStructure(CancellationTokenSource cancellationTokenSource)
+    protected static Eff<MaydayStructure> CreateMaydayStructure(
+        CancellationTokenSource cancellationTokenSource,
+        TimeProvider timeProvider)
     {
-        var jointFactoryEff = DynamixelJointFactory.Create(cancellationTokenSource);
+        var jointFactoryEff = DynamixelJointFactory.Create(cancellationTokenSource, timeProvider);
 
         var structure = jointFactoryEff.Map(MaydayStructure.Create);
         return structure;

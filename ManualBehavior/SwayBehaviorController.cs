@@ -5,22 +5,23 @@ using RobotDomain.Behavior;
 using RobotDomain.Geometry;
 using RobotDomain.Time;
 using UnitsNet;
+using Duration = UnitsNet.Duration;
 using Length = UnitsNet.Length;
 
 namespace ManualBehavior;
 
 public class SwayBehaviorController(
-    MaydayMotionPlanner MotionPlanner,
-    PeriodicScheduler PeriodicScheduler,
-    CancellationToken Ct) 
+    MaydayMotionPlanner motionPlanner,
+    PeriodicScheduler periodicScheduler,
+    CancellationToken ct,
+    TimeProvider timeProvider) 
     : BehaviorController
 {
     public Unit Start()
     {
         WakeUp();
         
-
-        PeriodicScheduler.Run(SwayOnce, Ct);
+        periodicScheduler.Run(SwayOnce, ct);
         
         return Unit.Default;
     }
@@ -30,16 +31,17 @@ public class SwayBehaviorController(
         // TODO change to setting a movement goal instead of manipulating
         //  joints directly. This is a better use of the robot structure
         //  abstraction  
-        MotionPlanner.SetPosture(MaydayLegPosture.Sitting);
-        Thread.Sleep(TimeSpan.FromSeconds(1.0));
+        var timeStep = TimeSpan.FromSeconds(1.0);
+        motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.Sitting, timeStep));
+        Thread.Sleep(timeStep);
         
-        MotionPlanner.SetPosture(MaydayLegPosture.Standing);
-        Thread.Sleep(TimeSpan.FromSeconds(1.0));
+        motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.Standing, timeStep));
+        Thread.Sleep(timeStep);
 
-        MotionPlanner.Start(Ct);
+        motionPlanner.Start(ct);
     }
 
-    Movement CenteredMovement => Movement.Zero(PeriodicScheduler.CurrentTimeStamp);
+    Movement CenteredMovement => Movement.Zero();
 
     /// <summary>
     /// Sway halfway towards the central position plus randomly in any
@@ -48,17 +50,28 @@ public class SwayBehaviorController(
     /// </summary>
     void SwayOnce()
     {
-        MotionPlanner.SetGoal(CreateNewGoal());
+        motionPlanner.SetGoal(CreateNewGoal());
     }
 
-    Movement GetPreviousGoal()
+    Timed<Movement> CreateNewGoal()
+    {
+        var previousGoalTimed = GetPreviousGoal();
+        
+        return previousGoalTimed
+            .ExtendWith(TimeStep)
+            .Map(pg => pg with { Lean = pg.Lean.HalfWayTo(CenteredMovement.Lean) + SwayAmount() });
+    }
+
+    Timed<Movement> GetPreviousGoal()
     {
         // If there somehow is no previous movement, simply set it to centered as a starting point.
-        var previousGoal = MotionPlanner.GetGoal()
-            .IfNone(CenteredMovement);
+        var previousGoal = motionPlanner.GetGoal()
+            .IfNone(timeProvider.ScheduleIn(CenteredMovement, TimeStep));
     
         return previousGoal;
     }
+
+    private Duration TimeStep => periodicScheduler.Duration;
 
     static Transform SwayAmount()
     {
@@ -68,17 +81,5 @@ public class SwayBehaviorController(
         var swayAmount = Transform.Random(maxTranslation, maxRotation);
         
         return swayAmount;
-    }
-
-    Movement CreateNewGoal()
-    {
-        Movement previousGoal = GetPreviousGoal();
-        
-        return previousGoal with
-        {
-            Lean = previousGoal.Lean.HalfWayTo(CenteredMovement.Lean) + SwayAmount(),
-            Duration = PeriodicScheduler.Duration,
-            TimeStamp = PeriodicScheduler.CurrentTimeStamp
-        };
     }
 }

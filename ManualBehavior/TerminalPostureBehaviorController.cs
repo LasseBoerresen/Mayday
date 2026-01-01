@@ -3,13 +3,18 @@ using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 
 namespace ManualBehavior;
 
 public class TerminalPostureBehaviorController(
     MaydayMotionPlanner motionPlanner,
-    CancellationTokenSource cancelTokenSource) : BehaviorController
+    CancellationTokenSource cancelTokenSource,
+    TimeProvider timeProvider) 
+    : BehaviorController
 {
+    static readonly TimeSpan TimeStep = TimeSpan.FromSeconds(1.0);
+    
     public Unit Start()
     {
         WakeUp();
@@ -25,7 +30,7 @@ public class TerminalPostureBehaviorController(
     {
         var command = GetCommand();
         ExecuteCommand(command);
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        
         Console.WriteLine("Tip positions");
         Console.WriteLine(motionPlanner.GetPositionsOf(LinkName.Tip));
         Console.WriteLine(motionPlanner.GetOrientationsOf(LinkName.Tip));
@@ -47,7 +52,7 @@ public class TerminalPostureBehaviorController(
     void ExecuteCommand(PostureCommand command)
     {
         LookForLegPosture(command)
-            .Some(motionPlanner.SetPosture)
+            .Some(SchedulePosture)
             .None(() => DoComplexCommand(command));
     }
 
@@ -89,25 +94,28 @@ public class TerminalPostureBehaviorController(
     {
         Console.WriteLine("\nWaking up...");
         
-        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        motionPlanner.SetPosture(MaydayLegPosture.SittingTall);
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
+        SchedulePosture(MaydayLegPosture.Sitting);
+        SchedulePosture(MaydayLegPosture.SittingTall);
+        SchedulePosture(MaydayLegPosture.Sitting);
     }
 
     void Sleep()
     {
         Console.WriteLine("Going to sleep...");
         
-        Thread.Sleep(TimeSpan.FromSeconds(0.5));
-        motionPlanner.SetPosture(MaydayLegPosture.Sitting);
+        SchedulePosture(MaydayLegPosture.Sitting);
+    }
+    
+    void SchedulePosture(MaydayLegPosture posture)
+    {
+        motionPlanner.SetPosture(timeProvider.ScheduleIn(posture, TimeStep));
+        Thread.Sleep(TimeStep);
     }
 
     void Stop()
     {
         Sleep();
-        Thread.Sleep(TimeSpan.FromSeconds(2));
+        
         cancelTokenSource.Cancel();
     }
 

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Generic;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace MaydayDomain;
@@ -37,15 +38,20 @@ public class MaydayLeg
         return new(_joints.Select(j => j.State.Angle));
     }
 
-    public virtual void SetPosture(MaydayLegPosture posture)
+    public virtual void SetPosture(Timed<MaydayLegPosture> posture)
     {
         JointAndGoalAnglePairs(posture)
-            .ForEach(pair => pair.joint.SetAngleGoal(pair.angle));
+            .ForEach(pair => pair.joint.SetAngleGoal(pair.angleGoalTimed));
     }
 
-    IEnumerable<(Joint joint, Angle angle)> JointAndGoalAnglePairs(MaydayLegPosture posture)
+    IEnumerable<(Joint joint, Timed<Angle> angleGoalTimed)> JointAndGoalAnglePairs(
+        Timed<MaydayLegPosture> posture)
     {
-        return _joints.Zip(posture.AsListOfGoalAngles(), (joint, angle) => (joint, angle));
+        var timedTargetsForJoints = posture
+            .Map(p => p.AsListOfGoalAngles().AsEnumerable())
+            .Sequence();
+        
+        return _joints.Zip(timedTargetsForJoints);
     }
 
     public Transform GetTransformOf(LinkName linkName) => GetTransformOf(LinkFromName(linkName));
@@ -72,25 +78,25 @@ public class MaydayLeg
         return GetTransformOf(LinkName.Tip).Xyz;
     }
 
-    public void SetTipPositionTo(Xyz tipPosition)
+    public void SetTipPositionTo(Timed<Xyz> tipPositionTimed)
     {
-        var posture = LegPostureByPositionMap.GetFor(tipPosition, GetPosture());
+        var postureTimed = tipPositionTimed.Map(tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
+        
+        SetPosture(postureTimed);
+    }
+
+    public void MoveTipPositionBy(Timed<Xyz> tipOffsetTimed)
+    {
+        var posture = tipOffsetTimed.Map(to => LegPostureByPositionMap.GetFor(GetTipPosition() + to, GetPosture()));
         
         SetPosture(posture);
     }
 
-    public void MoveTipPositionBy(Xyz tipOffset)
+    public void MoveTipPositionTo(Timed<Xyz> tipPositionTimed)
     {
-        var posture = LegPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture());
+        var postureTimed = tipPositionTimed.Map(tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
         
-        SetPosture(posture);
-    }
-
-    public void MoveTipPositionTo(Xyz tipPosition)
-    {
-        var posture = LegPostureByPositionMap.GetFor(tipPosition, GetPosture());
-        
-        SetPosture(posture);
+        SetPosture(postureTimed);
     }
 
     public static void ApplyForJointAngleRanges(Action<MaydayLegPosture> action, Angle angleStep)

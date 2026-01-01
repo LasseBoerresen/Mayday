@@ -2,6 +2,7 @@
 using MaydayDomain;
 using Moq;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using Xunit;
 using static MaydayDomain.MaydayLegId;
 
@@ -44,12 +45,12 @@ public class MaydayStructureTests
         MaydayStructure may = new(legsDict);
         
         // When
-        var posture = MaydayLegPosture.Standing;
-        may.SetPostureForAllLegs(posture);
+        var postureTimed = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
+        may.SetPostureForAllLegs(postureTimed);
 
         // Then
         mockLegsDict.ToList().ForEach(kvp => 
-            kvp.Value.Verify(l => l.SetPosture(posture), Times.Once));
+            kvp.Value.Verify(l => l.SetPosture(postureTimed), Times.Once));
         
     }
 }

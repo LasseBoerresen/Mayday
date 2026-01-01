@@ -2,6 +2,7 @@
 using LanguageExt;
 using RobotDomain.Physics;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace Dynamixel;
@@ -11,6 +12,7 @@ public class AdapterSdkImpl : Adapter
     readonly PortAdapter _portAdapter;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
+    readonly TimeProvider _timeProvider;
     readonly Task _updateAngleTask;
     readonly Task _setGoalAngleTask;
     readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(10);
@@ -19,14 +21,16 @@ public class AdapterSdkImpl : Adapter
     public AdapterSdkImpl(
         PortAdapter portAdapter,
         JointStateCache jointStateCache,
-        CancellationTokenSource cancellationTokenSource)
+        CancellationTokenSource cancellationTokenSource,
+        TimeProvider timeProvider)
     {
         _portAdapter = portAdapter;
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
-        
+        _timeProvider = timeProvider;
+
         _updateAngleTask = Task.Run(() => UpdateLoopAsync(UpdateJointAngleCache, _updateAnglePeriod));
-        _setGoalAngleTask = Task.Run(() => UpdateLoopAsync(SetGoalAngleFromCache, _setGoalAnglePeriod));
+        _setGoalAngleTask = Task.Run(() => UpdateLoopAsync(SetGoalAngles, _setGoalAnglePeriod));
     }
 
     async Task UpdateLoopAsync(Action cacheUpdateAction, TimeSpan updatePeriod)
@@ -37,6 +41,7 @@ public class AdapterSdkImpl : Adapter
             
             try
             {
+                // TODO: Use PeriodicScheduler to not delay too long 
                 await Task.Delay(updatePeriod, _cancellationTokenSource.Token);
             }
             catch (TaskCanceledException)
@@ -51,11 +56,6 @@ public class AdapterSdkImpl : Adapter
         _jointStateCache.SetAnglesFor(ReadAngles());
     }
 
-    void SetGoalAngleFromCache()
-    {
-        SetGoalAngles();
-    }
-    
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     
     // TODO use PID values or remove them!
@@ -76,7 +76,7 @@ public class AdapterSdkImpl : Adapter
         TorqueEnable(id);
         
         // Ensure a state value is always available post initialization. 
-        _jointStateCache.SetFor(id, GetNewState(id));
+        _jointStateCache.SetFor(id, GetInitialState(id));
     }
 
     public JointState GetState(JointId id)
@@ -84,14 +84,14 @@ public class AdapterSdkImpl : Adapter
         return _jointStateCache.GetFor(id);
     }
     
-    JointState GetNewState(JointId id)
+    JointState GetInitialState(JointId id)
     {
-        JointState jointState = new JointState(
+        var jointState = new JointState(
             ReadAngle(id),
             ReadSpeed(id),
             ReadLoadRatio(id),
             ReadTemperature(id),
-            ReadAngleGoal(id));
+            Timed<Angle>.Passed(ReadAngleGoal(id)));
             
         // Console.WriteLine("new joint state: " + jointState);    
         return jointState;
@@ -116,22 +116,29 @@ public class AdapterSdkImpl : Adapter
             .ToDictionary();
     }
 
-    private IEnumerable<Id> GetDynamixelIds()
+    IEnumerable<Id> GetDynamixelIds()
     {
         return _jointStateCache.GetIds().Select(id => Id.FromBase(id));
     }
 
     void SetGoalAngles()
     {
-        var goalAngleById = _jointStateCache.GetById()
-            .Select(kvp => (Id.FromBase(kvp.Key), StepAngle.ToSteps(kvp.Value.AngleGoal)))
-            .ToDictionary();
+        var interpolatedGoalAnglesById = _jointStateCache
+            .GetById()
+            .MapValueToReadonly(jointState => jointState.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
         
-        _portAdapter.Write(goalAngleById, ControlRegister.GoalPosition);
+        var interpolatedGoalAnglesByIdAsDynamixel = interpolatedGoalAnglesById.ToDictionary(
+            kvp => Id.FromBase(kvp.Key), 
+            kvp =>  StepAngle.ToSteps(kvp.Value));
         
-        // _portAdapter.Write(id, ControlRegister.GoalPosition, StepAngle.ToSteps(angle));
+        _portAdapter.Write(interpolatedGoalAnglesByIdAsDynamixel, ControlRegister.GoalPosition);
     }
-    
+
+    double InterpolatedStepFactor<T>(Timed<T> timed)
+    {
+        return timed.StepFactor(currentTime: _timeProvider.GetUtcNow(), timeStep: _setGoalAnglePeriod);
+    }
+
     Angle ReadAngleGoal(JointId id)
     {
         var positionSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.GoalPosition);
@@ -189,9 +196,9 @@ public class AdapterSdkImpl : Adapter
         return _portAdapter.Ping(Id.FromBase(id));
     }
 
-    public void SetGoalAngleFor(JointId id, Angle angle)
+    public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
     {
-        _jointStateCache.SetAngleGoalFor(id, angle);
+        _jointStateCache.SetAngleGoalFor(id, goalAngleTimed);
     }
     
     void SetVelocityLimit(JointId id)

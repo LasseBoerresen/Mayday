@@ -3,6 +3,7 @@ using FluentAssertions;
 using MaydayDomain;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,8 +31,9 @@ public class MaydayLegInverseKinematicsTests
     
         // When
         var expectedTipPosition = Xyz.Zero with { X = Length.FromMeters(0.2) };
+        var expectedTipPositionTimed = Timed<Xyz>.Passed(expectedTipPosition);
         
-        _leg.SetTipPositionTo(expectedTipPosition);
+        _leg.SetTipPositionTo(expectedTipPositionTimed);
         
         // Then
         var actualTipPosition = _leg.GetTransformOf(LinkName.Tip).Xyz;

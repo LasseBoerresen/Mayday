@@ -1,4 +1,5 @@
 ﻿using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace Dynamixel;
@@ -10,6 +11,6 @@ public interface JointStateCache
     JointState GetFor(JointId id);
     void SetFor(JointId id, JointState state);
     void SetAngleFor(JointId id, Angle angle);
-    void SetAngleGoalFor(JointId id, Angle angle);
+    void SetAngleGoalFor(JointId id, Timed<Angle> angle);
     void SetAnglesFor(IDictionary<JointId, Angle> anglesById);
 }

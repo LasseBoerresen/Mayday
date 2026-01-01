@@ -33,6 +33,7 @@ public class PeriodicScheduler
     {
         // TODO WIP actually calculate how much time to wait, in order to not wait too long. 
         // _timeProvider.GetUtcNow() _duration.
+        // TODO prabably use Task.Delay for asyncronous and cancellable wait. Thread.Sleep blocks the tread. 
         Thread.Sleep(TimeSpan.FromMicroseconds(Duration.Microseconds));
     }
 

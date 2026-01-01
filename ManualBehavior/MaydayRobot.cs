@@ -6,23 +6,23 @@ namespace ManualBehavior;
 
 public class MaydayRobot(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
 {
-    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController()
+    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController(TimeProvider timeProvider)
     {
         CancellationTokenSource cancellationTokenSource = new();
 
         return InstantPostureMaydayMotionPlanner
-            .Create(cancellationTokenSource)
-            .Map(mp => new TerminalPostureBehaviorController(mp, cancellationTokenSource))
+            .Create(cancellationTokenSource, timeProvider)
+            .Map(mp => new TerminalPostureBehaviorController(mp, cancellationTokenSource, timeProvider))
             .Map(bc => new MaydayRobot(bc, cancellationTokenSource));
     }
 
-    public static Eff<MaydayRobot> CreateWithBabyLegsBehaviorController()
+    public static Eff<MaydayRobot> CreateWithBabyLegsBehaviorController(TimeProvider timeProvider)
     {
         CancellationTokenSource cancellationTokenSource = new();
         
         return StepByStepLearningInstantPostureMaydayMotionPlanner
-            .Create(cancellationTokenSource)
-            .Map(mp => new BabyLegsBehaviorController(mp, cancellationTokenSource))
+            .Create(cancellationTokenSource, timeProvider)
+            .Map(mp => new BabyLegsBehaviorController(mp, cancellationTokenSource, timeProvider))
             .Map(bc => new MaydayRobot(bc, cancellationTokenSource));
     }
 

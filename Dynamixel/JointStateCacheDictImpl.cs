@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace Dynamixel;
@@ -23,8 +24,8 @@ public class JointStateCacheDictImpl : JointStateCache
             addValueFactory: key => throw new NotSupportedException($"Error trying to set angle for uninitialized jointId: {id}"),
             updateValueFactory: (key, oldState) => oldState with { Angle = angle });
     }
-    
-    public void SetAngleGoalFor(JointId id, Angle angleGoal)
+
+    public void SetAngleGoalFor(JointId id, Timed<Angle> angleGoal)
     {
         // Must use update method, to ensure operation is atomic. 
         _cacheDict.AddOrUpdate(

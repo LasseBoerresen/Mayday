@@ -3,6 +3,7 @@ using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using Test.Unit;
 using Test.Utilities;
 using Xunit;
@@ -13,8 +14,9 @@ namespace Test.Integration.Main;
 
 public class MaydayLegTests
 {
+    static readonly TimeProvider TimeProvider = TimeProvider.System;
     static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner
-        .Create(new CancellationTokenSource())
+        .Create(new CancellationTokenSource(), TimeProvider)
         .RunUnsafe();
 
     public static TheoryData<string, LinkName, Transform>
@@ -32,8 +34,10 @@ public class MaydayLegTests
         string testId, LinkName linkName, Transform expectedTransform)
     {
         // Given
-        MotionPlanner.SetPosture(MaydayLegPosture.Neutral);
-
+        var timeStep = TimeSpan.FromSeconds(1);
+        MotionPlanner.SetPosture(TimeProvider.ScheduleIn(MaydayLegPosture.Neutral, timeStep));
+        Thread.Sleep(timeStep);
+        
         // When
         var actualTransform = MotionPlanner.GetTransformsOf(linkName).LF;
 
@@ -52,21 +56,24 @@ public class MaydayLegTests
         var maxZ = Length.FromMeters(0.18); // 0.2
         var deltaZ = Length.FromMeters(0.001);
         var stanceWidth = Length.FromMeters(0.12);
+        var timeStep = TimeSpan.FromSeconds(0.01);
+
+        
         
         for (var z = maxZ; z > minZ; z -= deltaZ)
         {
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, z));
-            MotionPlanner.SetTipPositionsForLegs(tipPositions);
-
-            Thread.Sleep(TimeSpan.FromSeconds(0.01));    
+            
+            MotionPlanner.SetTipPositionsForLegs(TimeProvider.ScheduleIn(tipPositions, timeStep));
+            Thread.Sleep(timeStep);    
         }
         
         for (var x = minZ; x < maxZ; x += deltaZ)
         {
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, x));
-            MotionPlanner.SetTipPositionsForLegs(tipPositions);
 
-            Thread.Sleep(TimeSpan.FromSeconds(0.01));    
+            MotionPlanner.SetTipPositionsForLegs(TimeProvider.ScheduleIn(tipPositions, timeStep));
+            Thread.Sleep(timeStep);    
         }
         
         // When

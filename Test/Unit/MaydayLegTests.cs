@@ -3,6 +3,7 @@ using MaydayDomain;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using Test.Unit.Dynamixel;
 using UnitsNet;
 using Xunit;
@@ -59,9 +60,9 @@ public class MaydayLegTests
     {
         return new()
         {
-            { "0", new(Angle.FromRevolutions(0.0), Angle.FromRevolutions(0.0), Angle.FromRevolutions(0.0)) },
-            { "1", new(Angle.FromRevolutions(0.5), Angle.FromRevolutions(0.5), Angle.FromRevolutions(0.5)) },
-            { "2", new(Angle.FromRevolutions(0.1), Angle.FromRevolutions(0.2), Angle.FromRevolutions(0.3)) },
+            { "0", new(coxaAngle: 0.0, femurAngle: 0.0, tibiaAngle: 0.0) },
+            { "1", new(coxaAngle: 0.5, femurAngle: 0.5, tibiaAngle: 0.5) },
+            { "2", new(coxaAngle: 0.1, femurAngle: 0.2, tibiaAngle: 0.3) },
         };
     }
 
@@ -79,13 +80,13 @@ public class MaydayLegTests
         MaydayLeg leg = new(mockJoints.Select(mj => (Connection)mj.Object).ToList(), []);
 
         // When
-        leg.SetPosture(givenPosture);
+        leg.SetPosture(Timed<MaydayLegPosture>.Passed(givenPosture));
 
         // Then
         mockJoints
-            .Zip(givenPosture.AsListOfGoalAngles())
+            .Zip(givenPosture.AsListOfGoalAngles(), (joint, angleGoal) => (joint, angleGoal))
             .ToList()
-            .ForEach(pair => pair.First.Verify(j => j.SetAngleGoal(pair.Second), Times.Once));
+            .ForEach(pair => pair.joint.Verify(j => j.SetAngleGoal(Timed<Angle>.Passed(pair.angleGoal)), Times.Once));
     }
 
     [Fact]
@@ -189,7 +190,8 @@ public class MaydayLegTests
         var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
-        leg.SetPosture(leg.GetPosture() with {CoxaAngle = Angle.FromRevolutions(0.25)});
+        var targetPosture = leg.GetPosture() with {CoxaAngle = Angle.FromRevolutions(0.25)};
+        leg.SetPosture(Timed<MaydayLegPosture>.Passed(targetPosture));
         
         // When
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
@@ -222,7 +224,7 @@ public class MaydayLegTests
         var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
-        leg.SetPosture(MaydayLegPosture.Straight);
+        leg.SetPosture(Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Straight));
         
         // When
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));
@@ -256,7 +258,8 @@ public class MaydayLegTests
         var leg = CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
             .CreateLeg(new(Side.Left, SidePosition.Center));
 
-        leg.SetPosture(leg.GetPosture() with {FemurAngle =  Angle.FromRevolutions(0.0625)});
+        var targetPostures = leg.GetPosture() with {FemurAngle =  Angle.FromRevolutions(0.0625)};
+        leg.SetPosture(Timed<MaydayLegPosture>.Passed(targetPostures));
         
         // When
         var actualTransform = leg.GetTransformOf(leg.LinkFromName(linkName));

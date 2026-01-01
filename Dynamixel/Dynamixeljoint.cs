@@ -1,5 +1,6 @@
 ﻿using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace Dynamixel;
@@ -36,7 +37,7 @@ public class DynamixelJoint : Joint
     //  double the frequency, but it decays on its own. 
     public override JointState State => _adapter.GetState(_id); 
     
-    public override void SetAngleGoal(Angle goal) => _adapter.SetGoalAngleFor(_id, goal);
+    public override void SetAngleGoal(Timed<Angle> goal) => _adapter.SetGoalAngleFor(_id, goal);
 
     public void Initialize() => _adapter.Initialize(_id, RotationDirection);
 }

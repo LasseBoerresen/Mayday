@@ -4,6 +4,7 @@ using System.Text.Json;
 using Generic;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 using static System.Math;
 using static Generic.UnitsNetExtensions;
@@ -87,7 +88,7 @@ public class LegPostureByPositionMap
         // local func
         void AppendPosture(MaydayLegPosture posture)
         {
-            leg.SetPosture(posture);
+            leg.SetPosture(Timed<MaydayLegPosture>.Passed(posture));
                     
             var position = leg.GetTipPosition();
             var cellPosition = GetCellCenterPositionFor(position);
@@ -186,7 +187,7 @@ public class LegPostureByPositionMap
     /// <returns>Posture for tip position closest to current posture</returns>
     /// <exception cref="InvalidOperationException">If the tip position is unreachable</exception>
     public static MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
-    {
+    {   
         var cellPosition = GetCellCenterPositionFor(tipPosition);
         var cellPositionNeighbor = GetNeighborCellCenterPositionFor(tipPosition);
         var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, cellPositionNeighbor);

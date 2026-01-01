@@ -1,6 +1,7 @@
 ﻿using RobotDomain.Geometry;
 using RobotDomain.Physics;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace Test.Unit;
@@ -16,7 +17,7 @@ public class FakeJoint(Angle angle)
 {
     public override JointState State => JointState.Zero with { Angle = angle };
 
-    public override void SetAngleGoal(Angle goal)
+    public override void SetAngleGoal(Timed<Angle> goal)
     {
         throw new NotImplementedException();
     }

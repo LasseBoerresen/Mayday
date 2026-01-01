@@ -2,6 +2,7 @@
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 using Xunit;
 using static RobotDomain.Structures.AttachmentOrder;
@@ -27,7 +28,7 @@ public class DynamixelJointFactoryTests
     {
         // Given
         JointId id = new(1);
-        var goalAngle = Angle.FromRevolutions(0.42);
+        var goalAngle = Timed<Angle>.Passed( Angle.FromRevolutions(0.42));
     
         // When
         var actualJoint = _dynamixelJointFactory.New(_parentLink, _childLink, Transform.Zero, id, Forward, LinkLast);

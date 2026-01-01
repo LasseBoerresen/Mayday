@@ -1,5 +1,6 @@
 ﻿using RobotDomain.Geometry;
 using RobotDomain.Physics;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace RobotDomain.Structures;
@@ -19,15 +20,15 @@ public class EchoJoint(
         parent, 
         child)
 {
-    Angle _goal = Angle.Zero;
+    Timed<Angle> _goal = Timed<Angle>.Passed(Angle.Zero);
     
     public override JointState State =>
         new(
-            Angle: _goal,
+            Angle: _goal.Target,
             RotationalSpeed: RotationalSpeed.Zero,
             Torque: LoadRatio.Zero,
             Temperature: Temperature.FromDegreesCelsius(23),
             AngleGoal: _goal);
 
-    public override void SetAngleGoal(Angle goal) => _goal = goal;
+    public override void SetAngleGoal(Timed<Angle> goal) => _goal = goal;
 }

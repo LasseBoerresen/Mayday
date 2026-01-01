@@ -1,4 +1,5 @@
 ﻿using RobotDomain.Geometry;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace RobotDomain.Structures;
@@ -24,7 +25,7 @@ public abstract class Joint : Connection
     }
     
     public abstract JointState State { get; }
-    public abstract void SetAngleGoal(Angle goal);
+    public abstract void SetAngleGoal(Timed<Angle> goal);
     
     protected override Transform Transform => 
         _attachmentOrder == AttachmentOrder.LinkLast 

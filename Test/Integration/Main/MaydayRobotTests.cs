@@ -9,11 +9,13 @@ namespace Test.Integration.Main;
 [TestSubject(typeof(MaydayRobot))]
 public class MaydayRobotTests
 {
+    static readonly TimeProvider TimeProvider = TimeProvider.System;
+    
     [PhysicalRobotFact]
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithTerminalPostureBehaviorController().RunUnsafe();
+        var may = MaydayRobot.CreateWithTerminalPostureBehaviorController(TimeProvider).RunUnsafe();
 
         // When
         Task.Run(() => may.Start());
@@ -30,7 +32,7 @@ public class MaydayRobotTests
     void GivenMayWithBabyLegsBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobot.CreateWithBabyLegsBehaviorController().RunUnsafe();
+        var may = MaydayRobot.CreateWithBabyLegsBehaviorController(TimeProvider).RunUnsafe();
 
         // When
         Task.Run(() => may.Start());

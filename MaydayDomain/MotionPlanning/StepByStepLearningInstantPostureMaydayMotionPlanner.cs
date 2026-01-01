@@ -22,20 +22,20 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
         _neuralNetwork = neuralNetwork;
     }
 
-    public override void MoveTipPositions(MaydayStructureSet<Xyz> tipDeltas)
+    public override void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)
     {
-        var inputs = tipDeltas.Map(CreateInput);
-        var expectedPositions = inputs.Map(i => i.EndXyz);
+        var inputsTimed = tipDeltasTimed.Map(tipDeltas => tipDeltas.Map(CreateInput));
+        var expectedPositions = inputsTimed.Target.Map(i=> i.EndXyz);
         
-        var outputs = inputs.Map(_neuralNetwork.Predict);
+        var outputsTimed = inputsTimed.Map(inputs => inputs.Map(_neuralNetwork.Predict));
 
-        SetPostures(outputs);
+        SetPostures(outputsTimed);
         WaitForMovementToFinish();
 
         var actualPositions = Structure.GetPositionsOf(LinkName.Tip);
 
         var errors = CalculateErrors(expectedPositions, actualPositions);
-        var trainingDataPoints = ToTrainingDataPoints(inputs, outputs, errors);
+        var trainingDataPoints = ToTrainingDataPoints(inputsTimed.Target, outputsTimed.Target, errors);
         // Just predicting for now, to get the model started.
         // Once it can predict random values, they we can start training 
         // _neuralNetwork.Train(trainingDataPoints);
@@ -91,9 +91,10 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
                 zip.Item1.Value, zip.Item2.Value, zip.Item3.Value));
     }
 
-    private void SetPostures(MaydayStructureSet<InverseLegKinematicsOutput> outputs)
+    private void SetPostures(Timed<MaydayStructureSet<InverseLegKinematicsOutput>> outputsTimed)
     {
-        Structure.SetPosture(MaydayStructurePosture.FromSet(outputs.Map(o => o.ToPosture())));
+        Structure.SetPosture(outputsTimed.Map(
+            outputs => MaydayStructurePosture.FromSet(outputs.Map(o => o.ToPosture()))));
     }
 
     private static void WaitForMovementToFinish()
@@ -111,10 +112,10 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     }
     
     public new static Eff<StepByStepLearningInstantPostureMaydayMotionPlanner> Create(
-        CancellationTokenSource cancellationTokenSource)
+        CancellationTokenSource cancellationTokenSource, TimeProvider timeProvider)
     {
-        var structureEff = CreateMaydayStructure(cancellationTokenSource);
-        var scheduler = new PeriodicScheduler(TimeProvider.System, Duration.FromSeconds(0.1));
+        var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
+        var scheduler = new PeriodicScheduler(timeProvider, Duration.FromSeconds(0.1));
         var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
         
         return structureEff.Map(structure => 
