@@ -13,9 +13,7 @@ public class AdapterSdkImpl : Adapter
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
-    readonly Task _updateAngleTask;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _updateAnglePeriod = TimeSpan.FromMilliseconds(10);
     readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
     public AdapterSdkImpl(
@@ -29,7 +27,6 @@ public class AdapterSdkImpl : Adapter
         _cancellationTokenSource = cancellationTokenSource;
         _timeProvider = timeProvider;
 
-        _updateAngleTask = Task.Run(() => UpdateLoopAsync(UpdateJointAngleCache, _updateAnglePeriod));
         _setGoalAngleTask = Task.Run(() => UpdateLoopAsync(SetGoalAngles, _setGoalAnglePeriod));
     }
 
@@ -37,10 +34,9 @@ public class AdapterSdkImpl : Adapter
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
-            cacheUpdateAction();
-            
             try
             {
+                cacheUpdateAction();
                 // TODO: Use PeriodicScheduler to not delay too long 
                 await Task.Delay(updatePeriod, _cancellationTokenSource.Token);
             }
@@ -48,12 +44,18 @@ public class AdapterSdkImpl : Adapter
             {
                 // Ignore exception when the task is canceled.
             }
+            catch (Exception ex)
+            {
+                // Log the error so it's not ignored!
+                Console.WriteLine($"Error in update loop: {ex.Message}");
+                // Depending on requirements, you might want to 'break' or 'continue'
+            }
         }
     }
 
     void UpdateJointAngleCache()
     {
-        _jointStateCache.SetAnglesFor(ReadAngles());
+        ReadAngles().ForEach(kvp => _jointStateCache.SetAngleFor(kvp.Key, kvp.Value));
     }
 
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
@@ -109,20 +111,23 @@ public class AdapterSdkImpl : Adapter
 
     IDictionary<JointId, Angle> ReadAngles()
     {
-        var positionStepsById = _portAdapter.Read(GetDynamixelIds(), ControlRegister.PresentPosition);
+        var positionStepsById = _portAdapter.Read(GetInitializedDynamixelIds(), ControlRegister.PresentPosition);
 
         return positionStepsById
             .Select(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
             .ToDictionary();
     }
 
-    IEnumerable<Id> GetDynamixelIds()
+    IEnumerable<Id> GetInitializedDynamixelIds()
     {
-        return _jointStateCache.GetIds().Select(id => Id.FromBase(id));
+        return _jointStateCache.GetIds().Select(Id.FromBase);
     }
 
     void SetGoalAngles()
     {
+        // Must have up-to-date angle in order to interpolate accurately. 
+        UpdateJointAngleCache();
+        
         var interpolatedGoalAnglesById = _jointStateCache
             .GetById()
             .MapValueToReadonly(jointState => jointState.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
@@ -246,22 +251,19 @@ public class AdapterSdkImpl : Adapter
     {
         _cancellationTokenSource.Cancel();
         
-        try
-        {
-            _updateAngleTask.Wait();
-        }
-        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
-        {
-            // Ignore cancellation exceptions.
-        }
         
         try
         {
             _setGoalAngleTask.Wait();
         }
-        catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is TaskCanceledException))
+        catch (AggregateException ex)
         {
-            // Ignore cancellation exceptions.
+            // If it's JUST a cancellation, we can ignore it
+            if (ex.InnerExceptions.All(e => e is TaskCanceledException))
+                return;
+                
+            // If there were other errors (like hardware disconnects), rethrow!
+            throw; 
         }
         
         _cancellationTokenSource.Dispose();

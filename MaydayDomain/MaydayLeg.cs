@@ -94,7 +94,8 @@ public class MaydayLeg
 
     public void MoveTipPositionTo(Timed<Xyz> tipPositionTimed)
     {
-        var postureTimed = tipPositionTimed.Map(tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
+        var postureTimed = tipPositionTimed.Map(
+            tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
         
         SetPosture(postureTimed);
     }

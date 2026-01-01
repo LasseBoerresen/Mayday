@@ -20,7 +20,7 @@ public class JointStateCacheDictImpl : JointStateCache
     {
         // Must use update method, to ensure operation is atomic. 
         _cacheDict.AddOrUpdate(
-            key: id,
+            key: id, 
             addValueFactory: key => throw new NotSupportedException($"Error trying to set angle for uninitialized jointId: {id}"),
             updateValueFactory: (key, oldState) => oldState with { Angle = angle });
     }
@@ -32,10 +32,5 @@ public class JointStateCacheDictImpl : JointStateCache
             key: id,
             addValueFactory: key => throw new NotSupportedException($"Error trying to set angle goal for uninitialized jointId: {id}"),
             updateValueFactory: (key, oldState) => oldState with { AngleGoal = angleGoal });
-    }
-
-    public void SetAnglesFor(IDictionary<JointId, Angle> anglesById)
-    {
-        throw new NotImplementedException();
     }
 }
