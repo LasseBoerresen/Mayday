@@ -2,11 +2,11 @@
 
 namespace RobotDomain.Time;
 
-public record Timed<T>(DateTimeOffset ArrivalTime, T Target)
+public record Timed<T>(DateTimeOffset ArrivalTime, DateTimeOffset IssueTime, T Target)
 {
-    public static Timed<T> Passed(T command) => new(DateTimeOffset.MinValue, command);
+    public static Timed<T> Passed(T command) => new(DateTimeOffset.MinValue, DateTimeOffset.MinValue, command);
 
-    public Timed<TNew> Map<TNew>(Func<T, TNew> mapper) => new(ArrivalTime, mapper(Target));
+    public Timed<TNew> Map<TNew>(Func<T, TNew> mapper) => new(ArrivalTime, IssueTime, mapper(Target));
 
     public double StepFactor(DateTimeOffset currentTime, TimeSpan timeStep)
     {
@@ -29,11 +29,13 @@ public static class TimedExtensions
     public static IEnumerable<Timed<T>> Sequence<T>(this Timed<IEnumerable<T>> timedEnumerable)
     {
         return timedEnumerable.Target
-            .Select(t => new Timed<T>(timedEnumerable.ArrivalTime, t));
+            .Select(t => new Timed<T>(timedEnumerable.ArrivalTime, timedEnumerable.IssueTime, t));
     }
 
     public static Timed<T> ScheduleIn<T>(this TimeProvider timeProvider, T target, TimeSpan arrivalTime)
     {
-        return new(timeProvider.GetUtcNow() + arrivalTime, target);
+        var now = timeProvider.GetUtcNow();
+        
+        return new(now + arrivalTime, now, target);
     }
 }
