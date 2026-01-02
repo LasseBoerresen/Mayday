@@ -10,12 +10,13 @@ public record Timed<T>(DateTimeOffset ArrivalTime, DateTimeOffset IssueTime, T T
 
     public double StepFactor(DateTimeOffset currentTime, TimeSpan timeStep)
     {
-        var remainingTime = (ArrivalTime - currentTime).ClampToPositive();
+        var timeDiff = (ArrivalTime - IssueTime).ClampToPositive();
+        var timeElapsed = currentTime - IssueTime;
 
-        if (remainingTime == TimeSpan.Zero) 
+        if (timeDiff == TimeSpan.Zero) 
             return 1.0;
         
-        return Math.Clamp(timeStep / remainingTime, min: 0.0, max: 1.0);
+        return Math.Clamp(timeElapsed / timeDiff, min: 0.0, max: 1.0);
     }
 
     public Timed<T> ExtendWith(TimeSpan t)

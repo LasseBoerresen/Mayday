@@ -14,7 +14,7 @@ public class AdapterSdkImpl : Adapter
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
+    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(2);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
@@ -58,12 +58,14 @@ public class AdapterSdkImpl : Adapter
         ReadAngles().ForEach(kvp => _jointStateCache.SetAngleFor(kvp.Key, kvp.Value));
     }
 
+    // Velocity limit cannot be high or infinite, otherwise the motors will
+    // reset on big movements, perhaps because of voltage drop. 0.5 rev/s seems to work. 
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     
     // TODO use PID values or remove them!
-    static int _POSITION_P_GAIN_SOFT = 200; // 640;  // 200;
-    static int _POSITION_I_GAIN_SOFT = 300;
-    static int _POSITION_D_GAIN_SOFT = 4000;
+    static uint _POSITION_P_GAIN_SOFT = 1000; // 640;  // 200;
+    static uint _POSITION_I_GAIN_SOFT = 1000;
+    static uint _POSITION_D_GAIN_SOFT = 4000;
 
     public void Initialize(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
@@ -75,6 +77,7 @@ public class AdapterSdkImpl : Adapter
         TorqueDisable(id);
         SetVelocityLimit(id);
         SetRotationDirection(id, rotationDirection);
+        SetPIDGains(id);
         TorqueEnable(id);
         
         // Ensure a state value is always available post initialization. 
@@ -85,7 +88,7 @@ public class AdapterSdkImpl : Adapter
     {
         return _jointStateCache.GetFor(id);
     }
-    
+
     JointState GetInitialState(JointId id)
     {
         var jointState = new JointState(
@@ -93,7 +96,8 @@ public class AdapterSdkImpl : Adapter
             ReadSpeed(id),
             ReadLoadRatio(id),
             ReadTemperature(id),
-            Timed<Angle>.Passed(ReadAngleGoal(id)));
+            AngleGoal: Timed<Angle>.Passed(ReadAngleGoal(id)),
+            AngleGoalPrevious: Timed<Angle>.Passed(ReadAngleGoal(id)));
             
         // Console.WriteLine("new joint state: " + jointState);    
         return jointState;
@@ -125,8 +129,10 @@ public class AdapterSdkImpl : Adapter
 
     void SetGoalAngles()
     {
+        Console.WriteLine($"{_timeProvider.GetUtcNow():O}: Calling SetGoalAngles");
+        
         // Must have up-to-date angle in order to interpolate accurately. 
-        UpdateJointAngleCache();
+        // UpdateJointAngleCache();
         
         var interpolatedGoalAnglesById = _jointStateCache
             .GetById()
@@ -205,7 +211,7 @@ public class AdapterSdkImpl : Adapter
     {
         _jointStateCache.SetAngleGoalFor(id, goalAngleTimed);
     }
-    
+
     void SetVelocityLimit(JointId id)
     {
         var dynamixelVelocity = VelocityLimitSlow
@@ -215,18 +221,25 @@ public class AdapterSdkImpl : Adapter
         _portAdapter.Write(Id.FromBase(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
+    void SetPIDGains(JointId id)
+    {
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionPGain, _POSITION_P_GAIN_SOFT);
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionIGain, _POSITION_I_GAIN_SOFT);
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionDGain, _POSITION_D_GAIN_SOFT);
+    }
+
     void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         var driveMode = GetDriveMode(id);
         var driveModeUpdated = driveMode & RotationDirection.FromDomain(rotationDirection).Value;
         SetDriveMode(id, driveModeUpdated);
     }
-    
+
     uint GetDriveMode(JointId id)
     {
         return _portAdapter.Read(Id.FromBase(id), ControlRegister.DriveMode);
     }
-    
+
     void SetDriveMode(JointId id, uint driveMode)
     {
         _portAdapter.Write(Id.FromBase(id), ControlRegister.DriveMode, driveMode);

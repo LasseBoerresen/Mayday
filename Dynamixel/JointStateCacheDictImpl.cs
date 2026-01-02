@@ -31,6 +31,7 @@ public class JointStateCacheDictImpl : JointStateCache
         _cacheDict.AddOrUpdate(
             key: id,
             addValueFactory: key => throw new NotSupportedException($"Error trying to set angle goal for uninitialized jointId: {id}"),
-            updateValueFactory: (key, oldState) => oldState with { AngleGoal = angleGoal });
+            updateValueFactory: (key, oldState) 
+                => oldState with { AngleGoal = angleGoal, AngleGoalPrevious = oldState.AngleGoal});
     }
 }

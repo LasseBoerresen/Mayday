@@ -9,19 +9,26 @@ public record JointState(
     RotationalSpeed RotationalSpeed,
     LoadRatio Torque,
     Temperature Temperature,
-    Timed<Angle> AngleGoal)
+    Timed<Angle> AngleGoal,
+    Timed<Angle> AngleGoalPrevious)
 {
     public static JointState Zero => new(
         Angle.Zero,
         RotationalSpeed.Zero,
         LoadRatio.Zero,
         Temperature.Zero,
+        Timed<Angle>.Passed(Angle.Zero),
         Timed<Angle>.Passed(Angle.Zero));
     
-    public Angle InterpolateGoalAngleOneTimeStep(Func<Timed<Angle>, double> interpolatedStepFactorFunc)
+    
+    public Angle InterpolateGoalAngleOneTimeStep(Func<Timed<Angle>, double> timedStepFactorFunc)
     {
-        var remainingAngle = AngleGoal.Target - Angle;
+                
+        var stepFactor = timedStepFactorFunc(AngleGoal);
+        var angleDiff = AngleGoal.Target - AngleGoalPrevious.Target;
         
-        return AngleGoal.Target + remainingAngle * interpolatedStepFactorFunc(AngleGoal);
+        var angleStep = angleDiff * stepFactor;
+        
+        return AngleGoalPrevious.Target + angleStep;
     }
 };

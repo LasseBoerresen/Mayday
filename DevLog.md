@@ -1,6 +1,16 @@
 ﻿# Development Log
 
 ### Adding duration to movement commands for pacing
+#### 2026-01-02 12:35 +01:00 @Home
+So I got Timed<T> targets to compile everywhere in the codebase. And implemented interpolation in the dynamixel adapter. However, there are 3 issues. Because the pid controll is not strong right now, i.e. the 'P' term is only 200 (whatever unit that is), the motors do not overcome friction immediately and do not reach the final position under weight. This means, now that I do smaller movements and control behavior more directly, I should probably upp the P and I terms, to have a more direct result. Also, because I cannot trust it to reach the target angle, using the current angle as a baseline for each interpolated step does not work, because the first couple of steps are so small that the interpolated goal is further from the target that we started with, because the controller is a PID controller, and does not put infinite effort into reaching the goal. Actually, checking the current PID gains, it is 640, 0, 3600. So the reason we dont reach our goals is that we have 0 I. 
+TODO:
+1. DONE When setting GoalAngle, also store PreviousGoal, so we can reliably step towards the goal in linear steps, not affected by how close we originally was to the previous goal.
+2. DONE Change pid to P 640 and I 2000
+3. Use the Periodic Scheduler with accurate intervals, (by polling), so we take accurate timeSteps.
+
+P.S. It worked, using previous goal means it moves consistently independent of offset. Having an I gain makes the robot twitch and has a spring to it in a satisfying way and also means it overcomes friction and gravity a bit better. Now I also dont need the current angle when setting goal, so I can decouple those in frequency. Because it is a bottle neck to communicate with the robot. And not having to read the angle every time saves 50%, which means we can get to approx 15ms period, if I dont "oversleep".
+
+### Adding duration to movement commands for pacing
 #### 2025-12-31 11:37 +01:00 @Home
 My plan was to have the dynamixel communication adapter update the goal position at the update frequency, but really, setting different goals is the job of the motion planner. If we dont set goals only in the joint domain, the movement will not follow the trajectory, because different parts of the trajectory needs joints moving at different speeds. My thougts we centering on the fact, that only the specific dynamixel joints know how strong the motor is, and thus it could be the responsibility of the joint to pace itself for a given goal angle and destination time. And that might still be the case. Because if not, the motor will try to move to the goal destination, however far it is, at max speed. We could mitigate that, with frequent motion planning updates, but decoupling them would probably be better. Then the motion planner is free to chose any appropriate update requencey to determine how accurately it will follow its planned trajectory. So I want all these components to have a datetimeprovider, in order to both set destination timestamps and compare that to the current time. I mean... Humans do not know the absolute timestamp of anything, but estimate how long something will take. Like, I want to get up from this chair in like a few seconds. Or, do we even do that. We just move at our "regular pace". 
 

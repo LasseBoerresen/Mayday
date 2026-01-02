@@ -21,6 +21,7 @@ public class EchoJoint(
         child)
 {
     Timed<Angle> _goal = Timed<Angle>.Passed(Angle.Zero);
+    Timed<Angle> _goalPrevious = Timed<Angle>.Passed(Angle.Zero);
     
     public override JointState State =>
         new(
@@ -28,7 +29,12 @@ public class EchoJoint(
             RotationalSpeed: RotationalSpeed.Zero,
             Torque: LoadRatio.Zero,
             Temperature: Temperature.FromDegreesCelsius(23),
-            AngleGoal: _goal);
+            AngleGoal: _goal,
+            AngleGoalPrevious: _goalPrevious);
 
-    public override void SetAngleGoal(Timed<Angle> goal) => _goal = goal;
+    public override void SetAngleGoal(Timed<Angle> goal)
+    {
+        _goalPrevious = _goal;
+        _goal = goal;
+    }
 }

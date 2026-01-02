@@ -7,6 +7,7 @@ using RobotDomain.Time;
 using Test.Unit;
 using Test.Utilities;
 using Xunit;
+using Xunit.Abstractions;
 using static Test.Unit.TestObjectFactory;
 using Length = UnitsNet.Length;
 
@@ -14,6 +15,13 @@ namespace Test.Integration.Main;
 
 public class MaydayLegTests
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public MaydayLegTests(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     static readonly TimeProvider TimeProvider = TimeProvider.System;
     static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner
         .Create(new CancellationTokenSource(), TimeProvider)
@@ -55,24 +63,30 @@ public class MaydayLegTests
         var minZ = Length.FromMeters(-0.22); // -0.22
         var maxZ = Length.FromMeters(0.18); // 0.2
         var deltaZ = Length.FromMeters(0.001);
-        var stanceWidth = Length.FromMeters(0.12);
-        var timeStep = TimeSpan.FromSeconds(0.01);
+        var stanceWidth = Length.FromMeters(0.125);
+        var timeStep = TimeSpan.FromSeconds(0.005);
 
         
         
         for (var z = maxZ; z > minZ; z -= deltaZ)
         {
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, z));
-            
-            MotionPlanner.SetTipPositionsForLegs(TimeProvider.ScheduleIn(tipPositions, timeStep));
+            var tipPositionsTimed = TimeProvider.ScheduleIn(tipPositions, timeStep);
+            _testOutputHelper.WriteLine($"{TimeProvider.GetUtcNow()}: Setting tip positions to {tipPositionsTimed}");
+
+            MotionPlanner.SetTipPositionsForLegs(tipPositionsTimed);
+            _testOutputHelper.WriteLine($"{TimeProvider.GetUtcNow()}: Sleeping");
             Thread.Sleep(timeStep);    
         }
         
         for (var x = minZ; x < maxZ; x += deltaZ)
         {
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, x));
-
-            MotionPlanner.SetTipPositionsForLegs(TimeProvider.ScheduleIn(tipPositions, timeStep));
+            var tipPositionsTimed = TimeProvider.ScheduleIn(tipPositions, timeStep);
+            _testOutputHelper.WriteLine($"{TimeProvider.GetUtcNow()}: Setting tip positions to {tipPositionsTimed}");
+            
+            MotionPlanner.SetTipPositionsForLegs(tipPositionsTimed);
+            _testOutputHelper.WriteLine($"{TimeProvider.GetUtcNow()}: Sleeping");
             Thread.Sleep(timeStep);    
         }
         
