@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Generic;
 using LanguageExt;
@@ -7,6 +8,8 @@ using UnitsNet;
 using static System.Console;
 using static Dynamixel.DynamixelCommunication;
 using Error = LanguageExt.Common.Error;
+using FTD2XX_NET;
+using Duration = UnitsNet.Duration;
 
 namespace Dynamixel;
 
@@ -24,16 +27,19 @@ public class PortAdapterSdkImpl : PortAdapter
         
         
 
-    private PortAdapterSdkImpl(PortNumber portNumber)
+    PortAdapterSdkImpl(PortNumber portNumber)
     {
         _portNumber = portNumber;
     }
 
-    static readonly BitRate BitRate = BitRate.FromBitsPerSecond(4000000); 
+    static readonly BitRate BitRate = BitRate.FromBitsPerSecond(4000000);
+    static readonly Duration PacketTimeOut = Duration.FromMilliseconds(2);
+    static readonly Duration DeviceLatency = Duration.FromMilliseconds(1);
+    
      
     // Check which port is being used on your controller
     // ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
-    const string DeviceName = "COM3";
+    const string FtdiDeviceSerialNumber = "FT2H2YMW";
 
     public void Write(IReadOnlyDictionary<Id, uint> valuesById, ControlRegister cr)
     {
@@ -52,9 +58,15 @@ public class PortAdapterSdkImpl : PortAdapter
                 if (dxl_addparam_result != true)
                     throw new Exception($"[ID: {kvp.Key}] groupSyncWrite addparam failed");
             });
-            
+
+            var sw = Stopwatch.StartNew();
             groupSyncWriteTxPacket(group.Value);
+            sw.Stop();
+            WriteLine($"Write time: {sw.ElapsedMilliseconds}ms");
+ 
+            sw.Restart();
             CheckCommunicationResults(mode: nameof(Write), cr: cr);
+            WriteLine($"check Communication time: {sw.ElapsedMilliseconds}ms");
         }
     }
 
@@ -259,6 +271,13 @@ public class PortAdapterSdkImpl : PortAdapter
         
         return Eff<Unit>.Pure(Unit.Default);
     }
+    
+    static Eff<Unit> SetPortPacketTimeOut(PortNumber portNumber)
+    {
+        setPacketTimeoutMSec(portNumber.Value, (uint)PacketTimeOut.Milliseconds);
+        
+        return Eff<Unit>.Pure(Unit.Default);
+    }
 
     public void Dispose()
     {
@@ -272,10 +291,11 @@ public class PortAdapterSdkImpl : PortAdapter
             .Bind(portNumber => InitializePacketHandler()
                 .Bind(_ => OpenPort(portNumber))
                 .Bind(_ => SetPortBaudrate(portNumber))
+                .Bind(_ => SetPortPacketTimeOut(portNumber))
                 .Map(_ => new PortAdapterSdkImpl(portNumber)));
     }
 
-    private static Eff<Unit> InitializePacketHandler()
+    static Eff<Unit> InitializePacketHandler()
     {
         try
         {
@@ -289,10 +309,39 @@ public class PortAdapterSdkImpl : PortAdapter
         return Eff<Unit>.Pure(Unit.Default);
     }
 
-    private static Eff<PortNumber> InitializePortHandlerAndGetNumber()
+    static Eff<PortNumber> InitializePortHandlerAndGetNumber()
     {
-        var portNumber = new PortNumber(portHandler(DeviceName));
+        return ConfigurePortLatencyAndGetComPortName()
+            .Map(deviceName => new PortNumber(portHandler(deviceName)));
+    }
+
+    static Eff<string> ConfigurePortLatencyAndGetComPortName()
+    {
+        var device = new FTDI();
         
-        return Eff<PortNumber>.Pure(portNumber);
+        try
+        {
+            // Note: Ensure DeviceName matches the FTDI Description string, 
+            // not necessarily the COM port string.
+            var ftStatus = device.OpenBySerialNumber(FtdiDeviceSerialNumber);
+            if (ftStatus != FTDI.FT_STATUS.FT_OK)
+                return Error.New($"Failed to open device with SN '{FtdiDeviceSerialNumber}', status: {ftStatus}");
+
+            ftStatus = device.SetLatency((byte)DeviceLatency.Milliseconds);
+            if (ftStatus != FTDI.FT_STATUS.FT_OK)
+                return Error.New($"Failed to set port latency, status: {ftStatus}");
+            
+            // OBS! COM ports only work on Windows. If on linux, implement different lookup or use /dev/ttyUSB0 instead
+            ftStatus = device.GetCOMPort(out var comPortName);
+            if (ftStatus != FTDI.FT_STATUS.FT_OK)
+                return Error.New($"Failed to get COM port name, status: {ftStatus}");
+
+            return Eff<string>.Pure(comPortName);
+        }
+        finally
+        {
+            if (device.IsOpen) 
+                device.Close();
+        }
     }
 }

@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <PackageReference Include="CsvHelper" Version="33.0.1" />
+      <PackageReference Include="FTDI.FTD2XX_NET" Version="1.3.3" />
     </ItemGroup>
 
 	<ItemGroup>

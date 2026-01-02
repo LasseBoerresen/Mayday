@@ -78,6 +78,7 @@ public class AdapterSdkImpl : Adapter
         SetVelocityLimit(id);
         SetRotationDirection(id, rotationDirection);
         SetPIDGains(id);
+        SetReturnDelay(id);
         TorqueEnable(id);
         
         // Ensure a state value is always available post initialization. 
@@ -226,6 +227,12 @@ public class AdapterSdkImpl : Adapter
         _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionPGain, _POSITION_P_GAIN_SOFT);
         _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionIGain, _POSITION_I_GAIN_SOFT);
         _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionDGain, _POSITION_D_GAIN_SOFT);
+    }
+    
+    void SetReturnDelay(JointId id)
+    {
+        // must be low, i.e. 0us or 2us for fast robot communicatoin without latency 
+        _portAdapter.Write(Id.FromBase(id), ControlRegister.ReturnDelayTime, 0);
     }
 
     void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
