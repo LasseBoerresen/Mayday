@@ -108,8 +108,8 @@ public class AdapterSdkImpl : Adapter
 
     void SetGoalAngles()
     {
-        // Must have up-to-date angle in order to interpolate accurately. 
-        // UpdateJointAngleCache();
+        // Also update joint angles syncronously, they are needed for inverse kinematics, when finding the closes joints.  
+        UpdateJointAngleCache();
         
         var interpolatedGoalAnglesById = _jointStateCache
             .GetById()
