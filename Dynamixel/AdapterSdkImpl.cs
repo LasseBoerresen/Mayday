@@ -15,7 +15,7 @@ public class AdapterSdkImpl : Adapter
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(100);
+    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
