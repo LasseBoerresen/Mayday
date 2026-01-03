@@ -63,10 +63,11 @@ public static class PeriodicScheduler
             // but only if we have more than 1ms + 0.5ms (buffer) left.
             var timeRemaining = duration - stopWatch.Elapsed;
 
-            if (timeRemaining > MinTimeForSleep)
-                Thread.Sleep(timeRemaining - SleepBuffer);
-            else
-                Thread.SpinWait(10); // Busy wait for the last bit of precision
+            Thread.SpinWait(100);
+            // if (timeRemaining > MinTimeForSleep)
+            //     Thread.Sleep(timeRemaining - SleepBuffer);
+            // else
+            //     Thread.SpinWait(10); // Busy wait for the last bit of precision
         }
     }
 
