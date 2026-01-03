@@ -59,14 +59,14 @@ public class PortAdapterSdkImpl : PortAdapter
                     throw new Exception($"[ID: {kvp.Key}] groupSyncWrite addparam failed");
             });
 
-            var sw = Stopwatch.StartNew();
+            // var sw = Stopwatch.StartNew();
             groupSyncWriteTxPacket(group.Value);
-            sw.Stop();
-            WriteLine($"Write time: {sw.ElapsedMilliseconds}ms");
- 
-            sw.Restart();
+            // sw.Stop();
+            // WriteLine($"Write time: {sw.Elapsed}");
+            //
+            // sw.Restart();
             CheckCommunicationResults(mode: nameof(Write), cr: cr);
-            WriteLine($"check Communication time: {sw.ElapsedMilliseconds}ms");
+            // WriteLine($"check Communication time: {sw.Elapsed}");
         }
     }
 

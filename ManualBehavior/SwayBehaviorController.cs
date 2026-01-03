@@ -12,16 +12,17 @@ namespace ManualBehavior;
 
 public class SwayBehaviorController(
     MaydayMotionPlanner motionPlanner,
-    PeriodicScheduler periodicScheduler,
     CancellationToken ct,
     TimeProvider timeProvider) 
     : BehaviorController
 {
+    private Duration TimeStep = Duration.FromSeconds(5.0);
+    
     public Unit Start()
     {
         WakeUp();
         
-        periodicScheduler.Run(SwayOnce, ct);
+        PeriodicScheduler.Run(SwayOnce, TimeStep , ct); 
         
         return Unit.Default;
     }
@@ -70,8 +71,6 @@ public class SwayBehaviorController(
     
         return previousGoal;
     }
-
-    private Duration TimeStep => periodicScheduler.Duration;
 
     static Transform SwayAmount()
     {

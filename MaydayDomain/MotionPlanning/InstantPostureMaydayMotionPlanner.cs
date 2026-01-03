@@ -11,16 +11,12 @@ namespace MaydayDomain.MotionPlanning;
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
-    PeriodicScheduler _scheduler;
     Option<Timed<Movement>> _goalMovement = Option<Timed<Movement>>.None;
 
 
-    public InstantPostureMaydayMotionPlanner(
-        MaydayStructure structure,
-        PeriodicScheduler scheduler)
+    public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
         Structure = structure;
-        _scheduler = scheduler;
     }
 
     public MaydayStructureSet<MaydayLegPosture> GetPostures() => Structure.GetPostures();
@@ -55,8 +51,10 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public Task Start(CancellationToken ct)
     {
-        return _scheduler.RunAsync(() => 
-            _goalMovement.IfSome(gm => TrackGoalOnce(gm, ct)), ct);
+        return PeriodicScheduler.RunAsync(
+            action: () => _goalMovement.IfSome(gm => TrackGoalOnce(gm, ct)), 
+            duration: Duration.FromSeconds(0.1), 
+            ct);
     }
 
     void TrackGoalOnce(Timed<Movement> goalMovementTimed, CancellationToken ct)
@@ -78,10 +76,7 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
         TimeProvider timeProvider)
     {
         var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
-        PeriodicScheduler scheduler = new(timeProvider, Duration.FromSeconds(0.1));
-
-        var maydayMotionPlanner = structureEff.Map(structure =>  
-            new InstantPostureMaydayMotionPlanner(structure, scheduler));
+        var maydayMotionPlanner = structureEff.Map(structure => new InstantPostureMaydayMotionPlanner(structure));
         
         return maydayMotionPlanner;
     }

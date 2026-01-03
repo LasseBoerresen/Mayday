@@ -62,9 +62,9 @@ public class MaydayLegTests
         // Given
         var minZ = Length.FromMeters(-0.22); // -0.22
         var maxZ = Length.FromMeters(0.18); // 0.2
-        var deltaZ = Length.FromMeters(0.001);
+        var deltaZ = Length.FromMeters(0.01);
         var stanceWidth = Length.FromMeters(0.125);
-        var timeStep = TimeSpan.FromSeconds(0.005);
+        var timeStep = TimeSpan.FromSeconds(0.05);
 
         
         

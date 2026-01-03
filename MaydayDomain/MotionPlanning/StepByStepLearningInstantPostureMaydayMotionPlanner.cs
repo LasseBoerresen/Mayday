@@ -15,9 +15,8 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
 
     private StepByStepLearningInstantPostureMaydayMotionPlanner(
         MaydayStructure structure,
-        PeriodicScheduler periodicScheduler,
         InverseLegKinematicsNeuralNetwork neuralNetwork) 
-        : base(structure, periodicScheduler)
+        : base(structure)
     {
         _neuralNetwork = neuralNetwork;
     }
@@ -115,10 +114,8 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
         CancellationTokenSource cancellationTokenSource, TimeProvider timeProvider)
     {
         var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
-        var scheduler = new PeriodicScheduler(timeProvider, Duration.FromSeconds(0.1));
         var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
         
-        return structureEff.Map(structure => 
-            new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, scheduler, nn));
+        return structureEff.Map(structure => new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, nn));
     }
 }

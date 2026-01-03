@@ -1,4 +1,5 @@
-﻿using Generic;
+﻿using System.Diagnostics;
+using Generic;
 using LanguageExt;
 using RobotDomain.Physics;
 using RobotDomain.Structures;
@@ -14,7 +15,7 @@ public class AdapterSdkImpl : Adapter
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(2);
+    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(100);
 
     public AdapterSdkImpl(
         PortAdapter portAdapter,
@@ -27,30 +28,7 @@ public class AdapterSdkImpl : Adapter
         _cancellationTokenSource = cancellationTokenSource;
         _timeProvider = timeProvider;
 
-        _setGoalAngleTask = Task.Run(() => UpdateLoopAsync(SetGoalAngles, _setGoalAnglePeriod));
-    }
-
-    async Task UpdateLoopAsync(Action cacheUpdateAction, TimeSpan updatePeriod)
-    {
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
-        {
-            try
-            {
-                cacheUpdateAction();
-                // TODO: Use PeriodicScheduler to not delay too long 
-                await Task.Delay(updatePeriod, _cancellationTokenSource.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                // Ignore exception when the task is canceled.
-            }
-            catch (Exception ex)
-            {
-                // Log the error so it's not ignored!
-                Console.WriteLine($"Error in update loop: {ex.Message}");
-                // Depending on requirements, you might want to 'break' or 'continue'
-            }
-        }
+        _setGoalAngleTask = PeriodicScheduler.RunAsync(SetGoalAngles, _setGoalAnglePeriod, cancellationTokenSource.Token);
     }
 
     void UpdateJointAngleCache()
@@ -130,8 +108,6 @@ public class AdapterSdkImpl : Adapter
 
     void SetGoalAngles()
     {
-        Console.WriteLine($"{_timeProvider.GetUtcNow():O}: Calling SetGoalAngles");
-        
         // Must have up-to-date angle in order to interpolate accurately. 
         // UpdateJointAngleCache();
         
