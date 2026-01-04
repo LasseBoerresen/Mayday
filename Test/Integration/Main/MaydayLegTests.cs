@@ -56,7 +56,7 @@ public class MaydayLegTests
     /// <summary>
     /// Tests basic inverse kinematics of legs, on real robot.
     /// </summary>
-    [PhysicalRobotFact]
+    [PhysicalRobotFact(Skip = "So far only a manual test. Needs to be automated.")]
     void GivenLegsWithTipAtX015_WhenGetTipPosition_ThenReturnsX015()
     {
         // Given
@@ -64,7 +64,7 @@ public class MaydayLegTests
         var maxZ = Length.FromMeters(0.18); // 0.2
         var deltaZ = Length.FromMeters(0.01);
         var stanceWidth = Length.FromMeters(0.125);
-        var timeStep = TimeSpan.FromSeconds(0.05);
+        var timeStep = TimeSpan.FromSeconds(0.125);
 
         
         
