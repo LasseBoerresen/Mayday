@@ -41,8 +41,8 @@ public class AdapterSdkImpl : Adapter
     static readonly Option<RotationalSpeed> VelocityLimitSlow = RotationalSpeed.FromRevolutionsPerSecond(0.5);  // AngularVelocity(tau / 8)  // tau / 16;
     
     // TODO use PID values or remove them!
-    static uint _POSITION_P_GAIN_SOFT = 1000; // 640;  // 200;
-    static uint _POSITION_I_GAIN_SOFT = 1000;
+    static uint _POSITION_P_GAIN_SOFT = 500; // 640;  // 200;
+    static uint _POSITION_I_GAIN_SOFT = 2000;
     static uint _POSITION_D_GAIN_SOFT = 4000;
 
     public void Initialize(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
