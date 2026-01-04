@@ -28,6 +28,9 @@ public class AdapterSdkImplTests
              _timeProvider);
     }
 
+    // TODO: This test is no longer correct, because portAdapter is no longer called to write single goal angles, but 
+    //  all at once. Also, they are written asyncronyously, so really we should only test if it is written within a
+    //  certain time frame, like 20ms. 
     [Fact]
     void Given_WhenSetGoalToZeroAngle_ThenCallsPortAdapterCorrectly()
     {
