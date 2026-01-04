@@ -1,4 +1,5 @@
 ﻿using MaydayDomain;
+using MaydayDomain.Components;
 using RobotDomain.Geometry;
 using Xunit;
 

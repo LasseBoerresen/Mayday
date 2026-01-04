@@ -1,8 +1,10 @@
 ﻿using Generic;
 using MaydayDomain;
+using MaydayDomain.Components;
 using Moq;
 using RobotDomain.Structures;
 using RobotDomain.Time;
+using UnitsNet;
 using Xunit;
 using static MaydayDomain.MaydayLegId;
 
@@ -16,6 +18,7 @@ public class MaydayStructureTests
         // Given
         IList<Connection> connections = [];
         IList<Link> links = [];
+        var thorax = Link.CreateThorax;
         
         Dictionary<MaydayLegId, MaydayLeg> legs = new()
         {
@@ -28,7 +31,7 @@ public class MaydayStructureTests
         };
 
         // When
-        MaydayStructure may = new(legs);
+        MaydayStructure may = new(thorax, legs);
 
         // Then
         Assert.True(may != null);
@@ -38,11 +41,12 @@ public class MaydayStructureTests
     public void GivenMaydayRobotWithMockLegs_WhenSetPosture_ThenCallsSetPostureOnAllLegs()
     {
         // Given
+        var thorax = Link.CreateThorax;
         Dictionary<MaydayLegId, Mock<MaydayLeg>> mockLegsDict = new();
         AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Connection>(), new List<Link>())));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
-        MaydayStructure may = new(legsDict);
+        MaydayStructure may = new(thorax, legsDict);
         
         // When
         var postureTimed = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
@@ -52,5 +56,29 @@ public class MaydayStructureTests
         mockLegsDict.ToList().ForEach(kvp => 
             kvp.Value.Verify(l => l.SetPosture(postureTimed), Times.Once));
         
+    }
+
+    [Fact]
+    public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
+    {
+        // Given
+        EchoJointFactory echoJointFactory = new();
+        MaydayStructure may = MaydayStructure.Create(echoJointFactory);
+        
+        // When
+        var coxaMotorTransforms = may.GetTransformsOf(LinkName.CoxaMotor);
+
+        // Then
+        foreach (var legId in AllLegIds)
+        {
+            var actualTransform = coxaMotorTransforms.ToLegDict()[legId];
+            var expectedTransform = Thorax.TransformFor(legId);
+
+            Assert.True(
+                actualTransform.IsAlmostEqual(expectedTransform, Length.FromMillimeters(0.1), Angle.FromDegrees(0.1)),
+                $"Transform for {legId} does not match expected thorax transform." +
+                $"\nActual: {actualTransform}" +
+                $"\nExpected: {expectedTransform}");
+        }
     }
 }

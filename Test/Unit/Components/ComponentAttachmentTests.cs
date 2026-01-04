@@ -21,13 +21,13 @@ public class ComponentAttachmentTests
     }
 
     [Fact]
-    void GivenBaseLinkAndAttachedLink_WhenGetChildOfBase_ThenReturnsAttachment()
+    void GivenBaseLinkAndAttachedLink_WhenGetChildrenOfBase_ThenReturnsAttachment()
     {
-        // When½
-        var actualChild = _baseLink.Child;
+        // When
+        var actualChildren = _baseLink.Children;
 
         // Then
-        Assert.Equal(_attachment, actualChild);
+        Assert.Contains(_attachment, actualChildren);
     }
     
     [Fact]

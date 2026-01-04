@@ -12,11 +12,9 @@ public abstract class Connection
 
     public string Name => $"{Parent.Name}To{Child.Name}"; 
 
-    public IList<Transform> GetTransformsTo(ComponentId id, IList<Transform> previousTransforms)
+    public Option<IList<Transform>> LookForTransformsTo(ComponentId id, IList<Transform> previousTransforms)
     {
-        return Child
-            .GetTransformsTo(id, previousTransforms.Append(Transform)
-            .ToList());
+        return Child.LookForTransformsTo(id, previousTransforms.Append(Transform).ToList());
     }
 
     protected Connection(ComponentId id, Link parent, Link child)

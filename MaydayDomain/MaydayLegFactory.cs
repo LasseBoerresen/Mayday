@@ -13,8 +13,7 @@ public class MaydayLegFactory(JointFactory jointFactory)
     {
         return MaydayLegId
             .AllLegIds
-            .Select(lId => new KeyValuePair<MaydayLegId, MaydayLeg>(lId, CreateLeg(lId)))
-            .ToDictionary();
+            .ToDictionary(lId => lId, CreateLeg);
     }
 
     public MaydayLeg CreateLeg(MaydayLegId legId)

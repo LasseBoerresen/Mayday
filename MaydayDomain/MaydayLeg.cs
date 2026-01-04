@@ -16,6 +16,7 @@ public class MaydayLeg
     readonly IImmutableList<Connection> _connections;
     readonly IImmutableList<Joint> _joints;
 
+    public Link BaseLink => CoxaMotor;
     Link CoxaMotor  => _links[0];
     Link Coxa       => _links[1];
     Link FemurMotor => _links[2];

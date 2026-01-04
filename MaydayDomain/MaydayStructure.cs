@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Generic;
 using MaydayDomain.MotionPlanning;
+using MaydayDomain.Components;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using RobotDomain.Time;
@@ -12,38 +13,46 @@ namespace MaydayDomain;
 //  managing legs should maybe be delegated to a "Legs" type. 
 public class MaydayStructure
 {
+    readonly Link _thorax;
+
     // TODO this should probably just be a structure set. More object oriented. 
     readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legsById;
 
-    public MaydayStructure(IDictionary<MaydayLegId, MaydayLeg> legs)
+    public MaydayStructure(Link thorax, IDictionary<MaydayLegId, MaydayLeg> legs)
     {
+        _thorax = thorax;
         _legsById = legs.ToImmutableSortedDictionary();
     }
 
     public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName)
     {
         return _legsById
-            .MapValue(l => l.GetTransformOf(linkName).Xyz)
+            .MapValue(l => GetTransformOf(linkName, l).Xyz)
             .ToMaydayStructureSet();
     }
 
     public Xyz GetPositionOf(LinkName linkName, MaydayLegId legId)
     {
-        return _legsById[legId].GetTransformOf(linkName).Xyz;
+        return GetTransformOf(linkName, _legsById[legId]).Xyz;
     }
 
     public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName)
     {
         return _legsById
-            .MapValue(l => l.GetTransformOf(linkName).Q)
+            .MapValue(l => GetTransformOf(linkName, l).Q)
             .ToMaydayStructureSet();
     }
 
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName)
     {
         return _legsById
-            .MapValue(l => l.GetTransformOf(linkName))
+            .MapValue(l => GetTransformOf(linkName, l))
             .ToMaydayStructureSet();
+    }
+
+    Transform GetTransformOf(LinkName linkName, MaydayLeg leg)
+    {
+        return _thorax.GetTransformOf(leg.LinkFromName(linkName).Id);
     }
 
     public void SetPosture(Timed<MaydayStructurePosture> postureTimed)
@@ -77,9 +86,13 @@ public class MaydayStructure
     
     public static MaydayStructure Create(JointFactory jointFactory)
     {
+        var thorax = Link.CreateThorax;
         var legs = new MaydayLegFactory(jointFactory).CreateAll();
-        
-        return new(legs);
+
+        legs.ForEach(kvp => 
+            Attachment.NewBetween(thorax, kvp.Value.BaseLink, Thorax.TransformFor(kvp.Key)));
+
+        return new(thorax, legs);
     }
 
     /// <summary>
@@ -99,11 +112,11 @@ public class MaydayStructure
             MoveThoraxBy(extraLeanRequiredTimed, legAndId.Value));
     }
 
-    static void MoveThoraxBy(Timed<Transform> leanTimed, MaydayLeg leg)
+    void MoveThoraxBy(Timed<Transform> leanTimed, MaydayLeg leg)
     {
         // Adding/subtracting two transforms effectively translates and rotates
         // the lhs which is exactly what is required for tip movement. 
-        leg.MoveTipPositionBy(leanTimed.Map(l => (GetTransformOfTipFor(leg) - l).Xyz));
+        leg.MoveTipPositionBy(leanTimed.Map(lean => (GetTransformOfTipFor(leg) - lean).Xyz));
     }
 
     public void MoveTipsTo(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed, CancellationToken ct)
@@ -115,11 +128,9 @@ public class MaydayStructure
             .ForEach(z => z.leg.MoveTipPositionTo(z.tipPositionTimed));
     }
 
-    static Transform GetTransformOfTipFor(MaydayLeg leg)
+    Transform GetTransformOfTipFor(MaydayLeg leg)
     {
-        throw new NotImplementedException(
-            "TODO: get tip transform at thorax center, by transforming through "
-            + "as of yet missing thorax link attached to dynamixel link");
+        return GetTransformOf(LinkName.Tip, leg);
     }
 
     Transform GetCurrentLean()

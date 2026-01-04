@@ -9,22 +9,20 @@ public class Link
     public ComponentId Id { get; }
     public LinkName Name { get; }
     public Option<Connection> Parent { get; private set; }
-    public Option<Connection> Child { get; private set; }
+    public List<Connection> Children { get; } = [];
 
     Link(
         ComponentId id, 
         LinkName name, 
-        Option<Connection> parent = default, 
-        Option<Connection> child = default)
+        Option<Connection> parent = default)
     {
         Id = id;
         Name = name;
         Parent = parent;
-        Child = child;
     }
 
     public static Link CreateBase => New(Base);
-    public static Link CreateThorax => New(Thorax); // TODO needs multiple children, one for each coxa dynamixel
+    public static Link CreateThorax => New(Thorax); 
     public static Link CreateCoxaMotor => New(CoxaMotor);
     public static Link CreateCoxa => New(Coxa);
     public static Link CreateFemurMotor => New(FemurMotor);
@@ -37,7 +35,7 @@ public class Link
 
     public void ConnectParent(Connection connection) => Parent = connection;
     
-    public void ConnectChild(Connection connection) => Child = connection;
+    public void ConnectChild(Connection connection) => Children.Add(connection);
 
     public Transform GetTransformOf(ComponentId childId)
     {
@@ -46,16 +44,22 @@ public class Link
     }
 
     IList<Transform> GetTransformsTo(ComponentId id) => 
-        GetTransformsTo(id, [Transform.Zero]); 
+        LookForTransformsTo(id, [Transform.Zero])
+            .IfNone(() => throw new ChildNotFoundException(this, id)); 
 
-    public IList<Transform> GetTransformsTo(ComponentId id, IList<Transform> previousTransforms)
+    public Option<IList<Transform>> LookForTransformsTo(ComponentId id, IList<Transform> previousTransforms)
     {
         if (Id == id)
-            return previousTransforms;
+            return Option<IList<Transform>>.Some(previousTransforms);
+
+        foreach (var child in Children)
+        {
+            var result = child.LookForTransformsTo(id, previousTransforms);
+            if (result.IsSome)
+                return result;
+        }
         
-        return Child
-            .IfNone(() => throw new ChildNotFoundException(this, id))
-            .GetTransformsTo(id, previousTransforms);
+        return Option<IList<Transform>>.None;
     }
 
     public override string ToString()
