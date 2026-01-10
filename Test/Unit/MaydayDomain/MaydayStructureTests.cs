@@ -106,7 +106,7 @@ public class MaydayStructureTests
         
         var tipPositionsCenter = mayStructure.GetPositionsOf(LinkName.Tip);
         var tipPositionsBackward = tipPositionsCenter.Map(tp => tp with {X = tp.X - xOffset});
-        mayStructure.MoveTipsTo(Timed<MaydayStructureSet<Xyz>>.Passed(tipPositionsBackward), CancellationToken.None);
+        mayStructure.MoveTipsTo(Timed<MaydayStructureSet<Xyz>>.Passed(tipPositionsBackward));
         
         // When
         var actualLean = mayStructure.GetCurrentLean();

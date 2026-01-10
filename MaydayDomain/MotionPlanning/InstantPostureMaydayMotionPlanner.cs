@@ -31,7 +31,7 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public void SetTipPositionsForLegs(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed)
     {
-        Structure.MoveTipsTo(tipPositionsTimed, CancellationToken.None);
+        Structure.MoveTipsTo(tipPositionsTimed);
     }
 
     public MaydayLegPosture GetPosture(MaydayLegId legId) => Structure.GetPostureOf(legId);
@@ -52,17 +52,17 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     public Task Start(CancellationToken ct)
     {
         return PeriodicScheduler.RunAsync(
-            action: () => _goalMovement.IfSome(gm => TrackGoalOnce(gm, ct)), 
+            action: () => _goalMovement.IfSome(TrackGoalOnce), 
             duration: Duration.FromSeconds(0.1), 
             ct);
     }
 
-    void TrackGoalOnce(Timed<Movement> goalMovementTimed, CancellationToken ct)
+    void TrackGoalOnce(Timed<Movement> goalMovementTimed)
     {
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
         
-        Structure.MoveThoraxTo(goalMovementTimed.Map(m => m.Lean), ct);
+        Structure.MoveThoraxTo(goalMovementTimed.Map(m => m.Lean));
     }
 
     public Option<Timed<Movement>> GetGoal() => _goalMovement;
