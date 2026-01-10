@@ -124,7 +124,7 @@ public class AdapterSdkImpl : Adapter
 
     double InterpolatedStepFactor<T>(Timed<T> timed)
     {
-        return timed.StepFactor(currentTime: _timeProvider.GetUtcNow(), timeStep: _setGoalAnglePeriod);
+        return timed.StepFactor(currentTime: _timeProvider.GetUtcNow());
     }
 
     Angle ReadAngleGoal(JointId id)

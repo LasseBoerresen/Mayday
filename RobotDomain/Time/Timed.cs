@@ -8,7 +8,7 @@ public record Timed<T>(DateTimeOffset ArrivalTime, DateTimeOffset IssueTime, T T
 
     public Timed<TNew> Map<TNew>(Func<T, TNew> mapper) => new(ArrivalTime, IssueTime, mapper(Target));
 
-    public double StepFactor(DateTimeOffset currentTime, TimeSpan timeStep)
+    public double StepFactor(DateTimeOffset currentTime)
     {
         var timeDiff = (ArrivalTime - IssueTime).ClampToPositive();
         var timeElapsed = currentTime - IssueTime;
