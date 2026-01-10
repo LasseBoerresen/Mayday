@@ -7,7 +7,7 @@ StartupMode startupMode = Enum.Parse<StartupMode>(Environment.GetEnvironmentVari
 var timeProvider = TimeProvider.System;
 
 if (startupMode == StartupMode.Run)
-    Run(MaydayRobot.CreateWithTerminalPostureBehaviorController(timeProvider));
+    Run(MaydayRobot.CreateWithSwayBehavior(timeProvider));
 else if (startupMode == StartupMode.Train)
     Run(MaydayRobot.CreateWithBabyLegsBehaviorController(timeProvider));
 

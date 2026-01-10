@@ -26,6 +26,16 @@ public class MaydayRobot(BehaviorController behaviorController, CancellationToke
             .Map(bc => new MaydayRobot(bc, cancellationTokenSource));
     }
 
+    public static Eff<MaydayRobot> CreateWithSwayBehavior(TimeProvider timeProvider)
+    {
+        CancellationTokenSource cts = new();
+        
+        return InstantPostureMaydayMotionPlanner
+            .Create(cts, timeProvider)
+            .Map(mp => new SwayBehaviorController(mp, cts.Token, timeProvider))
+            .Map(bc => new MaydayRobot(bc, cts));
+    }
+
     public Unit Start() => behaviorController.Start();
 
     public void Stop() => cancelTokenSource.Cancel();
