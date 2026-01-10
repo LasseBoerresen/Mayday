@@ -18,4 +18,9 @@ public record MaydayStructurePosture(
     {
         return new(legPostures.RF, legPostures.RC, legPostures.RB, legPostures.LF, legPostures.LC, legPostures.LB);
     }
+    
+    public MaydayStructureSet<MaydayLegPosture> ToSet()
+    {
+        return new(RF, RC, RB, LF, LC, LB);
+    }
 }

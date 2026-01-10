@@ -106,6 +106,8 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
     {
         return GetEnumerator();
     }
+
+    public T this[MaydayLegId legId] => ToLegDict()[legId];
 }
 
 public static class MayDayStructureSetExtensions

@@ -14,40 +14,32 @@ namespace MaydayDomain;
 public class MaydayStructure
 {
     readonly Link _thorax;
-
-    // TODO this should probably just be a structure set. More object oriented. 
-    readonly ImmutableSortedDictionary<MaydayLegId, MaydayLeg> _legsById;
+    readonly MaydayStructureSet<MaydayLeg> _legs;
 
     public MaydayStructure(Link thorax, IDictionary<MaydayLegId, MaydayLeg> legs)
     {
         _thorax = thorax;
-        _legsById = legs.ToImmutableSortedDictionary();
+        _legs = MaydayStructureSet<MaydayLeg>.FromLegDict(legs);
     }
 
     public MaydayStructureSet<Xyz> GetPositionsOf(LinkName linkName)
     {
-        return _legsById
-            .MapValue(l => GetTransformOf(linkName, l).Xyz)
-            .ToMaydayStructureSet();
+        return _legs.Map(l => GetTransformOf(linkName, l).Xyz);
     }
 
     public Xyz GetPositionOf(LinkName linkName, MaydayLegId legId)
     {
-        return GetTransformOf(linkName, _legsById[legId]).Xyz;
+        return GetTransformOf(linkName, _legs[legId]).Xyz;
     }
 
     public MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName)
     {
-        return _legsById
-            .MapValue(l => GetTransformOf(linkName, l).Q)
-            .ToMaydayStructureSet();
+        return _legs.Map(l => GetTransformOf(linkName, l).Q);
     }
 
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName)
     {
-        return _legsById
-            .MapValue(l => GetTransformOf(linkName, l))
-            .ToMaydayStructureSet();
+        return _legs.Map(l => GetTransformOf(linkName, l));
     }
 
     Transform GetTransformOf(LinkName linkName, MaydayLeg leg)
@@ -57,31 +49,23 @@ public class MaydayStructure
 
     public void SetPosture(Timed<MaydayStructurePosture> postureTimed)
     {
-        _legsById.ForEach(kvp => kvp.Value.SetPosture(postureTimed.Map(p => p.ToLegDict()[kvp.Key])));
-    }
-    
-    public void SetPosture(Timed<LegProperty<MaydayLegPosture>> legPropertyOfPostureTimed)
-    {
-        var leg = _legsById[legPropertyOfPostureTimed.Target.LegId];
-        
-        leg.SetPosture(legPropertyOfPostureTimed.Map(p => p.Value));
+        _legs.Zip(postureTimed.Map(p => p.ToSet()).Sequence())
+            .ForEach(lAndP => lAndP.First.SetPosture(lAndP.Second));
     }
 
     public MaydayStructureSet<MaydayLegPosture> GetPostures()
     {
-        return _legsById
-            .MapValue(l => l.GetPosture())
-            .ToMaydayStructureSet();
+        return _legs.Map(l => l.GetPosture());
     }
 
     public MaydayLegPosture GetPostureOf(MaydayLegId legId)
     {
-        return _legsById[legId].GetPosture();
+        return _legs[legId].GetPosture();
     }
 
     public void SetPostureForAllLegs(Timed<MaydayLegPosture> postureTimed)
     {
-        _legsById.ForEach(kvp => kvp.Value.SetPosture(postureTimed));
+        _legs.ForEach(l => l.SetPosture(postureTimed));
     }
     
     public static MaydayStructure Create(JointFactory jointFactory)
@@ -110,8 +94,8 @@ public class MaydayStructure
     {
         var extraLeanRequiredTimed = leanTimed.Map(l => l - GetCurrentLean());
 
-        _legsById.ForEach(legAndId => 
-            MoveThoraxBy(extraLeanRequiredTimed, legAndId.Value));
+        _legs.ForEach(leg => 
+            MoveThoraxBy(extraLeanRequiredTimed, leg));
     }
 
     void MoveThoraxBy(Timed<Transform> leanTimed, MaydayLeg leg)
