@@ -128,11 +128,11 @@ public class MaydayStructure
         return GetTransformOf(LinkName.Tip, leg);
     }
 
-    Transform GetCurrentLean()
+    public Transform GetCurrentLean()
     {
         // TODO: To get the current lean, we need to find the ground plane from
-        //  the lowest 3 feet on two sides and reverse calculate the lean. Or
-        //  the orientation could come from an accelerometer, but the offset
+        //  the lowest 3 feet on two sides and reverse calculate the lean. Later
+        //  the orientation could come from an accelerometer, but the xy-offset
         //  needs to come from the offset from the average foot position, 
         //  including rotation around z axis from the angle of the coxa joint.
         throw new NotImplementedException();
