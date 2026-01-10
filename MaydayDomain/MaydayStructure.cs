@@ -121,6 +121,16 @@ public class MaydayStructure
         leg.MoveTipPositionBy(leanTimed.Map(lean => (GetTransformOfTipFor(leg) - lean).Xyz));
     }
 
+    public void MoveTipsBy(Timed<Xyz> offsetXyzTimed)
+    {
+        var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
+        
+        var tipPositionsOffsetTimed = offsetXyzTimed.Map(
+            offsetXyz => tipPositionsCurrent.Map(tp => tp + offsetXyz));
+            
+        MoveTipsTo(tipPositionsOffsetTimed);
+    }
+
     public void MoveTipsTo(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed)
     {
         _legsById.Values

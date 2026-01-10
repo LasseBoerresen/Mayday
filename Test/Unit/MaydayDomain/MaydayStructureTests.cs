@@ -83,6 +83,7 @@ public class MaydayStructureTests
     {
         // Given
         var mayStructure = MaydayStructure.CreateEcho();
+        
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
         
@@ -97,22 +98,22 @@ public class MaydayStructureTests
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given
-        var xOffset = Length.FromCentimeters(1);
-        
         var mayStructure = MaydayStructure.CreateEcho();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
         
-        var tipPositionsCenter = mayStructure.GetPositionsOf(LinkName.Tip);
-        var tipPositionsBackward = tipPositionsCenter.Map(tp => tp with {X = tp.X - xOffset});
-        mayStructure.MoveTipsTo(Timed<MaydayStructureSet<Xyz>>.Passed(tipPositionsBackward));
+        
+        var offsetX = Length.FromCentimeters(1);
+        var offsetXyz = Xyz.Zero with { X = -offsetX };
+        
+        mayStructure.MoveTipsBy(Timed<Xyz>.Passed(offsetXyz));
         
         // When
         var actualLean = mayStructure.GetCurrentLean();
         
         // Then
-        var forwardXyz1Cm = Xyz.Zero with {X = xOffset};
+        var forwardXyz1Cm = Xyz.Zero with {X = offsetX};
         var expectedLean = Transform.Zero with {Xyz = forwardXyz1Cm };
 
         TestObjectFactory.AssertTransformEqual("testidfoo", expectedLean, actualLean);
