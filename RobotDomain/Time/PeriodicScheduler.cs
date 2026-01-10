@@ -71,9 +71,9 @@ public static class PeriodicScheduler
         }
     }
 
-    static void LogActionExceededTimeSlot(Stopwatch stopWatch, TimeSpan nextTick)
+    static void LogActionExceededTimeSlot(Stopwatch stopWatch, TimeSpan duration)
     {
         Console.WriteLine(
-            $"Action exceeded time slot in {nameof(PeriodicScheduler)} by {stopWatch.Elapsed - nextTick}");
+            $"Action exceeded time slot of {duration} in {nameof(PeriodicScheduler)} by {stopWatch.Elapsed - duration}");
     }
 }
