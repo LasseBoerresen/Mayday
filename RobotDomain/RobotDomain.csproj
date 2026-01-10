@@ -23,11 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Structures\Joint\" />
-      <Folder Include="Structures\MaydayStructure\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Generic\Generic.csproj" />
     </ItemGroup>
 
