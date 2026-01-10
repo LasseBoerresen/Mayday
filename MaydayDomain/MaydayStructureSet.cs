@@ -1,6 +1,7 @@
 using System.Collections;
 using Generic;
 using MaydayDomain.MotionPlanning;
+using RobotDomain.Time;
 using static MaydayDomain.MaydayLegId;
 
 namespace MaydayDomain;
@@ -105,4 +106,17 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
     {
         return GetEnumerator();
     }
-};
+}
+
+public static class MayDayStructureSetExtensions
+{
+    public static MaydayStructureSet<Timed<T>> Sequence<T>(
+        this Timed<MaydayStructureSet<T>> timedSet)
+    {
+        var enumerableOfTimedT = timedSet
+            .Map(set => set.AsEnumerable())
+            .Sequence();
+        
+        return MaydayStructureSet<Timed<T>>.FromEnumerable(enumerableOfTimedT);
+    }
+}

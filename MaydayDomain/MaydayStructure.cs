@@ -135,7 +135,7 @@ public class MaydayStructure
     {
         _legsById.Values
             .Zip(
-                tipPositionsTimed.Map(tp => tp.AsEnumerable()).Sequence(), 
+                tipPositionsTimed.Sequence(), 
                 (leg, tipPositionTimed) => (leg, tipPositionTimed))
             .ForEach(z => z.leg.MoveTipPositionTo(z.tipPositionTimed));
     }
