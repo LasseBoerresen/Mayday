@@ -2,6 +2,7 @@
 using MaydayDomain;
 using MaydayDomain.Components;
 using Moq;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
@@ -62,11 +63,10 @@ public class MaydayStructureTests
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
-        EchoJointFactory echoJointFactory = new();
-        MaydayStructure may = MaydayStructure.Create(echoJointFactory);
+        var mayStructure = MaydayStructure.CreateEcho();
         
         // When
-        var coxaMotorTransforms = may.GetTransformsOf(LinkName.CoxaMotor);
+        var coxaMotorTransforms = mayStructure.GetTransformsOf(LinkName.CoxaMotor);
 
         // Then
         foreach (var legId in AllLegIds)
@@ -80,5 +80,45 @@ public class MaydayStructureTests
                 $"\nActual: {actualTransform}" +
                 $"\nExpected: {expectedTransform}");
         }
+    }
+
+    [Fact]
+    public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
+    {
+        // Given
+        var mayStructure = MaydayStructure.CreateEcho();
+        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
+        mayStructure.SetPostureForAllLegs(standingPostureCommand);
+        
+        // When
+        var actualLean = mayStructure.GetCurrentLean();
+        
+        // Then
+        TestObjectFactory.AssertTransformEqual("testidfoo", Transform.Zero, actualLean);
+    }
+    
+    [Fact]
+    public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
+    {
+        // Given
+        var xOffset = Length.FromCentimeters(1);
+        
+        var mayStructure = MaydayStructure.CreateEcho();
+        
+        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
+        mayStructure.SetPostureForAllLegs(standingPostureCommand);
+        
+        var tipPositionsCenter = mayStructure.GetPositionsOf(LinkName.Tip);
+        var tipPositionsBackward = tipPositionsCenter.Map(tp => tp with {X = tp.X - xOffset});
+        mayStructure.MoveTipsTo(Timed<MaydayStructureSet<Xyz>>.Passed(tipPositionsBackward), CancellationToken.None);
+        
+        // When
+        var actualLean = mayStructure.GetCurrentLean();
+        
+        // Then
+        var forwardXyz1Cm = Xyz.Zero with {X = xOffset};
+        var expectedLean = Transform.Zero with {Xyz = forwardXyz1Cm };
+
+        TestObjectFactory.AssertTransformEqual("testidfoo", expectedLean, actualLean);
     }
 }

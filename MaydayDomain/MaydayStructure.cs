@@ -95,6 +95,13 @@ public class MaydayStructure
         return new(thorax, legs);
     }
 
+    public static MaydayStructure CreateEcho()
+    {
+        EchoJointFactory echoJointFactory = new();
+        
+        return Create(echoJointFactory);
+    }
+
     /// <summary>
     /// To lean the thorax, move all tips opposite direction. Rotational lean
     /// results in some translation of the tip around the thorax origo 
