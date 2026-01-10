@@ -1,4 +1,4 @@
-﻿namespace RobotDomain.Behavior;
+﻿namespace ManualBehavior;
 
 public enum PostureCommand
 {

@@ -1,4 +1,4 @@
-﻿namespace MaydayDomain.MotionPlanning;
+﻿namespace MaydayDomain;
 
 public record LegProperty<T>(MaydayLegId LegId, T Value)
 {

@@ -1,10 +1,9 @@
 ﻿using RobotDomain.Geometry;
-using RobotDomain.Physics;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
 
-namespace Test.Unit;
+namespace Test.Unit.RobotDomain.Structures;
 
 public class FakeJoint(Angle angle) 
     : Joint(

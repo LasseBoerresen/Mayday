@@ -1,9 +1,8 @@
-﻿using MaydayDomain;
-using MaydayDomain.Components;
+﻿using MaydayDomain.Components;
 using RobotDomain.Geometry;
 using Xunit;
 
-namespace Test.Unit;
+namespace Test.Unit.MaydayDomain.Components;
 
 public class ThoraxTests
 {

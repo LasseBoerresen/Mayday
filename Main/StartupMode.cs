@@ -1,4 +1,6 @@
-﻿public enum StartupMode
+﻿namespace Main;
+
+public enum StartupMode
 {
     Run,
     Train,

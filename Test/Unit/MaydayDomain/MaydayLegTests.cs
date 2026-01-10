@@ -1,10 +1,9 @@
-﻿using Dynamixel;
-using MaydayDomain;
+﻿using MaydayDomain;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using RobotDomain.Time;
-using Test.Unit.Dynamixel;
+using Test.Unit.RobotDomain.Structures;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,7 +11,7 @@ using static RobotDomain.Structures.LinkName;
 using static Test.Unit.TestObjectFactory;
 using RotationDirection = RobotDomain.Structures.RotationDirection;
 
-namespace Test.Unit;
+namespace Test.Unit.MaydayDomain;
 
 public class MaydayLegTests
 {

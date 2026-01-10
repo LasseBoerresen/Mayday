@@ -1,7 +1,7 @@
 ﻿using Dynamixel;
 using Xunit;
 
-namespace Test.Unit;
+namespace Test.Unit.Dynamixel;
 
 public class DynamixelRotationalSpeedTests
 {

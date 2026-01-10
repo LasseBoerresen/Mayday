@@ -2,10 +2,9 @@
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using Moq;
-using RobotDomain.Time;
 using Xunit;
 
-namespace Test.Unit;
+namespace Test.Unit.MaydayDomain.MotionPlanning;
 
 [TestSubject(typeof(InstantPostureMaydayMotionPlanner))]
 public class InstantPostureMotionPlannerTestCase

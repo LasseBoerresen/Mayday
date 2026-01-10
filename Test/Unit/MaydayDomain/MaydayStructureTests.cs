@@ -8,7 +8,7 @@ using UnitsNet;
 using Xunit;
 using static MaydayDomain.MaydayLegId;
 
-namespace Test.Unit;
+namespace Test.Unit.MaydayDomain;
 
 public class MaydayStructureTests
 {
