@@ -74,11 +74,7 @@ public class MaydayStructureTests
             var actualTransform = coxaMotorTransforms.ToLegDict()[legId];
             var expectedTransform = Thorax.TransformFor(legId);
 
-            Assert.True(
-                actualTransform.IsAlmostEqual(expectedTransform, Length.FromMillimeters(0.1), Angle.FromDegrees(0.1)),
-                $"Transform for {legId} does not match expected thorax transform." +
-                $"\nActual: {actualTransform}" +
-                $"\nExpected: {expectedTransform}");
+            TestObjectFactory.AssertTransformEqual("testidfoo", expectedTransform, actualTransform);
         }
     }
 
