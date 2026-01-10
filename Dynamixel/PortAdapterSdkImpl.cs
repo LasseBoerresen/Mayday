@@ -327,11 +327,15 @@ public class PortAdapterSdkImpl : PortAdapter
             if (ftStatus != FTDI.FT_STATUS.FT_OK)
                 return Error.New($"Failed to open device with SN '{FtdiDeviceSerialNumber}', status: {ftStatus}");
 
+            // TODO: BUG, this does not seem to actually change the com port
+            //  latency, and it only works after manually changing it for the
+            //  com port in windows device manager. 
             ftStatus = device.SetLatency((byte)DeviceLatency.Milliseconds);
             if (ftStatus != FTDI.FT_STATUS.FT_OK)
                 return Error.New($"Failed to set port latency, status: {ftStatus}");
             
-            // OBS! COM ports only work on Windows. If on linux, implement different lookup or use /dev/ttyUSB0 instead
+            // OBS! COM ports only work on Windows. If on linux, implement
+            // different lookup or use /dev/ttyUSB0 instead
             ftStatus = device.GetCOMPort(out var comPortName);
             if (ftStatus != FTDI.FT_STATUS.FT_OK)
                 return Error.New($"Failed to get COM port name, status: {ftStatus}");
