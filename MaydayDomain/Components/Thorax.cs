@@ -22,6 +22,25 @@ public record Thorax
         
         throw new ArgumentOutOfRangeException(nameof(legId), legId, null);
     }
+
+    public static Func<Xyz, Xyz> XyzViewedAs(MaydayLegId legId)
+        => xyz => ViewedAs(legId)(Transform.FromXyz(xyz)).Xyz;
+
+    public static Func<Transform, Transform> ViewedAs(MaydayLegId legId)
+        => t => t - TransformFor(legId);
     
     public Transform Origin => Transform.Zero;    
-}   
+}
+
+public static class ThoraxExtensions
+{
+    public static Xyz ViewedFrom(this Xyz xyz, MaydayLegId legId)
+    {
+        return Thorax.XyzViewedAs(legId)(xyz);
+    }
+
+    public static Transform ViewedFrom(this Transform t, MaydayLegId legId)
+    {
+        return Thorax.ViewedAs(legId)(t);
+    }
+}
