@@ -103,11 +103,6 @@ public class MaydayStructure
     {
         var extraLeanRequiredTimed = leanTimed.Map(l => l - GetCurrentLean());
 
-        // TODO the underlying dynamixel adapter benefits from updating all
-        //  motors at the same time, but here we don't wanna know. We just set
-        //  target angle goals, which return immediately, and the adapter should
-        //  then run at an appropriate frequency to set new goals for all
-        //  updated joints.   
         _legsById.ForEach(legAndId => 
             MoveThoraxBy(extraLeanRequiredTimed, legAndId.Value));
     }
