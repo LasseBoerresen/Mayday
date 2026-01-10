@@ -38,7 +38,7 @@ public static class PeriodicScheduler
         }
     }
 
-    private static void CallActionWithErrorLogging(Action action)
+    static void CallActionWithErrorLogging(Action action)
     {
         try
         {
@@ -71,7 +71,7 @@ public static class PeriodicScheduler
         }
     }
 
-    private static void LogActionExceededTimeSlot(Stopwatch stopWatch, TimeSpan nextTick)
+    static void LogActionExceededTimeSlot(Stopwatch stopWatch, TimeSpan nextTick)
     {
         Console.WriteLine(
             $"Action exceeded time slot in {nameof(PeriodicScheduler)} by {stopWatch.Elapsed - nextTick}");

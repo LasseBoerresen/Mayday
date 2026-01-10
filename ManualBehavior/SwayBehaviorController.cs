@@ -16,7 +16,7 @@ public class SwayBehaviorController(
     TimeProvider timeProvider) 
     : BehaviorController
 {
-    private Duration TimeStep = Duration.FromSeconds(5.0);
+    Duration TimeStep = Duration.FromSeconds(5.0);
     
     public Unit Start()
     {

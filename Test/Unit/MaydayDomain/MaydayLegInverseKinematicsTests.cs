@@ -13,7 +13,7 @@ namespace Test.Unit.MaydayDomain;
 
 public class MaydayLegInverseKinematicsTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly ITestOutputHelper _testOutputHelper;
 
     readonly MaydayLeg _leg = MaydayLegTests
         .CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)

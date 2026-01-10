@@ -9,7 +9,7 @@ namespace MaydayDomain.MotionPlanning;
 public class InverseLegKinematicsNeuralNetwortTensorflowNetImpl 
     : InverseLegKinematicsNeuralNetwork
 {
-    private IModel _model;
+    IModel _model;
     
     public InverseLegKinematicsNeuralNetwortTensorflowNetImpl()
     {

@@ -11,9 +11,9 @@ namespace MaydayDomain.MotionPlanning;
 public class StepByStepLearningInstantPostureMaydayMotionPlanner 
     : InstantPostureMaydayMotionPlanner
 {
-    private readonly InverseLegKinematicsNeuralNetwork _neuralNetwork;
+    readonly InverseLegKinematicsNeuralNetwork _neuralNetwork;
 
-    private StepByStepLearningInstantPostureMaydayMotionPlanner(
+    StepByStepLearningInstantPostureMaydayMotionPlanner(
         MaydayStructure structure,
         InverseLegKinematicsNeuralNetwork neuralNetwork) 
         : base(structure)
@@ -70,7 +70,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     //     // _neuralNetwork.Train(trainingDataPoints);
     // }
 
-    private static MaydayStructureSet<InverseLegKinematicsError> CalculateErrors(
+    static MaydayStructureSet<InverseLegKinematicsError> CalculateErrors(
         MaydayStructureSet<Xyz> expectedPositions, 
         MaydayStructureSet<Xyz> actualPositions)
     {
@@ -79,7 +79,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
             .ToMaydayStructureSet();
     }
 
-    private static IEnumerable<InverseLegKinematicsDataPoint> ToTrainingDataPoints(
+    static IEnumerable<InverseLegKinematicsDataPoint> ToTrainingDataPoints(
         MaydayStructureSet<InverseLegKinematicsInput> inputs, 
         MaydayStructureSet<InverseLegKinematicsOutput> outputs, 
         MaydayStructureSet<InverseLegKinematicsError> errors)
@@ -90,18 +90,18 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
                 zip.Item1.Value, zip.Item2.Value, zip.Item3.Value));
     }
 
-    private void SetPostures(Timed<MaydayStructureSet<InverseLegKinematicsOutput>> outputsTimed)
+    void SetPostures(Timed<MaydayStructureSet<InverseLegKinematicsOutput>> outputsTimed)
     {
         Structure.SetPosture(outputsTimed.Map(
             outputs => MaydayStructurePosture.FromSet(outputs.Map(o => o.ToPosture()))));
     }
 
-    private static void WaitForMovementToFinish()
+    static void WaitForMovementToFinish()
     {
         Thread.Sleep(TimeSpan.FromSeconds(1));
     }
 
-    private LegProperty<InverseLegKinematicsInput> CreateInput(LegProperty<Xyz> deltaXyzs)
+    LegProperty<InverseLegKinematicsInput> CreateInput(LegProperty<Xyz> deltaXyzs)
     {
         return deltaXyzs.Map(
             deltaXyz => InverseLegKinematicsInput.Create(

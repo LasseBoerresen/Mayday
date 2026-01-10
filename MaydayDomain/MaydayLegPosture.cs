@@ -95,9 +95,9 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
             TibiaAngle.ToUnit(AngleUnit.Revolution));
     }
 
-    private static double LinearInterpolate(double start, double end, double t) => start + (end - start) * t;
+    static double LinearInterpolate(double start, double end, double t) => start + (end - start) * t;
 
-    private static void ValidateFractionRange(Ratio fraction)
+    static void ValidateFractionRange(Ratio fraction)
     {
         if (fraction.DecimalFractions < 0.0 || fraction.DecimalFractions > 1.0)
             throw new ArgumentException($"Fraction must be between 0.0 and 1.0, got: {fraction}");

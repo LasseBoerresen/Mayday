@@ -25,7 +25,7 @@ public class LegPostureByPositionMap
         }
     };
     static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
-    private static readonly Length CellSize = Length.FromMeters(1.0 / 128.0); // binary number for 100% float accuracy
+    static readonly Length CellSize = Length.FromMeters(1.0 / 128.0); // binary number for 100% float accuracy
 
     static LegPostureByPositionMap()
     {
@@ -97,7 +97,7 @@ public class LegPostureByPositionMap
         }
     }
 
-    private static void EnsureCellDensity(Dictionary<Xyz, List<MaydayLegPosture>> map)
+    static void EnsureCellDensity(Dictionary<Xyz, List<MaydayLegPosture>> map)
     {
         var minimumPosturesPerCell = 1;
         
