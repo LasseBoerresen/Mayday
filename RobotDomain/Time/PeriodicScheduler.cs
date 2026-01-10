@@ -47,7 +47,7 @@ public static class PeriodicScheduler
         catch (Exception ex)
         {
             // Log the error so it's not ignored!
-            Console.WriteLine($"Error in periodic task: {ex.Message}");
+            Console.WriteLine($"Error in periodic task: {ex.Message}, {ex.StackTrace}");
             // Depending on requirements, you might want to 'break' or 'continue'
         }
     }
