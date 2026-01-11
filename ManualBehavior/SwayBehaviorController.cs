@@ -67,7 +67,7 @@ public class SwayBehaviorController(
     {
         // If there somehow is no previous movement, simply set it to centered as a starting point.
         var previousGoal = motionPlanner.GetGoal()
-            .IfNone(timeProvider.ScheduleIn(CenteredMovement, TimeStep));
+            .IfNone(timeProvider.ScheduleIn(CenteredMovement, TimeSpan.Zero));
     
         return previousGoal;
     }
