@@ -16,11 +16,11 @@ namespace RobotDomain.Geometry;
 /// </summary>
 public record Rpy
 {
-    public Angle R { get; }
+    public Angle R { get; init; }
 
-    public Angle P { get; }
+    public Angle P { get; init; }
 
-    public Angle Y { get; }
+    public Angle Y { get; init; }
 
     // In the context of Mayday, 5 revolutions is an absurd value. 
     static readonly Angle AbsurdValue = Angle.FromRevolutions(5);

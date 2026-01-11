@@ -11,9 +11,9 @@ namespace RobotDomain.Geometry;
 
 public record Xyz
 {
-    public Length X { get; }
-    public Length Y { get; }
-    public Length Z { get; }
+    public Length X { get; init; }
+    public Length Y { get; init; }
+    public Length Z { get; init; }
     
     // For mayday, anything above a meter is too far.
     static readonly Length AbsurdValue = Length.FromMeters(1); 

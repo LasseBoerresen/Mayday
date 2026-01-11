@@ -16,10 +16,10 @@ namespace RobotDomain.Geometry;
 /// </summary>
 public record Q
 {
-    public double W { get; }
-    public double X { get; }
-    public double Y { get; }
-    public double Z { get; }
+    public double W { get; init; }
+    public double X { get; init; }
+    public double Y { get; init; }
+    public double Z { get; init; }
     
     // Any Qaternion value above 1.0 should be impossible. 
     static readonly double AbsurdValue = 1.1;
