@@ -84,7 +84,7 @@ public class MaydayStructureTests
         // Given
         var mayStructure = MaydayStructure.CreateEcho();
         
-        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
+        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
         
         // When
@@ -100,7 +100,7 @@ public class MaydayStructureTests
         // Given
         var mayStructure = MaydayStructure.CreateEcho();
         
-        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
+        var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
         
         
