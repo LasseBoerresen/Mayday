@@ -47,9 +47,9 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
             LB: propertyList[5].Value);
     }
 
-    public IDictionary<MaydayLegId, T> ToLegDict()
+    public OrderedDictionary<MaydayLegId, T> ToLegDict()
     {
-        return new Dictionary<MaydayLegId, T>
+        return new OrderedDictionary<MaydayLegId, T>
         {
             { RightFront, RF },
             { RightCenter, RC },
