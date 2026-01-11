@@ -76,6 +76,6 @@ public record Transform(Xyz Xyz, Q Q)
 
     Transform DistanceTo(Transform other)
     {
-        return this - other;
+        return other - this;
     }
 }
