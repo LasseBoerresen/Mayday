@@ -90,6 +90,8 @@ public record Q(double W, double X, double Y, double Z)
         return new Xyz(xyzAsRotatedQ.X, xyzAsRotatedQ.Y, xyzAsRotatedQ.Z);
     }
 
+    public static Q Inverse(Q q) => FromNumericsQ(Quaternion.Inverse(q.ToNumericsQ()));
+    
     /// <summary>
     /// Just because it hasn't been mentioned. Since quaternions used for spatial orientation are always unit length
     /// (or should be), the following will also work.

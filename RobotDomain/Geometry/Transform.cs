@@ -32,6 +32,9 @@ public record Transform(Xyz Xyz, Q Q)
         return Add(a, b);
     }
 
+    /// <summary>
+    /// The sum of two Transforms as if they were applied one after the other. 
+    /// </summary>
     public static Transform Add(Transform a, Transform b)
     {
         Xyz bXyzRotated = a.Q.Rotate(b.Xyz);
@@ -45,12 +48,17 @@ public record Transform(Xyz Xyz, Q Q)
         return Subtract(a, b);
     }
 
+    /// <summary>
+    /// Returns the transform from b to a. 
+    /// </summary>
     public static Transform Subtract(Transform a, Transform b)
     {
-        Xyz bXyzRotated = a.Q.Rotate(b.Xyz);
-        
-        Transform antisum = new(a.Xyz - bXyzRotated, a.Q - b.Q);
-        return antisum;
+        var relativeRotation = a.Q - b.Q; 
+        Xyz worldDelta = a.Xyz - b.Xyz;
+        Xyz relativeTranslation = Q.Inverse(b.Q).Rotate(worldDelta);
+
+        Transform relativeTransform = new(relativeTranslation, relativeRotation);
+        return relativeTransform;
     }
 
     public bool IsAlmostEqual(Transform other, Length translationPrecision, Angle rotationalPrecision)
