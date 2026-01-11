@@ -119,3 +119,19 @@ public record Xyz(Length X, Length Y, Length Z)
 
     static Xyz FromVector3Meters(Vector3 v) => new(v.X, v.Y, v.Z);
 }
+
+public static class XyzExtensions
+{
+    public static Xyz Mean(this IEnumerable<Xyz> xyzs)
+    {
+        if (!xyzs.Any())
+            throw new ArgumentException("Cannot calculate mean of empty collection", nameof(xyzs));
+    
+        return xyzs.Sum() * (1.0 / xyzs.Count());
+    }
+    
+    public static Xyz Sum(this IEnumerable<Xyz> xyzs)
+    {
+        return xyzs.Aggregate(seed: Xyz.Zero, (a, b) => a + b);
+    }
+}
