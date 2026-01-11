@@ -42,7 +42,7 @@ public class SwayBehaviorController(
         motionPlanner.Start(ct);
     }
 
-    Movement CenteredMovement => Movement.Zero();
+    readonly Movement CenteredMovement = Movement.Zero();
 
     /// <summary>
     /// Sway halfway towards the central position plus randomly in any
