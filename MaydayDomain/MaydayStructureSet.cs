@@ -1,6 +1,5 @@
 using System.Collections;
 using Generic;
-using MaydayDomain.MotionPlanning;
 using RobotDomain.Time;
 using static MaydayDomain.MaydayLegId;
 
@@ -52,12 +51,12 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
     {
         return new Dictionary<MaydayLegId, T>
         {
-            { LeftFront, LF },
-            { LeftCenter, LC },
-            { LeftBack, LB },
             { RightFront, RF },
             { RightCenter, RC },
             { RightBack, RB },
+            { LeftFront, LF },
+            { LeftCenter, LC },
+            { LeftBack, LB },
         };
     }
 
@@ -65,12 +64,12 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
     {
         return
         [
+            new(RightFront, RF),
+            new(RightCenter, RC),
+            new(RightBack, RB),
             new(LeftFront, LF),
             new(LeftCenter, LC),
             new(LeftBack, LB),
-            new(RightFront, RF),
-            new(RightCenter, RC),
-            new(RightBack, RB)
         ];
     }
 
