@@ -1,7 +1,9 @@
 ﻿using JetBrains.Annotations;
 using RobotDomain.Geometry;
+using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
+using static Test.Unit.TestObjectFactory;
 
 namespace Test.Unit.RobotDomain.Geometry;
 
@@ -39,7 +41,7 @@ public class TransformTests
         var actual = a + b;
         
         // Then
-        TestObjectFactory.AssertTransformEqual(testId, expected, actual);
+        AssertTransformEqual(testId, expected, actual);
     }
     
     public static TheoryData<string, Transform, Transform, Transform, Transform>
@@ -68,6 +70,25 @@ public class TransformTests
         var actual = a + b + c;
         
         // Then
-        TestObjectFactory.AssertTransformEqual(testId, expected, actual);
+        AssertTransformEqual(testId, expected, actual);
+    }
+
+    [Fact]
+    public void GivenNonZeroTransform__WhenCalculateHalfwayToZero__ThenShouldBeHalfway()
+    {
+        // Given
+        var transformGiven = new Transform(
+            new Xyz(0.2, 0.4, -0.6), 
+            Q.FromAxisAngle(new(1, 0, 1), Angle.FromRevolutions(0.2)));
+        
+        // When
+        var actualHalfwayTransform =  transformGiven.HalfWayTo(Transform.Zero);
+        
+        // Then
+        var transformExpected = new Transform(
+            new Xyz(0.1, 0.2, -0.3), 
+            Q.FromAxisAngle(new(1, 0, 1), Angle.FromRevolutions(0.1))); 
+        
+        AssertTransformEqual("testIdFoo", transformExpected, actualHalfwayTransform);
     }
 }
