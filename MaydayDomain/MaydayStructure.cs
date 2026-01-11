@@ -92,7 +92,7 @@ public class MaydayStructure
     /// </summary>
     public void MoveThoraxTo(Timed<Transform> leanTimed)
     {
-        var extraLeanRequiredTimed = leanTimed.Map(l => l - GetCurrentLean());
+        var extraLeanRequiredTimed = leanTimed.Map(lean => lean - GetCurrentLean());
 
         _legs.ForEach(leg => 
             MoveThoraxBy(extraLeanRequiredTimed, leg));
@@ -146,6 +146,15 @@ public class MaydayStructure
         //  the orientation could come from an accelerometer, but the xy-offset
         //  needs to come from the offset from the average foot position, 
         //  including rotation around z axis from the angle of the coxa joint.
-        throw new NotImplementedException();
+
+        var tipPositionsMean = GetPositionsOf(LinkName.Tip).Mean();
+        
+
+        // TODO: I can get the z rotation as the average coxa angle. Well, if
+        //  the tips are at equal stances. But really I should calculate the 
+        //  ground plane, and the thorax's angle and translation to that and
+        //  its origo. 
+
+        return new Transform(-tipPositionsMean, Q.Unit);
     }
 }
