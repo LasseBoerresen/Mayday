@@ -59,8 +59,18 @@ public class SwayBehaviorController(
         var previousGoalTimed = GetPreviousGoal();
         
         return previousGoalTimed
-            .ExtendWith(TimeStep)
-            .Map(pg => pg with { Lean = pg.Lean.HalfWayTo(CenteredMovement.Lean) + SwayAmount() });
+            .Map(CreateGoalTowardsCenterWithSway)
+            .ExtendWith(TimeStep);
+    }
+
+    Movement CreateGoalTowardsCenterWithSway(Movement previousGoal)
+    {
+        var halfwayToCenter = previousGoal.Lean.HalfWayTo(CenteredMovement.Lean);
+        var swayAmount = SwayAmount();
+        
+        var goalHalfwaysToCenterWithSway = previousGoal with { Lean = halfwayToCenter + swayAmount };
+        
+        return goalHalfwaysToCenterWithSway;
     }
 
     Timed<Movement> GetPreviousGoal()
