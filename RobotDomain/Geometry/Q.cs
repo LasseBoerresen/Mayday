@@ -14,14 +14,48 @@ namespace RobotDomain.Geometry;
 /// Based on:
 /// https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
 /// </summary>
-public record Q(double W, double X, double Y, double Z)
+public record Q
 {
+    public double W { get; }
+    public double X { get; }
+    public double Y { get; }
+    public double Z { get; }
+    
+    // Any Qaternion value above 1.0 should be impossible. 
+    static readonly double AbsurdValue = 1.1;
+
+    /// <summary>Rotation Quaternion</summary>
+    /// <remarks>
+    /// Based on:
+    /// https://danceswithcode.net/engineeringnotes/quaternions/quaternions.html
+    /// </remarks>
+    public Q(double W, double X, double Y, double Z)
+    {
+        this.W = W;
+        this.X = X;
+        this.Y = Y;
+        this.Z = Z;
+        
+        ValidateValues();
+    }
+
+    void ValidateValues()
+    {
+        if (double.IsNaN(W)|| double.IsNaN(X)|| double.IsNaN(Y) || double.IsNaN(Z))
+            throw new ArgumentException($"Cannot create {nameof(Q)} with NaN values: {this}");
+            
+        if (Abs(W) > AbsurdValue || Abs(X) > AbsurdValue || Abs(Y) > AbsurdValue || Abs(Z) > AbsurdValue)
+            throw new ArgumentException($"Cannot create {nameof(Q)} with absurd values, i.e abs(v) > {AbsurdValue}, got: {this}");
+    }
+
     // Note: angle of a quaternion is only half a rotation by that quaternion!
     public Angle Angle => Angle.FromRadians(2.0 * Acos(W)).ToUnit(AngleUnit.Revolution);
 
-    public Vector3 Axis => Vector3.Normalize(Xyz);
+    // Choose a default axis for the identity rotation, here Z. 
+    public Vector3 Axis => Xyz.Length() > 1e-10 ? Vector3.Normalize(Xyz) : Vector3.UnitZ;
 
     Vector3 Xyz => new((float)X, (float)Y, (float)Z);
+    
     public static Q Unit => new(W: 1.0, X: 0.0, Y: 0.0, Z: 0.0);
 
     public static Q FromRpy(Rpy rpy)
@@ -157,5 +191,13 @@ public record Q(double W, double X, double Y, double Z)
         var normalizedRandomRotationQuaternion = Quaternion.Normalize(randomRotationQuaternion);
         
         return FromNumericsQ(normalizedRandomRotationQuaternion);
+    }
+
+    public void Deconstruct(out double W, out double X, out double Y, out double Z)
+    {
+        W = this.W;
+        X = this.X;
+        Y = this.Y;
+        Z = this.Z;
     }
 }

@@ -16,17 +16,31 @@ namespace RobotDomain.Geometry;
 /// </summary>
 public record Rpy
 {
-    public Angle R { get; init; }
+    public Angle R { get; }
 
-    public Angle P { get; init; }
+    public Angle P { get; }
 
-    public Angle Y { get; init; }
+    public Angle Y { get; }
+
+    // In the context of Mayday, 5 revolutions is an absurd value. 
+    static readonly Angle AbsurdValue = Angle.FromRevolutions(5);
 
     public Rpy(Angle R, Angle P, Angle Y)
     {
         this.R = CropToSingleRotation(R);
         this.P = CropToSingleRotation(P);
         this.Y = CropToSingleRotation(Y);
+        
+        ValidateValues();
+    }
+
+    void ValidateValues()
+    {
+        if (double.IsNaN(R.Value)|| double.IsNaN(P.Value) || double.IsNaN(Y.Value))
+            throw new ArgumentException($"Cannot create {nameof(Rpy)} with NaN values: {this}");
+            
+        if (R.Abs() > AbsurdValue || P.Abs() > AbsurdValue || Y.Abs() > AbsurdValue)
+            throw new ArgumentException($"Cannot create {nameof(Rpy)} with absurd values, i.e > {AbsurdValue}, got: {this}");
     }
 
     public Rpy(double r, double p, double y)

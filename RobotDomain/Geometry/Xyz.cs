@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.Metrics;
+using System.Numerics;
 using Generic;
 using LanguageExt;
 using UnitsNet;
@@ -8,9 +9,34 @@ using Length = UnitsNet.Length;
 
 namespace RobotDomain.Geometry;
 
-public record Xyz(Length X, Length Y, Length Z)
+public record Xyz
 {
+    public Length X { get; }
+    public Length Y { get; }
+    public Length Z { get; }
+    
+    // For mayday, anything above a meter is too far.
+    static readonly Length AbsurdValue = Length.FromMeters(1); 
+
     // TODO Refactor this meters constructor to factoryMethod Called Meters
+    public Xyz(Length X, Length Y, Length Z)
+    {
+        this.X = X;
+        this.Y = Y;
+        this.Z = Z;
+        
+        ValidateValues();
+    }
+
+    void ValidateValues()
+    {
+        if (double.IsNaN(X.Value)|| double.IsNaN(Y.Value) || double.IsNaN(Z.Value))
+            throw new ArgumentException($"Cannot create {nameof(Xyz)} with NaN values: {this}");
+
+        if (X.Abs() > AbsurdValue || Y.Abs() > AbsurdValue || Z.Abs() > AbsurdValue)
+            throw new ArgumentException($"Cannot create {nameof(Xyz)} with absurd values, i.e > {AbsurdValue}, got: {this}");
+    }
+
     public Xyz(double x, double y, double z)
         : this(Length.FromMeters(x), Length.FromMeters(y), Length.FromMeters(z)) {}
 
@@ -118,6 +144,13 @@ public record Xyz(Length X, Length Y, Length Z)
     Vector3 AsVector3Meters() => new((float)X.Meters, (float)Y.Meters, (float)Z.Meters);
 
     static Xyz FromVector3Meters(Vector3 v) => new(v.X, v.Y, v.Z);
+
+    public void Deconstruct(out Length X, out Length Y, out Length Z)
+    {
+        X = this.X;
+        Y = this.Y;
+        Z = this.Z;
+    }
 }
 
 public static class XyzExtensions
