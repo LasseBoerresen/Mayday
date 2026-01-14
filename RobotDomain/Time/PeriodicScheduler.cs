@@ -57,7 +57,7 @@ public static class PeriodicScheduler
         if (stopWatch.Elapsed.TotalMilliseconds > duration.TotalMilliseconds)
             LogActionExceededTimeSlot(stopWatch, duration);
         
-        while (stopWatch.Elapsed.TotalMilliseconds < duration.Milliseconds)
+        while (stopWatch.Elapsed.TotalMilliseconds < duration.TotalMilliseconds)
         {
             // With thread timing set to 1ms, we can afford to yield slightly to prevent 100% CPU usage
             // but only if we have more than 1ms + 0.5ms (buffer) left.
