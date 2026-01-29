@@ -5,7 +5,7 @@ using RobotDomain.Time;
 
 namespace MaydayDomain.MotionPlanning;
 
-public interface MaydayMotionPlanner
+public interface MaydayMotionPlanner : IDisposable
 {
     MaydayStructureSet<MaydayLegPosture> GetPostures();
     MaydayLegPosture GetPostureOf(MaydayLegId legId);
@@ -21,7 +21,7 @@ public interface MaydayMotionPlanner
     /// <summary>
     /// Start tracking the goal 
     /// </summary>
-    Task Start(CancellationToken ct);
+    void Start(CancellationToken ct);
     
     /// <summary>
     /// Gets the current goal 

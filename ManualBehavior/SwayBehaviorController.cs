@@ -16,7 +16,7 @@ public class SwayBehaviorController(
     TimeProvider timeProvider) 
     : BehaviorController
 {
-    Duration TimeStep = Duration.FromSeconds(5.0);
+    readonly Duration TimeStep = Duration.FromSeconds(5.0);
     
     public Unit Start()
     {
@@ -42,8 +42,6 @@ public class SwayBehaviorController(
         motionPlanner.Start(ct);
     }
 
-    readonly Movement CenteredMovement = Movement.Zero();
-
     /// <summary>
     /// Sway halfway towards the central position plus randomly in any
     /// direction. This should exponentially keep the sway centered but also
@@ -58,6 +56,7 @@ public class SwayBehaviorController(
     {
         var goalTimed = timeProvider.ScheduleIn(CreateGoalTowardsCenterWithSway(), TimeStep);
         
+        Console.WriteLine("Goal lean: " + goalTimed.Target.Lean.Xyz);
         return goalTimed;
     }
 
@@ -65,7 +64,7 @@ public class SwayBehaviorController(
     {
         var previousGoal = GetPreviousGoal();
         
-        var leanHalfwayToCenter = previousGoal.Lean.HalfWayTo(CenteredMovement.Lean);
+        var leanHalfwayToCenter = previousGoal.Lean.HalfWayTo(Movement.StandingStill.Lean);
         var swayAmount = SwayAmount();
 
         var newGoal = previousGoal with { Lean = leanHalfwayToCenter + swayAmount };
@@ -77,14 +76,14 @@ public class SwayBehaviorController(
         // If there somehow is no previous movement, simply set it to centered as a starting point.
         var previousGoal = motionPlanner.GetGoal()
             .Map(tg => tg.Target)
-            .IfNone(CenteredMovement);
+            .IfNone(Movement.StandingStill);
     
         return previousGoal;
     }
 
     static Transform SwayAmount()
     {
-        var maxTranslation = Length.FromMeters(0.05);
+        var maxTranslation = Length.FromMeters(0.04);
         var maxRotation = Angle.FromRevolutions(0.125);
                
         var swayAmount = Transform.Random(maxTranslation, maxRotation);

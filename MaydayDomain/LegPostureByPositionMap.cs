@@ -25,12 +25,15 @@ public class LegPostureByPositionMap
         }
     };
     static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
-    static readonly Length CellSize = Length.FromMeters(1.0 / 128.0); // binary number for 100% float accuracy
+    static readonly Length CellSize = Length.FromMeters(1.0 / 64.0); // binary number for 100% float accuracy
 
     static LegPostureByPositionMap()
     {
         var leg = CreateEchoLeg();
 
+        // TODO it is a problem that this takes so long to build, and it is
+        //  lazy, so when the robot is already running, this starts to build. I
+        //  must either pre initialize or load from disk. 
         Map = BuildDictionary(leg).ToFrozenDictionary();
     }
 
@@ -74,7 +77,7 @@ public class LegPostureByPositionMap
 
     public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
     {
-        var angleStep = Angle.FromRevolutions(1.0 / 128);
+        var angleStep = Angle.FromRevolutions(1.0 / 64);
         
         
         var map = new Dictionary<Xyz, List<MaydayLegPosture>>();

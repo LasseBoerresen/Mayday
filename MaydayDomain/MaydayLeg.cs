@@ -36,7 +36,8 @@ public class MaydayLeg
 
     public MaydayLegPosture GetPosture()
     {
-        return new(_joints.Select(j => j.State.Angle));
+        MaydayLegPosture maydayLegPosture = new(_joints.Select(j => j.State.Angle));
+        return maydayLegPosture;
     }
 
     public virtual void SetPosture(Timed<MaydayLegPosture> posture)
@@ -95,8 +96,9 @@ public class MaydayLeg
 
     public void MoveTipPositionTo(Timed<Xyz> tipPositionTimed)
     {
+        var currentPosture = GetPosture();
         var postureTimed = tipPositionTimed.Map(
-            tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
+            tp => LegPostureByPositionMap.GetFor(tp, currentPosture));
         
         SetPosture(postureTimed);
     }

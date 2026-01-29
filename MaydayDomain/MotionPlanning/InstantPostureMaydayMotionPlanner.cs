@@ -11,6 +11,7 @@ namespace MaydayDomain.MotionPlanning;
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
+    Task? _trackingTask;
     Option<Timed<Movement>> _goalMovement = Option<Timed<Movement>>.None;
 
 
@@ -49,11 +50,11 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    public Task Start(CancellationToken ct)
+    public void Start(CancellationToken ct)
     {
-        return PeriodicScheduler.RunAsync(
+        _trackingTask = PeriodicScheduler.RunAsync(
             action: () => _goalMovement.IfSome(TrackGoalOnce), 
-            duration: Duration.FromSeconds(0.1), 
+            duration: Duration.FromSeconds(1), 
             ct);
     }
 
@@ -61,7 +62,7 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     {
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
-        
+        Console.WriteLine("MoveThoraxTo: " + goalMovementTimed.Target.Lean.Xyz);
         Structure.MoveThoraxTo(goalMovementTimed.Map(m => m.Lean));
     }
 
@@ -90,4 +91,17 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
         var structure = jointFactoryEff.Map(MaydayStructure.Create);
         return structure;
     }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+    
+    void Dispose(bool disposing)
+    {
+        if (disposing)
+            _trackingTask?.Dispose();
+    }
+    
+    ~InstantPostureMaydayMotionPlanner() => Dispose(false);
 }
