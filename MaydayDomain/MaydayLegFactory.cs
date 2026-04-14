@@ -6,9 +6,8 @@ using static RobotDomain.Structures.Side;
 
 namespace MaydayDomain;
 
-public class MaydayLegFactory(JointFactory jointFactory)
+public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap legPostureByPositionMap)
 {
-    
     public IDictionary<MaydayLegId, MaydayLeg> CreateAll()
     {
         return MaydayLegId
@@ -35,7 +34,7 @@ public class MaydayLegFactory(JointFactory jointFactory)
         links.Add(Link.CreateTip);
         connections.Add(CrateTibiaToTipAttachment(links));
 
-        return new(connections, links);
+        return new(connections, links, legPostureByPositionMap);
     }
     
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
@@ -93,5 +92,12 @@ public class MaydayLegFactory(JointFactory jointFactory)
             links[5], 
             links[6], 
             new Transform(new(0.125, 0, -0.09), Q.FromRpy(new(0, 0.16666, 0))));
+    }
+
+    public static MaydayLegFactory CreateEcho()
+    {
+        return new MaydayLegFactory(
+            new EchoJointFactory(), 
+            LegPostureByPositionMap.CreateEmpty());
     }
 }

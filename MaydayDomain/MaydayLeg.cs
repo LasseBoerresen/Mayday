@@ -15,6 +15,7 @@ public class MaydayLeg
     readonly ImmutableList<Link> _links;
     readonly IImmutableList<Connection> _connections;
     readonly IImmutableList<Joint> _joints;
+    readonly LegPostureByPositionMap _legPostureByPositionMap;
 
     public Link BaseLink => CoxaMotor;
     Link CoxaMotor  => _links[0];
@@ -25,10 +26,15 @@ public class MaydayLeg
     Link Tibia      => _links[5];
     Link Tip        => _links[6];
 
-    public MaydayLeg(IList<Connection> connections, IList<Link> links)
+    public MaydayLeg(
+        IList<Connection> connections, 
+        IList<Link> links, 
+        LegPostureByPositionMap legPostureByPositionMap)
     {
-        _links = links.ToImmutableList();
         _connections = connections.ToImmutableList();
+        _links = links.ToImmutableList();
+        _legPostureByPositionMap = legPostureByPositionMap;
+        
         _joints = connections.OfType<Joint>().ToImmutableList();
     }
 
@@ -82,14 +88,16 @@ public class MaydayLeg
 
     public void SetTipPositionTo(Timed<Xyz> tipPositionTimed)
     {
-        var postureTimed = tipPositionTimed.Map(tp => LegPostureByPositionMap.GetFor(tp, GetPosture()));
+        var postureTimed = tipPositionTimed.Map(tipPosition => 
+            _legPostureByPositionMap.GetFor(tipPosition, GetPosture()));
         
         SetPosture(postureTimed);
     }
 
     public void MoveTipPositionBy(Timed<Xyz> tipOffsetTimed)
     {
-        var posture = tipOffsetTimed.Map(to => LegPostureByPositionMap.GetFor(GetTipPosition() + to, GetPosture()));
+        var posture = tipOffsetTimed.Map(tipOffset => 
+            _legPostureByPositionMap.GetFor(GetTipPosition() + tipOffset, GetPosture()));
         
         SetPosture(posture);
     }
@@ -98,7 +106,7 @@ public class MaydayLeg
     {
         var currentPosture = GetPosture();
         var postureTimed = tipPositionTimed.Map(
-            tp => LegPostureByPositionMap.GetFor(tp, currentPosture));
+            tp => _legPostureByPositionMap.GetFor(tp, currentPosture));
         
         SetPosture(postureTimed);
     }

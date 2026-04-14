@@ -12,71 +12,56 @@ using Length = UnitsNet.Length;
 
 namespace MaydayDomain;
 
-public class LegPostureByPositionMap
+public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map)
 {
-    const string FilePath = "MaydayLegPostureMap.json";
-    static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        WriteIndented = true,
-        Converters =
-        {
-            new LengthJsonConverter(),
-            new AngleJsonConverter()
-        }
-    };
-    static readonly IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map;
     static readonly Length CellSize = Length.FromMeters(1.0 / 64.0); // binary number for 100% float accuracy
+    public static LegPostureByPositionMap CreateEmpty() => new(new Dictionary<Xyz, List<MaydayLegPosture>>());
 
-    static LegPostureByPositionMap()
+    /// <summary>
+    /// Get leg joint posture which results in the given tip position 
+    /// </summary>
+    /// <returns>Posture for tip position closest to current posture</returns>
+    /// <exception cref="InvalidOperationException">If the tip position is unreachable</exception>
+    public MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
+    {   
+        var cellPosition = GetCellCenterPositionFor(tipPosition);
+        var cellPositionNeighbor = GetNeighborCellCenterPositionFor(tipPosition);
+        var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, cellPositionNeighbor);
+     
+        var posture = GetClosestFor(cellPosition, currentPosture);
+        var postureNeighbor = GetClosestFor(cellPositionNeighbor , currentPosture);
+        var postureInterpolated = MaydayLegPosture.InterpolateBetween(posture, postureNeighbor, fractionOfProgressBetweenCells);
+
+        return postureInterpolated;
+    }
+
+    MaydayLegPosture GetClosestFor(Xyz cellPosition, MaydayLegPosture posture)
+    {
+        var possiblePostures = Map
+            .LookFor(cellPosition)
+            .IfNone(() => throw new InvalidOperationException($"No leg posture for cell position {cellPosition}"));
+            
+        return possiblePostures
+            .OrderBy(p => p.DistanceTo(posture))
+            .FirstOption()
+            .IfNone(() => throw new NotSupportedException($"All 'some' cell position sets should be non-empty."));
+        
+        // return Map[cellPosition]
+        //     .OrderBy(p => p.DistanceTo(posture))
+        //     .First();
+    }
+
+    public static LegPostureByPositionMap BuildNew()
+    {
+        var dict = BuildNewDictionary();
+        
+        return new LegPostureByPositionMap(dict);
+    }
+    
+    static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildNewDictionary()    
     {
         var leg = CreateEchoLeg();
-
-        // TODO it is a problem that this takes so long to build, and it is
-        //  lazy, so when the robot is already running, this starts to build. I
-        //  must either pre initialize or load from disk. 
-        Map = BuildDictionary(leg).ToFrozenDictionary();
-    }
-
-    static MaydayLeg CreateEchoLeg()
-    {
-        MaydayLegFactory legFactory = new(new EchoJointFactory());
-       
-        var leg = legFactory.CreateLeg(MaydayLegId.LeftBack);
-        return leg;
-    }
-
-    static IDictionary<Xyz, IImmutableSet<MaydayLegPosture>> LoadFromFile()
-    {
-        var json = File.ReadAllText(FilePath);
-        var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<MaydayLegPosture>>>(json, SerializerOptions)
-            ?? throw new InvalidOperationException($"Failed to deserialize file {FilePath}");
-
-        return deserialized.ToDictionary(
-            kvp => JsonSerializer.Deserialize<Xyz>(kvp.Key, SerializerOptions) 
-                   ?? throw new InvalidOperationException($"Failed to deserialize Xyz key: {kvp.Key}"),
-            kvp => (IImmutableSet<MaydayLegPosture>)kvp.Value.ToImmutableHashSet());
-    }
-
-    public static void StoreToFile(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> dict)
-    {
-
-        var oneMeterString =  JsonSerializer.Serialize(Xyz.One, SerializerOptions);
-        var oneMeterLength =  JsonSerializer.Deserialize<Xyz>(oneMeterString, SerializerOptions);
-            
-        var serializable = dict
-            .OrderBy(kvp => kvp.Key.X.Meters)
-            .ThenBy(kvp => kvp.Key.Y.Meters)
-            .ThenBy(kvp => kvp.Key.Z.Meters)
-            .ToDictionary(
-                kvp => JsonSerializer.Serialize(kvp.Key),
-                kvp => kvp.Value);
-
-        var json = JsonSerializer.Serialize(serializable, SerializerOptions);
-        File.WriteAllText(FilePath, json);
-    }
-
-    public static IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> BuildDictionary(MaydayLeg leg)
-    {
+    
         var angleStep = Angle.FromRevolutions(1.0 / 64);
         
         
@@ -98,6 +83,14 @@ public class LegPostureByPositionMap
 
             map.AppendElement(key: cellPosition, element: posture);
         }
+    }
+
+    static MaydayLeg CreateEchoLeg()
+    {
+        MaydayLegFactory legFactory = new(new EchoJointFactory(), CreateEmpty());
+       
+        var leg = legFactory.CreateLeg(MaydayLegId.LeftBack);
+        return leg;
     }
 
     static void EnsureCellDensity(Dictionary<Xyz, List<MaydayLegPosture>> map)
@@ -182,39 +175,5 @@ public class LegPostureByPositionMap
 
         var cellCenterCoordinate = offsetPosition - residual;
         return cellCenterCoordinate;
-    }
-
-    /// <summary>
-    /// Get leg joint posture which results in the given tip position 
-    /// </summary>
-    /// <returns>Posture for tip position closest to current posture</returns>
-    /// <exception cref="InvalidOperationException">If the tip position is unreachable</exception>
-    public static MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
-    {   
-        var cellPosition = GetCellCenterPositionFor(tipPosition);
-        var cellPositionNeighbor = GetNeighborCellCenterPositionFor(tipPosition);
-        var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, cellPositionNeighbor);
-     
-        var posture = GetClosestFor(cellPosition, currentPosture);
-        var postureNeighbor = GetClosestFor(cellPositionNeighbor , currentPosture);
-        var postureInterpolated = MaydayLegPosture.InterpolateBetween(posture, postureNeighbor, fractionOfProgressBetweenCells);
-
-        return postureInterpolated;
-    }
-
-    static MaydayLegPosture GetClosestFor(Xyz cellPosition, MaydayLegPosture posture)
-    {
-        var possiblePostures = Map
-            .LookFor(cellPosition)
-            .IfNone(() => throw new InvalidOperationException($"No leg posture for cell position {cellPosition}"));
-            
-        return possiblePostures
-            .OrderBy(p => p.DistanceTo(posture))
-            .FirstOption()
-            .IfNone(() => throw new NotSupportedException($"All 'some' cell position sets should be non-empty."));
-        
-        // return Map[cellPosition]
-        //     .OrderBy(p => p.DistanceTo(posture))
-        //     .First();
     }
 }

@@ -68,10 +68,10 @@ public class MaydayStructure
         _legs.ForEach(l => l.SetPosture(postureTimed));
     }
     
-    public static MaydayStructure Create(JointFactory jointFactory)
+    public static MaydayStructure Create(MaydayLegFactory legFactory)
     {
         var thorax = Link.CreateThorax;
-        var legs = new MaydayLegFactory(jointFactory).CreateAll();
+        var legs = legFactory.CreateAll();
 
         legs.ForEach(kvp => 
             Attachment.NewBetween(thorax, kvp.Value.BaseLink, Thorax.TransformFor(kvp.Key)));
@@ -81,9 +81,7 @@ public class MaydayStructure
 
     public static MaydayStructure CreateEcho()
     {
-        EchoJointFactory echoJointFactory = new();
-        
-        return Create(echoJointFactory);
+        return Create(MaydayLegFactory.CreateEcho());
     }
 
     /// <summary>

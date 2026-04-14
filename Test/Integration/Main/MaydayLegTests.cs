@@ -1,4 +1,6 @@
-﻿using LanguageExt;
+﻿using Dynamixel;
+using LanguageExt;
+using MaydayDataAccess;
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
@@ -22,11 +24,19 @@ public class MaydayLegTests
         _testOutputHelper = testOutputHelper;
     }
 
+    static readonly CancellationTokenSource cts = new();
     static readonly TimeProvider TimeProvider = TimeProvider.System;
-    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner
-        .Create(new CancellationTokenSource(), TimeProvider)
-        .RunUnsafe();
 
+    static readonly Eff<JointFactory> jointFactoryEff = DynamixelJointFactory
+        .Create(cts, TimeProvider)
+        .Map(JointFactory (djf) => djf);
+    static readonly LegPostureByPositionMap legPostureByPositionMap = new LegPostureByPositionMapFileRepo().Load();
+    static readonly MaydayLegFactory legFactory = jointFactoryEff
+        .Map(jf => new MaydayLegFactory(jf, legPostureByPositionMap))
+        .RunUnsafe();
+    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create(legFactory)
+        
+;
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {
@@ -43,7 +53,9 @@ public class MaydayLegTests
     {
         // Given
         var timeStep = TimeSpan.FromSeconds(1);
-        MotionPlanner.SetPosture(TimeProvider.ScheduleIn(MaydayLegPosture.Neutral, timeStep));
+        var timedPosture = TimeProvider.ScheduleIn(MaydayLegPosture.Neutral, timeStep);
+        
+        MotionPlanner.SetPosture(timedPosture);
         Thread.Sleep(timeStep);
         
         // When

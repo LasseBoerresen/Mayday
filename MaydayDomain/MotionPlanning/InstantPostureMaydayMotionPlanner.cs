@@ -72,36 +72,22 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public void UnsetGoal() => _goalMovement = Option<Timed<Movement>>.None;
 
-    public static Eff<InstantPostureMaydayMotionPlanner> Create(
-        CancellationTokenSource cancellationTokenSource,
-        TimeProvider timeProvider)
+    public static InstantPostureMaydayMotionPlanner Create(MaydayLegFactory legFactory)
     {
-        var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
-        var maydayMotionPlanner = structureEff.Map(structure => new InstantPostureMaydayMotionPlanner(structure));
+        var structure = CreateMaydayStructure(legFactory);
         
+        var maydayMotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
         return maydayMotionPlanner;
     }
 
-    protected static Eff<MaydayStructure> CreateMaydayStructure(
-        CancellationTokenSource cancellationTokenSource,
-        TimeProvider timeProvider)
+    protected static MaydayStructure CreateMaydayStructure(MaydayLegFactory legFactory)
     {
-        var jointFactoryEff = DynamixelJointFactory.Create(cancellationTokenSource, timeProvider);
-
-        var structure = jointFactoryEff.Map(MaydayStructure.Create);
+        var structure = MaydayStructure.Create(legFactory);
         return structure;
     }
     
     public void Dispose()
     {
-        Dispose(true);
+        _trackingTask?.Dispose();
     }
-    
-    void Dispose(bool disposing)
-    {
-        if (disposing)
-            _trackingTask?.Dispose();
-    }
-    
-    ~InstantPostureMaydayMotionPlanner() => Dispose(false);
 }

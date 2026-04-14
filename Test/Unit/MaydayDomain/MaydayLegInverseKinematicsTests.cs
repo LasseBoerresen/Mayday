@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
+using MaydayDataAccess;
 using MaydayDomain;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -47,16 +48,16 @@ public class MaydayLegInverseKinematicsTests
     [Fact(Skip = $"Run only to rebuild and store {nameof(LegPostureByPositionMap)}")]
     public void RebuildDictLegPostureByPositionMap()
     {
-        var newDict = LegPostureByPositionMap.BuildDictionary(_leg);
+        var newMap = LegPostureByPositionMap.BuildNew();
 
-        Print(newDict);
+        Print(newMap);
 
-        LegPostureByPositionMap.StoreToFile(newDict);
+        new LegPostureByPositionMapFileRepo().Store(newMap);
     }
 
-    void Print(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> newDict)
+    void Print(LegPostureByPositionMap map)
     {
-        foreach (var keyValuePair in newDict)
+        foreach (var keyValuePair in map.Map)
         {
             var posturesString = String.Join(",\n", keyValuePair.Value.Select(p => p.ToString()));
             _testOutputHelper.WriteLine($"{keyValuePair.Key}: \n{posturesString}");

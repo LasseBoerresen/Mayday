@@ -110,12 +110,12 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
                 startPosture: GetPostureOf(deltaXyzs.LegId)));
     }
     
-    public new static Eff<StepByStepLearningInstantPostureMaydayMotionPlanner> Create(
-        CancellationTokenSource cancellationTokenSource, TimeProvider timeProvider)
+    public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create(
+        MaydayLegFactory legFactory)
     {
-        var structureEff = CreateMaydayStructure(cancellationTokenSource, timeProvider);
+        var structure = CreateMaydayStructure(legFactory);
         var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
         
-        return structureEff.Map(structure => new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, nn));
+        return new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, nn);
     }
 }

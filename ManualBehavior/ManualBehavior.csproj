@@ -7,8 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MaydayDataAccess\MaydayDataAccess.csproj" />
       <ProjectReference Include="..\MaydayDomain\MaydayDomain.csproj" />
       <ProjectReference Include="..\RobotDomain\RobotDomain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LanguageExt.Sys" Version="5.0.0-beta-46" />
     </ItemGroup>
 
 </Project>

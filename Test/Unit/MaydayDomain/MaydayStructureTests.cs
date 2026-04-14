@@ -1,4 +1,5 @@
-﻿using Generic;
+﻿using System.Collections.ObjectModel;
+using Generic;
 using MaydayDomain;
 using MaydayDomain.Components;
 using Moq;
@@ -19,16 +20,17 @@ public class MaydayStructureTests
         // Given
         IList<Connection> connections = [];
         IList<Link> links = [];
+        var legPostureByPositionMap = LegPostureByPositionMap.CreateEmpty();
         var thorax = Link.CreateThorax;
-        
+
         Dictionary<MaydayLegId, MaydayLeg> legs = new()
         {
-            { RightFront, new(connections, links) },
-            { RightCenter, new(connections, links) },
-            { RightBack, new(connections, links) },
-            { LeftFront, new(connections, links) },
-            { LeftCenter, new(connections, links) },
-            { LeftBack, new(connections, links) }
+            { RightFront, new(connections, links, legPostureByPositionMap) },
+            { RightCenter, new(connections, links, legPostureByPositionMap) },
+            { RightBack, new(connections, links, legPostureByPositionMap) },
+            { LeftFront, new(connections, links, legPostureByPositionMap) },
+            { LeftCenter, new(connections, links, legPostureByPositionMap) },
+            { LeftBack, new(connections, links, legPostureByPositionMap) }
         };
 
         // When
