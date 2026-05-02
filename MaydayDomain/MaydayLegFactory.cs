@@ -94,7 +94,7 @@ public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap
             new Transform(new(0.125, 0, -0.09), Q.FromRpy(new(0, 0.16666, 0))));
     }
 
-    public static MaydayLegFactory CreateEcho()
+    public static MaydayLegFactory NewEchoLegFactory()
     {
         return new MaydayLegFactory(
             new EchoJointFactory(), 

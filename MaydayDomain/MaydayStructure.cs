@@ -81,7 +81,7 @@ public class MaydayStructure
 
     public static MaydayStructure CreateEcho()
     {
-        return Create(MaydayLegFactory.CreateEcho());
+        return Create(MaydayLegFactory.NewEchoLegFactory());
     }
 
     /// <summary>
