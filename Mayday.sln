@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaydayDataAccess", "MaydayDataAccess\MaydayDataAccess.csproj", "{560074E6-FAC6-44D9-9FF9-709BB7783F87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robots", "Robots\Robots.csproj", "{0F29E6ED-E3CD-451D-BE5E-C85ECB433259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +68,9 @@ Global
 		{560074E6-FAC6-44D9-9FF9-709BB7783F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{560074E6-FAC6-44D9-9FF9-709BB7783F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{560074E6-FAC6-44D9-9FF9-709BB7783F87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F29E6ED-E3CD-451D-BE5E-C85ECB433259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F29E6ED-E3CD-451D-BE5E-C85ECB433259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F29E6ED-E3CD-451D-BE5E-C85ECB433259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F29E6ED-E3CD-451D-BE5E-C85ECB433259}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
