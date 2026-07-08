@@ -11,6 +11,7 @@ public static class TestObjectFactory
 {
     static readonly Length translationPrecision = Length.FromMeters(0.01);
     static readonly Angle rotationalPrecision = Angle.FromRevolutions(0.01);
+    public static TimeProvider TimeProvider  => Mock.Of<TimeProvider>();
 
     public static Mock<Joint> CreateMockJoint() => new(
         Transform.Zero,

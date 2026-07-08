@@ -3,6 +3,8 @@ using LanguageExt.Common;
 using LanguageExt.Sys.Live;
 using Main;
 using ManualBehavior;
+using MaydayDomain.MotionPlanning;
+using Robots;
 
 
 Main().Run(Runtime.New())
@@ -19,11 +21,11 @@ static Eff<Runtime, Unit> Main()
 static Eff<MaydayRobot> CreateRobot<RT>(TimeProvider timeProvider)
 {
     StartupMode startupMode = Enum.Parse<StartupMode>(Environment.GetEnvironmentVariable("mayday_startup_mode") ?? "");
-
+    
     return startupMode switch
     {
-        StartupMode.Run => MaydayRobot.CreateWithSwayBehavior(timeProvider),
-        StartupMode.Train => MaydayRobot.CreateWithBabyLegsBehaviorController(timeProvider),
+        StartupMode.Run => MaydayRobotFactory.CreateWithSwayBehavior(timeProvider),
+        StartupMode.Train => MaydayRobotFactory.CreateWithBabyLegsBehaviorController(timeProvider),
         _ => Error.New("Invalid startup mode: " + startupMode)
     };
 }
