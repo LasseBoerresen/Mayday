@@ -11,7 +11,7 @@ namespace MaydayDomain;
 
 // TODO over time, the structure might hold lots of sensors and stuff, so
 //  managing legs should maybe be delegated to a "Legs" type. 
-public class DefaultMaydayStructure
+public class DefaultMaydayStructure : MaydayStructure
 {
     readonly Link _thorax;
     readonly MaydayStructureSet<MaydayLeg> _legs;

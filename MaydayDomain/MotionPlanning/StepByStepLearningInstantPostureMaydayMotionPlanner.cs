@@ -14,7 +14,7 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
     readonly InverseLegKinematicsNeuralNetwork _neuralNetwork;
 
     StepByStepLearningInstantPostureMaydayMotionPlanner(
-        DefaultMaydayStructure structure,
+        MaydayStructure structure,
         InverseLegKinematicsNeuralNetwork neuralNetwork) 
         : base(structure)
     {

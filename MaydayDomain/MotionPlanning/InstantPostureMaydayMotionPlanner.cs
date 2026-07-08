@@ -10,12 +10,12 @@ namespace MaydayDomain.MotionPlanning;
 
 public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 {
-    protected readonly DefaultMaydayStructure Structure;
+    protected readonly MaydayStructure Structure;
     Task? _trackingTask;
     Option<Timed<Movement>> _goalMovement = Option<Timed<Movement>>.None;
 
 
-    public InstantPostureMaydayMotionPlanner(DefaultMaydayStructure structure)
+    public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
         Structure = structure;
     }

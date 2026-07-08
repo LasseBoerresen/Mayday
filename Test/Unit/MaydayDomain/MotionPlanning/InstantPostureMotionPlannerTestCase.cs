@@ -9,7 +9,7 @@ namespace Test.Unit.MaydayDomain.MotionPlanning;
 [TestSubject(typeof(InstantPostureMaydayMotionPlanner))]
 public class InstantPostureMotionPlannerTestCase
 {
-    readonly Mock<DefaultMaydayStructure> _mockStructure = new();
+    readonly Mock<MaydayStructure> _mockStructure = new();
     // readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
 
     public InstantPostureMotionPlannerTestCase()
