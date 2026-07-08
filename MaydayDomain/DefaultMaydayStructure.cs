@@ -11,12 +11,12 @@ namespace MaydayDomain;
 
 // TODO over time, the structure might hold lots of sensors and stuff, so
 //  managing legs should maybe be delegated to a "Legs" type. 
-public class MaydayStructure
+public class DefaultMaydayStructure
 {
     readonly Link _thorax;
     readonly MaydayStructureSet<MaydayLeg> _legs;
 
-    public MaydayStructure(Link thorax, IDictionary<MaydayLegId, MaydayLeg> legs)
+    public DefaultMaydayStructure(Link thorax, IDictionary<MaydayLegId, MaydayLeg> legs)
     {
         _thorax = thorax;
         _legs = MaydayStructureSet<MaydayLeg>.FromLegDict(legs);
@@ -68,7 +68,7 @@ public class MaydayStructure
         _legs.ForEach(l => l.SetPosture(postureTimed));
     }
     
-    public static MaydayStructure Create(MaydayLegFactory legFactory)
+    public static DefaultMaydayStructure Create(MaydayLegFactory legFactory)
     {
         var thorax = Link.CreateThorax;
         var legs = legFactory.CreateAll();
@@ -79,7 +79,7 @@ public class MaydayStructure
         return new(thorax, legs);
     }
 
-    public static MaydayStructure CreateEcho()
+    public static DefaultMaydayStructure CreateEcho()
     {
         return Create(MaydayLegFactory.NewEchoLegFactory());
     }

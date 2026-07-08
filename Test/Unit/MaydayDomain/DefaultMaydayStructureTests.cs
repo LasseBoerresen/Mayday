@@ -12,7 +12,7 @@ using static MaydayDomain.MaydayLegId;
 
 namespace Test.Unit.MaydayDomain;
 
-public class MaydayStructureTests
+public class DefaultMaydayStructureTests
 {
     [Fact] 
     public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
@@ -34,7 +34,7 @@ public class MaydayStructureTests
         };
 
         // When
-        MaydayStructure may = new(thorax, legs);
+        DefaultMaydayStructure may = new(thorax, legs);
 
         // Then
         Assert.True(may != null);
@@ -49,7 +49,7 @@ public class MaydayStructureTests
         AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Connection>(), new List<Link>())));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
-        MaydayStructure may = new(thorax, legsDict);
+        DefaultMaydayStructure may = new(thorax, legsDict);
         
         // When
         var postureTimed = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Standing);
@@ -65,7 +65,7 @@ public class MaydayStructureTests
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
-        var mayStructure = MaydayStructure.CreateEcho();
+        var mayStructure = DefaultMaydayStructure.CreateEcho();
         
         // When
         var coxaMotorTransforms = mayStructure.GetTransformsOf(LinkName.CoxaMotor);
@@ -84,7 +84,7 @@ public class MaydayStructureTests
     public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
     {
         // Given
-        var mayStructure = MaydayStructure.CreateEcho();
+        var mayStructure = DefaultMaydayStructure.CreateEcho();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
@@ -103,7 +103,7 @@ public class MaydayStructureTests
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given
-        var mayStructure = MaydayStructure.CreateEcho();
+        var mayStructure = DefaultMaydayStructure.CreateEcho();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
