@@ -8,25 +8,18 @@ using Duration = UnitsNet.Duration;
 
 namespace MaydayDomain.MotionPlanning;
 
-public class StepByStepLearningInstantPostureMaydayMotionPlanner 
-    : InstantPostureMaydayMotionPlanner
-{
-    readonly InverseLegKinematicsNeuralNetwork _neuralNetwork;
-
-    StepByStepLearningInstantPostureMaydayMotionPlanner(
+public class StepByStepLearningInstantPostureMaydayMotionPlanner(
         MaydayStructure structure,
         InverseLegKinematicsNeuralNetwork neuralNetwork) 
-        : base(structure)
-    {
-        _neuralNetwork = neuralNetwork;
-    }
+    : InstantPostureMaydayMotionPlanner(structure)
+{
 
     public override void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)
     {
         var inputsTimed = tipDeltasTimed.Map(tipDeltas => tipDeltas.Map(CreateInput));
         var expectedPositions = inputsTimed.Target.Map(i=> i.EndXyz);
         
-        var outputsTimed = inputsTimed.Map(inputs => inputs.Map(_neuralNetwork.Predict));
+        var outputsTimed = inputsTimed.Map(inputs => inputs.Map(neuralNetwork.Predict));
 
         SetPostures(outputsTimed);
         WaitForMovementToFinish();
@@ -108,14 +101,5 @@ public class StepByStepLearningInstantPostureMaydayMotionPlanner
                 endXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId) + deltaXyz,
                 startXyz: GetPositionOf(LinkName.Tip, deltaXyzs.LegId),
                 startPosture: GetPostureOf(deltaXyzs.LegId)));
-    }
-    
-    public new static StepByStepLearningInstantPostureMaydayMotionPlanner Create(
-        MaydayLegFactory legFactory)
-    {
-        var structure = CreateMaydayStructure(legFactory);
-        var nn = InverseLegKinematicsNeuralNetwortTensorflowNetImpl.Create();
-        
-        return new StepByStepLearningInstantPostureMaydayMotionPlanner(structure, nn);
     }
 }

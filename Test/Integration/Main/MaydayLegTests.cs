@@ -25,18 +25,23 @@ public class MaydayLegTests
     }
 
     static readonly CancellationTokenSource cts = new();
+    
     static readonly TimeProvider TimeProvider = TimeProvider.System;
 
     static readonly Eff<JointFactory> jointFactoryEff = DynamixelJointFactory
         .Create(cts, TimeProvider)
         .Map(JointFactory (djf) => djf);
+        
     static readonly LegPostureByPositionMap legPostureByPositionMap = new LegPostureByPositionMapFileRepo().Load();
+    
     static readonly MaydayLegFactory legFactory = jointFactoryEff
         .Map(jf => new MaydayLegFactory(jf, legPostureByPositionMap))
         .RunUnsafe();
-    static readonly MaydayMotionPlanner MotionPlanner = InstantPostureMaydayMotionPlanner.Create(legFactory)
-        
-;
+
+    static readonly MaydayStructure structure = new MaydayStructureFactory(legFactory).CreateDefault();
+    
+    static readonly MaydayMotionPlanner MotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
+    
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()
     {

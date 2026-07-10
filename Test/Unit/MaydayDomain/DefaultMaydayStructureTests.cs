@@ -65,7 +65,7 @@ public class DefaultMaydayStructureTests
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
-        var mayStructure = DefaultMaydayStructure.CreateEcho();
+        var mayStructure = MaydayStructureFactory.CreateEcho();
         
         // When
         var coxaMotorTransforms = mayStructure.GetTransformsOf(LinkName.CoxaMotor);
@@ -84,7 +84,7 @@ public class DefaultMaydayStructureTests
     public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
     {
         // Given
-        var mayStructure = DefaultMaydayStructure.CreateEcho();
+        var mayStructure = MaydayStructureFactory.CreateEcho();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
@@ -103,7 +103,7 @@ public class DefaultMaydayStructureTests
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given
-        var mayStructure = DefaultMaydayStructure.CreateEcho();
+        var mayStructure = MaydayStructureFactory.CreateEcho();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);

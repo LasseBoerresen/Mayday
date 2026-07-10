@@ -72,20 +72,6 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
 
     public void UnsetGoal() => _goalMovement = Option<Timed<Movement>>.None;
 
-    public static InstantPostureMaydayMotionPlanner Create(MaydayLegFactory legFactory)
-    {
-        var structure = CreateMaydayStructure(legFactory);
-        
-        var maydayMotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
-        return maydayMotionPlanner;
-    }
-
-    protected static DefaultMaydayStructure CreateMaydayStructure(MaydayLegFactory legFactory)
-    {
-        var structure = DefaultMaydayStructure.Create(legFactory);
-        return structure;
-    }
-    
     public void Dispose()
     {
         _trackingTask?.Dispose();
