@@ -25,9 +25,6 @@ public class LegPostureByPositionMapFileRepo : LegPostureByPositionMapRepo
 
     public void Store(LegPostureByPositionMap map)
     {
-        var oneMeterString =  JsonSerializer.Serialize(Xyz.One, SerializerOptions);
-        var oneMeterLength =  JsonSerializer.Deserialize<Xyz>(oneMeterString, SerializerOptions);
-            
         var serializable = map.Map
             .OrderBy(kvp => kvp.Key.X.Meters)
             .ThenBy(kvp => kvp.Key.Y.Meters)
