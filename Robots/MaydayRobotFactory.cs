@@ -5,6 +5,7 @@ using MaydayDataAccess;
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
+using Robots.Base;
 
 namespace Robots;
 

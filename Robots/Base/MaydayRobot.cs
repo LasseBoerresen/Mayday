@@ -1,7 +1,7 @@
 ﻿using LanguageExt;
 using RobotDomain.Behavior;
 
-namespace ManualBehavior;
+namespace Robots.Base;
 
 public class MaydayRobot(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
 {

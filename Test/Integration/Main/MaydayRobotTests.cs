@@ -2,6 +2,7 @@
 using LanguageExt;
 using ManualBehavior;
 using Robots;
+using Robots.Base;
 using Test.Utilities;
 using Xunit;
 

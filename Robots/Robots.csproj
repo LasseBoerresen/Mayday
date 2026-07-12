@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Base\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\ManualBehavior\ManualBehavior.csproj" />
     </ItemGroup>
 

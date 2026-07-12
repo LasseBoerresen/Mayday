@@ -5,6 +5,7 @@ using Main;
 using ManualBehavior;
 using MaydayDomain.MotionPlanning;
 using Robots;
+using Robots.Base;
 
 
 Main().Run(Runtime.New())
