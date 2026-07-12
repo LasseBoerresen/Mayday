@@ -1,8 +1,8 @@
-﻿using Robots;
+﻿using FluentAssertions;
+using Robots;
 using Xunit;
-using FluentAssertions;
 
-namespace Test.Unit.MaydayRobot;
+namespace Test.Unit.Robots.Mayday;
 
 public class MaydayDayRobotFactoryTests
 {
