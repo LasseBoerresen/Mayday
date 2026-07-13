@@ -1,8 +1,8 @@
 ﻿using System.Collections.Frozen;
 using System.Text.Json;
 using Generic;
+using MaydayDataAccess.Geometry;
 using MaydayDomain;
-using RobotDomain.Geometry;
 
 namespace MaydayDataAccess;
 
@@ -18,7 +18,7 @@ public class LegPostureByPositionMapFileRepo : LegPostureByPositionMapRepo
 
         return new LegPostureByPositionMap(
             deserialized.ToFrozenDictionary(
-                kvp => JsonSerializer.Deserialize<Xyz>(kvp.Key, SerializerOptions) 
+                kvp => JsonSerializer.Deserialize<XyzDao>(kvp.Key, SerializerOptions).ToDomain() 
                     ?? throw new InvalidOperationException($"Failed to deserialize Xyz key: {kvp.Key}"),
                 kvp => kvp.Value));
     }
@@ -30,20 +30,12 @@ public class LegPostureByPositionMapFileRepo : LegPostureByPositionMapRepo
             .ThenBy(kvp => kvp.Key.Y.Meters)
             .ThenBy(kvp => kvp.Key.Z.Meters)
             .ToDictionary(
-                kvp => JsonSerializer.Serialize(kvp.Key),
-                kvp => kvp.Value);
+                kvp => XyzDao.FromDomain(kvp.Key).ToKey(),
+                kvp => kvp.Value.Map(MaydayLegPostureDao.FromDomain));
 
         var json = JsonSerializer.Serialize(serializable, SerializerOptions);
         File.WriteAllText(FilePath, json);
     }
     
-    static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        WriteIndented = true,
-        Converters =
-        {
-            new LengthJsonConverter(),
-            new AngleJsonConverter()
-        }
-    };
+    static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
 }

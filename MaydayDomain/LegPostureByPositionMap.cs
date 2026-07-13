@@ -12,6 +12,10 @@ using Length = UnitsNet.Length;
 
 namespace MaydayDomain;
 
+/// <summary>
+/// Maps any 3d tip position to a set of leg postures
+/// </summary>
+/// <param name="Map"></param>
 public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map)
 {
     static readonly Length CellSize = Length.FromMeters(1.0 / 64.0); // binary number for 100% float accuracy
@@ -51,6 +55,10 @@ public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPos
         //     .First();
     }
 
+    // TODO Why would a leg have more than two possible postures? It is
+    //  basically only knee direction thaT matters... Find the two best postures, 
+    //  which lies closest to the cell center, and throw away others. Maybe it
+    //  is even a pair, with optional values, not a list of postures.  
     public static LegPostureByPositionMap BuildNew()
     {
         var dict = BuildNewDictionary();
