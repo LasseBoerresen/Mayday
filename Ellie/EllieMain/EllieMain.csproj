@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Dynamixel\Dynamixel.csproj" />
       <ProjectReference Include="..\..\RobotDomain\RobotDomain.csproj" />
     </ItemGroup>
 
