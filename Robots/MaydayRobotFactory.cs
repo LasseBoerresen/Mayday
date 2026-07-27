@@ -21,7 +21,7 @@ public static class MaydayRobotFactory
             .Map(jointFactory => new MaydayLegFactory(jointFactory, legPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
             .Map(structure => new InstantPostureMaydayMotionPlanner(structure))
-            .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, cts, timeProvider))
+            .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, cts.Token, timeProvider))
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }
 

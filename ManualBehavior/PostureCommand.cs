@@ -2,7 +2,6 @@
 
 public enum PostureCommand
 {
-    Stop = 0,
     Wake = 1,
     Sleep = 2,
     Stand = 3,

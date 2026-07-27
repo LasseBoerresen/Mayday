@@ -5,6 +5,11 @@ using UnitsNet;
 
 namespace Dynamixel;
 
+// TODO Rename To and move out of dynamixel component, there is nothing dynamixly about it, other than it having a singleton  
+
+/// <summary>
+/// An individual rotary servo joint using a singleton servo 
+/// </summary>
 public class DynamixelJoint : Joint
 {
     readonly JointId _id;

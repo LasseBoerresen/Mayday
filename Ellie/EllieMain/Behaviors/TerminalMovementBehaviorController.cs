@@ -1,26 +1,34 @@
-﻿using LanguageExt;
+﻿using EllieMain.MotionPlanning;
 using RobotDomain.Behavior;
 
 namespace EllieMain.Behaviors;
 
-public class TerminalMovementBehaviorController(CancellationToken ct) : BehaviorController
+public class TerminalMovementBehaviorController(
+    EllieMotionPlanner motionPlanner,
+    CancellationToken ct) 
+    : TerminalBehaviorController<MovementCommand>(ct)
 {
-    public Unit Start()
+    protected override void WakeUpBehavior()
     {
-        PrintCommandList();
-        while (!ct.IsCancellationRequested)
-            ExecuteConsoleCommand();
-            
-        return Unit.Default;
+        motionPlanner.Start();
     }
 
-    void PrintCommandList()
+    protected override void SleepBehavior()
     {
         throw new NotImplementedException();
     }
 
-    void ExecuteConsoleCommand()
+    protected override void ExecuteCommand(MovementCommand command)
     {
         throw new NotImplementedException();
     }
+
+    protected override void PrintUpdate()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public enum MovementCommand
+{
 }

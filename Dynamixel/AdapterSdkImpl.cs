@@ -8,6 +8,8 @@ using UnitsNet;
 
 namespace Dynamixel;
 
+// TODO rename to ScheduledJointController. 
+
 public class AdapterSdkImpl : Adapter
 {
     readonly PortAdapter _portAdapter;

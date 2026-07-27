@@ -15,4 +15,8 @@
       <ProjectReference Include="..\..\RobotDomain\RobotDomain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dynamixel\" />
+    </ItemGroup>
+
 </Project>
