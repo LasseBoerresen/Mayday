@@ -14,7 +14,7 @@ using Duration = UnitsNet.Duration;
 namespace Dynamixel;
 
 // TODO this class should be a singleton, since it represents a single port. Also the dynamixel adapter.
-public class CommunicationBusSdkImpl : CommunicationBus
+public class NativeSerialPortCommunicationBus : CommunicationBus
 {
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
@@ -27,7 +27,7 @@ public class CommunicationBusSdkImpl : CommunicationBus
         
         
 
-    CommunicationBusSdkImpl(PortNumber portNumber)
+    NativeSerialPortCommunicationBus(PortNumber portNumber)
     {
         _portNumber = portNumber;
     }
@@ -285,14 +285,14 @@ public class CommunicationBusSdkImpl : CommunicationBus
         GC.SuppressFinalize(this);
     }
 
-    public static Eff<CommunicationBusSdkImpl> CreateInitialized()
+    public static Eff<NativeSerialPortCommunicationBus> CreateInitialized()
     {
         return InitializePortHandlerAndGetNumber()
             .Bind(portNumber => InitializePacketHandler()
                 .Bind(_ => OpenPort(portNumber))
                 .Bind(_ => SetPortBaudrate(portNumber))
                 .Bind(_ => SetPortPacketTimeOut(portNumber))
-                .Map(_ => new CommunicationBusSdkImpl(portNumber)));
+                .Map(_ => new NativeSerialPortCommunicationBus(portNumber)));
     }
 
     static Eff<Unit> InitializePacketHandler()

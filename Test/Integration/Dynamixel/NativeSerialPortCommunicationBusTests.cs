@@ -6,22 +6,22 @@ using Xunit;
 
 namespace Test.Integration.Dynamixel;
 
-[TestSubject(typeof(CommunicationBusSdkImpl))]
-public class CommunicationBusSdkImplTests
+[TestSubject(typeof(NativeSerialPortCommunicationBus))]
+public class NativeSerialPortCommunicationBusTests
 {
-    readonly CommunicationBusSdkImpl _communicationBus = CommunicationBusSdkImpl.CreateInitialized().RunUnsafe();
+    readonly NativeSerialPortCommunicationBus _nativeSerialPortCommunicationBus = NativeSerialPortCommunicationBus.CreateInitialized().RunUnsafe();
     Id _id = new(1);
 
     [PhysicalRobotFact]
     void GivenRobotIsAttached_WhenSetTwoGoalAnglesAndSleep1sBetween_ThenCurrentPositionWithin20()
     {
         // Given
-        _communicationBus.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
+        _nativeSerialPortCommunicationBus.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
     
         foreach (var i in Enumerable.Range(1, 18))
         {
             _id = new(i);
-            _communicationBus.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
+            _nativeSerialPortCommunicationBus.Write(_id, ControlRegister.TorqueEnable, Convert.ToByte(true));
             
             // When
             var goal = StepAngle.StepCenter - 100;
@@ -41,7 +41,7 @@ public class CommunicationBusSdkImplTests
 
     void SetAndWaitForGoal(uint goal)
     {
-        _communicationBus.Write(_id, ControlRegister.GoalPosition, goal);
+        _nativeSerialPortCommunicationBus.Write(_id, ControlRegister.GoalPosition, goal);
         
         Thread.Sleep(TimeSpan.FromSeconds(0.1));
     }
@@ -50,7 +50,7 @@ public class CommunicationBusSdkImplTests
     {
         const int toleranceInAngleSteps = 30;
         
-        var currentPosition = _communicationBus.Read(_id, ControlRegister.GoalPosition);
+        var currentPosition = _nativeSerialPortCommunicationBus.Read(_id, ControlRegister.GoalPosition);
         var absoluteDifference = Math.Abs((int)currentPosition - goal);
         
         Assert.True(absoluteDifference < toleranceInAngleSteps);

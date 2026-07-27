@@ -26,7 +26,7 @@ public class DynamixelJointFactory(JointDriver jointDriver) : JointFactory, IDis
         CancellationTokenSource cancellationTokenSource, 
         TimeProvider timeProvider)
     {
-        var communicationBusEff = CommunicationBusSdkImpl.CreateInitialized();
+        var communicationBusEff = NativeSerialPortCommunicationBus.CreateInitialized();
         
         return communicationBusEff.Map(communicationBus => 
             Create(communicationBus, cancellationTokenSource, timeProvider));
