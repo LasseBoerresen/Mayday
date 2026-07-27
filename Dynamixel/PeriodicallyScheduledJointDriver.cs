@@ -11,7 +11,7 @@ namespace Dynamixel;
 
 // TODO rename to ScheduledJointController. 
 
-public class JointDriverSdkImpl : JointDriver
+public class PeriodicallyScheduledJointDriver : JointDriver
 {
     readonly CommunicationBus _communicationBus;
     readonly JointStateCache _jointStateCache;
@@ -20,7 +20,7 @@ public class JointDriverSdkImpl : JointDriver
     readonly Task _setGoalAngleTask;
     readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
-    public JointDriverSdkImpl(
+    public PeriodicallyScheduledJointDriver(
         CommunicationBus communicationBus,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,

@@ -39,9 +39,13 @@ public class DynamixelJointFactory(JointDriver jointDriver) : JointFactory, IDis
     {
         JointStateCacheDictImpl jointStateCache = new();
 
-        var jointAdapter = new JointDriverSdkImpl(communicationBus, jointStateCache, cancellationTokenSource, timeProvider);
+        var jointDriver = new PeriodicallyScheduledJointDriver(
+            communicationBus, 
+            jointStateCache, 
+            cancellationTokenSource, 
+            timeProvider);
 
-        return new DynamixelJointFactory(jointAdapter);
+        return new DynamixelJointFactory(jointDriver);
     }
 
     public void Dispose()
