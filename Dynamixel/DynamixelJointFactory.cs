@@ -1,10 +1,11 @@
 ﻿using LanguageExt;
 using RobotDomain.Geometry;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 
 namespace Dynamixel;
 
-public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
+public class DynamixelJointFactory(JointDriver jointDriver) : JointFactory, IDisposable
 {
     public Joint New(
         Link parent,
@@ -14,7 +15,7 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder)
     {
-        DynamixelJoint joint = new(id, adapter, passiveTransform, rotationDirection, attachmentOrder, parent, child);
+        DynamixelJoint joint = new(id, jointDriver, passiveTransform, rotationDirection, attachmentOrder, parent, child);
 
         joint.Initialize();
 
@@ -38,14 +39,14 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
     {
         JointStateCacheDictImpl jointStateCache = new();
 
-        var jointAdapter = new AdapterSdkImpl(communicationBus, jointStateCache, cancellationTokenSource, timeProvider);
+        var jointAdapter = new JointDriverSdkImpl(communicationBus, jointStateCache, cancellationTokenSource, timeProvider);
 
         return new DynamixelJointFactory(jointAdapter);
     }
 
     public void Dispose()
     {
-        adapter.Dispose();
+        jointDriver.Dispose();
         GC.SuppressFinalize(this);
     }
 }

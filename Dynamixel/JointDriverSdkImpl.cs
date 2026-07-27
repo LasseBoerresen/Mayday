@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Generic;
 using LanguageExt;
+using RobotDomain.Motion;
 using RobotDomain.Physics;
 using RobotDomain.Structures;
 using RobotDomain.Time;
@@ -10,7 +11,7 @@ namespace Dynamixel;
 
 // TODO rename to ScheduledJointController. 
 
-public class AdapterSdkImpl : Adapter
+public class JointDriverSdkImpl : JointDriver
 {
     readonly CommunicationBus _communicationBus;
     readonly JointStateCache _jointStateCache;
@@ -19,7 +20,7 @@ public class AdapterSdkImpl : Adapter
     readonly Task _setGoalAngleTask;
     readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
-    public AdapterSdkImpl(
+    public JointDriverSdkImpl(
         CommunicationBus communicationBus,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,

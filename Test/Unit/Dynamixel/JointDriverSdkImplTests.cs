@@ -9,19 +9,19 @@ using RotationDirection = RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit.Dynamixel;
 
-[TestSubject(typeof(AdapterSdkImpl))]
-public class AdapterSdkImplTests
+[TestSubject(typeof(JointDriverSdkImpl))]
+public class JointDriverSdkImplTests
 {
     readonly Mock<CommunicationBus> _dynamixelPortAdapterMock = new();
-    readonly AdapterSdkImpl _adapter;
+    readonly JointDriverSdkImpl _jointDriver;
     readonly JointId _id = new(1);
     readonly TimeProvider _timeProvider = TimeProvider.System;
 
-    public AdapterSdkImplTests()
+    public JointDriverSdkImplTests()
     {
         _dynamixelPortAdapterMock.Setup(pa => pa.Ping(It.IsAny<Id>())).Returns(true);
          
-         _adapter = new(
+         _jointDriver = new(
              _dynamixelPortAdapterMock.Object, 
              new Mock<JointStateCache>().Object, 
              new CancellationTokenSource(),
@@ -36,7 +36,7 @@ public class AdapterSdkImplTests
     {
         // When
         var goalAngle = Timed<Angle>.Passed(Angle.Zero);
-        _adapter.SetGoalAngleFor(_id, goalAngle);
+        _jointDriver.SetGoalAngleFor(_id, goalAngle);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
@@ -48,7 +48,7 @@ public class AdapterSdkImplTests
     void Given_WhenInitialize_ThenCallsPortAdapterTorqueEnableWithValue1()
     {
         // When
-        _adapter.Initialize(_id, RotationDirection.Forward);
+        _jointDriver.Initialize(_id, RotationDirection.Forward);
 
         // Then
         _dynamixelPortAdapterMock.Verify(
@@ -60,7 +60,7 @@ public class AdapterSdkImplTests
     void Given_WhenInitialize_ThenCallsPortAdapterWriteVelocityLimit()
     {
         // When
-        _adapter.Initialize(_id, RotationDirection.Forward);
+        _jointDriver.Initialize(_id, RotationDirection.Forward);
 
         // Then
         _dynamixelPortAdapterMock.Verify(

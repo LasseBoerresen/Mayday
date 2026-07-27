@@ -1,4 +1,5 @@
 ﻿using RobotDomain.Geometry;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
@@ -13,11 +14,11 @@ namespace Dynamixel;
 public class DynamixelJoint : Joint
 {
     readonly JointId _id;
-    readonly Adapter _adapter;
+    readonly JointDriver _jointDriver;
 
     public DynamixelJoint(
         JointId id,
-        Adapter adapter,
+        JointDriver jointDriver,
         Transform passiveTransform,
         RobotDomain.Structures.RotationDirection rotationDirection,
         AttachmentOrder attachmentOrder,
@@ -32,7 +33,7 @@ public class DynamixelJoint : Joint
             child)
     {
         _id = id;
-        _adapter = adapter;
+        _jointDriver = jointDriver;
     }
     
     // TODO: create state proxy, that simply updates at a base frequency,
@@ -40,9 +41,9 @@ public class DynamixelJoint : Joint
     //  just returns the current value.
     //  I could add a "boost" functionality, where whenever cache is hit, we
     //  double the frequency, but it decays on its own. 
-    public override JointState State => _adapter.GetState(_id); 
+    public override JointState State => _jointDriver.GetState(_id); 
     
-    public override void SetAngleGoal(Timed<Angle> goal) => _adapter.SetGoalAngleFor(_id, goal);
+    public override void SetAngleGoal(Timed<Angle> goal) => _jointDriver.SetGoalAngleFor(_id, goal);
 
-    public void Initialize() => _adapter.Initialize(_id, RotationDirection);
+    public void Initialize() => _jointDriver.Initialize(_id, RotationDirection);
 }

@@ -1,4 +1,5 @@
 using Dynamixel;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
@@ -6,12 +7,12 @@ using RotationDirection = RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit.Dynamixel;
 
-public class EchoAdapter : Adapter
+public class EchoJointDriver : JointDriver
 {
     JointState InitialState { get; }
     readonly Dictionary<JointId, JointState> _states = new(); 
 
-    public EchoAdapter(JointState state) => InitialState = state;
+    public EchoJointDriver(JointState state) => InitialState = state;
 
     public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
     {

@@ -1,6 +1,7 @@
 ﻿using Dynamixel;
 using Moq;
 using RobotDomain.Geometry;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
@@ -12,7 +13,7 @@ namespace Test.Unit.Dynamixel;
 
 public class DynamixelJointFactoryTests
 {
-    readonly Mock<Adapter> _mockAdapter;
+    readonly Mock<JointDriver> _mockAdapter;
     readonly DynamixelJointFactory _dynamixelJointFactory;
     readonly Link _parentLink = Link.New(LinkName.Base);
     readonly Link _childLink = Link.New(LinkName.Thorax);
