@@ -12,7 +12,7 @@ namespace Dynamixel;
 
 public class AdapterSdkImpl : Adapter
 {
-    readonly PortAdapter _portAdapter;
+    readonly CommunicationBus _communicationBus;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
@@ -20,12 +20,12 @@ public class AdapterSdkImpl : Adapter
     readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
     public AdapterSdkImpl(
-        PortAdapter portAdapter,
+        CommunicationBus communicationBus,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,
         TimeProvider timeProvider)
     {
-        _portAdapter = portAdapter;
+        _communicationBus = communicationBus;
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
         _timeProvider = timeProvider;
@@ -86,7 +86,7 @@ public class AdapterSdkImpl : Adapter
 
     Angle ReadAngle(JointId id)
     {
-        var positionSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentPosition);
+        var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentPosition);
 
         var angle = StepAngle.ToAngle(positionSteps);
         
@@ -96,7 +96,7 @@ public class AdapterSdkImpl : Adapter
 
     IDictionary<JointId, Angle> ReadAngles()
     {
-        var positionStepsById = _portAdapter.Read(GetInitializedDynamixelIds(), ControlRegister.PresentPosition);
+        var positionStepsById = _communicationBus.Read(GetInitializedDynamixelIds(), ControlRegister.PresentPosition);
 
         return positionStepsById
             .Select(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
@@ -121,7 +121,7 @@ public class AdapterSdkImpl : Adapter
             kvp => Id.FromBase(kvp.Key), 
             kvp =>  StepAngle.ToSteps(kvp.Value));
         
-        _portAdapter.Write(interpolatedGoalAnglesByIdAsDynamixel, ControlRegister.GoalPosition);
+        _communicationBus.Write(interpolatedGoalAnglesByIdAsDynamixel, ControlRegister.GoalPosition);
     }
 
     double InterpolatedStepFactor<T>(Timed<T> timed)
@@ -131,21 +131,21 @@ public class AdapterSdkImpl : Adapter
 
     Angle ReadAngleGoal(JointId id)
     {
-        var positionSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.GoalPosition);
+        var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.GoalPosition);
         
         return StepAngle.ToAngle(positionSteps);
     }
 
     RotationalSpeed ReadSpeed(JointId id)
     {
-        var speedSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
+        var speedSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
         
         return StepSpeed.ToSpeed(speedSteps);
     }
 
     LoadRatio ReadLoadRatio(JointId id)
     {
-        var loadSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentLoad);
+        var loadSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentLoad);
         
         // TODO Test with real dynamixels, that -1000:1000 range is converted correctly, from uint to int...
         return LoadRatio.FromSteps((int)loadSteps);
@@ -153,14 +153,14 @@ public class AdapterSdkImpl : Adapter
 
     UnitsNet.Temperature ReadTemperature(JointId id)
     {
-        var temperatureSteps = _portAdapter.Read(Id.FromBase(id), ControlRegister.PresentTemperature);
+        var temperatureSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
     }
 
     void ReadHardwareErrorStatus(JointId id)
     {
-        var hardwareErrorStatus = _portAdapter.Read(Id.FromBase(id), ControlRegister.HardwareErrorStatus);
+        var hardwareErrorStatus = _communicationBus.Read(Id.FromBase(id), ControlRegister.HardwareErrorStatus);
         if (hardwareErrorStatus != 0)
             Console.WriteLine($"HardwareErrorStatus: {hardwareErrorStatus:b8}");
     }
@@ -168,7 +168,7 @@ public class AdapterSdkImpl : Adapter
     void Reboot(JointId id)
     {
         Console.WriteLine($"Rebooting {id}");
-        _portAdapter.Reboot(Id.FromBase(id));
+        _communicationBus.Reboot(Id.FromBase(id));
         Thread.Sleep(300);
         
         var delay = TimeSpan.FromSeconds(0.1);
@@ -183,7 +183,7 @@ public class AdapterSdkImpl : Adapter
 
     bool Ping(JointId id)
     {
-        return _portAdapter.Ping(Id.FromBase(id));
+        return _communicationBus.Ping(Id.FromBase(id));
     }
 
     public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
@@ -197,20 +197,20 @@ public class AdapterSdkImpl : Adapter
             .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
             .IfNone(DynamixelRotationalSpeed.Infinite);
          
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
     void SetPIDGains(JointId id)
     {
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionPGain, _POSITION_P_GAIN_SOFT);
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionIGain, _POSITION_I_GAIN_SOFT);
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.PositionDGain, _POSITION_D_GAIN_SOFT);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionPGain, _POSITION_P_GAIN_SOFT);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionIGain, _POSITION_I_GAIN_SOFT);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionDGain, _POSITION_D_GAIN_SOFT);
     }
     
     void SetReturnDelay(JointId id)
     {
         // must be low, i.e. 0us or 2us for fast robot communicatoin without latency 
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.ReturnDelayTime, 0);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.ReturnDelayTime, 0);
     }
 
     void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
@@ -222,12 +222,12 @@ public class AdapterSdkImpl : Adapter
 
     uint GetDriveMode(JointId id)
     {
-        return _portAdapter.Read(Id.FromBase(id), ControlRegister.DriveMode);
+        return _communicationBus.Read(Id.FromBase(id), ControlRegister.DriveMode);
     }
 
     void SetDriveMode(JointId id, uint driveMode)
     {
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.DriveMode, driveMode);
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.DriveMode, driveMode);
     }
 
     void TorqueEnable(JointId id) => SetTorque(id, true);
@@ -236,12 +236,12 @@ public class AdapterSdkImpl : Adapter
 
     void SetTorque(JointId id, bool value)
     {
-        _portAdapter.Write(Id.FromBase(id), ControlRegister.TorqueEnable, Convert.ToUInt32(value));
+        _communicationBus.Write(Id.FromBase(id), ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }
 
     public void Dispose()
     {
-        _portAdapter.Dispose();
+        _communicationBus.Dispose();
         CancelAndDisposeUpdateTask();
     }
 

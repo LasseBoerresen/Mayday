@@ -6,7 +6,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using UnitsNet;
 using static System.Console;
-using static Dynamixel.DynamixelCommunication;
+using static Dynamixel.LowLevelCommunicationBusNativeInterop;
 using Error = LanguageExt.Common.Error;
 using FTD2XX_NET;
 using Duration = UnitsNet.Duration;
@@ -14,7 +14,7 @@ using Duration = UnitsNet.Duration;
 namespace Dynamixel;
 
 // TODO this class should be a singleton, since it represents a single port. Also the dynamixel adapter.
-public class PortAdapterSdkImpl : PortAdapter
+public class CommunicationBusSdkImpl : CommunicationBus
 {
     const int CommunicationSuccessCode = 0;
     const int ProtocolVersion = 2;
@@ -27,7 +27,7 @@ public class PortAdapterSdkImpl : PortAdapter
         
         
 
-    PortAdapterSdkImpl(PortNumber portNumber)
+    CommunicationBusSdkImpl(PortNumber portNumber)
     {
         _portNumber = portNumber;
     }
@@ -285,14 +285,14 @@ public class PortAdapterSdkImpl : PortAdapter
         GC.SuppressFinalize(this);
     }
 
-    public static Eff<PortAdapterSdkImpl> CreateInitialized()
+    public static Eff<CommunicationBusSdkImpl> CreateInitialized()
     {
         return InitializePortHandlerAndGetNumber()
             .Bind(portNumber => InitializePacketHandler()
                 .Bind(_ => OpenPort(portNumber))
                 .Bind(_ => SetPortBaudrate(portNumber))
                 .Bind(_ => SetPortPacketTimeOut(portNumber))
-                .Map(_ => new PortAdapterSdkImpl(portNumber)));
+                .Map(_ => new CommunicationBusSdkImpl(portNumber)));
     }
 
     static Eff<Unit> InitializePacketHandler()

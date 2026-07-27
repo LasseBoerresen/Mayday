@@ -12,7 +12,7 @@ namespace Test.Unit.Dynamixel;
 [TestSubject(typeof(AdapterSdkImpl))]
 public class AdapterSdkImplTests
 {
-    readonly Mock<PortAdapter> _dynamixelPortAdapterMock = new();
+    readonly Mock<CommunicationBus> _dynamixelPortAdapterMock = new();
     readonly AdapterSdkImpl _adapter;
     readonly JointId _id = new(1);
     readonly TimeProvider _timeProvider = TimeProvider.System;

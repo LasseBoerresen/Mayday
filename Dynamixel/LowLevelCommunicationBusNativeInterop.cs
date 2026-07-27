@@ -17,7 +17,7 @@ namespace Dynamixel;
 /// Added by following this guide: 
 /// https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/overview/#dynamixel-sdk
 /// </remarks>
-public static class DynamixelCommunication
+public static class LowLevelCommunicationBusNativeInterop
 {
     const string dll_path = @"Lib\dxl_x64_c_4_0_2.dll";
 

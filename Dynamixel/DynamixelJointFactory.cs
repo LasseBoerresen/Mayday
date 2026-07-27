@@ -25,19 +25,20 @@ public class DynamixelJointFactory(Adapter adapter) : JointFactory, IDisposable
         CancellationTokenSource cancellationTokenSource, 
         TimeProvider timeProvider)
     {
-        var portAdapterEff = PortAdapterSdkImpl.CreateInitialized();
+        var communicationBusEff = CommunicationBusSdkImpl.CreateInitialized();
         
-        return portAdapterEff.Map(portAdapter => Create(portAdapter, cancellationTokenSource, timeProvider));
+        return communicationBusEff.Map(communicationBus => 
+            Create(communicationBus, cancellationTokenSource, timeProvider));
     }
 
     static DynamixelJointFactory Create(
-        PortAdapter portAdapter, 
+        CommunicationBus communicationBus, 
         CancellationTokenSource cancellationTokenSource, 
         TimeProvider timeProvider)
     {
         JointStateCacheDictImpl jointStateCache = new();
 
-        var jointAdapter = new AdapterSdkImpl(portAdapter, jointStateCache, cancellationTokenSource, timeProvider);
+        var jointAdapter = new AdapterSdkImpl(communicationBus, jointStateCache, cancellationTokenSource, timeProvider);
 
         return new DynamixelJointFactory(jointAdapter);
     }
