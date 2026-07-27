@@ -12,8 +12,8 @@ EllieFactory CreateEllieFactory()
 {
     CancellationTokenSource cts = new();
 
-    DynamixelWheelController wheelController = new();
-    ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelController);
+    DynamixelWheelDriver wheelDriver = new();
+    ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelDriver);
     TerminalMovementBehaviorController behaviorController = new(motionPlanner, cts.Token);
 
     return new EllieFactory(behaviorController, cts);

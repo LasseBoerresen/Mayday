@@ -2,11 +2,11 @@
 
 namespace EllieMain.MotionPlanning;
 
-public class ArticulatedSteeringEllieMotionPlanner(WheelController wheelController) : EllieMotionPlanner
+public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver) : EllieMotionPlanner
 {
     public void Start()
     {
-        wheelController.Initialize(WheelId.FrontLeft, RobotDomain.Structures.RotationDirection.Reverse);
-        wheelController.Initialize(WheelId.FrontRight, RobotDomain.Structures.RotationDirection.Forward);
+        wheelDriver.Initialize(WheelId.FrontLeft, RobotDomain.Structures.RotationDirection.Reverse);
+        wheelDriver.Initialize(WheelId.FrontRight, RobotDomain.Structures.RotationDirection.Forward);
     }
 }

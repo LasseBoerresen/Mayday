@@ -2,7 +2,7 @@
 
 namespace Dynamixel;
 
-public class DynamixelWheelController : WheelController 
+public class DynamixelWheelDriver : WheelDriver 
 {
     public void Initialize(WheelId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {

@@ -14,14 +14,14 @@ namespace EllieMainTests.EndToEnd;
 /// </summary>
 public class EllieTests
 {
-    readonly Mock<WheelController> wheelControllerMock = new();
+    readonly Mock<WheelDriver> wheelDriverMock = new();
 
     EllieFactory EllieFactory
     {
         get
         {
             CancellationTokenSource cts = new();
-            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelControllerMock.Object);
+            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelDriverMock.Object);
             var behaviorController = new TerminalMovementBehaviorController(motionPlanner, cts.Token);
             
             return new EllieFactory(behaviorController, cts);
@@ -55,7 +55,7 @@ public class EllieTests
 
         void VerifyWheelInit(WheelId wheelId, RotationDirection rotationDirection)
         {
-            wheelControllerMock.Verify(
+            wheelDriverMock.Verify(
                 wc => wc.Initialize(
                     It.Is<WheelId>(id => id == wheelId), 
                     It.Is<RotationDirection>(dir => dir == rotationDirection)),

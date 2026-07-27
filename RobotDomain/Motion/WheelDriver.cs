@@ -3,7 +3,7 @@ using UnitsNet;
 
 namespace RobotDomain.Motion;
 
-public interface WheelController
+public interface WheelDriver
 {
     // void RotateAt(WheelId id, Timed<Speed> goalSpeedTimed);
     void Initialize(WheelId id, RobotDomain.Structures.RotationDirection rotationDirection);
