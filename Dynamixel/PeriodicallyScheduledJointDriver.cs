@@ -42,7 +42,21 @@ public class PeriodicallyScheduledJointDriver : JointDriver
         _driver.Initialize(id, rotationDirection);
         
         // Ensure a state value is always available post initialization. 
-        _jointStateCache.SetFor(id, _driver.GetInitialJointState(id));
+        _jointStateCache.SetFor(id, GetInitialJointState(id));
+    }
+
+    JointState GetInitialJointState(JointId id)
+    {
+        var jointState = new JointState(
+            _driver.ReadAngle(id),
+            _driver.ReadSpeed(id),
+            _driver.ReadLoadRatio(id),
+            _driver.ReadTemperature(id),
+            AngleGoal: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)),
+            AngleGoalPrevious: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)));
+            
+        // Console.WriteLine("new joint state: " + jointState);    
+        return jointState;
     }
 
     public JointState GetState(JointId id)
@@ -64,11 +78,7 @@ public class PeriodicallyScheduledJointDriver : JointDriver
             .GetById()
             .MapValueToReadonly(jointState => jointState.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
         
-        var interpolatedGoalAnglesByIdAsDynamixel = interpolatedGoalAnglesById.ToDictionary(
-            kvp => Id.FromBase(kvp.Key), 
-            kvp =>  StepAngle.ToSteps(kvp.Value));
-        
-        _communicationBus.Write(interpolatedGoalAnglesByIdAsDynamixel, ControlRegister.GoalPosition);
+        _driver.SetGoalAngles(interpolatedGoalAnglesById);
     }
 
     double InterpolatedStepFactor<T>(Timed<T> timed)

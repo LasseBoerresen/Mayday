@@ -1,4 +1,6 @@
-﻿using LanguageExt;
+﻿using Generic;
+using LanguageExt;
+using RobotDomain.Motion;
 using RobotDomain.Physics;
 using RobotDomain.Structures;
 using RobotDomain.Time;
@@ -6,7 +8,14 @@ using UnitsNet;
 
 namespace Dynamixel;
 
-public class Driver(CommunicationBus _communicationBus)
+/// <summary>
+/// General dynamixel initialization and control with regular units   
+/// </summary>
+/// <remarks>
+/// Handles reboot on error at startup
+/// </remarks>
+/// <param name="_communicationBus"></param>
+public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
 {
     // Velocity limit cannot be high or infinite, otherwise the motors will
     // reset on big movements, perhaps because of voltage drop. 0.5 rev/s seems to work. 
@@ -32,30 +41,27 @@ public class Driver(CommunicationBus _communicationBus)
         TorqueEnable(id);
     }
 
-    public JointState GetInitialJointState(JointId id)
+    public IDictionary<JointId, Angle> ReadAngles(IEnumerable<JointId> ids)
     {
-        var jointState = new JointState(
-                ReadAngle(id),
-                ReadSpeed(id),
-                ReadLoadRatio(id),
-                ReadTemperature(id),
-                AngleGoal: Timed<Angle>.Passed(ReadAngleGoal(id)),
-                AngleGoalPrevious: Timed<Angle>.Passed(ReadAngleGoal(id)));
-            
-        // Console.WriteLine("new joint state: " + jointState);    
-        return jointState;
-    }
-
-    public IDictionary<JointId, Angle> ReadAngles(IEnumerable<Id> ids)
-    {
-        var positionStepsById = _communicationBus.Read(ids, ControlRegister.PresentPosition);
+        var dynamixelIds = ids.Select(id => (Id)id);
+    
+        var positionStepsById = _communicationBus.Read(dynamixelIds, ControlRegister.PresentPosition);
 
         return positionStepsById
-                .Select(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
-                .ToDictionary();
+            .Map(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
+            .ToDictionary();
     }
 
-    Angle ReadAngle(JointId id)
+    public void SetGoalAngles(IReadOnlyDictionary<JointId, Angle> goalAnglesByIdMap)
+    {
+        var goalAngleStepsByIdMap = goalAnglesByIdMap.ToDictionary(
+                kvp => (Id)kvp.Key,
+                kvp => StepAngle.ToSteps(kvp.Value));
+    
+        _communicationBus.Write(goalAngleStepsByIdMap, ControlRegister.GoalPosition);
+    }
+
+    public Angle ReadAngle(JointId id)
     {
         var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentPosition);
 
@@ -65,7 +71,7 @@ public class Driver(CommunicationBus _communicationBus)
         return angle;
     }
 
-    LoadRatio ReadLoadRatio(JointId id)
+    public LoadRatio ReadLoadRatio(JointId id)
     {
         var loadSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentLoad);
         
@@ -73,11 +79,25 @@ public class Driver(CommunicationBus _communicationBus)
         return LoadRatio.FromSteps((int)loadSteps);
     }
 
-    UnitsNet.Temperature ReadTemperature(JointId id)
+    public UnitsNet.Temperature ReadTemperature(JointId id)
     {
         var temperatureSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
+    }
+
+    public Angle ReadAngleGoal(JointId id)
+    {
+        var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.GoalPosition);
+        
+        return StepAngle.ToAngle(positionSteps);
+    }
+
+    public RotationalSpeed ReadSpeed(JointId id)
+    {
+        var speedSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
+        
+        return StepSpeed.ToSpeed(speedSteps);
     }
 
     void ReadHardwareErrorStatus(JointId id)
@@ -107,21 +127,7 @@ public class Driver(CommunicationBus _communicationBus)
     {
         return _communicationBus.Ping(Id.FromBase(id));
     }
-    
-    Angle ReadAngleGoal(JointId id)
-    {
-        var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.GoalPosition);
-        
-        return StepAngle.ToAngle(positionSteps);
-    }
 
-    RotationalSpeed ReadSpeed(JointId id)
-    {
-        var speedSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
-        
-        return StepSpeed.ToSpeed(speedSteps);
-    }
-    
     void SetVelocityLimit(JointId id)
     {
         var dynamixelVelocity = VelocityLimitSlow

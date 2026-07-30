@@ -6,7 +6,7 @@ public record Id(int Value) : JointId(Value)
 {
     public static Id Broadcast => new(254);
     
-    public static Id FromBase(JointId id) => new(id.Value);
+    public static Id FromBase(JointId id) => (Id)id;
     
     public static implicit operator byte(Id id) => (byte)id.Value;
     
