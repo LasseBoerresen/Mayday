@@ -2,7 +2,7 @@
 using RobotDomain.Time;
 using UnitsNet;
 
-namespace Dynamixel;
+namespace RobotDomain.Motion;
 
 public interface JointStateCache
 {

@@ -2,6 +2,7 @@
 using EllieMain;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
+using RobotDomain.Motion;
 
 var ellie = CreateEllieFactory().CreateDefault();
 
@@ -12,7 +13,7 @@ EllieFactory CreateEllieFactory()
 {
     CancellationTokenSource cts = new();
 
-    DynamixelWheelDriver wheelDriver = new();
+    PeriodicallyBatchedWheelDriver wheelDriver = new();
     ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelDriver);
     TerminalMovementBehaviorController behaviorController = new(motionPlanner, cts.Token);
 

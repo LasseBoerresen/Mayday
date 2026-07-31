@@ -1,23 +1,21 @@
-﻿using System.Diagnostics;
-using Generic;
-using RobotDomain.Motion;
+﻿using Generic;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
 
-namespace Dynamixel;
+namespace RobotDomain.Motion;
 
-public class PeriodicallyScheduledJointDriver : JointDriver
+public class PeriodicallyBatchedJointDriver : JointDriver
 {
-    readonly Driver _driver;
+    readonly ActuatorDriver _driver;
     readonly JointStateCache _jointStateCache;
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
     readonly Task _setGoalAngleTask;
     readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
-    public PeriodicallyScheduledJointDriver(
-        Driver driver,
+    public PeriodicallyBatchedJointDriver(
+        ActuatorDriver driver,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,
         TimeProvider timeProvider)
@@ -32,12 +30,12 @@ public class PeriodicallyScheduledJointDriver : JointDriver
 
     void UpdateJointAngleCache()
     {
-        _driver.ReadAngles(GetInitializedDynamixelIds())
+        _driver.ReadAngles(_jointStateCache.GetIds())
             .ForEach(kvp => _jointStateCache.SetAngleFor(kvp.Key, kvp.Value));
     }
 
     // TODO write a group-based version, for faster robot startup 
-    public void Initialize(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
+    public void Initialize(JointId id, RotationDirection rotationDirection)
     {
         _driver.Initialize(id, rotationDirection);
         
@@ -64,11 +62,6 @@ public class PeriodicallyScheduledJointDriver : JointDriver
         return _jointStateCache.GetFor(id);
     }
 
-    IEnumerable<Id> GetInitializedDynamixelIds()
-    {
-        return _jointStateCache.GetIds().Select(Id.FromBase);
-    }
-
     void SetGoalAngles()
     {
         // Also update joint angles syncronously, they are needed for inverse kinematics, when finding the closes joints.  
@@ -85,7 +78,6 @@ public class PeriodicallyScheduledJointDriver : JointDriver
     {
         return timed.StepFactor(currentTime: _timeProvider.GetUtcNow());
     }
-
     public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
     {
         _jointStateCache.SetAngleGoalFor(id, goalAngleTimed);
@@ -93,14 +85,12 @@ public class PeriodicallyScheduledJointDriver : JointDriver
 
     public void Dispose()
     {
-        _communicationBus.Dispose();
         CancelAndDisposeUpdateTask();
     }
 
     void CancelAndDisposeUpdateTask()
     {
         _cancellationTokenSource.Cancel();
-        
         
         try
         {

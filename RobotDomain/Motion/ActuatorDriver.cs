@@ -4,6 +4,9 @@ using UnitsNet;
 
 namespace RobotDomain.Motion;
 
+// TODO Use ActuatorId instead of joint Id, because it is also for wheels, and
+//  it works better as dynamixel id 
+
 /// <summary>
 /// General actuator initialization and control functionality for single or
 /// multiple actuators.   
