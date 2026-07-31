@@ -6,7 +6,7 @@ namespace EllieMain.Base;
 
 public class Ellie(BehaviorController behaviorController, CancellationTokenSource cancelTokenSource)
 {
-    public Task<Unit> Start() => Task.Run(behaviorController.Start);
+    public Unit Start() => behaviorController.Start();
 
     public void Stop() => cancelTokenSource.Cancel();
 }

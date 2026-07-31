@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-46" />
+      <PackageReference Include="LanguageExt.Sys" Version="5.0.0-beta-46" />
     </ItemGroup>
 
     <ItemGroup>
