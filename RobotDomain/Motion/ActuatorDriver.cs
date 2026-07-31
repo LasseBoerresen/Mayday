@@ -1,5 +1,6 @@
 ﻿using RobotDomain.Physics;
 using RobotDomain.Structures;
+using RobotDomain.Time;
 using UnitsNet;
 
 namespace RobotDomain.Motion;
@@ -13,19 +14,21 @@ namespace RobotDomain.Motion;
 /// </summary>
 public interface ActuatorDriver
 {
-    void Initialize(JointId id, RotationDirection rotationDirection);
+    void Initialize(ActuatorId id, RotationDirection rotationDirection);
 
-    IDictionary<JointId, Angle> ReadAngles(IEnumerable<JointId> ids);
+    IDictionary<ActuatorId, Angle> ReadAngles(IEnumerable<ActuatorId> ids);
 
-    void SetGoalAngles(IReadOnlyDictionary<JointId, Angle> goalAnglesByIdMap);
+    void SetGoalAngles(IReadOnlyDictionary<ActuatorId, Angle> goalAnglesByIdMap);
 
-    Angle ReadAngle(JointId id);
+    Angle ReadAngle(ActuatorId id);
 
-    LoadRatio ReadLoadRatio(JointId id);
+    LoadRatio ReadLoadRatio(ActuatorId id);
 
-    Temperature ReadTemperature(JointId id);
+    Temperature ReadTemperature(ActuatorId id);
 
-    Angle ReadAngleGoal(JointId id);
+    Angle ReadAngleGoal(ActuatorId id);
 
-    RotationalSpeed ReadSpeed(JointId id);
+    RotationalSpeed ReadSpeed(ActuatorId id);
+
+    void RotateAt(ActuatorId id, RotationalSpeed speed);
 }

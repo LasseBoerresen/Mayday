@@ -26,7 +26,7 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
     static uint _POSITION_I_GAIN_SOFT = 2000;
     static uint _POSITION_D_GAIN_SOFT = 4000;
 
-    public void Initialize(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
+    public void Initialize(ActuatorId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         if(!Ping(id))
             Reboot(id);
@@ -41,18 +41,18 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         TorqueEnable(id);
     }
 
-    public IDictionary<JointId, Angle> ReadAngles(IEnumerable<JointId> ids)
+    public IDictionary<ActuatorId, Angle> ReadAngles(IEnumerable<ActuatorId> ids)
     {
         var dynamixelIds = ids.Select(id => (Id)id);
     
         var positionStepsById = _communicationBus.Read(dynamixelIds, ControlRegister.PresentPosition);
 
         return positionStepsById
-            .Map(kvp => ((JointId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
+            .Map(kvp => ((ActuatorId)kvp.Key, StepAngle.ToAngle(kvp.Value)))
             .ToDictionary();
     }
 
-    public void SetGoalAngles(IReadOnlyDictionary<JointId, Angle> goalAnglesByIdMap)
+    public void SetGoalAngles(IReadOnlyDictionary<ActuatorId, Angle> goalAnglesByIdMap)
     {
         var goalAngleStepsByIdMap = goalAnglesByIdMap.ToDictionary(
                 kvp => (Id)kvp.Key,
@@ -61,7 +61,12 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         _communicationBus.Write(goalAngleStepsByIdMap, ControlRegister.GoalPosition);
     }
 
-    public Angle ReadAngle(JointId id)
+    public void RotateAt(ActuatorId id, RotationalSpeed speed)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Angle ReadAngle(ActuatorId id)
     {
         var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentPosition);
 
@@ -71,7 +76,7 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         return angle;
     }
 
-    public LoadRatio ReadLoadRatio(JointId id)
+    public LoadRatio ReadLoadRatio(ActuatorId id)
     {
         var loadSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentLoad);
         
@@ -79,35 +84,35 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         return LoadRatio.FromSteps((int)loadSteps);
     }
 
-    public UnitsNet.Temperature ReadTemperature(JointId id)
+    public UnitsNet.Temperature ReadTemperature(ActuatorId id)
     {
         var temperatureSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentTemperature);
 
         return StepTemperature.ToTemperature(temperatureSteps);
     }
 
-    public Angle ReadAngleGoal(JointId id)
+    public Angle ReadAngleGoal(ActuatorId id)
     {
         var positionSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.GoalPosition);
         
         return StepAngle.ToAngle(positionSteps);
     }
 
-    public RotationalSpeed ReadSpeed(JointId id)
+    public RotationalSpeed ReadSpeed(ActuatorId id)
     {
         var speedSteps = _communicationBus.Read(Id.FromBase(id), ControlRegister.PresentVelocity);
         
         return StepSpeed.ToSpeed(speedSteps);
     }
 
-    void ReadHardwareErrorStatus(JointId id)
+    void ReadHardwareErrorStatus(ActuatorId id)
     {
         var hardwareErrorStatus = _communicationBus.Read(Id.FromBase(id), ControlRegister.HardwareErrorStatus);
         if (hardwareErrorStatus != 0)
             Console.WriteLine($"HardwareErrorStatus: {hardwareErrorStatus:b8}");
     }
 
-    void Reboot(JointId id)
+    void Reboot(ActuatorId id)
     {
         Console.WriteLine($"Rebooting {id}");
         _communicationBus.Reboot(Id.FromBase(id));
@@ -123,12 +128,12 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         }
     }
 
-    bool Ping(JointId id)
+    bool Ping(ActuatorId id)
     {
         return _communicationBus.Ping(Id.FromBase(id));
     }
 
-    void SetVelocityLimit(JointId id)
+    void SetVelocityLimit(ActuatorId id)
     {
         var dynamixelVelocity = VelocityLimitSlow
                 .Map(DynamixelRotationalSpeed.FromRotationalSpeed)
@@ -137,41 +142,41 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
         _communicationBus.Write(Id.FromBase(id), ControlRegister.ProfileVelocity, dynamixelVelocity.Value);
     }
 
-    void SetPIDGains(JointId id)
+    void SetPIDGains(ActuatorId id)
     {
         _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionPGain, _POSITION_P_GAIN_SOFT);
         _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionIGain, _POSITION_I_GAIN_SOFT);
         _communicationBus.Write(Id.FromBase(id), ControlRegister.PositionDGain, _POSITION_D_GAIN_SOFT);
     }
     
-    void SetReturnDelay(JointId id)
+    void SetReturnDelay(ActuatorId id)
     {
         // must be low, i.e. 0us or 2us for fast robot communicatoin without latency 
         _communicationBus.Write(Id.FromBase(id), ControlRegister.ReturnDelayTime, 0);
     }
 
-    void SetRotationDirection(JointId id, RobotDomain.Structures.RotationDirection rotationDirection)
+    void SetRotationDirection(ActuatorId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         var driveMode = GetDriveMode(id);
         var driveModeUpdated = driveMode & RotationDirection.FromDomain(rotationDirection).Value;
         SetDriveMode(id, driveModeUpdated);
     }
 
-    uint GetDriveMode(JointId id)
+    uint GetDriveMode(ActuatorId id)
     {
         return _communicationBus.Read(Id.FromBase(id), ControlRegister.DriveMode);
     }
 
-    void SetDriveMode(JointId id, uint driveMode)
+    void SetDriveMode(ActuatorId id, uint driveMode)
     {
         _communicationBus.Write(Id.FromBase(id), ControlRegister.DriveMode, driveMode);
     }
 
-    void TorqueEnable(JointId id) => SetTorque(id, true);
+    void TorqueEnable(ActuatorId id) => SetTorque(id, true);
 
-    void TorqueDisable(JointId id) => SetTorque(id, false);
+    void TorqueDisable(ActuatorId id) => SetTorque(id, false);
 
-    void SetTorque(JointId id, bool value)
+    void SetTorque(ActuatorId id, bool value)
     {
         _communicationBus.Write(Id.FromBase(id), ControlRegister.TorqueEnable, Convert.ToUInt32(value));
     }

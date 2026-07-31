@@ -1,9 +1,18 @@
-﻿namespace RobotDomain.Motion;
+﻿using RobotDomain.Time;
+using UnitsNet;
 
-public class PeriodicallyBatchedWheelDriver : WheelDriver 
+namespace RobotDomain.Motion;
+
+public class PeriodicallyBatchedWheelDriver(ActuatorDriver actuatorDriver) : WheelDriver 
 {
     public void Initialize(WheelId id, Structures.RotationDirection rotationDirection)
     {
+        actuatorDriver.Initialize(id, rotationDirection);
         throw new NotImplementedException("Dynamixel wheel controller not implemented yet.");
+    }
+
+    public void RotateAt(WheelId frontLeft, Timed<RotationalSpeed> speed)
+    {
+        throw new NotImplementedException();
     }
 }

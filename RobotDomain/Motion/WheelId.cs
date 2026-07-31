@@ -1,8 +1,6 @@
-﻿using System.Xml;
+﻿namespace RobotDomain.Motion;
 
-namespace RobotDomain.Motion;
-
-public readonly record struct WheelId(int Value)
+public record WheelId(int Value) : ActuatorId
 {
     public static readonly WheelId FrontLeft = new(0);
     public static readonly WheelId RearLeft = new(1);
