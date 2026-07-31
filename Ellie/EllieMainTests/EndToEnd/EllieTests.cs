@@ -5,6 +5,8 @@ using EllieMain.MotionPlanning;
 using Moq;
 using RobotDomain.Motion;
 using RobotDomain.Structures;
+using RobotDomain.Time;
+using UnitsNet;
 
 namespace EllieMainTests.EndToEnd;
 
@@ -14,7 +16,7 @@ namespace EllieMainTests.EndToEnd;
 /// </summary>
 public class EllieTests
 {
-    readonly Mock<WheelDriver> wheelDriverMock = new();
+    readonly Mock<AcDriver> wheelDriverMock = new();
 
     EllieFactory EllieFactory
     {
@@ -56,9 +58,7 @@ public class EllieTests
         void VerifyWheelInit(WheelId wheelId, RotationDirection rotationDirection)
         {
             wheelDriverMock.Verify(
-                wc => wc.Initialize(
-                    It.Is<WheelId>(id => id == wheelId), 
-                    It.Is<RotationDirection>(dir => dir == rotationDirection)),
+                wd => wd.Initialize(wheelId, rotationDirection),
                 Times.Once);
         }
     }
@@ -80,4 +80,18 @@ public class EllieTests
     //             It.IsAny<RobotDomain.Structures.RotationDirection>()),
     //         Times.Once);
     // }
+    
+    [Fact]
+    public void GivenNewlyStartedEllie__WhenSendAccelerateForwardMovementCommand__ThenAllWheelsSetToNonZeroForwardMotion()
+    {
+        // Given
+        var ellie = EllieFactory.CreateDefault();
+        ellie.Start();  
+        
+        // When
+        
+        
+        // Then
+        ActuatorDriver.Verify(wd => wd.RotateAt(WheelId.FrontLeft, It.Is<Timed<RotationalSpeed>>(rs => rs > RotationalSpeed.Zero)), Times.AtLeastOnce);
+    }
 }
