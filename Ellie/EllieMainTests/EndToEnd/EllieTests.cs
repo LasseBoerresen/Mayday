@@ -2,10 +2,11 @@
 using EllieMain;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
+using Generic.System;
 using Moq;
 using RobotDomain.Motion;
 using RobotDomain.Structures;
-using RobotDomain.Time;
+using Test.Utilities;
 using UnitsNet;
 
 namespace EllieMainTests.EndToEnd;
@@ -16,15 +17,17 @@ namespace EllieMainTests.EndToEnd;
 /// </summary>
 public class EllieTests
 {
-    readonly Mock<AcDriver> wheelDriverMock = new();
+    readonly Terminal _terminal = new TestTerminal([]);
+    readonly Mock<ActuatorDriver> _actuatorDriverMock = new();
 
     EllieFactory EllieFactory
     {
         get
         {
             CancellationTokenSource cts = new();
-            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelDriverMock.Object);
-            var behaviorController = new TerminalMovementBehaviorController(motionPlanner, cts.Token);
+            PeriodicallyBatchedWheelDriver wheelDriver = new(_actuatorDriverMock.Object);
+            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelDriver);
+            var behaviorController = new TerminalMovementBehaviorController(motionPlanner, _terminal, cts.Token);
             
             return new EllieFactory(behaviorController, cts);
         }
@@ -41,23 +44,21 @@ public class EllieTests
     }
     
     [Fact]
-    public void WhenStartEllie__ThenAllWheelsAreInitializedOnce()
+    public async Task WhenStartEllie__ThenAllWheelsAreInitializedOnce()
     {
         // Given
         var ellie = EllieFactory.CreateDefault();
 
         // When 
-        ellie.Start();
-        Thread.Sleep(TimeSpan.FromSeconds(1));
-        ellie.Stop();
-
+        await ellie.StartWaitStop(waitTime: TimeSpan.FromSeconds(1));
+        
         // Then
         VerifyWheelInit(WheelId.FrontLeft, RotationDirection.Reverse);
         VerifyWheelInit(WheelId.FrontRight, RotationDirection.Forward);
 
         void VerifyWheelInit(WheelId wheelId, RotationDirection rotationDirection)
         {
-            wheelDriverMock.Verify(
+            _actuatorDriverMock.Verify(
                 wd => wd.Initialize(wheelId, rotationDirection),
                 Times.Once);
         }
@@ -82,16 +83,26 @@ public class EllieTests
     // }
     
     [Fact]
-    public void GivenNewlyStartedEllie__WhenSendAccelerateForwardMovementCommand__ThenAllWheelsSetToNonZeroForwardMotion()
+    public async Task GivenNewlyStartedEllie__WhenSendAccelerateForwardMovementCommand__ThenAllWheelsSetToNonZeroForwardMotion()
     {
         // Given
         var ellie = EllieFactory.CreateDefault();
-        ellie.Start();  
+        await ellie.StartWaitStop(waitTime: TimeSpan.FromSeconds(1));  
         
         // When
         
         
         // Then
-        ActuatorDriver.Verify(wd => wd.RotateAt(WheelId.FrontLeft, It.Is<Timed<RotationalSpeed>>(rs => rs > RotationalSpeed.Zero)), Times.AtLeastOnce);
+        _actuatorDriverMock.Verify(
+            wd => wd.RotateAt(
+                WheelId.FrontLeft,
+                It.Is<RotationalSpeed>(rs => rs > RotationalSpeed.Zero)), 
+            Times.AtLeastOnce);
+            
+        _actuatorDriverMock.Verify(
+            wd => wd.RotateAt(
+                    WheelId.FrontRight,
+                    It.Is<RotationalSpeed>(rs => rs > RotationalSpeed.Zero)), 
+            Times.AtLeastOnce);
     }
-}
+    }

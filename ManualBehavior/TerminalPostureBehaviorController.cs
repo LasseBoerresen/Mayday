@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using Generic.System;
+using LanguageExt;
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Behavior;
@@ -9,9 +10,10 @@ namespace ManualBehavior;
 
 public class TerminalPostureBehaviorController(
     MaydayMotionPlanner motionPlanner,
+    Terminal terminal,
     CancellationToken cancelToken,
     TimeProvider timeProvider) 
-    : TerminalBehaviorController<PostureCommand>(cancelToken)
+    : TerminalBehaviorController<PostureCommand>(terminal, cancelToken)
 {
     static readonly TimeSpan TimeStep = TimeSpan.FromSeconds(1.0);
 

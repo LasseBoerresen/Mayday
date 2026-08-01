@@ -3,6 +3,7 @@ using EllieMain;
 using EllieMain.Base;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
+using Generic.System;
 using LanguageExt;
 using LanguageExt.Sys.Live;
 using RobotDomain.Motion;
@@ -31,11 +32,14 @@ Eff<Ellie> CreateEllieEff<RT>()
 Ellie CreateEllie(CommunicationBus communicationBus)
 {
     CancellationTokenSource cts = new();
+
+    // TODO Replace with Language.Ext.Runtime.Console to be more safe
+    SystemTerminal terminal = new();
     
     Dynamixel.Driver driver = new(communicationBus);
     PeriodicallyBatchedWheelDriver wheelDriver = new(driver);
     ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelDriver);
-    TerminalMovementBehaviorController behaviorController = new(motionPlanner, cts.Token);
+    TerminalMovementBehaviorController behaviorController = new(motionPlanner, terminal, cts.Token);
 
     EllieFactory ellieFactory = new(behaviorController, cts);
     

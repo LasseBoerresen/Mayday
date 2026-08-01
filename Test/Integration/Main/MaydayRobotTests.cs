@@ -1,23 +1,23 @@
-﻿using JetBrains.Annotations;
+﻿using Generic.System;
+using JetBrains.Annotations;
 using LanguageExt;
-using ManualBehavior;
 using Robots;
 using Robots.Base;
 using Test.Utilities;
-using Xunit;
 
 namespace Test.Integration.Main;
 
 [TestSubject(typeof(MaydayRobot))]
 public class MaydayRobotTests
 {
+    static readonly Terminal Terminal = new TestTerminal([]);
     static readonly TimeProvider TimeProvider = TimeProvider.System;
     
     [PhysicalRobotFact]
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobotFactory.CreateWithTerminalPostureBehaviorController(TimeProvider).RunUnsafe();
+        var may = MaydayRobotFactory.CreateWithTerminalPostureBehaviorController(Terminal, TimeProvider).RunUnsafe();
 
         // When
         Task.Run(() => may.Start());

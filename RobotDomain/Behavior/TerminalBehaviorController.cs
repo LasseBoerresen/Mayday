@@ -1,24 +1,35 @@
-﻿using LanguageExt;
+﻿using Generic.System;
+using LanguageExt;
 
 namespace RobotDomain.Behavior;
 
-public abstract class TerminalBehaviorController<TCommand>(CancellationToken cancelToken)
+public abstract class TerminalBehaviorController<TCommand>(Terminal terminal, CancellationToken cancelToken)
     : BehaviorController where TCommand : struct, Enum
 {
+    
+
     public Unit Start()
     {
         WakeUp();
 
         PrintCommandList();
         while (!cancelToken.IsCancellationRequested)
-            ExecuteConsoleCommand();
+        {
+            var command = GetCommand();
+            if (command == null) // terminal has no more inputs. 
+                break;
             
+            ExecuteCommand(command.Value);
+        
+            PrintUpdate();
+        }
+
         return Unit.Default;
     }
 
     protected void WakeUp()
     {
-        Console.WriteLine("\nWaking up...");
+        terminal.WriteLine("\nWaking up...");
         
         WakeUpBehavior();
     }
@@ -27,7 +38,7 @@ public abstract class TerminalBehaviorController<TCommand>(CancellationToken can
 
     protected void Sleep()
     {
-        Console.WriteLine("Going to sleep...");
+        terminal.WriteLine("Going to sleep...");
         
         SleepBehavior();
     }
@@ -35,23 +46,19 @@ public abstract class TerminalBehaviorController<TCommand>(CancellationToken can
     protected abstract void SleepBehavior();
 
 
-    void ExecuteConsoleCommand() 
-    {
-        var command = GetCommand();
-        ExecuteCommand(command);
-        
-        PrintUpdate();
-    }
-
     protected abstract void ExecuteCommand(TCommand command);
 
-    static TCommand GetCommand()
+    TCommand? GetCommand()
     {
-        Console.Write("Next command: ");
-        var commandString = Console.ReadLine()?.ToLower() ?? "";
-        if (!Enum.TryParse<TCommand>(commandString, ignoreCase: true, out var command))
+        terminal.Write("Next command: ");
+        var inputLine = terminal.ReadLine();
+        if (inputLine == null) 
+            return null;
+
+        var commandStringWasValid = Enum.TryParse<TCommand>(inputLine, ignoreCase: true, out var command);
+        if (!commandStringWasValid)
         {
-            Console.WriteLine($"Invalid command: '{commandString}'");
+            terminal.WriteLine($"Invalid command: '{inputLine}'");
             return GetCommand();
         }
 
@@ -60,12 +67,12 @@ public abstract class TerminalBehaviorController<TCommand>(CancellationToken can
 
     protected abstract void PrintUpdate();
     
-    static void PrintCommandList()
+    void PrintCommandList()
     {
         var commandListString = Enum
             .GetValues<TCommand>()
             .Aggregate("\n", (s, pc) => s + $"{Convert.ToInt32(pc)}: {pc}\n");
      
-        Console.Write(commandListString);
+        terminal.Write(commandListString);
     }
 }

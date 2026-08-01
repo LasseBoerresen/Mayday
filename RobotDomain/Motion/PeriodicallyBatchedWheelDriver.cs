@@ -8,7 +8,6 @@ public class PeriodicallyBatchedWheelDriver(ActuatorDriver actuatorDriver) : Whe
     public void Initialize(WheelId id, Structures.RotationDirection rotationDirection)
     {
         actuatorDriver.Initialize(id, rotationDirection);
-        throw new NotImplementedException("Dynamixel wheel controller not implemented yet.");
     }
 
     public void RotateAt(WheelId frontLeft, Timed<RotationalSpeed> speed)

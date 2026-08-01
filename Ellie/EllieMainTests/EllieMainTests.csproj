@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Dynamixel\Dynamixel.csproj" />
+      <ProjectReference Include="..\..\Test\Test.csproj" />
       <ProjectReference Include="..\EllieMain\EllieMain.csproj" />
     </ItemGroup>
 

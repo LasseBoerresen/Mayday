@@ -1,4 +1,5 @@
 ﻿using Dynamixel;
+using Generic.System;
 using LanguageExt;
 using ManualBehavior;
 using MaydayDataAccess;
@@ -11,7 +12,7 @@ namespace Robots;
 
 public static class MaydayRobotFactory
 {
-    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController(TimeProvider timeProvider) 
+    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController(Terminal terminal, TimeProvider timeProvider) 
     {
         CancellationTokenSource cts = new();
         var jointFactoryEff = DynamixelJointFactory.Create(cts, timeProvider);
@@ -21,7 +22,7 @@ public static class MaydayRobotFactory
             .Map(jointFactory => new MaydayLegFactory(jointFactory, legPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
             .Map(structure => new InstantPostureMaydayMotionPlanner(structure))
-            .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, cts.Token, timeProvider))
+            .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, terminal, cts.Token, timeProvider))
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }
 
