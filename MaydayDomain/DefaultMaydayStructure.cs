@@ -103,8 +103,10 @@ public class DefaultMaydayStructure : MaydayStructure
     {
         var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
         
-        var tipPositionsOffsetTimed = offsetXyzTimed.Map(
-            offsetXyz => tipPositionsCurrent.Map(tp => tp + offsetXyz));
+        var tipPositionsOffsetTimed = 
+            offsetXyzTimed.Map(offsetXyz => 
+            tipPositionsCurrent.Map(tipPosition => 
+                tipPosition + offsetXyz));
             
         MoveTipsTo(tipPositionsOffsetTimed);
     }
