@@ -35,11 +35,17 @@ Ellie CreateEllie(CommunicationBus communicationBus)
 
     // TODO Replace with Language.Ext.Runtime.Console to be more safe
     SystemTerminal terminal = new();
+    // TODO replace with Language.Ext.Runtime.TimeProvider to be more safe
+    var timeProvider = TimeProvider.System;
     
     Dynamixel.Driver driver = new(communicationBus);
     PeriodicallyBatchedWheelDriver wheelDriver = new(driver);
     ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelDriver);
-    TerminalMovementBehaviorController behaviorController = new(motionPlanner, terminal, cts.Token);
+    TerminalMovementBehaviorController behaviorController = new(
+        motionPlanner, 
+        terminal,
+        timeProvider,
+        cts.Token);
 
     EllieFactory ellieFactory = new(behaviorController, cts);
     

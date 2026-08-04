@@ -1,11 +1,12 @@
 ﻿using LanguageExt;
 using RobotDomain.Geometry;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 
 namespace MaydayDomain.MotionPlanning;
 
-public interface MaydayMotionPlanner : IDisposable
+public interface MaydayMotionPlanner : TrackingMotionPlanner<Motion>
 {
     MaydayStructureSet<MaydayLegPosture> GetPostures();
     
@@ -26,25 +27,4 @@ public interface MaydayMotionPlanner : IDisposable
     MaydayStructureSet<Q> GetOrientationsOf(LinkName linkName);
     
     MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName);
-    
-    /// <summary>
-    /// Start tracking the goal 
-    /// </summary>
-    void Start(CancellationToken ct);
-    
-    /// <summary>
-    /// Gets the current goal 
-    /// </summary>
-    Option<Timed<Movement>> GetGoal();
-    
-    /// <summary>
-    /// Sets goal for the motion planner to continuously pursue 
-    /// </summary>
-    /// <param name="movementTimed"></param>
-    void SetGoal(Timed<Movement> movementTimed);
-    
-    /// <summary>
-    /// Removes the movement goal, effectively pausing the motion planner.  
-    /// </summary>
-    void UnsetGoal();
 }

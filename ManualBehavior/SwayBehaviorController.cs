@@ -49,10 +49,10 @@ public class SwayBehaviorController(
     /// </summary>
     void SwayOnce()
     {
-        motionPlanner.SetGoal(CreateNewGoal());
+        motionPlanner.Goal = CreateNewGoal();
     }
 
-    Timed<Movement> CreateNewGoal()
+    Timed<Motion> CreateNewGoal()
     {
         var goalTimed = timeProvider.ScheduleIn(CreateGoalTowardsCenterWithSway(), TimeStep);
         
@@ -60,23 +60,23 @@ public class SwayBehaviorController(
         return goalTimed;
     }
 
-    Movement CreateGoalTowardsCenterWithSway()
+    Motion CreateGoalTowardsCenterWithSway()
     {
         var previousGoal = GetPreviousGoal();
         
-        var leanHalfwayToCenter = previousGoal.Lean.HalfWayTo(Movement.StandingStill.Lean);
+        var leanHalfwayToCenter = previousGoal.Lean.HalfWayTo(Motion.StandingStill.Lean);
         var swayAmount = SwayAmount();
 
         var newGoal = previousGoal with { Lean = leanHalfwayToCenter + swayAmount };
         return newGoal;
     }
 
-    Movement GetPreviousGoal()
+    Motion GetPreviousGoal()
     {
         // If there somehow is no previous movement, simply set it to centered as a starting point.
-        var previousGoal = motionPlanner.GetGoal()
-            .Map(tg => tg.Target)
-            .IfNone(Movement.StandingStill);
+        var previousGoal = motionPlanner.Goal
+            .Map(timedMotion => timedMotion.Target)
+            .IfNone(Motion.StandingStill);
     
         return previousGoal;
     }

@@ -8,5 +8,5 @@ public interface WheelDriver
     // void RotateAt(WheelId id, Timed<Speed> goalSpeedTimed);
     void Initialize(WheelId id, RobotDomain.Structures.RotationDirection rotationDirection);
     // WheelState GetStateFor(WheelId id);
-    void RotateAt(WheelId frontLeft, Timed<RotationalSpeed> speed);
+    void RotateAt(WheelId id, Timed<RotationalSpeed> speed);
 }

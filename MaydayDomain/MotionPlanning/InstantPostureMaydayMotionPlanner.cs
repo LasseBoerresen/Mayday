@@ -1,19 +1,15 @@
-﻿using Dynamixel;
-using LanguageExt;
-using RobotDomain.Geometry;
+﻿using RobotDomain.Geometry;
+using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 
-using Duration = UnitsNet.Duration;
-
 namespace MaydayDomain.MotionPlanning;
 
-public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
+// TODO rename Mayday.Movement into motion, because it is used in a MotionPlanner.
+public class InstantPostureMaydayMotionPlanner 
+    : PeriodicTrackingMotionPlanner<Motion>, MaydayMotionPlanner
 {
     protected readonly MaydayStructure Structure;
-    Task? _trackingTask;
-    Option<Timed<Movement>> _goalMovement = Option<Timed<Movement>>.None;
-
 
     public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
@@ -50,30 +46,12 @@ public class InstantPostureMaydayMotionPlanner : MaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    public void Start(CancellationToken ct)
-    {
-        _trackingTask = PeriodicScheduler.RunAsync(
-            action: () => _goalMovement.IfSome(TrackGoalOnce), 
-            duration: Duration.FromSeconds(1), 
-            ct);
-    }
-
-    void TrackGoalOnce(Timed<Movement> goalMovementTimed)
+    protected override void TrackGoalOnce(Timed<Motion> goalMotionTimed)
     {
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
-        Console.WriteLine("MoveThoraxTo: " + goalMovementTimed.Target.Lean.Xyz);
-        Structure.MoveThoraxTo(goalMovementTimed.Map(m => m.Lean));
-    }
-
-    public Option<Timed<Movement>> GetGoal() => _goalMovement;
-    
-    public void SetGoal(Timed<Movement> movementTimed) => _goalMovement = movementTimed;
-
-    public void UnsetGoal() => _goalMovement = Option<Timed<Movement>>.None;
-
-    public void Dispose()
-    {
-        _trackingTask?.Dispose();
+        Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
+        
+        Structure.MoveThoraxTo(goalMotionTimed.Map(m => m.Lean));
     }
 }

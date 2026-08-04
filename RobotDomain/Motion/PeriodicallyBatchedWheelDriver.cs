@@ -10,7 +10,7 @@ public class PeriodicallyBatchedWheelDriver(ActuatorDriver actuatorDriver) : Whe
         actuatorDriver.Initialize(id, rotationDirection);
     }
 
-    public void RotateAt(WheelId frontLeft, Timed<RotationalSpeed> speed)
+    public void RotateAt(WheelId id, Timed<RotationalSpeed> speed)
     {
         throw new NotImplementedException();
     }

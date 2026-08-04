@@ -24,10 +24,16 @@ public class EllieTests
     {
         get
         {
+            TimeProvider timeProvider = TimeProvider.System;
             CancellationTokenSource cts = new();
             PeriodicallyBatchedWheelDriver wheelDriver = new(_actuatorDriverMock.Object);
             var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelDriver);
-            var behaviorController = new TerminalMovementBehaviorController(motionPlanner, _terminal, cts.Token);
+            
+            var behaviorController = new TerminalMovementBehaviorController(
+                motionPlanner, 
+                _terminal, 
+                timeProvider, 
+                cts.Token);
             
             return new EllieFactory(behaviorController, cts);
         }
@@ -90,7 +96,7 @@ public class EllieTests
         await ellie.StartWaitStop(waitTime: TimeSpan.FromSeconds(1));  
         
         // When
-        
+        _terminal.WriteLine(nameof(MovementCommand.AccelerateForward));
         
         // Then
         _actuatorDriverMock.Verify(
