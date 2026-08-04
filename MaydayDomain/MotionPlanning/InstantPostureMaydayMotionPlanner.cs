@@ -48,6 +48,11 @@ public class InstantPostureMaydayMotionPlanner
 
     protected override void TrackGoalOnce(Timed<Motion> goalMotionTimed)
     {
+        // TODO actually split up the movement, so the structure does not just 
+        //  receive the final goal, because the different actuators should not
+        //  move there at the same pace, it depends on the non-linearity of the
+        //  leg pose versus the goal thorax pose.  
+    
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
         Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
