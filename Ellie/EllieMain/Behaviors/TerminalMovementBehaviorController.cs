@@ -50,6 +50,10 @@ public class TerminalMovementBehaviorController(
 
     protected override void PrintUpdate()
     {
-        throw new NotImplementedException();
+        var updateText = motionPlanner.Goal
+            .Some(g => $"Goal: {g}")
+            .None(() => "No goal");
+            
+        terminal.WriteLine(updateText);
     }
 }
