@@ -8,4 +8,5 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::6A299237-05B8-4C97-A1F3-E3CFA040A9B9::net10.0::EllieMainTests.EndToEnd.EllieTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=7f8e6686_002Dc99d_002D4039_002Da7f5_002Decc4de0f6e5d_0023MauiApp1/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
