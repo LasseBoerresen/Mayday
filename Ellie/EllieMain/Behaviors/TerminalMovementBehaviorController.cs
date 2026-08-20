@@ -46,7 +46,8 @@ public class TerminalMovementBehaviorController(
         }
     }
     
-    Timed<T> Schedule<T>(T target) => timeProvider.ScheduleIn(target, TimeSpan.FromSeconds(1));
+    Timed<T> Schedule<T>(T target) => 
+        timeProvider.ScheduleIn(target, TimeSpan.FromSeconds(1));
 
     protected override void PrintUpdate()
     {
