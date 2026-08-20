@@ -52,9 +52,13 @@ public class TerminalMovementBehaviorController(
     protected override void PrintUpdate()
     {
         var updateText = motionPlanner.Goal
-            .Some(g => $"Goal: {g}")
+            .Some(g => 
+                $"Goal: \n"
+                + $"Arrival time: {g.ArrivalTime}\n"
+                + $"Target:       {g.Target}")
             .None(() => "No goal");
             
         terminal.WriteLine(updateText);
+        terminal.WriteLine("");
     }
 }
