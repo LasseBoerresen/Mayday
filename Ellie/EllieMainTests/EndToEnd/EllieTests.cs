@@ -111,4 +111,4 @@ public class EllieTests
                     It.Is<RotationalSpeed>(rs => rs > RotationalSpeed.Zero)), 
             Times.AtLeastOnce);
     }
-    }
+}
