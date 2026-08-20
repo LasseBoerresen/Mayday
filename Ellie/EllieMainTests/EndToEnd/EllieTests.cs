@@ -56,7 +56,7 @@ public class EllieTests
         var ellie = EllieFactory.CreateDefault();
 
         // When 
-        await ellie.StartWaitStop(waitTime: TimeSpan.FromSeconds(1));
+        await ellie.StartWaitActWaitStopWait(waitTime: TimeSpan.FromSeconds(1));
         
         // Then
         VerifyWheelInit(WheelId.FrontLeft, RotationDirection.Reverse);
