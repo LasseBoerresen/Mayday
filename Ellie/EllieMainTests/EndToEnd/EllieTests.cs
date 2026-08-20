@@ -17,7 +17,7 @@ namespace EllieMainTests.EndToEnd;
 /// </summary>
 public class EllieTests
 {
-    readonly Terminal _terminal = new TestTerminal([]);
+    readonly TestTerminal _terminal = new([]);
     readonly Mock<ActuatorDriver> _actuatorDriverMock = new();
 
     EllieFactory EllieFactory
@@ -93,10 +93,12 @@ public class EllieTests
     {
         // Given
         var ellie = EllieFactory.CreateDefault();
-        await ellie.StartWaitStop(waitTime: TimeSpan.FromSeconds(1));  
+        
+        // Prepare first input to be AccelerateForward
+        _terminal.InputLine(nameof(MovementCommand.AccelerateForward));
         
         // When
-        _terminal.WriteLine(nameof(MovementCommand.AccelerateForward));
+        await ellie.StartWaitActWaitStopWait(waitTime: TimeSpan.FromSeconds(1));
         
         // Then
         _actuatorDriverMock.Verify(
