@@ -2,7 +2,7 @@
 
 namespace Test.Utilities;
 
-public class TestTerminal(Stack<string> inputLines) : Terminal
+public class TestTerminal(Queue<string> inputLines) : Terminal
 {
     public void Write(string? value)
     {
@@ -21,7 +21,12 @@ public class TestTerminal(Stack<string> inputLines) : Terminal
     public string? ReadLine()
     {
         return inputLines.Count != 0 
-            ?  inputLines.Pop()
+            ?  inputLines.Dequeue()
             : null;
+    }
+    
+    public void InputLine(string line)
+    {
+        inputLines.Enqueue(line);
     }
 }
