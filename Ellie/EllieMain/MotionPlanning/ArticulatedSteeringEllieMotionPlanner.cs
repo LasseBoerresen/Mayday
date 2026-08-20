@@ -22,10 +22,12 @@ public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver)
     /// <param name="timedSpeed"></param>
     public void AccelerateBy(Timed<Speed> timedSpeed)
     {
-        Goal = timedSpeed.Map(newSpeed => 
+        var newGoal = timedSpeed.Map(newSpeed => 
             Goal
-                .Some(goal => goal.Target with {ForwardSpeed = newSpeed })
+                .Some(goal => goal.Target with {ForwardSpeed = newSpeed }) // TODO Test that two accelerations add up. Right now it just sets the new speed disregarding the existing goal    
                 .None(new Motion(newSpeed, RotationalSpeed.Zero)));
+                
+        Goal = newGoal;
     }
 
     public void TurnBy(Timed<RotationalSpeed> timedRotationalSpeed)
