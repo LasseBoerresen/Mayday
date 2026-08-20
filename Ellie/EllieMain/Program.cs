@@ -19,7 +19,7 @@ Eff<Runtime, Unit> Main()
     // var timeProvider = TimeProvider.System;
 
     return CreateEllieEff<Runtime>()
-        .Map(may => may.Start());
+        .Map(ellie => ellie.Start());
 }
 
 Eff<Ellie> CreateEllieEff<RT>()
