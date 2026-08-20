@@ -65,7 +65,7 @@ public class EllieTests
         void VerifyWheelInit(WheelId wheelId, RotationDirection rotationDirection)
         {
             _actuatorDriverMock.Verify(
-                wd => wd.Initialize(wheelId, rotationDirection),
+                ad => ad.Initialize(wheelId, rotationDirection),
                 Times.Once);
         }
     }
@@ -100,13 +100,13 @@ public class EllieTests
         
         // Then
         _actuatorDriverMock.Verify(
-            wd => wd.RotateAt(
+            ad => ad.RotateAt(
                 WheelId.FrontLeft,
                 It.Is<RotationalSpeed>(rs => rs > RotationalSpeed.Zero)), 
             Times.AtLeastOnce);
             
         _actuatorDriverMock.Verify(
-            wd => wd.RotateAt(
+            ad => ad.RotateAt(
                     WheelId.FrontRight,
                     It.Is<RotationalSpeed>(rs => rs > RotationalSpeed.Zero)), 
             Times.AtLeastOnce);
