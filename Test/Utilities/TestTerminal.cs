@@ -20,9 +20,12 @@ public class TestTerminal(Queue<string> inputLines) : Terminal
     /// <returns></returns>
     public string? ReadLine()
     {
-        return inputLines.Count != 0 
-            ?  inputLines.Dequeue()
-            : null;
+        if (inputLines.Count == 0)
+            return null;
+            
+        var line = inputLines.Dequeue();
+        Console.WriteLine(line);
+        return line;
     }
     
     public void InputLine(string line)
