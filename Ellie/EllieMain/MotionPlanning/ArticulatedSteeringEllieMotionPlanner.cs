@@ -22,10 +22,17 @@ public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver)
     public Option<Timed<Motion>> Goal
     {
         get;
-        set => throw new NotImplementedException("Should plan trajectory for new goal");
+        set
+        {
+            field = value;
+            
+            // TODO make better steps than just the single goal value. Start at
+            //   current state, and split in duration steps. 
+            Plan = value.Map(MotionPlan<Motion> (tg) => new LinearStepsMotionPlan<Motion>([tg]));
+        }
     } = Option<Timed<Motion>>.None;
 
-    public Option<MotionPlan<Motion>> Plan { get; } = Option<MotionPlan<Motion>>.None;
+    public Option<MotionPlan<Motion>> Plan { get; private set; } = Option<MotionPlan<Motion>>.None;
 
     Task? _trackingTask;
     readonly Duration Period = Duration.FromSeconds(1);
