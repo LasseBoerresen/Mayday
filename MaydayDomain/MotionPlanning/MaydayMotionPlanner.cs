@@ -6,7 +6,7 @@ using RobotDomain.Time;
 
 namespace MaydayDomain.MotionPlanning;
 
-public interface MaydayMotionPlanner : TrackingMotionPlanner<Motion>
+public interface MaydayMotionPlanner : MotionPlanner<Motion>
 {
     MaydayStructureSet<MaydayLegPosture> GetPostures();
     

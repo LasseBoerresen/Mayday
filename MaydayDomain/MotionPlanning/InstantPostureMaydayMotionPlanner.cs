@@ -1,19 +1,45 @@
-﻿using RobotDomain.Geometry;
+﻿using LanguageExt;
+using RobotDomain.Geometry;
 using RobotDomain.Motion;
 using RobotDomain.Structures;
 using RobotDomain.Time;
+using Duration = UnitsNet.Duration;
 
 namespace MaydayDomain.MotionPlanning;
 
-// TODO rename Mayday.Movement into motion, because it is used in a MotionPlanner.
+/// <summary>
+/// adlkfj
+/// </summary>
+/// <remarks>
+/// A tracking motion planner continuously tracks a goal motion of a structure
+/// part, which may require nonlinear actuator subgoals.
+/// For example, moving a leg tip straight down at a steady pace will require
+/// some joints to move more in the beginning than others. Commanding the
+/// structure to simply move the tip to the end in one go will mean the tip
+/// does not move in a linear fashion towards the goal.
+/// </remarks>
 public class InstantPostureMaydayMotionPlanner 
-    : PeriodicTrackingMotionPlanner<Motion>, MaydayMotionPlanner
+    : MaydayMotionPlanner
 {
+    public Option<Timed<Motion>> Goal { get; set; }
+    public Option<MotionPlan<Motion>> Plan { get; }
     protected readonly MaydayStructure Structure;
+    Task? _trackingTask;
+    readonly Duration Period = Duration.FromSeconds(1);
 
     public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
     {
         Structure = structure;
+    }
+    
+    public void Start(CancellationToken ct)
+    {
+        Action trackingAction = () => Plan.IfSome(TrackGoalOnce);
+        
+        _trackingTask = PeriodicScheduler.RunAsync(
+                action: trackingAction, 
+                duration: Period, 
+                ct);
     }
 
     public MaydayStructureSet<MaydayLegPosture> GetPostures() => Structure.GetPostures();
@@ -46,7 +72,7 @@ public class InstantPostureMaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    protected override void TrackGoalOnce(Timed<Motion> goalMotionTimed)
+    protected void TrackGoalOnce(MotionPlan<Motion> goalMotionTimed)
     {
         // TODO actually split up the movement, so the structure does not just 
         //  receive the final goal, because the different actuators should not
@@ -55,8 +81,8 @@ public class InstantPostureMaydayMotionPlanner
     
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
-        Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
+        // Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
         
-        Structure.MoveThoraxTo(goalMotionTimed.Map(m => m.Lean));
+        // Structure.MoveThoraxTo(goalMotionTimed.Map(m => m.Lean));
     }
 }

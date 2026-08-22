@@ -1,4 +1,7 @@
-﻿namespace RobotDomain.Motion;
+﻿using LanguageExt;
+using RobotDomain.Time;
+
+namespace RobotDomain.Motion;
 
 // TODO In principle motion planners should be able to take 3 types of commands. 
 //   Position, speed and posture commands. Different applications require each one. 
@@ -8,6 +11,14 @@
 //   TMotion can contain a union of either target type. 
 
 /// <summary>
-/// Marker interface for motion planners, to group them for easy navigation
+/// When started, continuously tracks a goal state of a Structure by
+/// planning and executing a trajectory, which may require nonlinear actuator
+/// subgoals.
 /// </summary>
-public interface MotionPlanner;
+public interface MotionPlanner<TState>
+{
+    void Start(CancellationToken ct);
+
+    Option<Timed<TState>> Goal { get; set; }
+    Option<MotionPlan<TState>> Plan { get; }
+};

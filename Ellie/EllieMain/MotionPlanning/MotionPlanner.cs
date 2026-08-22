@@ -4,12 +4,13 @@ using UnitsNet;
 
 namespace EllieMain.MotionPlanning;
 
-// TODO probably extract a general robotics motion planner. Some things are not ellie specific, but shared with Mayday. 
-public interface EllieMotionPlanner : TrackingMotionPlanner<Motion>
+public interface EllieMotionPlanner : MotionPlanner<Motion>
 {
-    void Start();
+    void AccelerateBy(Timed<Speed> timedSpeedChange);
 
-    void AccelerateBy(Timed<Speed> timedSpeed);
+    void TurnBy(Timed<RotationalSpeed> timedRotationalSpeedChange);
+    
+    void AccelerateTo(Timed<Speed> timedSpeed);
 
-    void TurnBy(Timed<RotationalSpeed> timedRotationalSpeed);
+    void TurnAt(Timed<RotationalSpeed> timedRotationalSpeed);
 }

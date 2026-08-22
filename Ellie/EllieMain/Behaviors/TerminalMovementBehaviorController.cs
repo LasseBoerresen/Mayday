@@ -15,7 +15,7 @@ public class TerminalMovementBehaviorController(
 {
     protected override void WakeUpBehavior()
     {
-        motionPlanner.Start();
+        motionPlanner.Start(ct);
     }
 
     protected override void SleepBehavior()

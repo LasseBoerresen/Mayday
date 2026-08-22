@@ -40,9 +40,11 @@ Ellie CreateEllie(CommunicationBus communicationBus)
     
     Dynamixel.Driver driver = new(communicationBus);
     PeriodicallyBatchedWheelDriver wheelDriver = new(driver);
-    ArticulatedSteeringEllieMotionPlanner motionPlanner = new(wheelDriver);
+    
+    ArticulatedSteeringEllieMotionPlanner ellieMotionPlanner = new(wheelDriver);
+    
     TerminalMovementBehaviorController behaviorController = new(
-        motionPlanner, 
+        ellieMotionPlanner, 
         terminal,
         timeProvider,
         cts.Token);
