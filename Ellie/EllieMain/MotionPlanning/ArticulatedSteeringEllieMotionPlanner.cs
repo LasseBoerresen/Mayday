@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using EllieMain.Structures;
+using LanguageExt;
 using RobotDomain.Geometry;
 using RobotDomain.Motion;
 using RobotDomain.Time;
@@ -16,7 +17,9 @@ namespace EllieMain.MotionPlanning;
 /// speeds linearly from now to goal time. 
 /// </remarks>
 /// <param name="wheelDriver"></param>
-public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver) 
+public class ArticulatedSteeringEllieMotionPlanner(
+    EllieStructure structure,
+    TimeProvider timeProvider) 
     : EllieMotionPlanner
 {
     public Option<Timed<Motion>> Goal
@@ -45,13 +48,8 @@ public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver)
              return;
         isStarted = true;    
         
-        wheelDriver.Initialize(WheelId.FrontLeft, RobotDomain.Structures.RotationDirection.Reverse);
-        wheelDriver.Initialize(WheelId.FrontRight, RobotDomain.Structures.RotationDirection.Forward);
-
-        Action trackingAction = () => Plan.IfSome(TrackGoalOnce);
-        
         _trackingTask = PeriodicScheduler.RunAsync(
-            action: trackingAction, 
+            action: ExecutePlanStep, 
             duration: Period, 
             ct);
     }
@@ -59,11 +57,17 @@ public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver)
     /// <summary>
     /// To be used for tracking a single motion. 
     /// </summary>
-    /// <param name="goalMotionTimed"></param>
+    /// <param name="plan"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public static void TrackGoalOnce(MotionPlan<Motion> goalMotionTimed)
+    void ExecutePlanStep()
     {
-        throw new NotImplementedException();
+        Plan.IfSome(p =>
+        {
+            var timedMotionStep = p.At(timeProvider.GetUtcNow());
+            
+            timedMotionStep.Map(motion => motion.);
+        });
+        
     }
 
     /// <summary>

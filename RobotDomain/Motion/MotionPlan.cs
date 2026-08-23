@@ -11,5 +11,5 @@ namespace RobotDomain.Motion;
 /// </typeparam>
 public interface MotionPlan<TState>
 {
-    Timed<TState> At(DateTime time);
+    Timed<TState> At(DateTimeOffset time);
 };
