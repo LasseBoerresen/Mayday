@@ -36,9 +36,15 @@ public class ArticulatedSteeringEllieMotionPlanner(WheelDriver wheelDriver)
 
     Task? _trackingTask;
     readonly Duration Period = Duration.FromSeconds(1);
-    
+    bool isStarted = false;
+
     public void Start(CancellationToken ct)
     {
+        // Avoid double starting. 
+        if (isStarted)
+             return;
+        isStarted = true;    
+        
         wheelDriver.Initialize(WheelId.FrontLeft, RobotDomain.Structures.RotationDirection.Reverse);
         wheelDriver.Initialize(WheelId.FrontRight, RobotDomain.Structures.RotationDirection.Forward);
 
