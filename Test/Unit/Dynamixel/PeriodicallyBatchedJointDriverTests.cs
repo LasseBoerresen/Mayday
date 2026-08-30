@@ -17,17 +17,20 @@ public class PeriodicallyBatchedJointDriverTests
     readonly PeriodicallyBatchedJointDriver _JointDriver;
     readonly JointId _id = new(1);
     readonly TimeProvider _timeProvider = TimeProvider.System;
+    readonly TimeSpan _updatePeriod = TimeSpan.FromMilliseconds(1);
 
     public PeriodicallyBatchedJointDriverTests()
     {
         _communicationBusMock.Setup(pa => pa.Ping(It.IsAny<Id>())).Returns(true);
         Driver driver = new(_communicationBusMock.Object);
+        JointStateCacheDictImpl jointStateCache = new();
         
-        _JointDriver = new(
+        _JointDriver = new PeriodicallyBatchedJointDriver(
             driver,
-            new Mock<JointStateCache>().Object, 
+            jointStateCache, 
             new CancellationTokenSource(),
-            _timeProvider);
+            _timeProvider,
+            _updatePeriod);
     }
 
     // TODO: This test is no longer correct, because portAdapter is no longer called to write single goal angles, but 
@@ -36,6 +39,8 @@ public class PeriodicallyBatchedJointDriverTests
     [Fact]
     void Given_WhenSetGoalToZeroAngle_ThenCallsCommunicationBusCorrectly()
     {
+        // TODO control time in the PeriodicScheduler to be able to properly test 
+    
         // When
         var goalAngle = Timed<Angle>.Passed(Angle.Zero);
         _JointDriver.SetGoalAngleFor(_id, goalAngle);

@@ -12,20 +12,21 @@ public class PeriodicallyBatchedJointDriver : JointDriver
     readonly CancellationTokenSource _cancellationTokenSource;
     readonly TimeProvider _timeProvider;
     readonly Task _setGoalAngleTask;
-    readonly TimeSpan _setGoalAnglePeriod = TimeSpan.FromMilliseconds(10);
 
     public PeriodicallyBatchedJointDriver(
         ActuatorDriver driver,
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        TimeSpan? updatePeriod = null)
     {
         _driver = driver;
         _jointStateCache = jointStateCache;
         _cancellationTokenSource = cancellationTokenSource;
         _timeProvider = timeProvider;
+        var _updatePeriod = updatePeriod ?? TimeSpan.FromMilliseconds(10);
 
-        _setGoalAngleTask = PeriodicScheduler.RunAsync(SetGoalAngles, _setGoalAnglePeriod, cancellationTokenSource.Token);
+        _setGoalAngleTask = PeriodicScheduler.RunAsync(SetGoalAngles, _updatePeriod, cancellationTokenSource.Token);
     }
 
     void UpdateJointAngleCache()
@@ -80,6 +81,7 @@ public class PeriodicallyBatchedJointDriver : JointDriver
     {
         return timed.StepFactor(currentTime: _timeProvider.GetUtcNow());
     }
+    
     public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
     {
         _jointStateCache.SetAngleGoalFor(id, goalAngleTimed);
