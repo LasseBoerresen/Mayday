@@ -24,19 +24,24 @@ public class InstantPostureMaydayMotionPlanner
     public Option<Timed<Motion>> Goal { get; set; }
     public Option<MotionPlan<Motion>> Plan { get; }
     protected readonly MaydayStructure Structure;
+    readonly TimeProvider _timeProvider;
     Task? _trackingTask;
     readonly Duration Period = Duration.FromSeconds(1);
 
-    public InstantPostureMaydayMotionPlanner(MaydayStructure structure)
+    public InstantPostureMaydayMotionPlanner(
+        MaydayStructure structure, 
+        TimeProvider timeProvider)
     {
         Structure = structure;
+        _timeProvider = timeProvider;
     }
     
     public void Start(CancellationToken ct)
     {
         Action trackingAction = () => Plan.IfSome(TrackGoalOnce);
-        
-        _trackingTask = PeriodicScheduler.RunAsync(
+
+        PeriodicScheduler periodicScheduler = new(_timeProvider);
+        _trackingTask = periodicScheduler.RunAsync(
                 action: trackingAction, 
                 duration: Period, 
                 ct);

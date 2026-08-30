@@ -40,7 +40,9 @@ public class MaydayLegTests
 
     static readonly MaydayStructure structure = new MaydayStructureFactory(legFactory).CreateDefault();
     
-    static readonly MaydayMotionPlanner MotionPlanner = new InstantPostureMaydayMotionPlanner(structure);
+    static readonly MaydayMotionPlanner MotionPlanner = new InstantPostureMaydayMotionPlanner(
+        structure, 
+        TimeProvider);
     
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()

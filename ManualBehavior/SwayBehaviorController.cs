@@ -21,8 +21,9 @@ public class SwayBehaviorController(
     public Unit Start()
     {
         WakeUp();
-        
-        PeriodicScheduler.Run(SwayOnce, TimeStep , ct); 
+
+        PeriodicScheduler periodicScheduler = new(timeProvider);
+        periodicScheduler.Run(SwayOnce, TimeStep , ct); 
         
         return Unit.Default;
     }

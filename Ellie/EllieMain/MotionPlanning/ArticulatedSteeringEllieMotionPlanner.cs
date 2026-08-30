@@ -46,9 +46,10 @@ public class ArticulatedSteeringEllieMotionPlanner(
         // Avoid double starting. 
         if (isStarted)
              return;
-        isStarted = true;    
-        
-        _trackingTask = PeriodicScheduler.RunAsync(
+        isStarted = true;
+
+        PeriodicScheduler periodicScheduler = new(timeProvider);
+        _trackingTask = periodicScheduler.RunAsync(
             action: ExecutePlanStep, 
             duration: Period, 
             ct);

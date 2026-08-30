@@ -3,7 +3,7 @@ using Duration = UnitsNet.Duration;
 
 namespace RobotDomain.Time;
 
-public static class PeriodicScheduler
+public class PeriodicScheduler(TimeProvider timeProvider)
 {
     static readonly HighResolutionWindowsTimerSetting HighHighResolutionWindowsTimerSetting;
     
@@ -19,22 +19,20 @@ public static class PeriodicScheduler
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
     }
 
-    public static Task RunAsync(Action action, Duration duration, CancellationToken ct)
+    public Task RunAsync(Action action, Duration duration, CancellationToken ct)
     {
         return Task.Run(() => Run(action, duration, ct), ct);
     }
 
-    public static void Run(Action action, Duration duration, CancellationToken ct)
+    public void Run(Action action, Duration duration, CancellationToken ct)
     {
-        var stopWatch = Stopwatch.StartNew();
-
         while (!ct.IsCancellationRequested)
         {
-            stopWatch.Restart();
+            var startTime = timeProvider.GetUtcNow();
             
             CallActionWithErrorLogging(action);
             
-            Wait(stopWatch, duration);
+            Wait(startTime, duration);
         }
     }
 
@@ -52,18 +50,24 @@ public static class PeriodicScheduler
         }
     }
 
-    static void Wait(Stopwatch stopWatch, TimeSpan duration)
+    void Wait(DateTimeOffset startTime, TimeSpan duration)
     {
-        if (stopWatch.Elapsed.TotalMilliseconds > duration.TotalMilliseconds)
-            LogActionExceededTimeSlot(stopWatch, duration);
+        var now = timeProvider.GetUtcNow();
+        var elapsed = now - startTime;
         
-        while (stopWatch.Elapsed.TotalMilliseconds < duration.TotalMilliseconds)
+        if (elapsed > duration)
+            LogActionExceededTimeSlot(elapsed, duration);
+        
+        while (elapsed < duration)
         {
             // With thread timing set to 1ms, we can afford to yield slightly to prevent 100% CPU usage
             // but only if we have more than 1ms + 0.5ms (buffer) left.
-            var timeRemaining = duration - stopWatch.Elapsed;
+            var timeRemaining = duration - elapsed;
 
-            Thread.SpinWait(100);
+            Thread.SpinWait(iterations: 100);
+            now = timeProvider.GetUtcNow();
+            elapsed = now - startTime;
+            
             // if (timeRemaining > MinTimeForSleep)
             //     Thread.Sleep(timeRemaining - SleepBuffer);
             // else
@@ -71,9 +75,10 @@ public static class PeriodicScheduler
         }
     }
 
-    static void LogActionExceededTimeSlot(Stopwatch stopWatch, TimeSpan duration)
+    static void LogActionExceededTimeSlot(TimeSpan elapsedDuration, TimeSpan targetDuration)
     {
         Console.WriteLine(
-            $"Action exceeded time slot of {duration} in {nameof(PeriodicScheduler)} by {stopWatch.Elapsed - duration}");
+            $"Action exceeded time slot of {targetDuration} "
+            + $"in {nameof(PeriodicScheduler)} by {elapsedDuration - targetDuration}");
     }
 }

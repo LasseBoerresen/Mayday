@@ -26,7 +26,8 @@ public class PeriodicallyBatchedJointDriver : JointDriver
         _timeProvider = timeProvider;
         var _updatePeriod = updatePeriod ?? TimeSpan.FromMilliseconds(10);
 
-        _setGoalAngleTask = PeriodicScheduler.RunAsync(SetGoalAngles, _updatePeriod, cancellationTokenSource.Token);
+        PeriodicScheduler periodicScheduler = new(timeProvider);
+        _setGoalAngleTask = periodicScheduler.RunAsync(SetGoalAngles, _updatePeriod, cancellationTokenSource.Token);
     }
 
     void UpdateJointAngleCache()
