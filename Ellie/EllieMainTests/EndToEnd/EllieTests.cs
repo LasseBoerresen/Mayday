@@ -2,6 +2,7 @@
 using EllieMain;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
+using EllieMain.Structures;
 using Generic.System;
 using Moq;
 using RobotDomain.Motion;
@@ -27,7 +28,9 @@ public class EllieTests
             TimeProvider timeProvider = TimeProvider.System;
             CancellationTokenSource cts = new();
             PeriodicallyBatchedWheelDriver wheelDriver = new(_actuatorDriverMock.Object);
-            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(wheelDriver);
+            DefaultEllieStructure structure = new(wheelDriver);
+            
+            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(structure, timeProvider);
             
             var behaviorController = new TerminalMovementBehaviorController(
                 motionPlanner, 

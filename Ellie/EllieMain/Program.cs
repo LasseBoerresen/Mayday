@@ -3,6 +3,7 @@ using EllieMain;
 using EllieMain.Base;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
+using EllieMain.Structures;
 using Generic.System;
 using LanguageExt;
 using LanguageExt.Sys.Live;
@@ -40,8 +41,9 @@ Ellie CreateEllie(CommunicationBus communicationBus)
     
     Dynamixel.Driver driver = new(communicationBus);
     PeriodicallyBatchedWheelDriver wheelDriver = new(driver);
+    DefaultEllieStructure structure = new(wheelDriver);
     
-    ArticulatedSteeringEllieMotionPlanner ellieMotionPlanner = new(wheelDriver);
+    ArticulatedSteeringEllieMotionPlanner ellieMotionPlanner = new(structure, timeProvider);
     
     TerminalMovementBehaviorController behaviorController = new(
         ellieMotionPlanner, 

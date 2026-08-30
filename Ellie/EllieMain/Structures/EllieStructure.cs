@@ -1,4 +1,6 @@
-﻿using UnitsNet;
+﻿using EllieMain.MotionPlanning;
+using RobotDomain.Time;
+using UnitsNet;
 
 namespace EllieMain.Structures;
 
@@ -9,7 +11,7 @@ public interface EllieStructure
     /// </summary>
     void Start(CancellationToken ct);
 
-    void DriveAllWheelsAt<TNew>(Speed speed);
+    void MoveAt(Timed<StructureSet<Speed, Angle>> timedMotions);
 
     State GetState();
 }

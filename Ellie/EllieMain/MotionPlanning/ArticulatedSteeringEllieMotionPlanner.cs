@@ -61,13 +61,22 @@ public class ArticulatedSteeringEllieMotionPlanner(
     /// <exception cref="NotImplementedException"></exception>
     void ExecutePlanStep()
     {
-        Plan.IfSome(p =>
-        {
-            var timedMotionStep = p.At(timeProvider.GetUtcNow());
-            
-            timedMotionStep.Map(motion => motion.);
-        });
+        // If a plan exists, find current step
         
+        Plan.IfSome(plan =>
+        {
+            var timedMotionStep = plan.At(timeProvider.GetUtcNow());
+
+            var structureMotions = timedMotionStep.Map(MapBodyMotionToStructureMotions);
+            
+            structure.MoveAt(structureMotions);
+        });
+    }
+
+    
+    StructureSet<Speed, Angle> MapBodyMotionToStructureMotions(Motion bodyMotion)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>

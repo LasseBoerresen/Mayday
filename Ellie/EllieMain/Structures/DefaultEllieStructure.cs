@@ -1,4 +1,7 @@
-﻿using RobotDomain.Motion;
+﻿using EllieMain.MotionPlanning;
+using RobotDomain.Motion;
+using RobotDomain.Time;
+using UnitsNet;
 
 namespace EllieMain.Structures;
 
@@ -19,6 +22,11 @@ public class DefaultEllieStructure(WheelDriver wheelDriver) : EllieStructure
         
         wheelDriver.Initialize(WheelId.FrontLeft, RobotDomain.Structures.RotationDirection.Reverse);
         wheelDriver.Initialize(WheelId.FrontRight, RobotDomain.Structures.RotationDirection.Forward);        
+    }
+
+    public void MoveAt(Timed<StructureSet<Speed, Angle>> timedMotions)
+    {
+        throw new NotImplementedException();
     }
 
     public State GetState()
