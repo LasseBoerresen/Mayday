@@ -6,7 +6,7 @@ using MaydayDomain;
 
 namespace MaydayDataAccess;
 
-public class LegPostureByPositionMapFileRepo : LegPostureByPositionMapRepo
+public class LegPostureByPositionMapFileRepo(FileInfo mapFileInfo) : LegPostureByPositionMapRepo
 {
     const string FilePath = "MaydayLegPostureMap.json";
 

@@ -18,6 +18,8 @@ namespace MaydayDomain;
 /// <param name="Map"></param>
 public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map)
 {
+    public class BadMapResolutionException : Exception;
+
     static readonly Length CellSize = Length.FromMeters(1.0 / 64.0); // binary number for 100% float accuracy
     public static LegPostureByPositionMap CreateEmpty() => new(new Dictionary<Xyz, List<MaydayLegPosture>>());
 
