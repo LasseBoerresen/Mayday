@@ -22,7 +22,7 @@ internal readonly record struct XyzDao(double X, double Y, double Z)
         var parts = key.Split(',');
 
         if (parts.Length != 3)
-            throw new FormatException($"Invalid {nameof(XyzDao)} key: {key}");
+            throw new FormatException($"Invalid {nameof(XyzDao)} key length given split on ',': {key}");
 
         return new XyzDao(
             double.Parse(parts[0], CultureInfo.InvariantCulture),
