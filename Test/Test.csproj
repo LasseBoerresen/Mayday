@@ -55,4 +55,10 @@
       <Folder Include="Unit\MaydayDomain\Structures\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Unit\MaydayDataAccess\TestData\EmptyLegPostureByPositionMap.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

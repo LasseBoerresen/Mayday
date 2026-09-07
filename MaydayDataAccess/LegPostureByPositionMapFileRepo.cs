@@ -8,19 +8,23 @@ namespace MaydayDataAccess;
 
 public class LegPostureByPositionMapFileRepo(FileInfo mapFileInfo) : LegPostureByPositionMapRepo
 {
-    const string FilePath = "MaydayLegPostureMap.json";
-
     public LegPostureByPositionMap Load()
     {
-        var json = File.ReadAllText(FilePath);
-        var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<MaydayLegPosture>>>(json, SerializerOptions)
-            ?? throw new InvalidOperationException($"Failed to deserialize file {FilePath}");
+        var json = File.ReadAllText(mapFileInfo.FullName);
+        
+        // Must deserialize key to string first, because json cannot have non-string keys.
+        var deserializedStringKey = JsonSerializer.Deserialize<Dictionary<string, List<MaydayLegPostureDao>>>(json)
+            ?? throw new InvalidOperationException($"Failed to deserialize file {mapFileInfo}");
 
-        return new LegPostureByPositionMap(
-            deserialized.ToFrozenDictionary(
-                kvp => JsonSerializer.Deserialize<XyzDao>(kvp.Key, SerializerOptions).ToDomain() 
-                    ?? throw new InvalidOperationException($"Failed to deserialize Xyz key: {kvp.Key}"),
-                kvp => kvp.Value));
+        var deserializedXyzDaoKey = deserializedStringKey.ToDictionary(
+            kvp => XyzDao.FromKey(kvp.Key), 
+            kvp => kvp.Value);
+
+        var mapDict = deserializedXyzDaoKey.ToFrozenDictionary(
+            kvp => kvp.Key.ToDomain(),
+            kvp => kvp.Value.Map(legPostureDao => legPostureDao.ToDomain()).ToList()); 
+
+        return new LegPostureByPositionMap(mapDict);
     }
 
     public void Store(LegPostureByPositionMap map)
@@ -34,7 +38,8 @@ public class LegPostureByPositionMapFileRepo(FileInfo mapFileInfo) : LegPostureB
                 kvp => kvp.Value.Map(MaydayLegPostureDao.FromDomain));
 
         var json = JsonSerializer.Serialize(serializable, SerializerOptions);
-        File.WriteAllText(FilePath, json);
+
+        File.WriteAllText(mapFileInfo.FullName, json);
     }
     
     static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
