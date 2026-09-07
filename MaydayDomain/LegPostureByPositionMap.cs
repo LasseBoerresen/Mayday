@@ -43,6 +43,8 @@ public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPos
 
     MaydayLegPosture GetClosestFor(Xyz cellPosition, MaydayLegPosture posture)
     {
+        // TODO return Result<MaydayLegPosture, NoPostureError> if not found
+        //  and force caller to handle that not all input xyz are reachable.  
         var possiblePostures = Map
             .LookFor(cellPosition)
             .IfNone(() => throw new InvalidOperationException($"No leg posture for cell position {cellPosition}"));
