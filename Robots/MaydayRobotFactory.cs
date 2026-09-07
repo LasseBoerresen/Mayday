@@ -10,30 +10,28 @@ using Robots.Base;
 
 namespace Robots;
 
-public static class MaydayRobotFactory
+public class MaydayRobotFactory(LegPostureByPositionMap LegPostureByPositionMap)
 {
-    public static Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController(Terminal terminal, TimeProvider timeProvider) 
+    public Eff<MaydayRobot> CreateWithTerminalPostureBehaviorController(Terminal terminal, TimeProvider timeProvider) 
     {
         CancellationTokenSource cts = new();
         var jointFactoryEff = DynamixelJointFactory.Create(cts, timeProvider);
-        var legPostureByPositionMap = new LegPostureByPositionMapFileRepo().Load();
         
         return jointFactoryEff
-            .Map(jointFactory => new MaydayLegFactory(jointFactory, legPostureByPositionMap))
+            .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
             .Map(structure => new InstantPostureMaydayMotionPlanner(structure, timeProvider))
             .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, terminal, cts.Token, timeProvider))
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }
 
-    public static Eff<MaydayRobot> CreateWithBabyLegsBehaviorController(TimeProvider timeProvider)
+    public Eff<MaydayRobot> CreateWithBabyLegsBehaviorController(TimeProvider timeProvider)
     {
         CancellationTokenSource cts = new();
         var jointFactoryEff = DynamixelJointFactory.Create(cts, timeProvider);
-        var legPostureByPosition = new LegPostureByPositionMapFileRepo().Load(); 
         
         return jointFactoryEff
-            .Map(jointFactory => new MaydayLegFactory(jointFactory, legPostureByPosition))
+            .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
             .Map(structure => new StepByStepLearningInstantPostureMaydayMotionPlanner(
                 structure, 
@@ -43,14 +41,13 @@ public static class MaydayRobotFactory
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }
 
-    public static Eff<MaydayRobot> CreateWithSwayBehavior(TimeProvider timeProvider)
+    public Eff<MaydayRobot> CreateWithSwayBehavior(TimeProvider timeProvider)
     {
         CancellationTokenSource cts = new();
         var jointFactoryEff = DynamixelJointFactory.Create(cts, timeProvider);
-        var legPostureByPositionMap = new LegPostureByPositionMapFileRepo().Load(); // should probably also return Eff 
         
         return jointFactoryEff
-            .Map(jointFactory => new MaydayLegFactory(jointFactory, legPostureByPositionMap))
+            .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
             .Map(structure => new InstantPostureMaydayMotionPlanner(structure, timeProvider))
             .Map(motionPlanner => new SwayBehaviorController(motionPlanner, cts.Token, timeProvider))

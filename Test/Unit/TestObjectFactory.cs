@@ -18,7 +18,7 @@ public static class TestObjectFactory
         RotationDirection.Forward,
         AttachmentOrder.LinkFirst,
         ComponentId.New, 
-        Link.New(Base), 
+        Link.New(LinkName.Base), 
         Link.New(Thorax));
     
     public static string TestMessage(string testId, object expected, object actual)

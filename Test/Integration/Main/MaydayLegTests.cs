@@ -1,6 +1,5 @@
 ﻿using Dynamixel;
 using LanguageExt;
-using MaydayDataAccess;
 using MaydayDomain;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
@@ -12,6 +11,7 @@ using Xunit;
 using Xunit.Abstractions;
 using static Test.Unit.TestObjectFactory;
 using Length = UnitsNet.Length;
+using TestObjectMother = Test.Integration.MaydayDomain.Base.TestObjectMother;
 
 namespace Test.Integration.Main;
 
@@ -31,11 +31,9 @@ public class MaydayLegTests
     static readonly Eff<JointFactory> jointFactoryEff = DynamixelJointFactory
         .Create(cts, TimeProvider)
         .Map(JointFactory (djf) => djf);
-        
-    static readonly LegPostureByPositionMap legPostureByPositionMap = new LegPostureByPositionMapFileRepo().Load();
-    
+
     static readonly MaydayLegFactory legFactory = jointFactoryEff
-        .Map(jf => new MaydayLegFactory(jf, legPostureByPositionMap))
+        .Map(jf => new MaydayLegFactory(jf, TestObjectMother.LegPostureByPositionMap))
         .RunUnsafe();
 
     static readonly MaydayStructure structure = new MaydayStructureFactory(legFactory).CreateDefault();

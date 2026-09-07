@@ -3,6 +3,8 @@ using JetBrains.Annotations;
 using LanguageExt;
 using Robots;
 using Robots.Base;
+using Test.Integration.Robots;
+using Test.Integration.Robots.Base;
 using Test.Utilities;
 
 namespace Test.Integration.Main;
@@ -17,10 +19,12 @@ public class MaydayRobotTests
     void GivenMayWithTerminalPostureBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobotFactory.CreateWithTerminalPostureBehaviorController(Terminal, TimeProvider).RunUnsafe();
+        var may = TestObjectMother.MaydayRobotFactory
+            .CreateWithTerminalPostureBehaviorController(Terminal, TimeProvider)
+            .RunUnsafe();
 
         // When
-        Task.Run(() => may.Start());
+        Task.Run(may.Start);
         
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
 
@@ -34,10 +38,12 @@ public class MaydayRobotTests
     void GivenMayWithBabyLegsBehaviorController_WhenStartThenSleepThenStop_ThenSucceeds()
     {
         // Given
-        var may = MaydayRobotFactory.CreateWithBabyLegsBehaviorController(TimeProvider).RunUnsafe();
+        var may = TestObjectMother.MaydayRobotFactory
+            .CreateWithBabyLegsBehaviorController(TimeProvider)
+            .RunUnsafe();
 
         // When
-        Task.Run(() => may.Start());
+        Task.Run(may.Start);
         
         Thread.Sleep(TimeSpan.FromSeconds(0.5));
 

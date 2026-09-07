@@ -1,5 +1,6 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Robots;
+using Test.Integration.Robots.Base;
 using Xunit;
 
 namespace Test.Unit.Robots.Mayday;
@@ -11,9 +12,10 @@ public class MaydayDayRobotFactoryTests
     {
         // Given
         TimeProvider timeProvider = TimeProvider.System;
-    
+        var maydayRobotFactory = TestObjectMother.MaydayRobotFactory;
+
         // When
-        var maydayRobotEff = MaydayRobotFactory.CreateWithSwayBehavior(timeProvider);
+        var maydayRobotEff = maydayRobotFactory.CreateWithSwayBehavior(timeProvider);
 
         // Then
         maydayRobotEff.Map(mr => mr.Should().NotBeNull());
