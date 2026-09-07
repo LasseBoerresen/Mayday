@@ -56,12 +56,11 @@ public class MaydayLegTests
     }
 
     public static TheoryData<string, MaydayLegPosture> DataForGivenLeg_WhenSetPosture_ThenSetsJointsWithAngleGoals()
-    {
-        return new()
+    {        return new()
         {
-            { "0", new(coxaAngle: 0.0, femurAngle: 0.0, tibiaAngle: 0.0) },
-            { "1", new(coxaAngle: 0.5, femurAngle: 0.5, tibiaAngle: 0.5) },
-            { "2", new(coxaAngle: 0.1, femurAngle: 0.2, tibiaAngle: 0.3) },
+            { "0", MaydayLegPosture.FromRevolutions(coxaAngle: 0.0, femurAngle: 0.0, tibiaAngle: 0.0) },
+            { "1", MaydayLegPosture.FromRevolutions(coxaAngle: 0.5, femurAngle: 0.5, tibiaAngle: 0.5) },
+            { "2", MaydayLegPosture.FromRevolutions(coxaAngle: 0.1, femurAngle: 0.2, tibiaAngle: 0.3) },
         };
     }
 
