@@ -23,8 +23,8 @@ public class TransformTests
         return new()
         {
             {"0", Transform.Zero, Transform.Zero, Transform.Zero},
-            {"1", Transform.FromXyz(new(1, 0, 0)), Transform.Zero, Transform.FromXyz(new(1, 0, 0))},
-            {"2", Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(2, 0, 0))},
+            {"1", Transform.FromXyz(new(0.1, 0, 0)), Transform.Zero, Transform.FromXyz(new(0.1, 0, 0))},
+            {"2", Transform.FromXyz(new(0.1, 0, 0)), Transform.FromXyz(new(0.1, 0, 0)), Transform.FromXyz(new(0.2, 0, 0))},
             {
                 "3, quarter yaw: 1x -> 1y", 
                 Transform.FromQ(Q.FromRpy(new(0, 0, 0.25))), 
@@ -51,13 +51,13 @@ public class TransformTests
         {
             {"0", Transform.Zero, Transform.Zero, Transform.Zero, Transform.Zero},
             {"1", Transform.FromXyz(new(1, 0, 0)), Transform.Zero, Transform.Zero, Transform.FromXyz(new(1, 0, 0))},
-            {"2", Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(1, 0, 0)), Transform.FromXyz(new(3, 0, 0))},
+            {"2", Transform.FromXyz(new(0.1, 0, 0)), Transform.FromXyz(new(0.1, 0, 0)), Transform.FromXyz(new(0.1, 0, 0)), Transform.FromXyz(new(0.3, 0, 0))},
             {
                 "3, quarter yaw, 1x:  1y -> ", 
-                new Transform(new(1, 0, 0), Q.FromRpy(new(0, 0, 0.25))), 
-                new Transform(new(2, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
-                new Transform(new(3, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
-                new Transform(new(-2, 2, 0), Q.FromRpy(new(0, 0, 0.75)))},
+                new Transform(new(0.1, 0, 0), Q.FromRpy(new(0, 0, 0.25))), 
+                new Transform(new(0.2, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
+                new Transform(new(0.3, 0, 0), Q.FromRpy(new(0, 0, 0.25))),
+                new Transform(new(-0.2, 0.2, 0), Q.FromRpy(new(0, 0, 0.75)))},
         };
     }
 
