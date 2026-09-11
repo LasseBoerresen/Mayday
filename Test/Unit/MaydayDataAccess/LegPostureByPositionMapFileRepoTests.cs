@@ -12,7 +12,7 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
         = new(Path.Combine(AppContext.BaseDirectory, "Unit", "MaydayDataAccess", "TestData"));
 
     [Fact]
-    public void GivenEmptyMapFile__WhenLoad__ThenThrowsBadMapResolutionException()
+    public void GivenEmptyMapFile__WhenLoad__ThenThrowsEmptyMapException()
     {
         // Given
         FileInfo mapFileInfo = new(
@@ -24,8 +24,7 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
         var loadAction = () => legPostureByPositionMapFileRepo.Load();
         
         // Then
-        loadAction.Should().Throw<LegPostureByPositionMap.BadMapResolutionException>();
-        
+        loadAction.Should().Throw<LegPostureByPositionMap.EmptyMapException>();
     }
 
     /// <summary>

@@ -15,12 +15,30 @@ namespace MaydayDomain;
 /// <summary>
 /// Maps any 3d tip position to a set of leg postures
 /// </summary>
-/// <param name="Map"></param>
-public record LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map)
+public record LegPostureByPositionMap
 {
-    public class BadMapResolutionException : Exception;
+    public LegPostureByPositionMap(IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map)
+    {
+        this.Map = Map;
+    }
 
+    public class EmptyMapException : Exception;
+
+    // TODO handle that loaded map could be different cellSize, which would mess everything up
     static readonly Length CellSize = Length.FromMeters(1.0 / 64.0); // binary number for 100% float accuracy
+
+    public IReadOnlyDictionary<Xyz, List<MaydayLegPosture>> Map 
+    { 
+        get;
+        init
+        {
+            if (value.Count == 0)
+                throw new EmptyMapException();
+                
+            field = value;
+        }
+    }
+
     public static LegPostureByPositionMap CreateEmpty() => new(new Dictionary<Xyz, List<MaydayLegPosture>>());
 
     /// <summary>
