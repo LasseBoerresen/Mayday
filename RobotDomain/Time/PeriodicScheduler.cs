@@ -47,6 +47,7 @@ public class PeriodicScheduler(TimeProvider timeProvider)
             // Log the error so it's not ignored!
             Console.WriteLine($"Error in periodic task: {ex.Message}, {ex.StackTrace}");
             // Depending on requirements, you might want to 'break' or 'continue'
+            Environment.FailFast("Unobserved task exception", ex);
         }
     }
 
