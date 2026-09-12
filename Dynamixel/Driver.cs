@@ -43,7 +43,7 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
 
     public IDictionary<ActuatorId, Angle> ReadAngles(IEnumerable<ActuatorId> ids)
     {
-        var dynamixelIds = ids.Select(id => (Id)id);
+        var dynamixelIds = ids.Select(Id.FromBase);
     
         var positionStepsById = _communicationBus.Read(dynamixelIds, ControlRegister.PresentPosition);
 
@@ -55,7 +55,7 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
     public void SetGoalAngles(IReadOnlyDictionary<ActuatorId, Angle> goalAnglesByIdMap)
     {
         var goalAngleStepsByIdMap = goalAnglesByIdMap.ToDictionary(
-                kvp => (Id)kvp.Key,
+                kvp => Id.FromBase(kvp.Key),
                 kvp => StepAngle.ToSteps(kvp.Value));
     
         _communicationBus.Write(goalAngleStepsByIdMap, ControlRegister.GoalPosition);

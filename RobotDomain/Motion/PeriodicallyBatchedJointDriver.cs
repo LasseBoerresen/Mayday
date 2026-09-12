@@ -33,7 +33,7 @@ public class PeriodicallyBatchedJointDriver : JointDriver
     void UpdateJointAngleCache()
     {
         _driver.ReadAngles(_jointStateCache.GetIds())
-            .ForEach(kvp => _jointStateCache.SetAngleFor((JointId)kvp.Key, kvp.Value));
+            .ForEach(kvp => _jointStateCache.SetAngleFor(JointId.FromBase(kvp.Key), kvp.Value));
     }
 
     // TODO write a group-based version, for faster robot startup 
