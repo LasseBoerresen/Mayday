@@ -59,6 +59,9 @@
       <None Update="Unit\MaydayDataAccess\TestData\EmptyLegPostureByPositionMap.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Unit\MaydayDataAccess\TestData\SingleLegPostureByPositionMap.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

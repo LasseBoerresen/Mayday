@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using MaydayDataAccess;
 using MaydayDomain;
+using RobotDomain.Geometry;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -10,6 +11,24 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
 {
     static readonly DirectoryInfo TestDataDirInfo
         = new(Path.Combine(AppContext.BaseDirectory, "Unit", "MaydayDataAccess", "TestData"));
+
+    [Fact]
+    public void GivenMapFileWithOneMappingAndNeighbor__WhenLoad__ThenMapShouldUseThatMapping()
+    {
+        // Given
+        FileInfo mapFileInfo = new(
+            Path.Combine(TestDataDirInfo.FullName, "SingleLegPostureByPositionMap.json"));
+        
+        LegPostureByPositionMapFileRepo legPostureByPositionMapFileRepo = new(mapFileInfo);
+
+        // When
+        var map = legPostureByPositionMapFileRepo.Load();
+        
+        // Then
+        var actualPosture = map.GetFor(new Xyz(0,0,0), MaydayLegPosture.Neutral);
+        
+        actualPosture.Should().Be(MaydayLegPosture.FromRevolutions(0.1, 0.2, 0.3));
+    }
 
     [Fact]
     public void GivenEmptyMapFile__WhenLoad__ThenThrowsEmptyMapException()
