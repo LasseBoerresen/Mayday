@@ -112,7 +112,7 @@ public record LegPostureByPositionMapDictImpl : LegPostureByPositionMap
 
     static MaydayLeg CreateEchoLeg()
     {
-        MaydayLegFactory legFactory = new(new EchoJointFactory(), CreateEmpty());
+        MaydayLegFactory legFactory = new(new EchoJointFactory(), new EmptyPostureByPositionMapping());
        
         var leg = legFactory.CreateLeg(MaydayLegId.LeftBack);
         return leg;
@@ -203,5 +203,13 @@ public record LegPostureByPositionMapDictImpl : LegPostureByPositionMap
 
         var cellCenterCoordinate = offsetPosition - residual;
         return cellCenterCoordinate;
+    }
+
+    class EmptyPostureByPositionMapping : LegPostureByPositionMap
+    {
+        public MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
+        {
+            throw new NotSupportedException($"{nameof(EmptyPostureByPositionMapping)} cannot do mappings.");
+        }
     }
 }
