@@ -14,7 +14,7 @@ internal readonly record struct XyzDao(double X, double Y, double Z)
 
     public string ToKey()
     {
-        return $"{X},{Y},{Z}";
+        return FormattableString.Invariant($"{X},{Y},{Z}");
     }
     
     public static XyzDao FromKey(string key)
