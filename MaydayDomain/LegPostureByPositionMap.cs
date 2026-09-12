@@ -48,12 +48,15 @@ public record LegPostureByPositionMap
     /// <exception cref="InvalidOperationException">If the tip position is unreachable</exception>
     public MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
     {   
+        // Find corresponding cell position for tipPosition and closes neighbour
+        // and interpolate between them.
+        
         var cellPosition = GetCellCenterPositionFor(tipPosition);
         var cellPositionNeighbor = GetNeighborCellCenterPositionFor(tipPosition);
         var fractionOfProgressBetweenCells = tipPosition.GetFractionOfProgressBetween(cellPosition, cellPositionNeighbor);
      
         var posture = GetClosestFor(cellPosition, currentPosture);
-        var postureNeighbor = GetClosestFor(cellPositionNeighbor , currentPosture);
+        var postureNeighbor = GetClosestFor(cellPositionNeighbor, currentPosture);
         var postureInterpolated = MaydayLegPosture.InterpolateBetween(posture, postureNeighbor, fractionOfProgressBetweenCells);
 
         return postureInterpolated;
@@ -131,6 +134,9 @@ public record LegPostureByPositionMap
             throw new Exception($"Not enough postures for each cell, min: {minimumPosturesPerCell}.");
     }
 
+    /// <summary>
+    /// Find the single closest neighbouring cell position 
+    /// </summary>
     static Xyz GetNeighborCellCenterPositionFor(Xyz tipPosition)
     {
         var centerCellPos = GetCellCenterPositionFor(tipPosition);
