@@ -49,15 +49,16 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
     /// <summary>
     /// Not a test, but a builder of new <see cref="LegPostureByPositionMap"/>
     /// </summary>
-    // [Fact(Skip = $"Run only to rebuild and store {nameof(LegPostureByPositionMap)}")]
-    [Fact]
+    [Fact(Skip = 
+        $"Run only to rebuild and store {nameof(LegPostureByPositionMap)}, "
+        + $"by manual copy from bin to MaydayDataAccess project")]
+    // [Fact]
     public void RebuildDictLegPostureByPositionMap()
     {
         var newMap = LegPostureByPositionMapDictImpl.BuildNew();
-
         Print(newMap);
-
-        FileInfo mapFileInfo = new("MaydayLegPostureMap.json");
+        
+        FileInfo mapFileInfo = new(Path.Combine(TestDataDirInfo.FullName, "DefaultLegPostureByPositionMap.json"));
         LegPostureByPositionMapFileRepo legPostureByPositionMapFileRepo = new(mapFileInfo);
         
         legPostureByPositionMapFileRepo.Store(newMap);

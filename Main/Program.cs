@@ -52,10 +52,13 @@ static Eff<StartupMode> GetStartupMode<RT>()
 static Eff<MaydayRobotFactory> CreateMaydayRobotFactory<RT>()
 {
     // TODO handle that reading file can fail and will produce Error or EFF.Pure
-    FileInfo legPostureByPositionMapFileInfo = new("asdfasdfMaydayLegPostureMap.json");
+    
+    DirectoryInfo dirInfo = new(Path.Combine(AppContext.BaseDirectory));
+    FileInfo legPostureByPositionMapFileInfo = new(Path.Combine(dirInfo.FullName, "DefaultLegPostureByPositionMap.json"));
+    
     LegPostureByPositionMapFileRepo legPostureByPositionMapFileRepo = new(legPostureByPositionMapFileInfo);
     var legPostureByPositionMap = legPostureByPositionMapFileRepo.Load();
-    
+
     return Eff<MaydayRobotFactory>.Pure(new(legPostureByPositionMap));
 }
 
