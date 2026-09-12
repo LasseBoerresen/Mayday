@@ -98,6 +98,6 @@ public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap
     {
         return new MaydayLegFactory(
             new EchoJointFactory(), 
-            LegPostureByPositionMap.CreateEmpty());
+            LegPostureByPositionMapDictImpl.CreateEmpty());
     }
 }

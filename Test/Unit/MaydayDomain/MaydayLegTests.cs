@@ -45,7 +45,7 @@ public class MaydayLegTests
 
         // Given
         var fakeJoints = givenPosture.AsListOfGoalAngles().Select(a => (Connection)new FakeJoint(a)).ToList();
-        MaydayLeg leg = new(fakeJoints, [], LegPostureByPositionMap.CreateEmpty());
+        MaydayLeg leg = new(fakeJoints, [], LegPostureByPositionMapDictImpl.CreateEmpty());
 
         // When
         var actual = leg.GetPosture();
@@ -75,7 +75,7 @@ public class MaydayLegTests
 
         // Given
         List<Mock<Joint>> mockJoints = [CreateMockJoint(), CreateMockJoint(), CreateMockJoint()];
-        MaydayLeg leg = new(mockJoints.Select(mj => (Connection)mj.Object).ToList(), [], LegPostureByPositionMap.CreateEmpty());
+        MaydayLeg leg = new(mockJoints.Select(mj => (Connection)mj.Object).ToList(), [], LegPostureByPositionMapDictImpl.CreateEmpty());
 
         // When
         leg.SetPosture(Timed<MaydayLegPosture>.Passed(givenPosture));
@@ -94,7 +94,7 @@ public class MaydayLegTests
         MaydayLegId legId = MaydayLegId.LeftFront;
 
         // When
-        _ = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMap.CreateEmpty())
+        _ = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMapDictImpl.CreateEmpty())
             .CreateLeg(legId);
 
         // Then
@@ -110,7 +110,7 @@ public class MaydayLegTests
         MaydayLegId legId = MaydayLegId.RightBack;
 
         // When
-        _ = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMap.CreateEmpty())
+        _ = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMapDictImpl.CreateEmpty())
             .CreateLeg(legId);
 
         // Then
@@ -138,7 +138,7 @@ public class MaydayLegTests
         // Given
 
         // When 
-        var actualLegsDict = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMap.CreateEmpty())
+        var actualLegsDict = new MaydayLegFactory(_mockJointFactory.Object, LegPostureByPositionMapDictImpl.CreateEmpty())
             .CreateAll();
 
         // Then
@@ -272,7 +272,7 @@ public class MaydayLegTests
     internal static MaydayLegFactory CreateEchoMaydayLegFactoryWithJointsAt(JointState jointState)
     {
         EchoJointFactory echoJointFactory = new();
-        MaydayLegFactory maydayLegFactory = new(echoJointFactory, LegPostureByPositionMap.CreateEmpty());
+        MaydayLegFactory maydayLegFactory = new(echoJointFactory, LegPostureByPositionMapDictImpl.CreateEmpty());
         return maydayLegFactory;
     }
 }

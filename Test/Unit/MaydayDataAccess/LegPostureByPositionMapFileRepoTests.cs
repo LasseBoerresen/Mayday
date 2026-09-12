@@ -43,7 +43,7 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
         var loadAction = () => legPostureByPositionMapFileRepo.Load();
         
         // Then
-        loadAction.Should().Throw<LegPostureByPositionMap.EmptyMapException>();
+        loadAction.Should().Throw<LegPostureByPositionMapDictImpl.EmptyMapException>();
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
     [Fact]
     public void RebuildDictLegPostureByPositionMap()
     {
-        var newMap = LegPostureByPositionMap.BuildNew();
+        var newMap = LegPostureByPositionMapDictImpl.BuildNew();
 
         Print(newMap);
 
@@ -63,7 +63,7 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
         legPostureByPositionMapFileRepo.Store(newMap);
     }
 
-    void Print(LegPostureByPositionMap map)
+    void Print(LegPostureByPositionMapDictImpl map)
     {
         foreach (var keyValuePair in map.Map)
         {

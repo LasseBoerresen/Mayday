@@ -20,7 +20,7 @@ public class DefaultMaydayStructureTests
         // Given
         IList<Connection> connections = [];
         IList<Link> links = [];
-        var legPostureByPositionMap = LegPostureByPositionMap.CreateEmpty();
+        var legPostureByPositionMap = LegPostureByPositionMapDictImpl.CreateEmpty();
         var thorax = Link.CreateThorax;
 
         Dictionary<MaydayLegId, MaydayLeg> legs = new()

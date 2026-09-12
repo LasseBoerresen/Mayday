@@ -24,10 +24,10 @@ public class LegPostureByPositionMapFileRepo(FileInfo mapFileInfo) : LegPostureB
             kvp => kvp.Key.ToDomain(),
             kvp => kvp.Value.Map(legPostureDao => legPostureDao.ToDomain()).ToList()); 
 
-        return new LegPostureByPositionMap(mapDict);
+        return new LegPostureByPositionMapDictImpl(mapDict);
     }
 
-    public void Store(LegPostureByPositionMap map)
+    public void Store(LegPostureByPositionMapDictImpl map)
     {
         var serializable = map.Map
             .OrderBy(kvp => kvp.Key.X.Meters)

@@ -7,5 +7,5 @@ public interface LegPostureByPositionMapRepo
 {
     LegPostureByPositionMap Load();
     
-    void Store(LegPostureByPositionMap map);
+    void Store(LegPostureByPositionMapDictImpl map);
 }
