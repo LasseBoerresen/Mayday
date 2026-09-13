@@ -183,12 +183,4 @@ public record Q
         
         return FromAxisAngle(Vector3Extensions.Random(), maxRotation * random.NextDoubleNeg1ToPos1());
     }
-
-    public void Deconstruct(out double W, out double X, out double Y, out double Z)
-    {
-        W = this.W;
-        X = this.X;
-        Y = this.Y;
-        Z = this.Z;
-    }
 }
