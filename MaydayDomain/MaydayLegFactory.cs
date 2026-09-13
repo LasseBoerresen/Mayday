@@ -34,7 +34,7 @@ public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap
         links.Add(Link.CreateTip);
         connections.Add(CrateTibiaToTipAttachment(links));
 
-        return new(connections, links, legPostureByPositionMap);
+        return new MaydayLeg(connections, links, legPostureByPositionMap);
     }
     
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
