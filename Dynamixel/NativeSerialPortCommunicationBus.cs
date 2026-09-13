@@ -241,6 +241,9 @@ public class NativeSerialPortCommunicationBus : CommunicationBus
         var idMessage = id.Map(id => $"dxl_id {id}");
         var errorMessage = $"{mode} {idMessage.IfNone("all ids")} {crMessage.IfNone("")} {valueMessage.IfNone("")} gave error:\n";
         
+        // TODO, perhaps do not throw, bug log error, or at least catch somwhere if this is not actually fatal.
+        //  The whole robot should not crash from one little problem.
+        //  It would be like people dying because they accidentally spoke at the same time. 
         var lastTxRxResult = getLastTxRxResult(_portNumber.Value, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
             throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
