@@ -40,20 +40,20 @@ public class PeriodicallyBatchedJointDriver : JointDriver
             // Ensure a state value is always available post initialization. 
             _jointStateCache.SetFor(id, GetInitialJointState(id));
         }
-    }
-
-    JointState GetInitialJointState(JointId id)
-    {
-        var jointState = new JointState(
-            _driver.ReadAngle(id),
-            _driver.ReadSpeed(id),
-            _driver.ReadLoadRatio(id),
-            _driver.ReadTemperature(id),
-            AngleGoal: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)),
-            AngleGoalPrevious: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)));
+        
+        JointState GetInitialJointState(JointId id)
+        {
+            var jointState = new JointState(
+                _driver.ReadAngle(id),
+                _driver.ReadSpeed(id),
+                _driver.ReadLoadRatio(id),
+                _driver.ReadTemperature(id),
+                AngleGoal: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)),
+                AngleGoalPrevious: Timed<Angle>.Passed(_driver.ReadAngleGoal(id)));
             
-        // Console.WriteLine("new joint state: " + jointState);    
-        return jointState;
+            // Console.WriteLine("new joint state: " + jointState);    
+            return jointState;
+        }
     }
 
     public JointState GetState(JointId id)
