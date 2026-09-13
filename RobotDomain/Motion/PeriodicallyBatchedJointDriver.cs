@@ -33,10 +33,13 @@ public class PeriodicallyBatchedJointDriver : JointDriver
     // TODO write a group-based version, for faster robot startup 
     public void Initialize(JointId id, RotationDirection rotationDirection)
     {
-        _driver.Initialize(id, rotationDirection);
+        lock (_driver)
+        {
+            _driver.Initialize(id, rotationDirection);
         
-        // Ensure a state value is always available post initialization. 
-        _jointStateCache.SetFor(id, GetInitialJointState(id));
+            // Ensure a state value is always available post initialization. 
+            _jointStateCache.SetFor(id, GetInitialJointState(id));
+        }
     }
 
     JointState GetInitialJointState(JointId id)
@@ -60,21 +63,24 @@ public class PeriodicallyBatchedJointDriver : JointDriver
 
     void SetGoalAngles()
     {
-        // Also update joint angles syncronously, they are needed for inverse kinematics, when finding the closes joints.  
-        UpdateJointAngleCache();
-        
-        var interpolatedGoalAnglesById = _jointStateCache
-            .GetById()
-            .ToDictionary(
-                ActuatorId (kvp) => kvp.Key,
-                kvp => kvp.Value.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
-        
-        _driver.SetGoalAngles(interpolatedGoalAnglesById);
-        
+        lock (_driver)
+        {
+            // Also update joint angles syncronously, they are needed for inverse kinematics, when finding the closes joints.  
+            UpdateJointAngleCache();
+
+            var interpolatedGoalAnglesById = _jointStateCache
+                .GetById()
+                .ToDictionary(
+                    ActuatorId (kvp) => kvp.Key,
+                    kvp => kvp.Value.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
+
+            _driver.SetGoalAngles(interpolatedGoalAnglesById);
+        }
+
         void UpdateJointAngleCache()
         {
             _driver.ReadAngles(_jointStateCache.GetIds())
-                .ForEach(kvp => _jointStateCache.SetAngleFor(JointId.FromBase(kvp.Key), kvp.Value));
+                .ForEach(kvp => _jointStateCache.SetAngleFor(JointId.FromBase(kvp.Key), kvp.Value));    
         }
         
         double InterpolatedStepFactor<T>(Timed<T> timed)
