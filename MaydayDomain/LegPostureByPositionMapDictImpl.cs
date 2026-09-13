@@ -60,7 +60,13 @@ public record LegPostureByPositionMapDictImpl : LegPostureByPositionMap
         //  and force caller to handle that not all input xyz are reachable.  
         var possiblePostures = Map
             .LookFor(cellPosition)
-            .IfNone(() => throw new InvalidOperationException($"No leg posture for cell position {cellPosition}"));
+            .IfNone(() =>
+            {
+                // TODO write what the cellPosition the current posture has, to figure out how far off the goal is. 
+                Console.WriteLine($"No leg posture for cell position {cellPosition}, using current");
+                return [posture];
+                // throw new InvalidOperationException($"No leg posture for cell position {cellPosition}");
+            });
             
         return possiblePostures
             .OrderBy(p => p.DistanceTo(posture))
