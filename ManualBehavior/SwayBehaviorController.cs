@@ -64,11 +64,17 @@ public class SwayBehaviorController(
     Motion CreateGoalTowardsCenterWithSway()
     {
         var previousGoal = GetPreviousGoal();
-        
-        var leanHalfwayToCenter = previousGoal.Lean.HalfWayTo(Motion.StandingStill.Lean);
         var swayAmount = SwayAmount();
+        
+        // More erratic, because movement is only corrected towards center next
+        // time, and corrections can add up with the random movement. 
+        // var leanTowardsCenter = previousGoal.Lean.InDirectionTo(Motion.StandingStill.Lean, factor: 0.5);
+        // var newGoal = previousGoal with { Lean = leanTowardsCenter + swayAmount };
 
-        var newGoal = previousGoal with { Lean = leanHalfwayToCenter + swayAmount };
+        // More smooth, because random movement and gravity towards center is never in same direction. 
+        var newRandomGoal = previousGoal with { Lean = previousGoal.Lean + swayAmount };
+        var newGoal = newRandomGoal with { Lean= newRandomGoal.Lean.InDirectionTo(Motion.StandingStill.Lean, factor: 0.5)};
+        
         return newGoal;
     }
 
