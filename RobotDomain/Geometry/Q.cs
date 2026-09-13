@@ -179,18 +179,9 @@ public record Q
 
     public static Q Random(Angle maxRotation)
     {
-        var truncatedMaxRevolutions = maxRotation.Revolutions % 1.0;
         Random random = new();
-
-        Quaternion randomRotationQuaternion = new(
-            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
-            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
-            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()),
-            (float)(truncatedMaxRevolutions * random.NextDoubleNeg1ToPos1()));
-            
-        var normalizedRandomRotationQuaternion = Quaternion.Normalize(randomRotationQuaternion);
         
-        return FromNumericsQ(normalizedRandomRotationQuaternion);
+        return FromAxisAngle(Vector3Extensions.Random(), maxRotation * random.NextDoubleNeg1ToPos1());
     }
 
     public void Deconstruct(out double W, out double X, out double Y, out double Z)
