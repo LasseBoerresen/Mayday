@@ -30,12 +30,6 @@ public class PeriodicallyBatchedJointDriver : JointDriver
         _setGoalAngleTask = periodicScheduler.RunAsync(SetGoalAngles, _updatePeriod, cancellationTokenSource.Token);
     }
 
-    void UpdateJointAngleCache()
-    {
-        _driver.ReadAngles(_jointStateCache.GetIds())
-            .ForEach(kvp => _jointStateCache.SetAngleFor(JointId.FromBase(kvp.Key), kvp.Value));
-    }
-
     // TODO write a group-based version, for faster robot startup 
     public void Initialize(JointId id, RotationDirection rotationDirection)
     {
@@ -76,11 +70,17 @@ public class PeriodicallyBatchedJointDriver : JointDriver
                 kvp => kvp.Value.InterpolateGoalAngleOneTimeStep(InterpolatedStepFactor));
         
         _driver.SetGoalAngles(interpolatedGoalAnglesById);
-    }
-
-    double InterpolatedStepFactor<T>(Timed<T> timed)
-    {
-        return timed.StepFactor(currentTime: _timeProvider.GetUtcNow());
+        
+        void UpdateJointAngleCache()
+        {
+            _driver.ReadAngles(_jointStateCache.GetIds())
+                .ForEach(kvp => _jointStateCache.SetAngleFor(JointId.FromBase(kvp.Key), kvp.Value));
+        }
+        
+        double InterpolatedStepFactor<T>(Timed<T> timed)
+        {
+            return timed.StepFactor(currentTime: _timeProvider.GetUtcNow());
+        }
     }
     
     public void SetGoalAngleFor(JointId id, Timed<Angle> goalAngleTimed)
