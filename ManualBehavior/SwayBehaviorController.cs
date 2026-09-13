@@ -22,6 +22,8 @@ public class SwayBehaviorController(
     {
         WakeUp();
 
+        motionPlanner.Start(ct);
+        
         PeriodicScheduler periodicScheduler = new(timeProvider);
         periodicScheduler.Run(SwayOnce, TimeStep , ct); 
         
@@ -39,8 +41,6 @@ public class SwayBehaviorController(
         
         motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.Standing, timeStep));
         Thread.Sleep(timeStep);
-
-        motionPlanner.Start(ct);
     }
 
     /// <summary>
