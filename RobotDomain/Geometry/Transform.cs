@@ -71,7 +71,12 @@ public record Transform(Xyz Xyz, Q Q)
 
     public Transform HalfWayTo(Transform other)
     {
-        return this + DistanceTo(other) * 0.5;
+        return this + InDirectionTo(other, 0.5);
+    }
+    
+    public Transform InDirectionTo(Transform other, double factor)
+    {
+        return this + DistanceTo(other) * factor;
     }
 
     Transform DistanceTo(Transform other)
