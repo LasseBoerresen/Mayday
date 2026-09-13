@@ -44,10 +44,9 @@ public class PeriodicScheduler(TimeProvider timeProvider)
         }
         catch (Exception ex)
         {
-            // Log the error so it's not ignored!
             Console.WriteLine($"Error in periodic task: {ex.Message}, {ex.StackTrace}");
-            // Depending on requirements, you might want to 'break' or 'continue'
-            Environment.FailFast("Unobserved task exception", ex);
+            // TODO Perhaps inject injecting an abstraction (like IFatalErrorHandler) with Test and Failfast impls to avoid crashing whole test applicatoin on failure here. 
+            Environment.FailFast("Unobserved task exception", ex);  
         }
     }
 
