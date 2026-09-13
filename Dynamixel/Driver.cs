@@ -23,7 +23,7 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
     
     // TODO use PID values or remove them!
     static uint _POSITION_P_GAIN_SOFT = 500; // 640;  // 200;
-    static uint _POSITION_I_GAIN_SOFT = 2000;
+    static uint _POSITION_I_GAIN_SOFT = 200;
     static uint _POSITION_D_GAIN_SOFT = 4000;
 
     public void Initialize(ActuatorId id, RobotDomain.Structures.RotationDirection rotationDirection)
