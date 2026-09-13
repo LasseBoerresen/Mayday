@@ -231,7 +231,7 @@ public class NativeSerialPortCommunicationBus : CommunicationBus
     /// Must be used withing the lock of the original communication
     /// </remarks>
     void CheckCommunicationResults(
-        string mode,
+        string mode, // TODO mode should clearly not be a string, but TransmissionMode, write or read. 
         Option<Id> id = default,
         Option<ControlRegister> cr = default,
         Option<uint> value = default)
