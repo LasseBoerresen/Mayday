@@ -78,7 +78,7 @@ public class DefaultMaydayStructure : MaydayStructure
         var currentLean = GetCurrentLean();
         var extraLeanRequiredTimed = leanTimed.Map(lean => lean - currentLean);
 
-        MoveTipsBy(extraLeanRequiredTimed.Map(tl => tl.Xyz));
+        MoveTipsBy(extraLeanRequiredTimed.Map(tl => -tl.Xyz));
 
         // _legs.ForEach(leg => 
         //     MoveThoraxBy(extraLeanRequiredTimed, leg));
