@@ -17,8 +17,10 @@ public static class StepAngle
     public static uint ToSteps(Angle angle)
     {
         ThrowIfNotWithinSemiCircle(angle);
+
+        var stepsRelative = angle / StepSize;
         
-        return (uint)(angle  / StepSize ) + StepCenter;
+        return (uint)(stepsRelative + StepCenter);
     }
 
     static void ThrowIfNotWithinSemiCircle(Angle angle)
