@@ -246,11 +246,13 @@ public class NativeSerialPortCommunicationBus : CommunicationBus
         //  It would be like people dying because they accidentally spoke at the same time. 
         var lastTxRxResult = getLastTxRxResult(_portNumber.Value, ProtocolVersion);
         if (lastTxRxResult != CommunicationSuccessCode)
-            throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
+            WriteLine($"{DateTime.UtcNow}: TxRxResult != SuccessCode: " + errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
+            // throw new(errorMessage + Marshal.PtrToStringAnsi(getTxRxResult(ProtocolVersion, lastTxRxResult)));
 
         var lastRxPacketError = getLastRxPacketError(_portNumber.Value, ProtocolVersion);
         if (lastRxPacketError != CommunicationSuccessCode)
-            throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
+            WriteLine($"{DateTime.UtcNow}: RxPacketError != SuccessCode: " + errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));    
+            // throw new(errorMessage + Marshal.PtrToStringAnsi(getRxPacketError(ProtocolVersion, lastRxPacketError)));
     }
     
     static Eff<Unit> OpenPort(PortNumber portNumber)
