@@ -21,8 +21,22 @@ namespace MaydayDomain.MotionPlanning;
 public class InstantPostureMaydayMotionPlanner 
     : MaydayMotionPlanner
 {
-    public Option<Timed<Motion>> Goal { get; set; }
-    public Option<MotionPlan<Motion>> Plan { get; }
+    // TODO make or run unit test that guarantees that goal sets plan correctly. 
+    public Option<Timed<Motion>> Goal
+    {
+        get;
+        set
+        {
+            field = value;
+            
+            // TODO make better steps than just the single goal value. Start at
+            //   current state, and split in duration steps. 
+            Plan = value.Map(MotionPlan<Motion> (tg) => new LinearStepsMotionPlan<Motion>([tg]));
+        }
+    } = Option<Timed<Motion>>.None;
+
+    public Option<MotionPlan<Motion>> Plan { get; private set; } = Option<MotionPlan<Motion>>.None;
+    
     protected readonly MaydayStructure Structure;
     readonly TimeProvider _timeProvider;
     Task? _trackingTask;
@@ -77,7 +91,7 @@ public class InstantPostureMaydayMotionPlanner
     
     public MaydayStructureSet<Transform> GetTransformsOf(LinkName linkName) => Structure.GetTransformsOf(linkName);
 
-    protected void TrackGoalOnce(MotionPlan<Motion> goalMotionTimed)
+    void TrackGoalOnce(MotionPlan<Motion> goalMotionTimed)
     {
         // TODO actually split up the movement, so the structure does not just 
         //  receive the final goal, because the different actuators should not
@@ -88,6 +102,9 @@ public class InstantPostureMaydayMotionPlanner
         // other movement components require stepping.
         // Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
         
-        // Structure.MoveThoraxTo(goalMotionTimed.Map(m => m.Lean));
+        Structure.MoveThoraxTo(
+            goalMotionTimed
+                .At(_timeProvider.GetUtcNow())
+                .Map(m => m.Lean));
     }
 }
