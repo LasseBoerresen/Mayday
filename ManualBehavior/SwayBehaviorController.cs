@@ -16,7 +16,7 @@ public class SwayBehaviorController(
     TimeProvider timeProvider) 
     : BehaviorController
 {
-    readonly Duration TimeStep = Duration.FromSeconds(5.0);
+    readonly Duration TimeStep = Duration.FromSeconds(10.0);
     
     public Unit Start()
     {
@@ -39,7 +39,7 @@ public class SwayBehaviorController(
         motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.Sitting, timeStep));
         Thread.Sleep(timeStep);
         
-        motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.Standing, timeStep));
+        motionPlanner.SetPosture(timeProvider.ScheduleIn(MaydayLegPosture.StandingWide, timeStep));
         Thread.Sleep(timeStep);
     }
 
@@ -85,9 +85,12 @@ public class SwayBehaviorController(
     static Transform SwayAmount()
     {
         var maxTranslation = Length.FromMeters(0.04);
-        var maxRotation = Angle.FromRevolutions(0.125);
+        var maxRotation = Angle.Zero; //.FromRevolutions(0.125); // TODO Just starting without rotation randomness to keep it simple. Maybe rotation is buggy. 
                
         var swayAmount = Transform.Random(maxTranslation, maxRotation);
+        
+        // TODO just only having random Z movements for now. 
+        swayAmount = swayAmount with { Xyz = swayAmount.Xyz with { X = Length.Zero, Y = Length.Zero } };
         
         return swayAmount;
     }

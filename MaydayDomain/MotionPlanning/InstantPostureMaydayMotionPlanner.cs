@@ -40,7 +40,7 @@ public class InstantPostureMaydayMotionPlanner
     protected readonly MaydayStructure Structure;
     readonly TimeProvider _timeProvider;
     Task? _trackingTask;
-    readonly Duration Period = Duration.FromSeconds(1);
+    readonly Duration Period = Duration.FromSeconds(0.2);
 
     public InstantPostureMaydayMotionPlanner(
         MaydayStructure structure, 
