@@ -141,9 +141,9 @@ public record Xyz
         return DistanceBetween(this, ClosestPointOnLineSegmentBetween(a, b));
     }
 
-    Vector3 AsVector3Meters() => new((float)X.Meters, (float)Y.Meters, (float)Z.Meters);
+    public Vector3 AsVector3Meters() => new((float)X.Meters, (float)Y.Meters, (float)Z.Meters);
 
-    static Xyz FromVector3Meters(Vector3 v) => new(v.X, v.Y, v.Z);
+    public static Xyz FromVector3Meters(Vector3 v) => new(v.X, v.Y, v.Z);
 
     public void Deconstruct(out Length X, out Length Y, out Length Z)
     {
