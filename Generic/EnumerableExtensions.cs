@@ -83,4 +83,18 @@ public static class EnumerableExtensions
     {
         return enumerable.Select(func);
     }
+    
+    extension<T>(IEnumerable<T> enumerable)
+    {
+        public IEnumerable<IEnumerable<T>> Combinations(int n)
+        {
+            if (n == 0)
+                return [[]];
+
+            return enumerable.SelectMany((e, i) =>
+                enumerable.Skip(i + 1)
+                    .Combinations(n - 1)
+                    .Select(c => new[] { e }.Concat(c)));
+        }
+    }
 }

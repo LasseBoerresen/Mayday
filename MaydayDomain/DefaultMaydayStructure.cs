@@ -1,8 +1,11 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Numerics;
 using Generic;
 using MaydayDomain.MotionPlanning;
 using MaydayDomain.Components;
 using RobotDomain.Geometry;
+using RobotDomain.Geometry.SystemNumerics;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using UnitsNet;
@@ -14,6 +17,7 @@ namespace MaydayDomain;
 
 public class DefaultMaydayStructure : MaydayStructure
 {
+    readonly Xyz _thoraxOrigin = Xyz.Zero;
     readonly Link _thorax;
     readonly MaydayStructureSet<MaydayLeg> _legs;
 
@@ -78,10 +82,13 @@ public class DefaultMaydayStructure : MaydayStructure
         var currentLean = GetCurrentLean();
         var extraLeanRequiredTimed = leanTimed.Map(lean => lean - currentLean);
 
+        // var groundedLegs = GetGroundedLegIds();
+        
+        // TODO, not all tips should be moved in same direction, because they
+        //  might not all even touching the ground. 
+        // TODO Add an addjustment to non-grounded feet (i.e. more than 1cm way
+        //  from lowest triplet) so they move down to triplet height. 
         MoveTipsBy(extraLeanRequiredTimed.Map(tl => -tl.Xyz));
-
-        // _legs.ForEach(leg => 
-        //     MoveThoraxBy(extraLeanRequiredTimed, leg));
     }
 
     void MoveThoraxBy(Timed<Transform> leanOffsetTimed, MaydayLeg leg)
@@ -131,20 +138,63 @@ public class DefaultMaydayStructure : MaydayStructure
 
     public Transform GetCurrentLean()
     {
-        // TODO: To get the current lean, we need to find the ground plane from
-        //  the lowest 3 feet on two sides and reverse calculate the lean. Later
-        //  the orientation could come from an accelerometer, but the xy-offset
-        //  needs to come from the offset from the average foot position, 
-        //  including rotation around z axis from the angle of the coxa joint.
+        // TODO: The xy-offset needs to come from the offset from the average
+        //  foot position, including rotation around z axis from the angle of
+        //  the coxa joint.
 
+        var groundClearance = GetGroundClearance();
         var tipPositionsMean = GetPositionsOf(LinkName.Tip).Mean();
         
+        var thoraxTranslation = new Xyz(
+            -tipPositionsMean.X,
+            -tipPositionsMean.Y, 
+            groundClearance);
 
         // TODO: I can get the z rotation as the average coxa angle. Well, if
-        //  the tips are at equal stances. But really I should calculate the 
-        //  ground plane, and the thorax's angle and translation to that and
-        //  its origo. 
+        //  the tips are at equal stances. 
 
-        return new Transform(-tipPositionsMean, Q.Unit);
+        return new Transform(thoraxTranslation, ThoraxRotation);
+
+        Length GetGroundClearance()
+        {
+            var groundPlane = CalculateGroundPlane();
+
+            Length clearance = -CenterOfGravityRay.DistanceToPlane(groundPlane);
+            
+            Debug.Assert(clearance > Length.FromMeters(0.0), $"Ground clearance is negative: {clearance}");
+            Debug.Assert(clearance < Length.FromMeters(0.5), $"Ground clearance is unreasonable high: {clearance}");
+            
+            return clearance;
+        }
     }
+    
+    Plane CalculateGroundPlane()
+    {
+        // Note: Coxa motor is the lowest wide point on the body that has a known position.
+        var potentialGroundPoints = 
+            GetPositionsOf(LinkName.Tip).Concat(
+            GetPositionsOf(LinkName.CoxaMotor));   
+                
+        var potentialGroundTriangles = potentialGroundPoints
+            .Combinations(n: 3)
+            .Map(triplet => Triangle3D.FromList([.. triplet]));
+                
+        // Find triangle intersected by centerOfGravityRay with largest distance.
+        Ray3D centerOfGravityRay = new(_thoraxOrigin, GravityDirection);
+
+        var lowestTriangleUnderCenterOfGravity = potentialGroundTriangles
+            .Map(triangle => (triangle, intersection: triangle.LookForIntersectionWith(centerOfGravityRay)))
+            .Where(triangleIntersection => triangleIntersection.intersection != null)
+            .MaxBy(triangleIntersection => triangleIntersection.intersection?.Distance)
+            .triangle;
+
+        return lowestTriangleUnderCenterOfGravity.ToPlane();
+
+    }
+
+    Ray3D CenterOfGravityRay => new(_thoraxOrigin, GravityDirection);
+    
+    Xyz GravityDirection => new(0, 0, -1); // In absense of an accelerometer, this is the best we can do.
+
+    Q ThoraxRotation => Q.Unit; // Should probably be drived from GravityDirection when accelerometer works. 
 }

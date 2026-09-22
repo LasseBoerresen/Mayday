@@ -2,6 +2,8 @@
 
 namespace MaydayDomain;
 
+// TODO rename to legPosition, because it is not really an id, but something
+//  for the structure distinguishing each leg 
 public record MaydayLegId(Side Side, SidePosition SidePosition) : IComparable<MaydayLegId>
 {
     public static IEnumerable<MaydayLegId> AllLegIds =>
