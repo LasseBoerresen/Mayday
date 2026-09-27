@@ -90,7 +90,7 @@ public class SwayBehaviorController(
 
     static Transform SwayAmount()
     {
-        var maxTranslation = Length.FromMeters(0.04);
+        var maxTranslation = Length.FromMeters(0.08);
         var maxRotation = Angle.Zero; //.FromRevolutions(0.125); // TODO Just starting without rotation randomness to keep it simple. Maybe rotation is buggy. 
                
         var swayAmount = Transform.Random(maxTranslation, maxRotation);
