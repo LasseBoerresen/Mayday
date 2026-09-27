@@ -16,7 +16,7 @@ public record Xyz
     public Length Z { get; init; }
     
     // For mayday, anything above a meter is too far.
-    static readonly Length AbsurdValue = Length.FromMeters(1); 
+    static readonly Length AbsurdValue = Length.FromMeters(5); 
 
     // TODO Refactor this meters constructor to factoryMethod Called Meters
     public Xyz(Length X, Length Y, Length Z)
