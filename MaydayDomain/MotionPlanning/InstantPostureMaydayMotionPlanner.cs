@@ -101,10 +101,7 @@ public class InstantPostureMaydayMotionPlanner
         // Note: To start with, only the thorax lean is tracked, because the
         // other movement components require stepping.
         // Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
-        
-        Structure.MoveThoraxTo(
-            goalMotionTimed
-                .At(_timeProvider.GetUtcNow())
-                .Map(m => m.Lean));
+
+        Structure.MoveThoraxTo(goalMotionTimed.At(_timeProvider.GetUtcNow()));
     }
 }

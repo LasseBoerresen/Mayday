@@ -1,4 +1,5 @@
-﻿using RobotDomain.Geometry;
+﻿using MaydayDomain.MotionPlanning;
+using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using RobotDomain.Time;
 
@@ -26,7 +27,7 @@ public interface MaydayStructure
     /// To lean the thorax, move all tips opposite direction. Rotational lean
     /// results in some translation of the tip around the thorax origo 
     /// </summary>
-    void MoveThoraxTo(Timed<Transform> leanTimed);
+    void MoveThoraxTo(Timed<Motion> motionTimed);
 
     void MoveTipsBy(Timed<Xyz> offsetXyzTimed);
 

@@ -77,28 +77,32 @@ public class DefaultMaydayStructure : MaydayStructure
     /// To lean the thorax, move all tips opposite direction. Rotational lean
     /// results in some translation of the tip around the thorax origo 
     /// </summary>
-    public void MoveThoraxTo(Timed<Transform> leanTimed)
+    public void MoveThoraxTo(Timed<Motion> motionTimed)
     {
-        var currentLean = GetCurrentLean();
-        var extraLeanRequiredTimed = leanTimed.Map(lean => lean - currentLean);
-        var tipMovementRequiredTimed = extraLeanRequiredTimed.Map(extraLeanRequired => -extraLeanRequired.Xyz);
+        var verticalTipMovementTimed = motionTimed.Map(motion =>
+            GetVerticalTipMovementWithGroundingAdjustment(motion.Lean));
 
-        var legClearancesFromGround = GetLegClearancesFromGround();
-        
-        var tipMovementRequiredWithGroundingAdjustmentTimed = 
-            tipMovementRequiredTimed.Map(tipMovementRequired => 
-            legClearancesFromGround.Map(legClearance => 
-                tipMovementRequired with { Z = tipMovementRequired.Z - legClearance}));
-        
-        MoveTipsBy(tipMovementRequiredWithGroundingAdjustmentTimed);
-        
-        MaydayStructureSet<Length> GetLegClearancesFromGround()
+        MoveTipsBy(verticalTipMovementTimed);
+
+        MaydayStructureSet<Xyz> GetVerticalTipMovementWithGroundingAdjustment(Transform lean)
         {
-            var groundPlane = CalculateGroundPlane();
+            var currentLean = GetCurrentLean();
+            var extraLeanRequired = lean - currentLean;
+            var tipMovementRequired = -extraLeanRequired.Xyz;
 
-            return GetPositionsOf(LinkName.Tip)
-                .Map(tipPosition => new Ray3D(tipPosition, GravityDirection))
-                .Map(tipGravityRay => tipGravityRay.DistanceToPlane(groundPlane));
+            var legClearancesFromGround = GetLegClearancesFromGround();
+        
+            return legClearancesFromGround.Map(legClearance => 
+                tipMovementRequired with { Z = tipMovementRequired.Z - legClearance});
+        
+            MaydayStructureSet<Length> GetLegClearancesFromGround()
+            {
+                var groundPlane = CalculateGroundPlane();
+
+                return GetPositionsOf(LinkName.Tip)
+                    .Map(tipPosition => new Ray3D(tipPosition, GravityDirection))
+                    .Map(tipGravityRay => tipGravityRay.DistanceToPlane(groundPlane));
+            }
         }
     }
 
