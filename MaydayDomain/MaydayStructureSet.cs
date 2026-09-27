@@ -85,6 +85,17 @@ public record MaydayStructureSet<T>(T RF, T RC, T RB, T LF, T LC, T LB) : IEnume
             .ToMaydayStructureSet();
     }
 
+    public MaydayStructureSet<V> CombineWith<U, V>(MaydayStructureSet<U> other, Func<T, U, V> combiner)
+    {
+        return new MaydayStructureSet<V>(
+            combiner(RF, other.RF),
+            combiner(RC, other.RC),
+            combiner(RB, other.RB),
+            combiner(LF, other.LF),
+            combiner(LC, other.LC),
+            combiner(LB, other.LB));
+    }
+
     public IEnumerator<T> GetEnumerator()
     {
         return ToLegProperties().Select(lp => lp.Value).GetEnumerator();
