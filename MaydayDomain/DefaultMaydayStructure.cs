@@ -188,7 +188,7 @@ public class DefaultMaydayStructure : MaydayStructure
         var lowestTriangleUnderCenterOfGravity = potentialGroundTriangles
             .Map(triangle => (triangle, intersection: triangle.LookForIntersectionWith(centerOfGravityRay)))
             .Where(triangleIntersection => triangleIntersection.intersection != null)
-            .MaxBy(triangleIntersection => triangleIntersection.intersection?.Distance)
+            .MinBy(triangleIntersection => (triangleIntersection.triangle.Center() - _thoraxOrigin).Z)
             .triangle;
 
         return lowestTriangleUnderCenterOfGravity.ToPlane();

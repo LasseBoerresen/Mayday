@@ -8,6 +8,8 @@ public readonly record struct Triangle3D(Xyz v0, Xyz v1, Xyz v2)
 {
     public Area Area() => UnitsNet.Area.FromSquareMeters(ToNumerics().Area());
     
+    public Xyz Center() => Xyz.FromVector3Meters(ToNumerics().Center());
+    
     public bool IsColinear()
     {
         return ToNumerics().IsColinear();

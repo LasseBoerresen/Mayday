@@ -71,6 +71,10 @@ public readonly record struct Triangle3(Vector3 v0, Vector3 v1, Vector3 v2)
             var v02 = v2 - v0;
             
             return Vector3.Cross(v01, v02).Length() * 0.5f;
-        }
+    }
+    
+    public Vector3 Center()
+    {
+        return (v0 + v1 + v2) / 3.0f;
     }
 }
