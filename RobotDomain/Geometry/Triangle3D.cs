@@ -25,6 +25,12 @@ public readonly record struct Triangle3D(Xyz v0, Xyz v1, Xyz v2)
         return null;
     }
 
+    Triangle3D FromNumerics(Triangle3 triangle) => 
+        new(
+            Xyz.FromVector3Meters(triangle.v0), 
+            Xyz.FromVector3Meters(triangle.v1), 
+            Xyz.FromVector3Meters(triangle.v2));
+    
     Triangle3 ToNumerics()
     {
         return new(
