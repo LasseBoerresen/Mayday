@@ -159,7 +159,7 @@ public class DefaultMaydayStructure : MaydayStructure
         {
             var groundPlane = CalculateGroundPlane();
 
-            Length clearance = -CenterOfGravityRay.DistanceToPlane(groundPlane);
+            Length clearance = CenterOfGravityRay.DistanceToPlane(groundPlane);
             
             Debug.Assert(clearance > Length.FromMeters(0.0), $"Ground clearance is negative: {clearance}");
             Debug.Assert(clearance < Length.FromMeters(0.5), $"Ground clearance is unreasonable high: {clearance}");

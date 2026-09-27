@@ -7,13 +7,26 @@ public readonly record struct Ray3D(Xyz Origin, Xyz Direction)
 {
     public Length DistanceToPlane(Plane plane)
     {
-        // TODO handle potential division by zero for rays parallel to plane. 
-        //  for those, check if Vector3.Dot(plane.Normal, rayDirection) < epsilon = 1e-6
-        
-        // Assumes plane.Normal is normalized.
-        var signedDistance = Plane.DotCoordinate(plane, Origin.AsVector3Meters());
-        
-        return Length.FromMeters(signedDistance);
+        var rayDir = Direction.AsVector3Meters();
+        var denom = Vector3.Dot(plane.Normal, rayDir);
+
+        // const float epsilon = 1e-6f;
+        // // Ray is parallel (or nearly parallel) to the plane
+        // if (MathF.Abs(denom) < epsilon)
+        // {
+        //     return null;
+        // }
+
+        var signedDistOrigin = Plane.DotCoordinate(plane, Origin.AsVector3Meters());
+        var t = -signedDistOrigin / denom;
+
+        // // Optional: if only forward ray intersections are valid
+        // if (t < 0)
+        // {
+        //     return null; // Plane is behind the ray
+        // }
+
+        return Length.FromMeters(t);
     }
     
     public Ray3 ToNumerics()
