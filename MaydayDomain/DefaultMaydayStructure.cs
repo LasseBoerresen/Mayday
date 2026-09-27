@@ -173,7 +173,7 @@ public class DefaultMaydayStructure : MaydayStructure
         // Note: Coxa motor is the lowest wide point on the body that has a known position.
         var potentialGroundPoints = 
             GetPositionsOf(LinkName.Tip).Concat(
-            GetPositionsOf(LinkName.CoxaMotor));   
+            GetPositionsOf(LinkName.FemurMotor));   
                 
         var potentialGroundTriangles = potentialGroundPoints
             .Combinations(n: 3)
