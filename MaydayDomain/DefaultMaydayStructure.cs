@@ -81,14 +81,25 @@ public class DefaultMaydayStructure : MaydayStructure
     {
         var currentLean = GetCurrentLean();
         var extraLeanRequiredTimed = leanTimed.Map(lean => lean - currentLean);
+        var tipMovementRequiredTimed = extraLeanRequiredTimed.Map(extraLeanRequired => -extraLeanRequired.Xyz);
 
-        // var groundedLegs = GetGroundedLegIds();
+        var legClearancesFromGround = GetLegClearancesFromGround();
         
-        // TODO, not all tips should be moved in same direction, because they
-        //  might not all even touching the ground. 
-        // TODO Add an addjustment to non-grounded feet (i.e. more than 1cm way
-        //  from lowest triplet) so they move down to triplet height. 
-        MoveTipsBy(extraLeanRequiredTimed.Map(tl => -tl.Xyz));
+        var tipMovementRequiredWithGroundingAdjustmentTimed = 
+            tipMovementRequiredTimed.Map(tipMovementRequired => 
+            legClearancesFromGround.Map(legClearance => 
+                tipMovementRequired with { Z = tipMovementRequired.Z - legClearance}));
+        
+        MoveTipsBy(tipMovementRequiredWithGroundingAdjustmentTimed);
+        
+        MaydayStructureSet<Length> GetLegClearancesFromGround()
+        {
+            var groundPlane = CalculateGroundPlane();
+
+            return GetPositionsOf(LinkName.Tip)
+                .Map(tipPosition => new Ray3D(tipPosition, GravityDirection))
+                .Map(tipGravityRay => tipGravityRay.DistanceToPlane(groundPlane));
+        }
     }
 
     void MoveThoraxBy(Timed<Transform> leanOffsetTimed, MaydayLeg leg)
@@ -106,6 +117,17 @@ public class DefaultMaydayStructure : MaydayStructure
         leg.MoveTipPositionTo(tipTargetTimed);
     }
 
+    public void MoveTipsBy(Timed<MaydayStructureSet<Xyz>> offsetXyzsTimed)
+    {
+        var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
+        
+        var tipPositionsOffsetTimed = offsetXyzsTimed.Map(offsetXyzs => 
+            offsetXyzs.CombineWith(tipPositionsCurrent, 
+                combiner: (tipPosition, offsetXyz) => tipPosition + offsetXyz));
+            
+        MoveTipsTo(tipPositionsOffsetTimed);
+    }
+    
     public void MoveTipsBy(Timed<Xyz> offsetXyzTimed)
     {
         var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
