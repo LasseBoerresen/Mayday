@@ -106,21 +106,6 @@ public class DefaultMaydayStructure : MaydayStructure
         }
     }
 
-    void MoveThoraxBy(Timed<Transform> leanOffsetTimed, MaydayLeg leg)
-    {
-        var tipTransform = GetTransformOfTipFor(leg);
-    
-        // Adding/subtracting two transforms effectively translates and rotates
-        // the rhs which is exactly what is required for tip movement. 
-        
-        // TODO: Test this, I am not sure we are subtracting the right thing
-        //  or if we should transform back to leg frame of reference 
-        var tipTargetTimed = leanOffsetTimed.Map(
-            lean => tipTransform.Xyz - lean.Xyz); // TODO Does not rotate for now 
-        
-        leg.MoveTipPositionTo(tipTargetTimed);
-    }
-
     public void MoveTipsBy(Timed<MaydayStructureSet<Xyz>> offsetXyzsTimed)
     {
         var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
