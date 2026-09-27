@@ -179,7 +179,7 @@ public class DefaultMaydayStructure : MaydayStructure
         var potentialGroundTriangles = potentialGroundPoints
             .Combinations(n: 3)
             .Map(triplet => Triangle3D.FromList([.. triplet]))
-            .Where(triangle => !(triangle.Area < tenCentimeterSquaredArea));
+            .Where(triangle => !(triangle.Area() < tenCentimeterSquaredArea));
             
                 
         // Find triangle intersected by centerOfGravityRay with largest distance.

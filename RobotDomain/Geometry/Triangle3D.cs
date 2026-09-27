@@ -6,7 +6,7 @@ namespace RobotDomain.Geometry;
 
 public readonly record struct Triangle3D(Xyz v0, Xyz v1, Xyz v2)
 {
-    public Area Area => Area.FromSquareMeters(ToNumerics().Area);
+    public Area Area() => UnitsNet.Area.FromSquareMeters(ToNumerics().Area());
     
     public bool IsColinear()
     {

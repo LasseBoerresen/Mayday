@@ -65,10 +65,8 @@ public readonly record struct Triangle3(Vector3 v0, Vector3 v1, Vector3 v2)
         return cross.LengthSquared() < epsilon * epsilon;
     }
     
-    public float Area
+    public float Area()
     {
-        get
-        {
             var v01 = v1 - v0;
             var v02 = v2 - v0;
             
