@@ -6,6 +6,13 @@ namespace RobotDomain.Geometry;
 
 public readonly record struct Triangle3D(Xyz v0, Xyz v1, Xyz v2)
 {
+    public Area Area => Area.FromSquareMeters(ToNumerics().Area);
+    
+    public bool IsColinear()
+    {
+        return ToNumerics().IsColinear();
+    }
+
     public Ray3DIntersection? LookForIntersectionWith(Ray3D ray)
     {
         if (ToNumerics().TryGetIntersection(ray.ToNumerics(), out var intersectionPoint, out var distance))

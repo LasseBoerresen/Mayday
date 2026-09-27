@@ -51,4 +51,28 @@ public readonly record struct Triangle3(Vector3 v0, Vector3 v1, Vector3 v2)
 
         return false;
     }
+    
+    public bool IsColinear()
+    {
+        var epsilon = 1e-2f;
+        
+        var v01 = v1 - v0;
+        var v02 = v2 - v0;
+
+        var cross = Vector3.Cross(v01, v02);
+
+        // LengthSquared avoids an expensive Math.Sqrt call
+        return cross.LengthSquared() < epsilon * epsilon;
+    }
+    
+    public float Area
+    {
+        get
+        {
+            var v01 = v1 - v0;
+            var v02 = v2 - v0;
+            
+            return Vector3.Cross(v01, v02).Length() * 0.5f;
+        }
+    }
 }

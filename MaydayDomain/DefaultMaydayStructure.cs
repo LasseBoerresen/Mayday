@@ -175,9 +175,12 @@ public class DefaultMaydayStructure : MaydayStructure
             GetPositionsOf(LinkName.Tip).Concat(
             GetPositionsOf(LinkName.FemurMotor));   
                 
+        var tenCentimeterSquaredArea = Area.FromSquareMeters(1e-2);
         var potentialGroundTriangles = potentialGroundPoints
             .Combinations(n: 3)
-            .Map(triplet => Triangle3D.FromList([.. triplet]));
+            .Map(triplet => Triangle3D.FromList([.. triplet]))
+            .Where(triangle => !(triangle.Area < tenCentimeterSquaredArea));
+            
                 
         // Find triangle intersected by centerOfGravityRay with largest distance.
         Ray3D centerOfGravityRay = new(_thoraxOrigin, GravityDirection);
