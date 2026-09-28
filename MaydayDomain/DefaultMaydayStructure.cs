@@ -80,11 +80,11 @@ public class DefaultMaydayStructure : MaydayStructure
     public void MoveThoraxTo(Timed<Motion> motionTimed)
     {
         var verticalTipMovementTimed = motionTimed.Map(motion =>
-            GetVerticalTipMovementWithGroundingAdjustment(motion.Lean));
+            GetTipOffsetsForThoraxLean(motion.Lean));
 
         MoveTipsBy(verticalTipMovementTimed);
 
-        MaydayStructureSet<Xyz> GetVerticalTipMovementWithGroundingAdjustment(Transform lean)
+        MaydayStructureSet<Xyz> GetTipOffsetsForThoraxLean(Transform lean)
         {
             var currentLean = GetCurrentLean();
             var extraLeanRequired = lean - currentLean;
