@@ -8,17 +8,14 @@ using Duration = UnitsNet.Duration;
 namespace MaydayDomain.MotionPlanning;
 
 /// <summary>
-/// adlkfj
+/// Periodically applies the current target of a motion plan to a Mayday structure.
 /// </summary>
 /// <remarks>
-/// A tracking motion planner continuously tracks a goal motion of a structure
-/// part, which may require nonlinear actuator subgoals.
-/// For example, moving a leg tip straight down at a steady pace will require
-/// some joints to move more in the beginning than others. Commanding the
-/// structure to simply move the tip to the end in one go will mean the tip
-/// does not move in a linear fashion towards the goal.
+/// The current implementation tracks thorax lean. Motion plans are sampled at
+/// a fixed interval; movements that require nonlinear actuator subgoals are
+/// not yet split into intermediate steps.
 /// </remarks>
-public class InstantPostureMaydayMotionPlanner 
+public class TrackingMaydayMotionPlanner
     : MaydayMotionPlanner
 {
     // TODO make or run unit test that guarantees that goal sets plan correctly. 
@@ -42,7 +39,7 @@ public class InstantPostureMaydayMotionPlanner
     Task? _trackingTask;
     readonly Duration Period = Duration.FromSeconds(0.2);
 
-    public InstantPostureMaydayMotionPlanner(
+    public TrackingMaydayMotionPlanner(
         MaydayStructure structure, 
         TimeProvider timeProvider)
     {
@@ -68,7 +65,7 @@ public class InstantPostureMaydayMotionPlanner
     public virtual void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)
     {
         throw new NotSupportedException(
-            "This naive motion planner does not support Moving tip positions, only setting joint angles.");
+            "This tracking motion planner does not support moving tip positions.");
     }
 
     public void SetTipPositionsForLegs(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed)

@@ -20,7 +20,7 @@ public class MaydayRobotFactory(LegPostureByPositionMap LegPostureByPositionMap)
         return jointFactoryEff
             .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
-            .Map(structure => new InstantPostureMaydayMotionPlanner(structure, timeProvider))
+            .Map(structure => new TrackingMaydayMotionPlanner(structure, timeProvider))
             .Map(motionPlanner => new TerminalPostureBehaviorController(motionPlanner, terminal, cts.Token, timeProvider))
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }
@@ -33,7 +33,7 @@ public class MaydayRobotFactory(LegPostureByPositionMap LegPostureByPositionMap)
         return jointFactoryEff
             .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
-            .Map(structure => new StepByStepLearningInstantPostureMaydayMotionPlanner(
+            .Map(structure => new StepByStepLearningMaydayMotionPlanner(
                 structure, 
                 new InverseLegKinematicsNeuralNetwortTensorflowNetImpl(),
                 timeProvider))
@@ -49,7 +49,7 @@ public class MaydayRobotFactory(LegPostureByPositionMap LegPostureByPositionMap)
         return jointFactoryEff
             .Map(jointFactory => new MaydayLegFactory(jointFactory, LegPostureByPositionMap))
             .Map(legFactory => new MaydayStructureFactory(legFactory).CreateDefault())
-            .Map(structure => new InstantPostureMaydayMotionPlanner(structure, timeProvider))
+            .Map(structure => new TrackingMaydayMotionPlanner(structure, timeProvider))
             .Map(motionPlanner => new SwayBehaviorController(motionPlanner, cts.Token, timeProvider))
             .Map(behaviorController => new MaydayRobot(behaviorController, cts));
     }

@@ -6,13 +6,13 @@ using Xunit;
 
 namespace Test.Unit.MaydayDomain.MotionPlanning;
 
-[TestSubject(typeof(InstantPostureMaydayMotionPlanner))]
-public class InstantPostureMotionPlannerTestCase
+[TestSubject(typeof(TrackingMaydayMotionPlanner))]
+public class TrackingMaydayMotionPlannerTestCase
 {
     readonly Mock<MaydayStructure> _mockStructure = new();
-    // readonly InstantPostureMaydayMotionPlanner _instantPostureMaydayMotionPlanner;
+    // readonly TrackingMaydayMotionPlanner _trackingMaydayMotionPlanner;
 
-    public InstantPostureMotionPlannerTestCase()
+    public TrackingMaydayMotionPlannerTestCase()
     {
         // _instantPostureMaydayMotionPlanner = new(_mockStructure.Object, new PeriodicScheduler());
     }

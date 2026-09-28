@@ -38,7 +38,7 @@ public class MaydayLegTests
 
     static readonly MaydayStructure structure = new MaydayStructureFactory(legFactory).CreateDefault();
     
-    static readonly MaydayMotionPlanner MotionPlanner = new InstantPostureMaydayMotionPlanner(
+    static readonly MaydayMotionPlanner MotionPlanner = new TrackingMaydayMotionPlanner(
         structure, 
         TimeProvider);
     

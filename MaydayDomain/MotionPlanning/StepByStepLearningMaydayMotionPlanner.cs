@@ -8,11 +8,11 @@ using Duration = UnitsNet.Duration;
 
 namespace MaydayDomain.MotionPlanning;
 
-public class StepByStepLearningInstantPostureMaydayMotionPlanner(
+public class StepByStepLearningMaydayMotionPlanner(
         MaydayStructure structure,
         InverseLegKinematicsNeuralNetwork neuralNetwork,
         TimeProvider timeProvider) 
-    : InstantPostureMaydayMotionPlanner(structure, timeProvider)
+    : TrackingMaydayMotionPlanner(structure, timeProvider)
 {
 
     public override void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)
