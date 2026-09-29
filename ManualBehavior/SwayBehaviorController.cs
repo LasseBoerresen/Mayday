@@ -95,8 +95,8 @@ public class SwayBehaviorController(
                
         var swayAmount = Transform.Random(maxTranslation, maxRotation);
         
-        // TODO just only having random Z movements for now. 
-        swayAmount = swayAmount with { Xyz = swayAmount.Xyz with { X = Length.Zero, Y = Length.Zero } };
+        // Uncomment to just only having random Z movements or other. 
+        // swayAmount = swayAmount with { Xyz = swayAmount.Xyz with { X = Length.Zero, Y = Length.Zero } };
         
         return swayAmount;
     }
