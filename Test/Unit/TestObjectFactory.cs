@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Generic;
+using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using UnitsNet;
@@ -37,6 +38,25 @@ public static class TestObjectFactory
     {
         Assert.True(
             expected.IsAlmostEqual(actual, translationPrecision), 
+            TestMessage(testId, expected, actual));
+    }
+
+    public static void AssertXyzEqual(string testId, Xyz expected, Xyz actual, Length precision)
+    {
+        Assert.True(
+            expected.IsAlmostEqual(actual, precision), 
+            TestMessage(testId, expected, actual));
+    }
+
+    public static void AssertLengthEqual(string testId, Length expected, Length actual)
+    {
+        AssertLengthEqual(testId, expected, actual, translationPrecision);
+    }
+
+    public static void AssertLengthEqual(string testId, Length expected, Length actual, Length precision)
+    {
+        Assert.True(
+            (expected - actual).Abs() <= precision, 
             TestMessage(testId, expected, actual));
     }
     

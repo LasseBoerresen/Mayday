@@ -2,6 +2,7 @@
 using Generic;
 using MaydayDomain;
 using MaydayDomain.Components;
+using MaydayDomain.MotionPlanning;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -125,4 +126,68 @@ public class DefaultMaydayStructureTests
     }
     
     // TODO: Test GetCurrentLean.Z by SetTipPositionsTo() in a circle, but with known Z. 
+
+    [Fact]
+    public void GivenStandingStillMotion_WhenSetStance_ThenEachLegIsGivenItsNominalFootprintInItsOwnFrame()
+    {
+        // Given
+        RecordingLegPostureByPositionMap recordingMap = new();
+        var mayStructure = new MaydayStructureFactory(
+            new MaydayLegFactory(new EchoJointFactory(), recordingMap)).CreateDefault();
+
+        var motion = Motion.StandingStill;
+
+        // When
+        mayStructure.SetStance(Timed<Motion>.Passed(motion));
+
+        // Then
+        var expectedTipPositionsInLegFrames = AllLegIds
+            .Select(legId => Stance.GetTipPositionInThoraxFrameFor(legId, motion).ViewedFrom(legId));
+
+        foreach (var expected in expectedTipPositionsInLegFrames)
+            Assert.Contains(
+                recordingMap.RequestedTipPositions,
+                actual => actual.IsAlmostEqual(expected, Length.FromMillimeters(0.1)));
+    }
+
+    [Fact]
+    public void GivenStanceSetTwice_WhenSetStance_ThenBothRoundsRequestTheSameTipPositions()
+    {
+        // Given
+        RecordingLegPostureByPositionMap recordingMap = new();
+        var mayStructure = new MaydayStructureFactory(
+            new MaydayLegFactory(new EchoJointFactory(), recordingMap)).CreateDefault();
+
+        var motionTimed = Timed<Motion>.Passed(Motion.StandingStill);
+
+        mayStructure.SetStance(motionTimed);
+        var firstRound = recordingMap.RequestedTipPositions.ToList();
+        recordingMap.Clear();
+
+        // When
+        mayStructure.SetStance(motionTimed);
+
+        // Then
+        Assert.Equal(firstRound, recordingMap.RequestedTipPositions);
+    }
+
+    /// <summary>
+    /// Records requested tip positions, so stance geometry can be verified
+    /// without depending on a populated inverse kinematics map.
+    /// </summary>
+    class RecordingLegPostureByPositionMap : LegPostureByPositionMap
+    {
+        readonly List<Xyz> _requestedTipPositions = [];
+
+        public IReadOnlyList<Xyz> RequestedTipPositions => _requestedTipPositions;
+
+        public void Clear() => _requestedTipPositions.Clear();
+
+        public MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)
+        {
+            _requestedTipPositions.Add(tipPosition);
+
+            return currentPosture;
+        }
+    }
 }

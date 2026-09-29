@@ -29,6 +29,12 @@ public interface MaydayStructure
     /// </summary>
     void MoveThoraxTo(Timed<Motion> motionTimed);
 
+    /// <summary>
+    /// Absolutely place all tips at their nominal footprints on flat ground, so
+    /// the thorax ends up leaning as the motion describes. Excludes the twist. 
+    /// </summary>
+    void SetStance(Timed<Motion> motionTimed);
+
     void MoveTipsBy(Timed<Xyz> offsetXyzTimed);
 
     void MoveTipsTo(Timed<MaydayStructureSet<Xyz>> tipPositionsTimed);

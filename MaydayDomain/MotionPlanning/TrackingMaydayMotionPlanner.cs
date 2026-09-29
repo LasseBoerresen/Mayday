@@ -99,6 +99,6 @@ public class TrackingMaydayMotionPlanner
         // other movement components require stepping.
         // Console.WriteLine("MoveThoraxTo: " + goalMotionTimed.Target.Lean.Xyz);
 
-        Structure.MoveThoraxTo(goalMotionTimed.At(_timeProvider.GetUtcNow()));
+        Structure.SetStance(goalMotionTimed.At(_timeProvider.GetUtcNow()));
     }
 }

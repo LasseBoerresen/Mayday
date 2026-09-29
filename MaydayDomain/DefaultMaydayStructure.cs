@@ -106,6 +106,23 @@ public class DefaultMaydayStructure : MaydayStructure
         }
     }
 
+    /// <summary>
+    /// Places every tip at its nominal footprint on flat ground, so the thorax
+    /// ends up at the pose given by <see cref="Motion.Lean"/>.
+    /// </summary>
+    /// <remarks>
+    /// Unlike <see cref="MoveThoraxTo"/>, this is an absolute, feed forward
+    /// placement rather than an incremental correction, so repeating the same
+    /// motion is idempotent and cannot accumulate drift. Ground is assumed flat
+    /// and defined as z = 0 in the ground frame, which removes the need for
+    /// estimating a ground plane and per leg clearances. The goal twist is not
+    /// handled here, since moving away from one spot requires stepping.
+    /// </remarks>
+    public void SetStance(Timed<Motion> motionTimed)
+    {
+        MoveTipsTo(motionTimed.Map(Stance.GetTipPositionsInThoraxFrameFor));
+    }
+
     public void MoveTipsBy(Timed<MaydayStructureSet<Xyz>> offsetXyzsTimed)
     {
         var tipPositionsCurrent = GetPositionsOf(LinkName.Tip);
