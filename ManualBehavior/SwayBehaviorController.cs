@@ -16,7 +16,7 @@ public class SwayBehaviorController(
     TimeProvider timeProvider) 
     : BehaviorController
 {
-    readonly Duration TimeStep = Duration.FromSeconds(10.0);
+    readonly Duration TimeStep = Duration.FromSeconds(2.0);
     
     public Unit Start()
     {
@@ -55,7 +55,7 @@ public class SwayBehaviorController(
 
     Timed<Motion> CreateNewGoal()
     {
-        var goalTimed = timeProvider.ScheduleIn(CreateGoalTowardsCenterWithSway(), TimeStep);
+        var goalTimed = timeProvider.ScheduleIn(CreateGoalTowardsCenterWithSway(), TimeStep/10);
         
         Console.WriteLine("Goal lean: " + goalTimed.Target.Lean.Xyz);
         return goalTimed;
@@ -90,7 +90,7 @@ public class SwayBehaviorController(
 
     static Transform SwayAmount()
     {
-        var maxTranslation = Length.FromMeters(0.08);
+        var maxTranslation = Length.FromMeters(0.07);
         var maxRotation = Angle.Zero; //.FromRevolutions(0.125); // TODO Just starting without rotation randomness to keep it simple. Maybe rotation is buggy. 
                
         var swayAmount = Transform.Random(maxTranslation, maxRotation);
