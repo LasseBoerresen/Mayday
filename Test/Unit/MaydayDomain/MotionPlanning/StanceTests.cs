@@ -35,15 +35,62 @@ public class StanceTests
     }
 
     [Fact]
-    public void GivenStanceRadius_WhenGetFootprint_ThenIsRadiallyOutwardsFromMount()
+    public void GivenStanceRadius_WhenGetFootprint_ThenIsThatRadiusFromThoraxOrigin()
     {
         foreach (var legId in AllLegIds)
         {
-            var mount = Thorax.TransformFor(legId);
             var footprint = Stance.GetFootprintInGroundFrameFor(legId, StanceRadius);
 
             TestObjectFactory.AssertLengthEqual(
-                legId.ToString(), StanceRadius, (footprint - mount.Xyz).Length, Precision);
+                legId.ToString(), StanceRadius, (footprint - Xyz.Zero).Length, Precision);
+        }
+    }
+
+    [Fact]
+    public void GivenStanceRadius_WhenGetFootprint_ThenLiesAtItsOwnLegsAzimuthOnTheStanceCircle()
+    {
+        // Expected footprints derived independently from the leg layout: each
+        // leg stands at its own azimuth, on a circle of StanceRadius centred on
+        // the thorax origin. Deliberately not derived from Thorax.TransformFor,
+        // so an error in the mount geometry cannot make this test agree with a
+        // matching error in the stance calculation.
+        var diagonal = StanceRadius * (Math.Sqrt(2.0) / 2.0);
+
+        Dictionary<MaydayLegId, Xyz> expectedFootprints = new()
+        {
+            { LeftFront, new(diagonal, diagonal, Length.Zero) },
+            { LeftCenter, new(Length.Zero, StanceRadius, Length.Zero) },
+            { LeftBack, new(-diagonal, diagonal, Length.Zero) },
+            { RightFront, new(diagonal, -diagonal, Length.Zero) },
+            { RightCenter, new(Length.Zero, -StanceRadius, Length.Zero) },
+            { RightBack, new(-diagonal, -diagonal, Length.Zero) },
+        };
+
+        foreach (var (legId, expected) in expectedFootprints)
+            TestObjectFactory.AssertXyzEqual(
+                legId.ToString(),
+                expected,
+                Stance.GetFootprintInGroundFrameFor(legId, StanceRadius),
+                Precision);
+    }
+
+    [Fact]
+    public void GivenMountMovedFurtherFromOrigin_WhenGetFootprint_ThenStanceRadiusIsUnchanged()
+    {
+        // The stance radius is measured from the thorax origin, so it must not
+        // drift when the mount geometry is re-measured. This is what made the
+        // real robot stand at 22cm when 15cm was asked for.
+        foreach (var legId in AllLegIds)
+        {
+            var mountDistanceFromOrigin = Thorax.TransformFor(legId).Xyz.Length;
+            var footprint = Stance.GetFootprintInGroundFrameFor(legId, StanceRadius);
+
+            Assert.True(
+                mountDistanceFromOrigin > Length.Zero,
+                $"{legId} mount is expected to be offset from the origin");
+
+            TestObjectFactory.AssertLengthEqual(
+                legId.ToString(), StanceRadius, footprint.Length, Precision);
         }
     }
 
@@ -103,7 +150,7 @@ public class StanceTests
     }
 
     [Fact]
-    public void GivenLargerStanceRadius_WhenGetTipPositions_ThenTipsAreFurtherFromTheirMounts()
+    public void GivenLargerStanceRadius_WhenGetTipPositions_ThenTipsAreThatRadiusFromThoraxOrigin()
     {
         var widerRadius = StanceRadius + Length.FromCentimeters(3);
 
@@ -112,12 +159,25 @@ public class StanceTests
 
         foreach (var legProperty in widerTips.ToLegProperties())
         {
-            var mountXy = Thorax.TransformFor(legProperty.LegId).Xyz;
             var tipXy = legProperty.Value with { Z = Length.Zero };
 
             TestObjectFactory.AssertLengthEqual(
-                legProperty.LegId.ToString(), widerRadius, (tipXy - mountXy).Length, Precision);
+                legProperty.LegId.ToString(), widerRadius, tipXy.Length, Precision);
         }
+    }
+
+    [Fact]
+    public void GivenStanceRadius_WhenGetFootprints_ThenAllLegsAreEquallyFarFromThoraxOrigin()
+    {
+        // Center legs are mounted closer to the origin than front and back legs,
+        // so adding the radius to the mount offset would make the stance an
+        // irregular hexagon rather than a circle.
+        var radii = AllLegIds
+            .Select(legId => Stance.GetFootprintInGroundFrameFor(legId, StanceRadius).Length)
+            .ToList();
+
+        foreach (var radius in radii)
+            TestObjectFactory.AssertLengthEqual("radius", radii.First(), radius, Precision);
     }
 
     [Fact]

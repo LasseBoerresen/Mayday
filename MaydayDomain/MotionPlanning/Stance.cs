@@ -16,15 +16,22 @@ namespace MaydayDomain.MotionPlanning;
 public static class Stance
 {
     /// <summary>
-    /// Where the given leg is supposed to stand on the ground, radially
-    /// outwards from its own coxa motor mount, at the given stance radius.
+    /// Where the given leg is supposed to stand on the ground, at the given
+    /// stance radius from the thorax origin, in the leg's own outward direction.
     /// </summary>
+    /// <remarks>
+    /// The stance radius is measured from the thorax origin, not from the coxa
+    /// motor mount, so all six footprints lie on one circle centred on the body
+    /// and the radius means the same thing for center legs as for front and
+    /// back legs. Each mount is yawed to face directly away from the origin, so
+    /// rotating the x axis by the mount rotation gives the outward radial
+    /// direction.
+    /// </remarks>
     public static Xyz GetFootprintInGroundFrameFor(MaydayLegId legId, Length stanceRadius)
     {
-        var mount = Thorax.TransformFor(legId);
-        var outwards = mount.Q.Rotate(Xyz.Zero with { X = stanceRadius });
+        var outwards = Thorax.TransformFor(legId).Q.Rotate(Xyz.Zero with { X = stanceRadius });
 
-        return (mount.Xyz + outwards) with { Z = Length.Zero };
+        return outwards with { Z = Length.Zero };
     }
 
     /// <summary>
