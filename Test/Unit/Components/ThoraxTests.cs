@@ -13,45 +13,46 @@ public class ThoraxTests
     {
         return new()
         {
-            #region 0. Thorax origin should be directly behind the leg 
+            #region 0. Thorax origin should be behind the leg
+            // Directly behind center legs. Corner legs are yawed 45°, but their mount position lies at ~41.4°
+            // from the thorax origin, so the origin appears slightly to the side.
 
             new(
                 Id: "0.0", 
                 MaydayLegId: MaydayLegId.LeftCenter, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.05, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1, 0, 0)),
                 
             new(
                 Id: "0.1", 
                 MaydayLegId: MaydayLegId.RightCenter, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.05, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1, 0, 0)),
             
             new(
                 Id: "0.2", 
                 MaydayLegId: MaydayLegId.LeftFront, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.0707, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1131, 0.0071, 0)),
                 
             new(
                 Id: "0.3", 
                 MaydayLegId: MaydayLegId.LeftBack, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.0707, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1131, -0.0071, 0)),
             
             new(
                 Id: "0.4", 
                 MaydayLegId: MaydayLegId.RightFront, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.0707, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1131, -0.0071, 0)),
                 
             new(
                 Id: "0.5", 
                 MaydayLegId: MaydayLegId.RightBack, 
                 XyzInThoraxFrame: Xyz.Zero, 
-                XyzInLegFrameExpected: new Xyz(-0.0707, 0, 0)),
+                XyzInLegFrameExpected: new Xyz(-0.1131, 0.0071, 0)),
             
-            // TODO add off center legs with sqr
             #endregion
 
 
