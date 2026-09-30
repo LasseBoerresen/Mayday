@@ -12,6 +12,8 @@ Tests, fakes, and test object mothers; no production API.
 
 Arrange observable behavior with fake joints and controllable inputs.
 
+For cases with several inputs or expected values, follow [ThoraxTests](Components/ThoraxTests.cs): `[MemberData]` provides `TheoryData<TestInput>`, with a test-local record and descriptive member names. Prefer this to positional `[InlineData]` when it improves readability and type safety; retain `[InlineData]` for simple scalar cases.
+
 ## Dependencies
 
 Production projects through `Test.csproj`; xUnit, Moq, and AwesomeAssertions.

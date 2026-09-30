@@ -121,6 +121,8 @@ The codebase was developed using Outside-In Test Driven Development inspired by 
 
 Tests are production assets. Prefer tests that describe observable behavior and preserve existing test intent unless behavior is deliberately changing. Use the existing xUnit conventions, including descriptive `Given...When...Then...` test names, and the assertion and mocking libraries already referenced by the test project (AwesomeAssertions and Moq).
 
+For parameterized tests, prefer `[Theory]` with `[MemberData]` backed by `TheoryData<TestInput>` over positional `[InlineData]` when cases have multiple values or domain-specific inputs. Define `TestInput` close to the test (usually as a test-class-specific record) with descriptive member names for inputs and expected results; use named arguments in cases so their meaning is clear. `Test\Unit\Components\ThoraxTests.cs` is the example: its `TestInput` names the leg, source-frame position, and expected leg-frame position.
+
 The main test project groups tests under `Test\Unit` and `Test\Integration`; shared builders and configuration live under `Test\Utilities` and test object mother folders. Ellie end-to-end tests are under `Ellie\EllieMainTests\EndToEnd`. Reuse these patterns and helpers before adding new test infrastructure.
 
 For behavior changes:
