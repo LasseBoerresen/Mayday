@@ -1,9 +1,15 @@
 ﻿# Mayday
+
 Hexapod robot designed from the bottom up to look organic, with smooth curves and move organically by having motorcontrol trained using a neural network, rather than hard coded as a set of movements. Its purpose is to be. To exist and explore its surroundings.
+
+For architectural decisions, component ownership, historical failures, and guidance for future changes, start with the [Repository Knowledge Index](knowledge/INDEX.md) and [agent workflow](AGENTS.md).
+
+The [architecture map](docs/architecture/README.md) includes an editable dependency diagram and guidance for documenting class and interaction relationships with diagrams.
 
 ![Mayday on display](https://github.com/LasseBoerresen/Mayday/blob/master/Media/_DSC6254.JPG)
 
 ## Architecture and Domain Model
+
 The sofware running Mayday is custom built from first principles, at least within the robotics domain, from high level behavior and decisions design, through kinematics to low level actuator control. 
 
 The software is grouped in 6 main layers, as detailed on the diagram below
@@ -20,6 +26,7 @@ The architecture is based on clean architecture, with an emphasis on decoupling 
 ![Architechture and domain model](https://github.com/LasseBoerresen/Mayday/blob/master/Media/Mayday%20Architecture.jpg)
 
 ## The Code
+
 The code itself is also following clean code priciples and is a fusion of object oriented structure with highly functional computations. The current pure C# version is a total rebuild, closely inspiered of the first python version. Both were test-driven to a high degree. 
 
 [Demo Video](https://youtu.be/liucpPML-Sw)

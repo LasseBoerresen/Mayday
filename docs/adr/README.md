@@ -1,0 +1,12 @@
+# Architectural decision records
+
+ADRs record significant decisions, the alternatives considered, and consequences. Use [the ADR template](../../templates/adr-template.md), assign the next `NNNN-short-title.md` filename, and distinguish accepted policy from proposals. Do not rewrite history: a changed decision needs a new ADR linking its predecessor; mark the old record Superseded and update the [knowledge index](../../knowledge/INDEX.md).
+
+For decisions about dependencies, API relationships, or interactions, add or link a small editable diagram when it makes the tradeoffs clearer. Explicitly label proposed changes versus existing code; [diagram conventions](../architecture/README.md#diagram-conventions) apply.
+
+## Decisions
+
+| ADR | Status | Scope |
+|---|---|---|
+| [0001 - Stable robot abstractions](0001-stable-robot-abstractions.md) | Accepted | Dependency direction across the two robots |
+| [0002 - Hardware access at the adapter boundary](0002-hardware-adapter-boundary.md) | Accepted | Device communication and test substitution |

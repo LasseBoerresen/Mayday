@@ -11,12 +11,28 @@ The system is intended to provide reliable abstractions for interacting with the
 Before making a significant change:
 
 1. Read this file and the root `README.md`.
-2. Read any `README.md` files in the affected project or namespace. At present, the repository also has `Ellie\EllieMain\README.md`; it contains only a heading, so use the source and project references to understand that area.
-3. Inspect the affected project file, neighboring abstractions, callers, and relevant tests.
-4. Trace dependencies across the layers before changing an API or moving a type.
+2. Identify affected components and read their `README.md` files and [knowledge index](knowledge/INDEX.md).
+3. Search [ADRs](docs/adr/README.md), [findings](knowledge/findings/README.md), [root causes](knowledge/root-causes/README.md), [lessons learned](knowledge/lessons-learned/README.md), [pitfalls](knowledge/pitfalls/README.md), [failed attempts](knowledge/failed-attempts/README.md), and [task summaries](knowledge/task-summaries/README.md). Follow links from the index; also search the directories for relevant terms.
+4. Check that the proposed change does not conflict with an existing decision. Inspect the affected project file, neighboring abstractions, callers, and tests; trace dependencies before changing an API or moving a type.
 5. For behavior that can affect physical hardware, understand its operating assumptions and prefer simulation or hardware-independent tests before running it on a robot.
 
 Follow established patterns unless there is a clear architectural reason to change them. Avoid unrelated cleanup, formatting, or broad restructuring in a focused change.
+
+## Repository Memory Workflow
+
+Treat [knowledge/INDEX.md](knowledge/INDEX.md) as the entry point, not as a substitute for reading the underlying records and source. Before proposing a significant change, explain which ADRs, findings, root causes, lessons learned, and pitfalls were consulted (or say none apply), whether an existing decision is being followed, and which documentation must change. Consult failed attempts and task summaries too; distinguish observed facts from proposals and old experiments.
+
+Whenever substantial knowledge is discovered:
+
+1. Update ADRs when decisions change. If superseding an accepted ADR, create a new ADR linking the old one, mark the old one Superseded, and update the index.
+2. Update component READMEs when responsibilities, APIs, boundaries, or invariants change.
+3. Record important discoveries as findings, diagnosed failures as root causes, reusable insights as lessons, recurring mistakes as pitfalls, and abandoned approaches as failed attempts.
+4. Write a task summary for significant completed work, linking related records and follow-up work.
+5. Update the knowledge index and the relevant directory README whenever significant knowledge is added; keep links, statuses, and recent entries current. Preserve historical evidence and do not present hypotheses as proven root causes.
+
+Use the templates in [templates](templates/README.md). Prefer documentation updates in the same change as code: architectural changes are incomplete without documentation. Future work must leave the repository more knowledgeable than before.
+
+Avoid cyclic dependencies, hidden or unnecessary global coupling, crossing documented boundaries, and ignoring prior decisions. Document any architectural deviation and its tradeoffs in an ADR; do not silently treat a current implementation as the intended architecture.
 
 ## Solution Layout
 
@@ -131,6 +147,8 @@ Documentation should explain behavior, purpose, and architectural intent rather 
 - Public methods should have XML documentation describing behavior, expectations, invariants, side effects, and contracts.
 - Interfaces and significant classes should explain their purpose, responsibilities, architectural role, and behavioral semantics.
 - Add or maintain a `README.md` in significant namespace or directory areas. Describe purpose, responsibilities, boundaries, dependency direction, primary abstractions, relationships to neighboring areas, and architectural rationale.
+- Include a diagram when relationships or behavior are easier to understand visually: Mermaid dependency/flow diagrams for architecture, class diagrams for important API relationships, and sequence diagrams for startup, timing, or hardware interactions. Keep diagrams small, labeled, and accompanied by concise text so both humans and AI agents can understand them. Prefer fenced Mermaid in Markdown for inline rendering; PlantUML or another text-based format is fine when it better expresses the model, with a viewable rendering or clear source link where necessary.
+- Update diagrams alongside the behavior or architecture they describe. Distinguish intended architecture from current dependencies and do not depict planned or unimplemented behavior as operational. Avoid duplicating diagrams in every file: link to a maintained diagram when it already explains the component.
 - Update relevant documentation when architecture or externally visible behavior changes.
 - Keep examples and documentation consistent with the current code; do not copy outdated assumptions from old notes or experiments without checking them.
 
@@ -148,3 +166,13 @@ Keep changes focused and reviewable. Separate structural refactoring from behavi
 - A behavior change alters features, algorithms, error handling, hardware capabilities, or robot movement; keep unrelated structural work out of that change.
 
 Avoid mixing broad formatting, file moves, renames, and behavior changes. Prefer a sequence of small commits, each with one clear intent, so reviewers can understand, test, and revert changes independently. Tests and documentation should make the intent and architectural impact clear.
+
+Separate behavior-preserving refactoring commits from functional behavior commits. For commits made as part of a task, use a concise subject and include `Problem:`, `Reason:`, and `Impact:` in the message, stating explicitly when behavior is unchanged. For example:
+
+```text
+refactor: separate reconstruction API dependency
+
+Problem: Scanner dependency leaked into reconstruction layer.
+Reason: Preserve the architectural boundary.
+Impact: No behavioral change.
+```
