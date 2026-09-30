@@ -125,6 +125,8 @@ Tests are production assets. Prefer tests that describe observable behavior and 
 
 For parameterized tests, prefer `[Theory]` with `[MemberData]` backed by `TheoryData<TestInput>` over positional `[InlineData]` when cases have multiple values or domain-specific inputs. Define `TestInput` close to the test (usually as a test-class-specific record) with descriptive member names for inputs and expected results; use named arguments in cases so their meaning is clear. `Test\Unit\Components\ThoraxTests.cs` is the example: its `TestInput` names the leg, source-frame position, and expected leg-frame position.
 
+Prefer parameterized tests over loops when the same behavior or assertion is checked for multiple inputs. Give each case its own `[Theory]` row so failures identify the specific input and cases can be run independently; keep loops only when iteration itself is the behavior under test or when aggregating a result is essential to the assertion.
+
 The main test project groups tests under `Test\Unit` and `Test\Integration`; shared builders and configuration live under `Test\Utilities` and test object mother folders. Ellie end-to-end tests are under `Ellie\EllieMainTests\EndToEnd`. Reuse these patterns and helpers before adding new test infrastructure.
 
 For behavior changes:
