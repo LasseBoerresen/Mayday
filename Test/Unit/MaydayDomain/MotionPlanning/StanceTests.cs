@@ -22,32 +22,18 @@ public class StanceTests
     static Motion StandingStill =>
         MotionWith(Transform.FromXyz(Xyz.Zero with { Z = GroundClearance }));
 
-    [Fact]
-    public void GivenStanceRadius_WhenGetFootprint_ThenIsOnGroundPlane()
-    {
-        foreach (var legId in AllLegIds)
+    public static TheoryData<LegInput> DataForEachLeg =>
+        new()
         {
-            var footprint = Stance.GetFootprintInGroundFrameFor(legId, StanceRadius);
+            new(Id: "LeftFront", LegId: LeftFront),
+            new(Id: "LeftCenter", LegId: LeftCenter),
+            new(Id: "LeftBack", LegId: LeftBack),
+            new(Id: "RightFront", LegId: RightFront),
+            new(Id: "RightCenter", LegId: RightCenter),
+            new(Id: "RightBack", LegId: RightBack),
+        };
 
-            TestObjectFactory.AssertLengthEqual(
-                legId.ToString(), Length.Zero, footprint.Z, Precision);
-        }
-    }
-
-    [Fact]
-    public void GivenStanceRadius_WhenGetFootprint_ThenIsThatRadiusFromThoraxOrigin()
-    {
-        foreach (var legId in AllLegIds)
-        {
-            var footprint = Stance.GetFootprintInGroundFrameFor(legId, StanceRadius);
-
-            TestObjectFactory.AssertLengthEqual(
-                legId.ToString(), StanceRadius, (footprint - Xyz.Zero).Length, Precision);
-        }
-    }
-
-    [Fact]
-    public void GivenStanceRadius_WhenGetFootprint_ThenLiesAtItsOwnLegsAzimuthOnTheStanceCircle()
+    public static TheoryData<FootprintInput> DataFor_GivenStanceRadius_WhenGetFootprint_ThenLiesAtItsOwnLegsAzimuthOnTheStanceCircle()
     {
         // Expected footprints derived independently from the leg layout: each
         // leg stands at its own azimuth, on a circle of StanceRadius centred on
@@ -56,52 +42,92 @@ public class StanceTests
         // matching error in the stance calculation.
         var diagonal = StanceRadius * (Math.Sqrt(2.0) / 2.0);
 
-        Dictionary<MaydayLegId, Xyz> expectedFootprints = new()
+        return new()
         {
-            { LeftFront, new(diagonal, diagonal, Length.Zero) },
-            { LeftCenter, new(Length.Zero, StanceRadius, Length.Zero) },
-            { LeftBack, new(-diagonal, diagonal, Length.Zero) },
-            { RightFront, new(diagonal, -diagonal, Length.Zero) },
-            { RightCenter, new(Length.Zero, -StanceRadius, Length.Zero) },
-            { RightBack, new(-diagonal, -diagonal, Length.Zero) },
+            new(
+                Id: "LeftFront",
+                LegId: LeftFront,
+                ExpectedFootprint: new(diagonal, diagonal, Length.Zero)),
+            new(
+                Id: "LeftCenter",
+                LegId: LeftCenter,
+                ExpectedFootprint: new(Length.Zero, StanceRadius, Length.Zero)),
+            new(
+                Id: "LeftBack",
+                LegId: LeftBack,
+                ExpectedFootprint: new(-diagonal, diagonal, Length.Zero)),
+            new(
+                Id: "RightFront",
+                LegId: RightFront,
+                ExpectedFootprint: new(diagonal, -diagonal, Length.Zero)),
+            new(
+                Id: "RightCenter",
+                LegId: RightCenter,
+                ExpectedFootprint: new(Length.Zero, -StanceRadius, Length.Zero)),
+            new(
+                Id: "RightBack",
+                LegId: RightBack,
+                ExpectedFootprint: new(-diagonal, -diagonal, Length.Zero)),
         };
-
-        foreach (var (legId, expected) in expectedFootprints)
-            TestObjectFactory.AssertXyzEqual(
-                legId.ToString(),
-                expected,
-                Stance.GetFootprintInGroundFrameFor(legId, StanceRadius),
-                Precision);
     }
 
-    [Fact]
-    public void GivenMountMovedFurtherFromOrigin_WhenGetFootprint_ThenStanceRadiusIsUnchanged()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenStanceRadius_WhenGetFootprint_ThenIsOnGroundPlane(LegInput input)
+    {
+        var footprint = Stance.GetFootprintInGroundFrameFor(input.LegId, StanceRadius);
+
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, Length.Zero, footprint.Z, Precision);
+    }
+
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenStanceRadius_WhenGetFootprint_ThenIsThatRadiusFromThoraxOrigin(LegInput input)
+    {
+        var footprint = Stance.GetFootprintInGroundFrameFor(input.LegId, StanceRadius);
+
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, StanceRadius, (footprint - Xyz.Zero).Length, Precision);
+    }
+
+    [Theory]
+    [MemberData(nameof(DataFor_GivenStanceRadius_WhenGetFootprint_ThenLiesAtItsOwnLegsAzimuthOnTheStanceCircle))]
+    public void GivenStanceRadius_WhenGetFootprint_ThenLiesAtItsOwnLegsAzimuthOnTheStanceCircle(FootprintInput input)
+    {
+        TestObjectFactory.AssertXyzEqual(
+            input.Id,
+            input.ExpectedFootprint,
+            Stance.GetFootprintInGroundFrameFor(input.LegId, StanceRadius),
+            Precision);
+    }
+
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenMountMovedFurtherFromOrigin_WhenGetFootprint_ThenStanceRadiusIsUnchanged(LegInput input)
     {
         // The stance radius is measured from the thorax origin, so it must not
         // drift when the mount geometry is re-measured. This is what made the
         // real robot stand at 22cm when 15cm was asked for.
-        foreach (var legId in AllLegIds)
-        {
-            var mountDistanceFromOrigin = Thorax.TransformFor(legId).Xyz.Length;
-            var footprint = Stance.GetFootprintInGroundFrameFor(legId, StanceRadius);
+        var mountDistanceFromOrigin = Thorax.TransformFor(input.LegId).Xyz.Length;
+        var footprint = Stance.GetFootprintInGroundFrameFor(input.LegId, StanceRadius);
 
-            Assert.True(
-                mountDistanceFromOrigin > Length.Zero,
-                $"{legId} mount is expected to be offset from the origin");
+        Assert.True(
+            mountDistanceFromOrigin > Length.Zero,
+            $"{input.LegId} mount is expected to be offset from the origin");
 
-            TestObjectFactory.AssertLengthEqual(
-                legId.ToString(), StanceRadius, footprint.Length, Precision);
-        }
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, StanceRadius, footprint.Length, Precision);
     }
 
-    [Fact]
-    public void GivenStandingStill_WhenGetTipPositions_ThenAllTipsAreGroundClearanceBelowThorax()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenStandingStill_WhenGetTipPositions_ThenAllTipsAreGroundClearanceBelowThorax(LegInput input)
     {
         var tipPositions = Stance.GetTipPositionsInThoraxFrameFor(StandingStill);
 
-        foreach (var legProperty in tipPositions.ToLegProperties())
-            TestObjectFactory.AssertLengthEqual(
-                legProperty.LegId.ToString(), -GroundClearance, legProperty.Value.Z, Precision);
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, -GroundClearance, tipPositions[input.LegId].Z, Precision);
     }
 
     [Fact]
@@ -117,8 +143,9 @@ public class StanceTests
             mean, Precision);
     }
 
-    [Fact]
-    public void GivenLeanForward1cm_WhenGetTipPositions_ThenAllTipsMoveBackward1cm()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenLeanForward1cm_WhenGetTipPositions_ThenAllTipsMoveBackward1cm(LegInput input)
     {
         var offsetX = Length.FromCentimeters(1);
 
@@ -128,13 +155,16 @@ public class StanceTests
             Transform.FromXyz(new Xyz(offsetX, Length.Zero, GroundClearance)));
         var leanedTips = Stance.GetTipPositionsInThoraxFrameFor(leanedForward);
 
-        var expectedTips = standingTips.Map(tip => tip with { X = tip.X - offsetX });
-
-        AssertTipsEqual(expectedTips, leanedTips);
+        TestObjectFactory.AssertXyzEqual(
+            input.Id,
+            standingTips[input.LegId] with { X = standingTips[input.LegId].X - offsetX },
+            leanedTips[input.LegId],
+            Precision);
     }
 
-    [Fact]
-    public void GivenLeanUp1cm_WhenGetTipPositions_ThenAllTipsMoveDown1cm()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenLeanUp1cm_WhenGetTipPositions_ThenAllTipsMoveDown1cm(LegInput input)
     {
         var offsetZ = Length.FromCentimeters(1);
 
@@ -144,40 +174,39 @@ public class StanceTests
             Transform.FromXyz(Xyz.Zero with { Z = GroundClearance + offsetZ }));
         var leanedTips = Stance.GetTipPositionsInThoraxFrameFor(leanedUp);
 
-        var expectedTips = standingTips.Map(tip => tip with { Z = tip.Z - offsetZ });
-
-        AssertTipsEqual(expectedTips, leanedTips);
+        TestObjectFactory.AssertXyzEqual(
+            input.Id,
+            standingTips[input.LegId] with { Z = standingTips[input.LegId].Z - offsetZ },
+            leanedTips[input.LegId],
+            Precision);
     }
 
-    [Fact]
-    public void GivenLargerStanceRadius_WhenGetTipPositions_ThenTipsAreThatRadiusFromThoraxOrigin()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenLargerStanceRadius_WhenGetTipPositions_ThenTipsAreThatRadiusFromThoraxOrigin(LegInput input)
     {
         var widerRadius = StanceRadius + Length.FromCentimeters(3);
 
         var widerMotion = StandingStill with { StanceRadius = widerRadius };
         var widerTips = Stance.GetTipPositionsInThoraxFrameFor(widerMotion);
 
-        foreach (var legProperty in widerTips.ToLegProperties())
-        {
-            var tipXy = legProperty.Value with { Z = Length.Zero };
+        var tipXy = widerTips[input.LegId] with { Z = Length.Zero };
 
-            TestObjectFactory.AssertLengthEqual(
-                legProperty.LegId.ToString(), widerRadius, tipXy.Length, Precision);
-        }
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, widerRadius, tipXy.Length, Precision);
     }
 
-    [Fact]
-    public void GivenStanceRadius_WhenGetFootprints_ThenAllLegsAreEquallyFarFromThoraxOrigin()
+    [Theory]
+    [MemberData(nameof(DataForEachLeg))]
+    public void GivenStanceRadius_WhenGetFootprints_ThenAllLegsAreEquallyFarFromThoraxOrigin(LegInput input)
     {
         // Center legs are mounted closer to the origin than front and back legs,
         // so adding the radius to the mount offset would make the stance an
         // irregular hexagon rather than a circle.
-        var radii = AllLegIds
-            .Select(legId => Stance.GetFootprintInGroundFrameFor(legId, StanceRadius).Length)
-            .ToList();
+        var footprint = Stance.GetFootprintInGroundFrameFor(input.LegId, StanceRadius);
 
-        foreach (var radius in radii)
-            TestObjectFactory.AssertLengthEqual("radius", radii.First(), radius, Precision);
+        TestObjectFactory.AssertLengthEqual(
+            input.Id, StanceRadius, footprint.Length, Precision);
     }
 
     [Fact]
@@ -206,9 +235,7 @@ public class StanceTests
         Assert.Equal(first, second);
     }
 
-    static void AssertTipsEqual(MaydayStructureSet<Xyz> expected, MaydayStructureSet<Xyz> actual)
-    {
-        foreach (var legId in AllLegIds)
-            TestObjectFactory.AssertXyzEqual(legId.ToString(), expected[legId], actual[legId], Precision);
-    }
+    public record LegInput(string Id, MaydayLegId LegId);
+
+    public record FootprintInput(string Id, MaydayLegId LegId, Xyz ExpectedFootprint);
 }
