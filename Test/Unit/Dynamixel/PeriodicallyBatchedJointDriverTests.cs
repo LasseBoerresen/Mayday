@@ -30,8 +30,8 @@ public class PeriodicallyBatchedJointDriverTests : IDisposable
             .Setup(pa => pa.Read(It.IsAny<IEnumerable<Id>>(), It.IsAny<ControlRegister>()))
             .Returns(new Dictionary<Id, uint>());
 
-        // Initialize reads the joint's present and goal position. Unconfigured, the mock reports step 0, which
-        // StepAngle.ToAngle maps just outside the range StepAngle.ToSteps accepts, so the update loop would throw.
+        // Initialize reads the joint's present and goal position. Report the center step, so the joint rests at zero
+        // angle instead of at Moq's default of step 0, which is -0.5 revolutions.
         _communicationBusMock
             .Setup(pa => pa.Read(It.IsAny<Id>(), It.IsAny<ControlRegister>()))
             .Returns(StepAngle.StepCenter);

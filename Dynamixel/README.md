@@ -47,6 +47,8 @@ Keep native SDK calls within this adapter; higher-level code should use stable c
 
 `NativeSerialPortCommunicationBus` serializes operations on its port; preserve lock coverage for shared native state.
 
+`StepAngle` maps XL430 position steps 0 to 4,095 (4,096 counts per revolution, 0.088 degrees per count, center step 2,048) to angles from -0.5 up to, but not including, 0.5 revolutions, and rounds an angle to the nearest step. Every step the actuator can report round-trips through `ToAngle` and `ToSteps`, including both ends of the range. Source: Robotis e-Manual, XL430-W250 control table.
+
 ## Architectural Constraints
 
 Opening ports and enabling/moving motors are explicit hardware actions; do not run casually.
