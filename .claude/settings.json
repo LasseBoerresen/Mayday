@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "PowerShell(dotnet build *)",
+      "PowerShell(dotnet test *)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)"
+    ],
+    "ask": [
+      "Bash(dotnet run *)",
+      "Bash(dotnet user-secrets set *)",
+      "Bash(*Main.exe*)",
+      "Bash(*Main.dll*)",
+      "PowerShell(dotnet run *)",
+      "PowerShell(dotnet user-secrets set *)",
+      "PowerShell(*Main.exe*)",
+      "PowerShell(*Main.dll*)"
+    ]
+  }
+}
