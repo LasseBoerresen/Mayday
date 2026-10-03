@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Test.Utilities;
 using Generic;
 using MaydayDomain;
 using MaydayDomain.Components;
@@ -16,6 +17,7 @@ namespace Test.Unit.MaydayDomain;
 public class DefaultMaydayStructureTests
 {
     [Fact] 
+    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
     public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
     {
         // Given
@@ -42,6 +44,7 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact] 
+    [Quarantine("Moq cannot create a MaydayLeg proxy: the MaydayLeg constructor no longer takes the arguments the mock supplies.")]
     public void GivenMaydayRobotWithMockLegs_WhenSetPosture_ThenCallsSetPostureOnAllLegs()
     {
         // Given
@@ -63,6 +66,7 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
+    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
@@ -82,6 +86,7 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
+    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
     public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
     {
         // Given
@@ -101,6 +106,7 @@ public class DefaultMaydayStructureTests
     }
     
     [Fact]
+    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given

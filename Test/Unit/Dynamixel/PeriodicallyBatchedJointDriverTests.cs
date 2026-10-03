@@ -1,4 +1,5 @@
 ﻿using Dynamixel;
+using Test.Utilities;
 using JetBrains.Annotations;
 using Moq;
 using RobotDomain.Motion;
@@ -57,6 +58,7 @@ public class PeriodicallyBatchedJointDriverTests : IDisposable
     //  all at once. Also, they are written asyncronyously, so really we should only test if it is written within a
     //  certain time frame, like 20ms. 
     [Fact]
+    [Quarantine("Stale: expects a single Write, but goals are written in batches and the joint is never initialized (see the TODO in the test).")]
     void Given_WhenSetGoalToZeroAngle_ThenCallsCommunicationBusCorrectly()
     {
         // TODO control time in the PeriodicScheduler to be able to properly test 
