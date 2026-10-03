@@ -22,7 +22,9 @@ public class TestConfiguration
     {
         return new ConfigurationBuilder()
             .AddEnvironmentVariables()
-            .AddUserSecrets<TestConfiguration>(optional: false)
+            // Optional: a machine without the secrets file, such as a CI runner, has no robot, which
+            // IsRobotConnected treats as not connected. Physical tests still need an explicit 'True' to run.
+            .AddUserSecrets<TestConfiguration>(optional: true)
             .Build();
     }
 }
