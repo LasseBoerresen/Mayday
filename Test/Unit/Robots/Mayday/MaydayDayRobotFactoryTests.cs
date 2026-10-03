@@ -1,12 +1,10 @@
 ﻿using AwesomeAssertions;
-using Test.Utilities;
 using Robots;
 using Test.Integration.Robots.Base;
 using Xunit;
 
 namespace Test.Unit.Robots.Mayday;
 
-[Quarantine(QuarantineReasons.EmptyLegPostureMap)]
 public class MaydayDayRobotFactoryTests
 {
     [Fact]

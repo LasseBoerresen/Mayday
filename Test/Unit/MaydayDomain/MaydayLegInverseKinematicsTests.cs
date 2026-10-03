@@ -12,7 +12,7 @@ using static Test.Unit.TestObjectFactory;
 
 namespace Test.Unit.MaydayDomain;
 
-[Quarantine(QuarantineReasons.EmptyLegPostureMap)]
+[Quarantine("Assertion mismatch on the reached tip position; previously hidden by EmptyMapException, cause not yet diagnosed.")]
 public class MaydayLegInverseKinematicsTests
 {
     readonly MaydayLeg _leg = MaydayLegTests
