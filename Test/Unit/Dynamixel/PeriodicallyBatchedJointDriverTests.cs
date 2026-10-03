@@ -19,6 +19,7 @@ public class PeriodicallyBatchedJointDriverTests : IDisposable
     readonly JointId _id = new(1);
     readonly TimeProvider _timeProvider = TimeProvider.System;
     readonly TimeSpan _updatePeriod = TimeSpan.FromMilliseconds(1);
+    readonly RecordingFatalErrorHandler _fatalErrorHandler = new();
 
     public PeriodicallyBatchedJointDriverTests()
     {
@@ -44,7 +45,38 @@ public class PeriodicallyBatchedJointDriverTests : IDisposable
             jointStateCache, 
             new CancellationTokenSource(),
             _timeProvider,
+            _fatalErrorHandler,
             _updatePeriod);
+    }
+
+    /// <summary>
+    /// The scenario that used to end the whole test host: the bus fails while the driver's loop is running. The
+    /// error now reaches the injected handler, and the test sees it as an ordinary assertion.
+    /// </summary>
+    [Fact]
+    void GivenBusReadThrows_WhenDriverRuns_ThenFatalErrorHandlerReceivesTheException()
+    {
+        // Given
+        var failure = new IOException("the bus failed");
+        Mock<CommunicationBus> failingBusMock = new();
+        failingBusMock
+            .Setup(pa => pa.Read(It.IsAny<IEnumerable<Id>>(), It.IsAny<ControlRegister>()))
+            .Throws(failure);
+        RecordingFatalErrorHandler fatalErrorHandler = new();
+
+        // When
+        using PeriodicallyBatchedJointDriver driver = new(
+            new Driver(failingBusMock.Object),
+            new JointStateCacheDictImpl(),
+            new CancellationTokenSource(),
+            _timeProvider,
+            fatalErrorHandler,
+            _updatePeriod);
+        
+        SpinWait.SpinUntil(() => fatalErrorHandler.Exceptions.Count >= 1, TimeSpan.FromSeconds(10));
+
+        // Then
+        Assert.Contains(failure, fatalErrorHandler.Exceptions);
     }
 
     // The driver runs a periodic update loop from construction. Stop it, or it outlives the test and can fail-fast

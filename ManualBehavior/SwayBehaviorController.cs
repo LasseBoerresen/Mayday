@@ -13,7 +13,8 @@ namespace ManualBehavior;
 public class SwayBehaviorController(
     MaydayMotionPlanner motionPlanner,
     CancellationToken ct,
-    TimeProvider timeProvider) 
+    TimeProvider timeProvider,
+    FatalErrorHandler fatalErrorHandler) 
     : BehaviorController
 {
     readonly Duration TimeStep = Duration.FromSeconds(2.0);
@@ -24,7 +25,7 @@ public class SwayBehaviorController(
 
         motionPlanner.Start(ct);
         
-        PeriodicScheduler periodicScheduler = new(timeProvider);
+        PeriodicScheduler periodicScheduler = new(timeProvider, fatalErrorHandler);
         periodicScheduler.Run(SwayOnce, TimeStep , ct); 
         
         return Unit.Default;

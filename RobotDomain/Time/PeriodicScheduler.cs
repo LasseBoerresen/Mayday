@@ -3,7 +3,16 @@ using Duration = UnitsNet.Duration;
 
 namespace RobotDomain.Time;
 
-public class PeriodicScheduler(TimeProvider timeProvider)
+/// <summary>
+/// Runs an action periodically on a precise cadence, and hands any exception the action throws to the injected
+/// <see cref="FatalErrorHandler"/>.
+/// </summary>
+/// <param name="timeProvider">The clock the cadence is measured with, so tests can control time.</param>
+/// <param name="fatalErrorHandler">
+/// Decides what an exception from the action means. Composition roots that drive a real robot pass
+/// <see cref="FailFastFatalErrorHandler"/>.
+/// </param>
+public class PeriodicScheduler(TimeProvider timeProvider, FatalErrorHandler fatalErrorHandler)
 {
     static readonly HighResolutionWindowsTimerSetting HighHighResolutionWindowsTimerSetting;
     
@@ -36,7 +45,7 @@ public class PeriodicScheduler(TimeProvider timeProvider)
         }
     }
 
-    static void CallActionWithErrorLogging(Action action)
+    void CallActionWithErrorLogging(Action action)
     {
         try
         {
@@ -44,9 +53,7 @@ public class PeriodicScheduler(TimeProvider timeProvider)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in periodic task: {ex.Message}, {ex.StackTrace}");
-            // TODO Perhaps inject injecting an abstraction (like IFatalErrorHandler) with Test and Failfast impls to avoid crashing whole test applicatoin on failure here. 
-            Environment.FailFast("Unobserved task exception", ex);  
+            fatalErrorHandler.Handle(ex);
         }
     }
 

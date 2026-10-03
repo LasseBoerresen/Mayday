@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using RobotDomain.Time;
 using RobotDomain.Geometry;
 using RobotDomain.Motion;
 using RobotDomain.Structures;
@@ -24,18 +25,20 @@ public class DynamixelJointFactory(JointDriver jointDriver) : JointFactory, IDis
     
     public static Eff<DynamixelJointFactory> Create(
         CancellationTokenSource cancellationTokenSource, 
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        FatalErrorHandler fatalErrorHandler)
     {
         var communicationBusEff = NativeSerialPortCommunicationBus.CreateInitialized();
         
         return communicationBusEff.Map(communicationBus => 
-            Create(communicationBus, cancellationTokenSource, timeProvider));
+            Create(communicationBus, cancellationTokenSource, timeProvider, fatalErrorHandler));
     }
 
     static DynamixelJointFactory Create(
         CommunicationBus communicationBus, 
         CancellationTokenSource cancellationTokenSource, 
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        FatalErrorHandler fatalErrorHandler)
     {
         JointStateCacheDictImpl jointStateCache = new();
 
@@ -45,7 +48,8 @@ public class DynamixelJointFactory(JointDriver jointDriver) : JointFactory, IDis
             driver, 
             jointStateCache, 
             cancellationTokenSource, 
-            timeProvider);
+            timeProvider,
+            fatalErrorHandler);
 
         return new DynamixelJointFactory(jointDriver);
     }

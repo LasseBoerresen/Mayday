@@ -28,8 +28,11 @@ public class MaydayLegTests
     
     static readonly TimeProvider TimeProvider = TimeProvider.System;
 
+    // Physical tests drive a real robot, so they keep the production fail-fast behavior.
+    static readonly FatalErrorHandler FatalErrorHandler = new FailFastFatalErrorHandler();
+
     static readonly Eff<JointFactory> jointFactoryEff = DynamixelJointFactory
-        .Create(cts, TimeProvider)
+        .Create(cts, TimeProvider, FatalErrorHandler)
         .Map(JointFactory (djf) => djf);
 
     static readonly MaydayLegFactory legFactory = jointFactoryEff
@@ -40,7 +43,8 @@ public class MaydayLegTests
     
     static readonly MaydayMotionPlanner MotionPlanner = new TrackingMaydayMotionPlanner(
         structure, 
-        TimeProvider);
+        TimeProvider,
+        FatalErrorHandler);
     
     public static TheoryData<string, LinkName, Transform>
         DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()

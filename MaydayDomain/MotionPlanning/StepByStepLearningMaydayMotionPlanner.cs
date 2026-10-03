@@ -11,8 +11,9 @@ namespace MaydayDomain.MotionPlanning;
 public class StepByStepLearningMaydayMotionPlanner(
         MaydayStructure structure,
         InverseLegKinematicsNeuralNetwork neuralNetwork,
-        TimeProvider timeProvider) 
-    : TrackingMaydayMotionPlanner(structure, timeProvider)
+        TimeProvider timeProvider,
+        FatalErrorHandler fatalErrorHandler)
+    : TrackingMaydayMotionPlanner(structure, timeProvider, fatalErrorHandler)
 {
 
     public override void MoveTipPositions(Timed<MaydayStructureSet<Xyz>> tipDeltasTimed)

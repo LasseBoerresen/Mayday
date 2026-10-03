@@ -19,7 +19,8 @@ namespace EllieMain.MotionPlanning;
 /// <param name="wheelDriver"></param>
 public class ArticulatedSteeringEllieMotionPlanner(
     EllieStructure structure,
-    TimeProvider timeProvider) 
+    TimeProvider timeProvider,
+    FatalErrorHandler fatalErrorHandler) 
     : EllieMotionPlanner
 {
     public Option<Timed<Motion>> Goal
@@ -48,7 +49,7 @@ public class ArticulatedSteeringEllieMotionPlanner(
              return;
         isStarted = true;
 
-        PeriodicScheduler periodicScheduler = new(timeProvider);
+        PeriodicScheduler periodicScheduler = new(timeProvider, fatalErrorHandler);
         _trackingTask = periodicScheduler.RunAsync(
             action: ExecutePlanStep, 
             duration: Period, 

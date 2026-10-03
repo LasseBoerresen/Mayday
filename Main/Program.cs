@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using RobotDomain.Time;
 using LanguageExt.Common;
 using LanguageExt.Sys.Live;
 using Main;
@@ -59,7 +60,7 @@ static Eff<MaydayRobotFactory> CreateMaydayRobotFactory<RT>()
     LegPostureByPositionMapFileRepo legPostureByPositionMapFileRepo = new(legPostureByPositionMapFileInfo);
     var legPostureByPositionMap = legPostureByPositionMapFileRepo.Load();
 
-    return Eff<MaydayRobotFactory>.Pure(new(legPostureByPositionMap));
+    return Eff<MaydayRobotFactory>.Pure(new(legPostureByPositionMap, new FailFastFatalErrorHandler()));
 }
 
 Unit PrintErrorToConsole(Error error)

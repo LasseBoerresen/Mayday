@@ -10,6 +10,6 @@ The stable core every robot builds on ([ADR 0001](../docs/adr/0001-stable-robot-
 
 ## Timing (`Time`)
 
-- `PeriodicScheduler` drives the periodic loops. It raises process priority to `High` and calls `Environment.FailFast` on unobserved callback errors; keep both unless the change is about them. Changes to cadence, timer resolution, cancellation, shutdown or priority affect physical motion: state the timing and safety reasoning in the commit `Rationale:`.
+- `PeriodicScheduler` drives the periodic loops. It raises process priority to `High` and hands unobserved callback errors to the `FatalErrorHandler` passed to its constructor; composition roots pass `FailFastFatalErrorHandler`, which calls `Environment.FailFast`. Keep the priority and the fail-fast in production unless the change is about them, and give each periodic planner or driver its handler explicitly from the composition root. Changes to cadence, timer resolution, cancellation, shutdown or priority affect physical motion: state the timing and safety reasoning in the commit `Rationale:`.
 - Planners and drivers take a `TimeProvider` from their caller so tests can control time.
 - `Motion.PeriodicallyBatchedJointDriver` runs at a higher rate than behavior and planning; see `Dynamixel/CLAUDE.md` for the port-serialization rules it relies on.
