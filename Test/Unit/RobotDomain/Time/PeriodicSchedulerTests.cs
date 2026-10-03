@@ -131,6 +131,27 @@ public class PeriodicSchedulerTests : IDisposable
         _fatalErrorHandler.Exceptions.Should().ContainSingle().Which.Should().BeSameAs(failure);
     }
 
+    [Fact]
+    async Task ShouldStopTheLoopAfterTheFatalErrorHandlerReturns()
+    {
+        // Given
+        int calls = 0;
+
+        // When
+        var loop = _periodicScheduler.RunAsync(
+            action: () =>
+            {
+                Interlocked.Increment(ref calls);
+                throw new InvalidOperationException("the periodic action failed");
+            },
+            _schedulerDuration,
+            _cancellationTokenSource.Token);
+        
+        // Then. The loop ends by itself: the clock never advances and the token is never cancelled.
+        await loop.WaitAsync(MaxWaitForScheduler); // Times out, and fails the test, if the loop never ends.
+        Volatile.Read(ref calls).Should().Be(1);
+    }
+
     static void WaitUntil(Func<bool> condition)
     {
         SpinWait.SpinUntil(condition, MaxWaitForScheduler);

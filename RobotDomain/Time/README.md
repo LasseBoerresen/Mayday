@@ -22,7 +22,7 @@ Accept clocks from callers rather than hardcoding time inside planners.
 
 ## Invariants
 
-`PeriodicScheduler` currently changes process priority and hands every exception from its action to the `FatalErrorHandler` it is constructed with, which has no default. Composition roots that drive a real robot pass `FailFastFatalErrorHandler`, which logs and calls `Environment.FailFast`; tests that use a mocked driver pass a recording handler. Physical tests keep `FailFastFatalErrorHandler`.
+`PeriodicScheduler` currently changes process priority and hands every exception from its action to the `FatalErrorHandler` it is constructed with, which has no default. Composition roots that drive a real robot pass `FailFastFatalErrorHandler`, which logs and calls `Environment.FailFast`; tests that use a mocked driver pass a recording handler. Physical tests keep `FailFastFatalErrorHandler`. If a handler returns, which a production handler never does, the loop ends instead of repeating the failure every period.
 
 ## Architectural Constraints
 

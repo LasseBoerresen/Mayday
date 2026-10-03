@@ -28,32 +28,48 @@ public class PeriodicScheduler(TimeProvider timeProvider, FatalErrorHandler fata
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
     }
 
+    /// <summary>
+    /// Starts <see cref="Run"/> on a thread-pool thread. The returned task completes when the loop ends.
+    /// </summary>
     public Task RunAsync(Action action, Duration duration, CancellationToken ct)
     {
         return Task.Run(() => Run(action, duration, ct), ct);
     }
 
+    /// <summary>
+    /// Calls <paramref name="action"/> once per <paramref name="duration"/> until <paramref name="ct"/> is
+    /// cancelled. Cancellation is only checked between periods.
+    /// </summary>
+    /// <remarks>
+    /// If the action throws, the exception goes to the <see cref="FatalErrorHandler"/> and, should the handler
+    /// return, the loop ends instead of repeating the failure every period. A handler used on a real robot ends the
+    /// process and never returns.
+    /// </remarks>
     public void Run(Action action, Duration duration, CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
         {
             var startTime = timeProvider.GetUtcNow();
             
-            CallActionWithErrorLogging(action);
+            if (!TryRunAction(action))
+                return;
             
             Wait(startTime, duration);
         }
     }
 
-    void CallActionWithErrorLogging(Action action)
+    /// <returns>True if the action completed; false if it threw and the error was handed to the handler.</returns>
+    bool TryRunAction(Action action)
     {
         try
         {
             action();
+            return true;
         }
         catch (Exception ex)
         {
             fatalErrorHandler.Handle(ex);
+            return false;
         }
     }
 
