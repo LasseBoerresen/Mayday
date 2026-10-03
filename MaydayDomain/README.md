@@ -38,11 +38,11 @@ Do not infer physical orientation or safe angles from numeric IDs alone; test us
 
 ## Related Findings
 
-[Hardware reference](../knowledge/findings/mayday-domain-hardware-reference.md).
+[Hardware reference](../knowledge/findings/mayday-domain-hardware-reference.md), [Scheduler construction](../knowledge/findings/scheduler-constructed-inside-domain-classes.md)
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md).
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md)
 
 ## Related Lessons Learned
 

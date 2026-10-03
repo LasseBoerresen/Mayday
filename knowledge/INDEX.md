@@ -6,32 +6,43 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 
 - [ADR 0001: Stable robot abstractions](../docs/adr/0001-stable-robot-abstractions.md)
 - [ADR 0002: Hardware access at the adapter boundary](../docs/adr/0002-hardware-adapter-boundary.md)
+- [ADR 0003: Gate pull requests with one aggregate check](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)
+- [ADR 0004: Quarantine failing tests with a trait](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)
+- [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Proposed, not implemented)
 
 ## Architectural Constraints
 
 - Dependencies should point toward stable shared contracts, not from `RobotDomain` into robot-specific projects ([architecture map](../docs/architecture/README.md)). The current `MaydayDomain` hardware reference is a [documented exception](findings/mayday-domain-hardware-reference.md).
 - Physical tests and startup can move real hardware: [physical-run pitfall](pitfalls/physical-runs.md).
 - Port access must remain serialized and scheduler changes require timing/safety review ([Dynamixel](../Dynamixel/README.md), [RobotDomain/Time](../RobotDomain/Time/README.md)).
+- Merges to `master` require the aggregate `gate` check ([ADR 0003](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)).
 
 ## Known Pitfalls
 
 - [Physical runs are not ordinary tests](pitfalls/physical-runs.md)
 - [Using measured angle as every interpolation baseline](pitfalls/interpolation-baseline.md)
+- [Periodic loops in tests](pitfalls/periodic-loops-in-tests.md)
 
 ## Common Root Causes
 
 - [Interpolation drift from a measured-angle baseline](root-causes/interpolation-baseline-drift.md)
+- [Test host crash from scheduler FailFast](root-causes/test-host-crash-from-scheduler-failfast.md)
+- [Step angle conversion used 4,094 counts per revolution](root-causes/step-angle-4094-counts.md)
+- [Empty leg posture map rejected by its own callers](root-causes/empty-leg-posture-map.md)
 
 ## Frequently Used Findings
 
 - [MaydayDomain currently references Dynamixel](findings/mayday-domain-hardware-reference.md)
+- [PeriodicScheduler is constructed inside four production classes](findings/scheduler-constructed-inside-domain-classes.md)
 
 ## Recent Lessons Learned
 
 - [Separate trajectory goals from measured joint state](lessons-learned/goal-versus-measured-state.md)
+- [Make tests able to fail on the bug they guard](lessons-learned/tests-must-discriminate.md)
 
 ## Recently Completed Tasks
 
+- [Gate pull requests and establish a test baseline](task-summaries/pr-gating-and-test-baseline.md)
 - [Migrate agent guidance to CLAUDE.md](task-summaries/claude-md-migration.md)
 - [Repository memory foundation](task-summaries/repository-memory-foundation.md)
 

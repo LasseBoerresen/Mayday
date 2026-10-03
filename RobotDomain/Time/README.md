@@ -30,7 +30,7 @@ Scheduler changes can affect CPU usage and physical motion; never run a hardware
 
 ## Common Pitfalls
 
-Do not replace periodic timing without reviewing deadlines, shutdown, and platform assumptions.
+Do not replace periodic timing without reviewing deadlines, shutdown, and platform assumptions. See also [periodic loops in tests](../../knowledge/pitfalls/periodic-loops-in-tests.md).
 
 ## Related ADRs
 
@@ -38,11 +38,11 @@ Do not replace periodic timing without reviewing deadlines, shutdown, and platfo
 
 ## Related Findings
 
-None recorded.
+[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md)
 
 ## Related Root Causes
 
-[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md).
+[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md)
 
 ## Related Lessons Learned
 
