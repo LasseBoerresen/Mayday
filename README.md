@@ -30,3 +30,9 @@ The architecture is based on clean architecture, with an emphasis on decoupling 
 The code itself is also following clean code priciples and is a fusion of object oriented structure with highly functional computations. The current pure C# version is a total rebuild, closely inspiered of the first python version. Both were test-driven to a high degree. 
 
 [Demo Video](https://youtu.be/liucpPML-Sw)
+
+## Continuous integration
+
+Every pull request to `master` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Its aggregate `gate` job is the single check the `master` ruleset requires; new quality gates are added to the `gate` job's `needs` list.
+
+Currently gated: the solution builds. Planned, in order: unit tests, coverage, complexity, mutation testing.
