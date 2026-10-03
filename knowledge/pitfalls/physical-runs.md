@@ -14,7 +14,7 @@ Tests use `PhysicalRobotFact` or `PhysicalRobotTheory`, or code calls `NativeSer
 
 ## Preferred Approach
 
-Use echo joints, mocks, or hardware-independent tests first. Confirm intended robot, port, environment, and operating conditions before an explicit physical run. See [CLAUDE.md](../../CLAUDE.md#hardware-abstraction-and-safety).
+Use echo joints, mocks, or hardware-independent tests first. Confirm intended robot, port, environment, and operating conditions before an explicit physical run. See [CLAUDE.md](../../CLAUDE.md#hard-rules).
 
 ## Related Components
 

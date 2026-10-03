@@ -1,184 +1,104 @@
-# Repository Guidance
+# Mayday
 
-## Project Purpose
+Mayday is a C# robotics control library and learning platform for two robots: **Mayday**, a hexapod, and **Ellie**, an articulated mobile robot. It covers behavior, motion planning, kinematics, robot structures, actuator control and hardware communication. The goal is reliable abstractions over the physical world, with behavior that is testable and with hardware and algorithms that can be swapped independently.
 
-Mayday is a custom C# robotics control library and experimentation platform for learning robotics and software architecture. It currently targets two robot platforms: Mayday, a hexapod, and Ellie, an articulated mobile robot. The software spans robot behavior, motion planning, kinematics, robot structures, actuator control, and hardware communication.
+Projects with special rules have their own `CLAUDE.md` (`Test`, `Dynamixel`, `RobotDomain`, `Ellie`), which loads when you work there. Every project has a `README.md` describing its responsibility, dependencies and invariants: **read it before changing that project.**
 
-The system is intended to provide reliable abstractions for interacting with the physical world while keeping robot behavior testable and allowing hardware and algorithms to be replaced or experimented with independently.
+## Solution layout
 
-## Start Here
+`Mayday.sln`; projects target `net10.0` with nullable reference types and implicit usings.
 
-Before making a significant change:
-
-1. Read this file and the root `README.md`.
-2. Identify affected components and read their `README.md` files and [knowledge index](knowledge/INDEX.md).
-3. Search [ADRs](docs/adr/README.md), [findings](knowledge/findings/README.md), [root causes](knowledge/root-causes/README.md), [lessons learned](knowledge/lessons-learned/README.md), [pitfalls](knowledge/pitfalls/README.md), [failed attempts](knowledge/failed-attempts/README.md), and [task summaries](knowledge/task-summaries/README.md). Follow links from the index; also search the directories for relevant terms.
-4. Check that the proposed change does not conflict with an existing decision. Inspect the affected project file, neighboring abstractions, callers, and tests; trace dependencies before changing an API or moving a type.
-5. For behavior that can affect physical hardware, understand its operating assumptions and prefer simulation or hardware-independent tests before running it on a robot.
-
-Follow established patterns unless there is a clear architectural reason to change them. Avoid unrelated cleanup, formatting, or broad restructuring in a focused change.
-
-## Repository Memory Workflow
-
-Treat [knowledge/INDEX.md](knowledge/INDEX.md) as the entry point, not as a substitute for reading the underlying records and source. Before proposing a significant change, explain which ADRs, findings, root causes, lessons learned, and pitfalls were consulted (or say none apply), whether an existing decision is being followed, and which documentation must change. Consult failed attempts and task summaries too; distinguish observed facts from proposals and old experiments.
-
-Whenever substantial knowledge is discovered:
-
-1. Update ADRs when decisions change. If superseding an accepted ADR, create a new ADR linking the old one, mark the old one Superseded, and update the index.
-2. Update component READMEs when responsibilities, APIs, boundaries, or invariants change.
-3. Record important discoveries as findings, diagnosed failures as root causes, reusable insights as lessons, recurring mistakes as pitfalls, and abandoned approaches as failed attempts.
-4. Write a task summary for significant completed work, linking related records and follow-up work.
-5. Update the knowledge index and the relevant directory README whenever significant knowledge is added; keep links, statuses, and recent entries current. Preserve historical evidence and do not present hypotheses as proven root causes.
-
-Use the templates in [templates](templates/README.md). Prefer documentation updates in the same change as code: architectural changes are incomplete without documentation. Future work must leave the repository more knowledgeable than before.
-
-Avoid cyclic dependencies, hidden or unnecessary global coupling, crossing documented boundaries, and ignoring prior decisions. Document any architectural deviation and its tradeoffs in an ADR; do not silently treat a current implementation as the intended architecture.
-
-## Solution Layout
-
-`Mayday.sln` contains the main Mayday projects and the Ellie projects. Most projects target `net10.0`, enable nullable reference types and implicit usings, and use the SDK-style C# project format.
-
-| Project or directory | Role |
+| Project | Role |
 |---|---|
-| `RobotDomain` | Shared robot-domain foundation: geometry, links, joints, structures, motion abstractions, behavior abstractions, and timing/scheduling. Keep robot-specific concepts out of this layer. |
-| `MaydayDomain` | Mayday hexapod structure, legs, postures, joint limits, and Mayday motion-planning and kinematics concepts. |
-| `Dynamixel` | Dynamixel actuator adapter, register and unit conversions, driver, and communication bus implementations. |
-| `ManualBehavior` | Manually selected Mayday behaviors, including terminal-driven posture and movement experiments. |
-| `Robots` | Mayday robot assembly and factory/composition code that combines domain, behavior, and driver components. |
-| `Main` | Mayday executable entry point and runtime startup/composition selection. |
-| `MaydayDataAccess` | Mayday-specific persistence and mapping for data such as leg posture-by-position maps. |
-| `Generic` | Shared utilities and system-facing terminal abstractions; keep it foundational and independent of robot-specific layers. |
-| `Test` | Main xUnit project, separated into `Unit` and `Integration` tests, with test utilities and object mothers. |
-| `Ellie\EllieMain` | Ellie-specific structure, behavior, motion planning, composition, and executable entry point. |
+| `RobotDomain` | Shared foundation: geometry, links, joints, structures, motion, behavior, timing. |
+| `MaydayDomain` | Hexapod structure, legs, postures, joint limits, kinematics, motion planning. |
+| `Dynamixel` | Actuator adapter, register/unit conversions, driver, communication bus. |
+| `ManualBehavior` | Manually selected Mayday behaviors, terminal-driven experiments. |
+| `Robots` | Mayday robot assembly and factories. |
+| `Main` | Mayday executable and composition root. **Starts real hardware.** |
+| `MaydayDataAccess` | Mayday persistence, e.g. leg posture-by-position maps. |
+| `Generic` | Shared utilities and terminal abstractions; independent of robot layers. |
+| `Test` | Main xUnit project (`Unit`, `Integration`, `Utilities`). |
+| `Ellie\EllieMain` | Ellie structure, behavior, planning, composition and executable. **Starts real hardware.** |
 | `Ellie\EllieMainTests` | Ellie end-to-end tests. |
-| `DataAccess`, `MauiApp1`, and `Ternimal` | Additional or experimental projects in the solution. Inspect their current code and references before relying on them as part of the primary robot runtime. |
+| `DataAccess`, `Ternimal` | Ancillary; inspect their code and references before relying on them. |
 
-The intended dependency direction follows the architecture described in the root README: stable robot abstractions at the core; robot-specific structure above them; motion planning and behavior above the structure; hardware adapters and concrete composition at the outer edges. The Mayday and Ellie applications are separate robot implementations that reuse shared concepts where appropriate. Avoid introducing dependencies from foundational abstractions toward robot-specific behavior, executable startup, or hardware libraries.
+## Commands
 
-## Architecture and Namespace Boundaries
+```powershell
+dotnet build Mayday.sln
+dotnet test Test\Test.csproj
+dotnet test Ellie\EllieMainTests\EllieMainTests.csproj
+```
 
-The system uses object-oriented domain abstractions together with functional-style transformations and composition in some projects. Preserve the distinction between:
+Run the smallest relevant test project first. Several projects set `TreatWarningsAsErrors`: fix warnings at their cause.
 
-- **Foundational abstractions** such as units-aware geometry, `Joint`, `Link`, motion plans, and timing in `RobotDomain`.
-- **Robot-specific models** such as Mayday legs, structures, postures, and kinematics in `MaydayDomain`, or Ellie structures and planners in `Ellie\EllieMain`.
-- **Behavior and application orchestration**, which chooses goals and connects planning to robot structures.
-- **Adapters and infrastructure**, including Dynamixel communication and data access.
-- **Composition roots**, notably `Main\Program.cs`, robot factories, and `Ellie\EllieMain\Program.cs`, which create concrete implementations and wire dependencies.
+## Hard rules
 
-Types in a namespace root are part of that namespace's public API. Keep the public surface small and intentional. Put implementation details in `Internal` namespaces or corresponding internal folders when useful, and do not make other namespaces depend on those details. Prefer placing a type beside the concept it models rather than accumulating unrelated types in a broad utility namespace.
+- **Physical hardware:** `Main`, `EllieMain` and tests marked `PhysicalRobotFact`/`PhysicalRobotTheory` can move a real robot. Run them only after the user confirms the robot, port and operating conditions in this conversation. Verify motion and driver changes with simulation, echo joints or hardware-independent tests.
+- **Safety limits:** preserve joint limits, velocity limits and other motion constraints when changing motion or driver behavior.
+- **Units:** represent physical quantities with `UnitsNet` types (`Angle`, `Length`, `RotationalSpeed`), never bare numbers.
+- **Focus:** keep each change to its task; leave unrelated formatting, renames and restructuring for their own change.
+- **Prior decisions:** check [ADRs](docs/adr/README.md) before changing a boundary. Record a deliberate deviation in a new ADR with its tradeoffs.
 
-Dependencies should flow from volatile application and hardware code toward stable abstractions. Before adding a project reference, check whether an existing abstraction or project boundary is the right place for the dependency.
+## Architecture
 
-## C# Conventions
+Dependencies point inward toward stable abstractions:
 
-- Follow the surrounding file's style. Existing code commonly uses file-scoped namespaces, PascalCase type and public member names, camelCase locals and parameters, and underscore-prefixed private fields.
-- Keep nullable annotations enabled and address compiler warnings rather than suppressing them. The solution treats warnings as errors in several core and test projects.
-- Use domain types and units for physical quantities. Prefer `UnitsNet` values such as `Angle`, `Length`, and `RotationalSpeed` over unlabelled numeric values when working with physical measurements.
-- Preserve domain value semantics and existing collection choices. Immutable collections are used in parts of the robot model; do not introduce mutable shared state without a clear ownership reason.
-- Follow nearby use of records, primary constructors, collection expressions, `LanguageExt` effects/options, and LINQ rather than introducing a new style without need.
-- Validate configuration and external inputs at boundaries. Make unsupported states explicit with established error or exception patterns instead of hiding failures behind defaults.
-- Keep names consistent with the domain vocabulary already used in the relevant project. Avoid renaming public concepts as incidental cleanup.
+```mermaid
+flowchart LR
+  Composition["Main / Robots / EllieMain<br/>(composition roots)"] --> Behavior["ManualBehavior / Ellie behaviors"]
+  Composition --> Adapters["Dynamixel / DataAccess"]
+  Behavior --> RobotSpecific["MaydayDomain / Ellie structures"]
+  RobotSpecific --> Core["RobotDomain"]
+  Adapters --> Core
+```
 
-## Composition and Dependency Injection
+- `RobotDomain` and `Generic` stay free of robot-specific, startup and hardware-library dependencies. Mayday and Ellie share `RobotDomain` contracts and never reference each other's structure. See [architecture map](docs/architecture/README.md) and its documented exceptions.
+- **Composition roots** (`Main\Program.cs`, `Robots` factories, `Ellie\EllieMain\Program.cs`) construct concrete implementations and own lifecycle resources. Pass dependencies explicitly through constructors; keep hardware initialization in composition roots.
+- **Public surface:** types at a namespace root are that namespace's public API. Put implementation details in an `Internal` namespace/folder, and depend only on another namespace's root types. Place each type beside the concept it models.
+- Before adding a project reference, check whether an existing abstraction already provides the dependency.
 
-Composition roots own construction of concrete implementations and lifecycle resources. Pass dependencies explicitly, preferably through constructors, and make ownership and shutdown responsibilities clear. Avoid service locators, hidden global state, or hardware initialization inside domain logic.
+## C# conventions
 
-Keep business and planning logic independent of how a concrete motor, terminal, clock, or persistence implementation is created. Use interfaces and abstractions at hardware and system boundaries so components can be substituted in tests, simulation, or a different robot build.
-
-Factories in `Robots` and the robot-specific application entry points are natural places to assemble implementations. Extend the established composition flow rather than moving hardware setup into lower-level domain types.
-
-## Hardware Abstraction and Safety
-
-Hardware access is a core boundary. Use interfaces such as the Dynamixel `CommunicationBus` for device communication, and keep vendor/native library calls inside adapter implementations. Higher-level behavior, kinematics, and robot structures should depend on stable abstractions, not on native interop or a particular physical device.
-
-- Keep hardware implementations replaceable and support hardware-independent tests wherever practical.
-- Make operations that enable torque, move actuators, initialize devices, or open communication ports explicit.
-- Validate IDs, configuration, units, and assumptions at boundaries; fail clearly on invalid configuration.
-- Prefer predictable motion and explicit limits. Preserve joint limits, velocity limits, and other safety-related constraints when changing motion or driver behavior.
-- Exercise hardware-dependent behavior in simulation or automated tests first when available. Tests marked with `PhysicalRobotFact` or `PhysicalRobotTheory` may require an actual robot and must not be treated as ordinary hardware-free tests.
-- Do not run physical-hardware tests or startup programs casually; confirm the intended hardware, port, and operating conditions first.
-
-## Threading and Timing
-
-Preserve the existing periodic execution architecture unless a change has a strong, documented reason. The intended responsibilities are separated across startup/composition, behavior selection, motion planning, and actuator/joint driving. `RobotDomain.Time.PeriodicScheduler` provides periodic execution, while the driver and planner abstractions define their own work.
-
-The joint driver can run at a higher frequency than behavior and planning updates. The Dynamixel communication bus serializes access to its underlying port with a lock, including operations that share native communication state. Do not bypass this boundary or make port access concurrent without establishing that the adapter and device protocol support it.
-
-- Give mutable state a clear owner and minimize shared mutable state.
-- Prefer immutable values and explicit handoff between periodic components.
-- Keep concurrency boundaries and cancellation/shutdown behavior understandable.
-- Avoid adding locks unless required; keep any lock scope as small as correctness permits.
-- Document important thread-safety assumptions close to the affected API or implementation.
-- Be cautious when changing scheduler cadence, timer behavior, cancellation, or process/thread priority: timing affects motion control and hardware communication.
+Match the surrounding file: file-scoped namespaces, `_camelCase` private fields, records, primary constructors, collection expressions, `LanguageExt` options/effects and LINQ where nearby code uses them. Keep immutable collections immutable and give any mutable state one clear owner. Validate configuration and external input at boundaries and fail explicitly. Keep the domain vocabulary already used in the project.
 
 ## Testing
 
-The codebase was developed using Outside-In Test Driven Development inspired by *Growing Object-Oriented Software, Guided by Tests*. Re-establish this workflow whenever practical:
+Work **outside-in** (*Growing Object-Oriented Software, Guided by Tests*): an end-to-end or integration test for the behavior, then unit tests for collaborators and edge cases, then the smallest implementation.
 
-1. Express the desired behavior with an end-to-end or integration test.
-2. Add focused unit tests for important collaborators and edge cases.
-3. Implement the smallest change that satisfies the behavior.
+Tests are a second, independent **ledger** of behavior:
+- **Behavior change:** make a test go red against the old behavior, then green with the implementation. Change an existing expectation only when the user confirms the contract changed.
+- **Refactoring:** leave the ledger untouched; existing tests prove behavior is preserved.
 
-Treat tests as a second, independent ledger of the system's behavior: every intentional change to observable behavior should be recorded both in the implementation and in tests that state the expected result. The ledgers balance when tests verify the public contract, including relevant edge cases and failure paths, rather than merely echoing implementation details. For a behavior change, first make the relevant test fail against the old behavior, then make it pass with the implementation. Do not change a failing expectation just to make a changed implementation pass; confirm and record that the intended contract has changed. For refactoring, keep the behavior ledger unchanged and use the existing tests to demonstrate that observable behavior is preserved.
-
-Tests are production assets. Prefer tests that describe observable behavior and preserve existing test intent unless behavior is deliberately changing. Use the existing xUnit conventions, including descriptive `Given...When...Then...` test names, and the assertion and mocking libraries already referenced by the test project (AwesomeAssertions and Moq).
-
-For parameterized tests, prefer `[Theory]` with `[MemberData]` backed by `TheoryData<TestInput>` over positional `[InlineData]` when cases have multiple values or domain-specific inputs. Define `TestInput` close to the test (usually as a test-class-specific record) with descriptive member names for inputs and expected results; use named arguments in cases so their meaning is clear. `Test\Unit\Components\ThoraxTests.cs` is the example: its `TestInput` names the leg, source-frame position, and expected leg-frame position.
-
-Prefer parameterized tests over loops when the same behavior or assertion is checked for multiple inputs. Give each case its own `[Theory]` row so failures identify the specific input and cases can be run independently; keep loops only when iteration itself is the behavior under test or when aggregating a result is essential to the assertion.
-
-The main test project groups tests under `Test\Unit` and `Test\Integration`; shared builders and configuration live under `Test\Utilities` and test object mother folders. Ellie end-to-end tests are under `Ellie\EllieMainTests\EndToEnd`. Reuse these patterns and helpers before adding new test infrastructure.
-
-For behavior changes:
-
-- Update or add tests for the public behavior, edge cases, and relevant failure paths.
-- Use fakes, mocks, echo joints, or other hardware-independent collaborators where appropriate.
-- Keep integration tests deterministic and avoid relying on wall-clock sleeps or real hardware unless the test is explicitly physical.
-- Preserve testability of time-sensitive code by using the existing `TimeProvider` and timing abstractions where appropriate.
-
-Useful commands from the repository root:
-
-```powershell
-dotnet test Test\Test.csproj
-dotnet test Ellie\EllieMainTests\EllieMainTests.csproj
-dotnet build Mayday.sln
-```
-
-Choose the smallest relevant test project first. Running the full solution can include ancillary or platform-specific projects, so target only what the change requires before escalating.
+Details on test conventions are in `Test/CLAUDE.md`.
 
 ## Documentation
 
-Documentation should explain behavior, purpose, and architectural intent rather than merely restating implementation. Keep implementation-specific details close to the implementation.
+- Public methods get XML docs covering behavior, contracts and side effects. Interfaces and significant classes explain their purpose and role.
+- Update the project `README.md` when responsibilities, APIs, boundaries or invariants change, and update diagrams with the behavior they show. Describe current behavior as current and planned behavior as planned.
+- Use fenced Mermaid for diagrams; link an existing diagram instead of duplicating it.
 
-- Public methods should have XML documentation describing behavior, expectations, invariants, side effects, and contracts.
-- Interfaces and significant classes should explain their purpose, responsibilities, architectural role, and behavioral semantics.
-- Add or maintain a `README.md` in significant namespace or directory areas. Describe purpose, responsibilities, boundaries, dependency direction, primary abstractions, relationships to neighboring areas, and architectural rationale.
-- Include a diagram when relationships or behavior are easier to understand visually: Mermaid dependency/flow diagrams for architecture, class diagrams for important API relationships, and sequence diagrams for startup, timing, or hardware interactions. Keep diagrams small, labeled, and accompanied by concise text so both humans and AI agents can understand them. Prefer fenced Mermaid in Markdown for inline rendering; PlantUML or another text-based format is fine when it better expresses the model, with a viewable rendering or clear source link where necessary.
-- Update diagrams alongside the behavior or architecture they describe. Distinguish intended architecture from current dependencies and do not depict planned or unimplemented behavior as operational. Avoid duplicating diagrams in every file: link to a maintained diagram when it already explains the component.
-- Update relevant documentation when architecture or externally visible behavior changes.
-- Keep examples and documentation consistent with the current code; do not copy outdated assumptions from old notes or experiments without checking them.
+## Repository knowledge
 
-## Performance
+[knowledge/INDEX.md](knowledge/INDEX.md) maps ADRs, findings, root causes, lessons, pitfalls, failed attempts and task summaries.
 
-Prioritize readability, maintainability, and correctness over micro-optimization. Do not optimize speculatively; identify and measure a real bottleneck first. If a less readable implementation is justified by measured performance needs, document the reason near the code.
+- **Before non-trivial work:** read the index and the records relevant to the affected area. Name the records you relied on (or say none apply) when proposing the change.
+- **After a real discovery, decision, diagnosed failure, abandoned approach or significant completed task:** propose the records to the user and write them from [templates](templates/README.md) once approved.
 
-Timing and motion loops are safety- and behavior-sensitive, so performance changes there must preserve scheduling and communication correctness and should be validated with appropriate measurements and tests.
+## Commits
 
-## Change and Commit Discipline
+History stays clean and reviewable: **each commit has one intent.** Order refactoring commits before, and separate from, the behavior commits they enable; documentation and tests ship in the same commit as the change they describe.
 
-Keep changes focused and reviewable. Separate structural refactoring from behavior changes whenever practical:
-
-- A refactoring changes structure without changing observable behavior and should leave relevant tests passing.
-- A behavior change alters features, algorithms, error handling, hardware capabilities, or robot movement; keep unrelated structural work out of that change.
-
-Avoid mixing broad formatting, file moves, renames, and behavior changes. Prefer a sequence of small commits, each with one clear intent, so reviewers can understand, test, and revert changes independently. Tests and documentation should make the intent and architectural impact clear.
-
-Separate behavior-preserving refactoring commits from functional behavior commits. For commits made as part of a task, use a concise subject and include `Problem:`, `Reason:`, and `Impact:` in the message, stating explicitly when behavior is unchanged. For example:
+Message format: concise conventional subject (`refactor:`, `feat:`, `fix:`, `test:`, `docs:`, `chore:`), then:
 
 ```text
 refactor: separate reconstruction API dependency
 
 Problem: Scanner dependency leaked into reconstruction layer.
-Reason: Preserve the architectural boundary.
+Rationale: Moving the interface preserves the architectural boundary
+without changing callers, unlike an adapter wrapper.
 Impact: No behavioral change.
 ```
+
+`Rationale:` states why this approach was chosen over the obvious alternatives. `Impact:` says explicitly when behavior is unchanged.
