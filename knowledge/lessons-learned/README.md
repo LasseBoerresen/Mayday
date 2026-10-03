@@ -5,3 +5,4 @@ Use [the lesson template](../../templates/lesson-learned-template.md) to capture
 ## Entries
 
 - [Separate trajectory goals from measured joint state](goal-versus-measured-state.md)
+- [Make tests able to fail on the bug they guard](tests-must-discriminate.md)

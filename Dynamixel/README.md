@@ -59,7 +59,7 @@ Opening ports and enabling/moving motors are explicit hardware actions; do not r
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md).
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
 
 ## Related Findings
 
@@ -67,11 +67,11 @@ Opening ports and enabling/moving motors are explicit hardware actions; do not r
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md).
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Step angle counts](../knowledge/root-causes/step-angle-4094-counts.md), [test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md)
 
 ## Related Lessons Learned
 
-[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md).
+[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md)
 
 ## Related Failed Attempts
 

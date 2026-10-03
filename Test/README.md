@@ -34,11 +34,11 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Common Pitfalls
 
-[Physical runs](../knowledge/pitfalls/physical-runs.md).
+[Physical runs](../knowledge/pitfalls/physical-runs.md), [periodic loops in tests](../knowledge/pitfalls/periodic-loops-in-tests.md)
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md).
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
 
 ## Related Findings
 
@@ -46,11 +46,11 @@ None recorded.
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md).
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../knowledge/root-causes/step-angle-4094-counts.md), [empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md)
 
 ## Related Lessons Learned
 
-[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md).
+[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md)
 
 ## Related Failed Attempts
 

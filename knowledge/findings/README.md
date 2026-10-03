@@ -5,3 +5,4 @@ Record important, evidence-backed discoveries that have not necessarily caused a
 ## Entries
 
 - [MaydayDomain currently references Dynamixel](mayday-domain-hardware-reference.md)
+- [PeriodicScheduler is constructed inside four production classes](scheduler-constructed-inside-domain-classes.md)

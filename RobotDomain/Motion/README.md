@@ -58,11 +58,11 @@ Periodic cadence and cancellation affect motion safety; review before changing t
 
 ## Related Findings
 
-None recorded.
+[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md)
 
 ## Related Root Causes
 
-[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md).
+[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md)
 
 ## Related Lessons Learned
 
