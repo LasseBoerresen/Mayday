@@ -2,7 +2,7 @@
 
 Hexapod robot designed from the bottom up to look organic, with smooth curves and move organically by having motorcontrol trained using a neural network, rather than hard coded as a set of movements. Its purpose is to be. To exist and explore its surroundings.
 
-For architectural decisions, component ownership, historical failures, and guidance for future changes, start with the [Repository Knowledge Index](knowledge/INDEX.md) and [agent workflow](AGENTS.md).
+For architectural decisions, component ownership, historical failures, and guidance for future changes, start with the [Repository Knowledge Index](knowledge/INDEX.md) and [agent workflow](CLAUDE.md).
 
 The [architecture map](docs/architecture/README.md) includes an editable dependency diagram and guidance for documenting class and interaction relationships with diagrams.
 

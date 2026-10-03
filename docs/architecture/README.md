@@ -1,6 +1,6 @@
 # Architecture map
 
-The [root README](../../README.md) describes Mayday's layered design. [AGENTS.md](../../AGENTS.md) describes development constraints; [the knowledge index](../../knowledge/INDEX.md) links decisions, incidents, and component documentation. Read project files for actual references before changing the dependency graph.
+The [root README](../../README.md) describes Mayday's layered design. [CLAUDE.md](../../CLAUDE.md) describes development constraints; [the knowledge index](../../knowledge/INDEX.md) links decisions, incidents, and component documentation. Read project files for actual references before changing the dependency graph.
 
 `Generic` and `RobotDomain` provide shared utilities and robot abstractions. `MaydayDomain` models hexapod structure and planning; `ManualBehavior` selects Mayday goals; `MaydayDataAccess` persists Mayday maps; `Dynamixel` adapts physical actuators. `Robots` assembles Mayday dependencies and `Main` starts the application. `Ellie/EllieMain` contains Ellie's model, planning, behavior and composition. Tests live in `Test` and `Ellie/EllieMainTests`. `DataAccess`, `MauiApp1`, and `Ternimal` are separate/experimental projects; do not assume they are part of either primary runtime.
 
