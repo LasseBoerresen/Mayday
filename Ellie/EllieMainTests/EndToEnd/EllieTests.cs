@@ -30,7 +30,7 @@ public class EllieTests
             PeriodicallyBatchedWheelDriver wheelDriver = new(_actuatorDriverMock.Object);
             DefaultEllieStructure structure = new(wheelDriver);
             
-            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(structure, timeProvider);
+            var motionPlanner = new ArticulatedSteeringEllieMotionPlanner(structure, timeProvider, new RecordingFatalErrorHandler());
             
             var behaviorController = new TerminalMovementBehaviorController(
                 motionPlanner, 

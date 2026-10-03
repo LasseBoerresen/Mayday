@@ -18,6 +18,7 @@ public class PeriodicallyBatchedJointDriver : JointDriver
         JointStateCache jointStateCache,
         CancellationTokenSource cancellationTokenSource,
         TimeProvider timeProvider,
+        FatalErrorHandler fatalErrorHandler,
         TimeSpan? updatePeriod = null)
     {
         _driver = driver;
@@ -26,7 +27,7 @@ public class PeriodicallyBatchedJointDriver : JointDriver
         _timeProvider = timeProvider;
         var _updatePeriod = updatePeriod ?? TimeSpan.FromMilliseconds(20);
 
-        PeriodicScheduler periodicScheduler = new(timeProvider);
+        PeriodicScheduler periodicScheduler = new(timeProvider, fatalErrorHandler);
         _setGoalAngleTask = periodicScheduler.RunAsync(SetGoalAngles, _updatePeriod, cancellationTokenSource.Token);
     }
 

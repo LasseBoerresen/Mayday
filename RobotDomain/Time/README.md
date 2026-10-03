@@ -6,7 +6,7 @@ Schedule periodic work and represent timed targets.
 
 ## Public APIs
 
-`PeriodicScheduler`, `Timed<T>`, `HighResolutionWindowsTimerSetting`.
+`PeriodicScheduler`, `FatalErrorHandler`, `FailFastFatalErrorHandler`, `Timed<T>`, `HighResolutionWindowsTimerSetting`.
 
 ## Key Concepts
 
@@ -22,7 +22,7 @@ Accept clocks from callers rather than hardcoding time inside planners.
 
 ## Invariants
 
-`PeriodicScheduler` currently changes process priority and fail-fasts on callback errors.
+`PeriodicScheduler` currently changes process priority and hands every exception from its action to the `FatalErrorHandler` it is constructed with, which has no default. Composition roots that drive a real robot pass `FailFastFatalErrorHandler`, which logs and calls `Environment.FailFast`; tests that use a mocked driver pass a recording handler. Physical tests keep `FailFastFatalErrorHandler`.
 
 ## Architectural Constraints
 

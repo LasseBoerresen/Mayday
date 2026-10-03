@@ -36,22 +36,25 @@ public class TrackingMaydayMotionPlanner
     
     protected readonly MaydayStructure Structure;
     readonly TimeProvider _timeProvider;
+    readonly FatalErrorHandler _fatalErrorHandler;
     Task? _trackingTask;
     readonly Duration Period = Duration.FromSeconds(0.2);
 
     public TrackingMaydayMotionPlanner(
         MaydayStructure structure, 
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        FatalErrorHandler fatalErrorHandler)
     {
         Structure = structure;
         _timeProvider = timeProvider;
+        _fatalErrorHandler = fatalErrorHandler;
     }
     
     public void Start(CancellationToken ct)
     {
         Action trackingAction = () => Plan.IfSome(TrackGoalOnce);
 
-        PeriodicScheduler periodicScheduler = new(_timeProvider);
+        PeriodicScheduler periodicScheduler = new(_timeProvider, _fatalErrorHandler);
         _trackingTask = periodicScheduler.RunAsync(
                 action: trackingAction, 
                 duration: Period, 

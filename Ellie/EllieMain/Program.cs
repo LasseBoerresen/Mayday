@@ -1,4 +1,5 @@
 ﻿using Dynamixel;
+using RobotDomain.Time;
 using EllieMain;
 using EllieMain.Base;
 using EllieMain.Behaviors;
@@ -43,7 +44,7 @@ Ellie CreateEllie(CommunicationBus communicationBus)
     PeriodicallyBatchedWheelDriver wheelDriver = new(driver);
     DefaultEllieStructure structure = new(wheelDriver);
     
-    ArticulatedSteeringEllieMotionPlanner ellieMotionPlanner = new(structure, timeProvider);
+    ArticulatedSteeringEllieMotionPlanner ellieMotionPlanner = new(structure, timeProvider, new FailFastFatalErrorHandler());
     
     TerminalMovementBehaviorController behaviorController = new(
         ellieMotionPlanner, 

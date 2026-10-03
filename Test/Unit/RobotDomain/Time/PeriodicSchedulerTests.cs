@@ -4,6 +4,7 @@ using AwesomeAssertions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Time.Testing;
 using RobotDomain.Time;
+using Test.Utilities;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,13 +20,14 @@ public class PeriodicSchedulerTests : IDisposable
     readonly ITestOutputHelper _testOutputHelper = new TestOutputHelper();
     readonly FakeTimeProvider _fakeTimeProvider = new();
     readonly CancellationTokenSource _cancellationTokenSource = new();
+    readonly RecordingFatalErrorHandler _fatalErrorHandler = new();
     readonly PeriodicScheduler _periodicScheduler;
     readonly Duration _testGracePeriod = Duration.FromMilliseconds(1);
     readonly Duration _schedulerDuration = Duration.FromSeconds(1);
 
     public PeriodicSchedulerTests()
     {
-        _periodicScheduler = new(_fakeTimeProvider);
+        _periodicScheduler = new(_fakeTimeProvider, _fatalErrorHandler);
 
     }
 
@@ -109,6 +111,24 @@ public class PeriodicSchedulerTests : IDisposable
 
         // Then
         Volatile.Read(ref counter).Should().Be(2);
+    }
+
+    [Fact]
+    void ShouldHandOverAnExceptionFromTheActionToTheFatalErrorHandler()
+    {
+        // Given
+        var failure = new InvalidOperationException("the periodic action failed");
+
+        // When
+        _ = _periodicScheduler.RunAsync(
+            action: () => throw failure,
+            _schedulerDuration,
+            _cancellationTokenSource.Token);
+        
+        WaitUntil(() => _fatalErrorHandler.Exceptions.Count >= 1);
+        
+        // Then
+        _fatalErrorHandler.Exceptions.Should().ContainSingle().Which.Should().BeSameAs(failure);
     }
 
     static void WaitUntil(Func<bool> condition)
