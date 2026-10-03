@@ -4,4 +4,5 @@ For significant completed work, use [the task summary template](../../templates/
 
 ## Entries
 
+- [Migrate agent guidance to CLAUDE.md](claude-md-migration.md)
 - [Repository memory foundation](repository-memory-foundation.md)
