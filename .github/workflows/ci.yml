@@ -23,8 +23,7 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet build Mayday.sln --configuration Release
 
-  # Runs the blocking test set: everything except tests marked [Quarantine]. Deliberately NOT in `gate`'s `needs`
-  # yet: add it there once it has stayed green on a clean runner.
+  # Runs the blocking test set: everything except tests marked [Quarantine]. Part of `gate`.
   test:
     runs-on: windows-latest
     env:
@@ -90,7 +89,7 @@ jobs:
   # GitHub treats a skipped required check as passing.
   gate:
     if: always()
-    needs: [build]
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
       - name: Fail unless every gated job succeeded
