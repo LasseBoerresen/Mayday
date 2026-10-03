@@ -32,7 +32,7 @@ public sealed class QuarantineTraitDiscoverer : ITraitDiscoverer
 /// <summary>Reasons shared by several quarantined tests, so one root cause reads the same everywhere.</summary>
 public static class QuarantineReasons
 {
-    public const string EmptyLegPostureMap =
-        "Test object mother builds an empty LegPostureByPositionMap, which LegPostureByPositionMapDictImpl rejects "
-        + "with EmptyMapException.";
+    public const string EchoLegFactoryEmptyMap =
+        "MaydayLegFactory.NewEchoLegFactory builds its leg factory with LegPostureByPositionMapDictImpl.CreateEmpty(), "
+        + "which always throws EmptyMapException, so the echo structure cannot be created.";
 }

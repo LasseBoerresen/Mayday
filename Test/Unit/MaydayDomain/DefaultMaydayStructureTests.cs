@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using MaydayTestObjectMother = Test.Integration.MaydayDomain.Base.TestObjectMother;
 using Test.Utilities;
 using Generic;
 using MaydayDomain;
@@ -17,13 +18,12 @@ namespace Test.Unit.MaydayDomain;
 public class DefaultMaydayStructureTests
 {
     [Fact] 
-    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
     public void GivenSixUniqueLegs_WhenCreateMaydayRobot_ThenSucceeds()
     {
         // Given
         IList<Connection> connections = [];
         IList<Link> links = [];
-        var legPostureByPositionMap = LegPostureByPositionMapDictImpl.CreateEmpty();
+        var legPostureByPositionMap = MaydayTestObjectMother.LegPostureByPositionMap;
         var thorax = Link.CreateThorax;
 
         Dictionary<MaydayLegId, MaydayLeg> legs = new()
@@ -66,7 +66,7 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
-    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
+    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
@@ -86,7 +86,7 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
-    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
+    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
     public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
     {
         // Given
@@ -106,7 +106,7 @@ public class DefaultMaydayStructureTests
     }
     
     [Fact]
-    [Quarantine(QuarantineReasons.EmptyLegPostureMap)]
+    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given
