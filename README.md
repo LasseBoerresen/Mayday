@@ -35,6 +35,6 @@ The code itself is also following clean code priciples and is a fusion of object
 
 Every pull request to `master` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Its aggregate `gate` job is the single check the `master` ruleset requires; new quality gates are added to the `gate` job's `needs` list.
 
-Currently gated: the solution builds.
+Currently gated: the solution builds, and the `Test` project passes without the tests marked `[Quarantine]` (the `test` job, results uploaded as an artifact).
 
-Run on every pull request but not gated yet: the `test` job (the `Test` project without tests marked `[Quarantine]`, results uploaded as an artifact) and the `quarantined` job (the quarantined tests, expected to fail, reported without blocking so a recovering test is noticed). `test` joins `gate` once it has stayed green on a clean runner. Planned after that, in order: coverage, complexity, mutation testing.
+Run on every pull request but not gated: the `quarantined` job, which runs the quarantined tests (expected to fail) and reports them without blocking, so a recovering test is noticed. `EllieMainTests` is not run in CI while Ellie is work in progress. Planned, in order: coverage, complexity, mutation testing.
