@@ -32,6 +32,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 
 ## Recently Completed Tasks
 
+- [Migrate agent guidance to CLAUDE.md](task-summaries/claude-md-migration.md)
 - [Repository memory foundation](task-summaries/repository-memory-foundation.md)
 
 ## Component Directory
