@@ -84,11 +84,11 @@ Details on test conventions are in `Test/CLAUDE.md`.
 [knowledge/INDEX.md](knowledge/INDEX.md) maps ADRs, findings, root causes, lessons, pitfalls, failed attempts and task summaries.
 
 - **Before non-trivial work:** read the index and the records relevant to the affected area. Name the records you relied on (or say none apply) when proposing the change.
-- **After a real discovery, decision, diagnosed failure, abandoned approach or significant completed task:** propose the records to the user and write them from [templates](templates/README.md) once approved.
+- **After a real discovery, decision, diagnosed failure, abandoned approach or significant completed task:** use the `record-knowledge` skill. It proposes records and waits for approval before writing them.
 
 ## Commits
 
-History stays clean and reviewable: **each commit has one intent.** Order refactoring commits before, and separate from, the behavior commits they enable; documentation and tests ship in the same commit as the change they describe.
+History stays clean and reviewable: **each commit has one intent.** Order refactoring commits before, and separate from, the behavior commits they enable; tests, XML docs and README updates ship in the same commit as the change they describe, while knowledge records go in their own `docs:` commit.
 
 Message format: concise conventional subject (`refactor:`, `feat:`, `fix:`, `test:`, `docs:`, `chore:`), then:
 
