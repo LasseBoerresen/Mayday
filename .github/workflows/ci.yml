@@ -23,6 +23,67 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet build Mayday.sln --configuration Release
 
+  # Runs the blocking test set: everything except tests marked [Quarantine]. Deliberately NOT in `gate`'s `needs`
+  # yet: add it there once it has stayed green on a clean runner.
+  test:
+    runs-on: windows-latest
+    env:
+      # No robot is attached to a runner. Say so explicitly so a physical test can never try to move one.
+      MAYDAY_ROBOT_IS_CONNECTED: "False"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Unit tests, quarantined tests excluded
+        run: >
+          dotnet test Test/Test.csproj --configuration Release --filter "Quarantine!=true"
+          --logger "trx;LogFileName=test.trx" --results-directory TestResults
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults
+
+  # Runs the quarantined tests, which are expected to fail, without blocking anything. The point is to notice
+  # when one starts passing, so its [Quarantine] attribute can be removed.
+  quarantined:
+    runs-on: windows-latest
+    env:
+      MAYDAY_ROBOT_IS_CONNECTED: "False"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Quarantined tests, expected to fail
+        continue-on-error: true
+        run: >
+          dotnet test Test/Test.csproj --configuration Release --filter "Quarantine=true"
+          --logger "trx;LogFileName=quarantined.trx" --results-directory TestResults
+      - name: Report quarantined tests
+        if: always()
+        shell: pwsh
+        run: |
+          $file = 'TestResults/quarantined.trx'
+          if (-not (Test-Path $file)) {
+            Write-Output '::warning::No quarantined test results were produced'
+            exit 0
+          }
+          [xml]$trx = Get-Content $file
+          $counters = $trx.TestRun.ResultSummary.Counters
+          $passed = [int]$counters.passed
+          $failed = [int]$counters.failed
+          "Quarantined tests: $failed failing, $passed passing" | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          if ($passed -gt 0) {
+            Write-Output "::warning::$passed quarantined test(s) now pass. Remove their [Quarantine] attribute."
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quarantined-results
+          path: TestResults
+
   # The only check the master ruleset requires. Add each new gate to `needs`
   # so the ruleset never has to change. `always()` keeps this job running when
   # a dependency fails; without it a failed dependency would skip the gate, and
