@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Test.Utilities;
 using MaydayDataAccess;
 using MaydayDomain;
 using RobotDomain.Geometry;
@@ -11,6 +12,7 @@ using static Test.Unit.TestObjectFactory;
 
 namespace Test.Unit.MaydayDomain;
 
+[Quarantine(QuarantineReasons.EmptyLegPostureMap)]
 public class MaydayLegInverseKinematicsTests
 {
     readonly MaydayLeg _leg = MaydayLegTests

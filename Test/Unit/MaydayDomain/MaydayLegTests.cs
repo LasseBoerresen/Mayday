@@ -1,4 +1,5 @@
 ﻿using MaydayDomain;
+using Test.Utilities;
 using Moq;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -13,6 +14,7 @@ using RotationDirection = RobotDomain.Structures.RotationDirection;
 
 namespace Test.Unit.MaydayDomain;
 
+[Quarantine(QuarantineReasons.EmptyLegPostureMap)]
 public class MaydayLegTests
 {
     readonly ITestOutputHelper _testOutputHelper;

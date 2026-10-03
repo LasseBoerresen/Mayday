@@ -12,6 +12,8 @@ Mayday and shared-layer xUnit unit/integration tests and test utilities.
 
 Hardware-independent tests by default; physical tests explicitly marked `PhysicalRobotFact`/`PhysicalRobotTheory`.
 
+A test known to fail is marked `[Quarantine("reason")]` (`Utilities/QuarantineAttribute.cs`), on the method or the class. It gets the trait `Quarantine=true`, so `dotnet test --filter "Quarantine!=true"` is the blocking run and `--filter "Quarantine=true"` lists what is still broken. Quarantine records a failure with its cause; it never changes what a test expects. Fix the test or the code, then remove the attribute.
+
 For multi-value or domain-specific parameterized cases, prefer a test-specific `TheoryData<TestInput>` with named `TestInput` members over positional `[InlineData]`. See [ThoraxTests](Unit/Components/ThoraxTests.cs) and the [test guidance](CLAUDE.md).
 
 ## Dependencies
