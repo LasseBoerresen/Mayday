@@ -20,13 +20,13 @@ When this was decided, 46 of 212 tests in `Test` failed and one crashed the test
 
 ## Why
 
-Quarantined tests still run, in their own non-blocking step (planned), so recovery shows up. Releasing tests as causes were fixed is observable: after the empty-map fix 36 of the 46 left quarantine, and two of the released tests revealed real assertion mismatches that the exception had hidden. They were quarantined again with their true reason.
+Quarantined tests still run, in their own non-blocking `quarantined` CI job, so recovery shows up. Releasing tests as causes were fixed is observable: after the empty-map fix 36 of the 46 left quarantine, and two of the released tests revealed real assertion mismatches that the exception had hidden. They were quarantined again with their true reason.
 
 ## Consequences
 
 - Benefits: a trustworthy blocking set (198 passed, 0 failed, 9 skipped after the echo fix); every known failure carries a reason in code.
 - Costs: the attribute can be abused to hide a regression. Tagging a test is a review point, and the planned gate-file protection should cover it.
-- Limitations: eight tests are quarantined today. The separate non-blocking CI step does not exist yet. `EllieMainTests` has two pre-existing failures with no quarantine.
+- Limitations: eight tests are quarantined today. The `quarantined` job reports how many still fail and warns when one passes. `EllieMainTests` has two pre-existing failures with no quarantine.
 
 ## Related Components
 

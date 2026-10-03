@@ -12,6 +12,8 @@
 - **Empty map:** a non-empty map for tests (`5db9c38`) and production `CreateNeutral` for the echo factory (`abf6a02`). 36 tests left quarantine, then two more. See [the root cause](../root-causes/empty-leg-posture-map.md).
 - **Step angle:** the 4,096-counts correction, pull request #26, merged as `88cc705`. See [the root cause](../root-causes/step-angle-4094-counts.md).
 
+- **Test job:** `test` and `quarantined` jobs (`4326f74`) and `test` required by the gate (`69f34c4`). Their first clean-runner runs failed 8 tests; fixed by `f6b788e` and `c756cba`. See [the root cause](../root-causes/tests-failing-only-on-a-clean-runner.md).
+
 State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 passed, 9 skipped, 0 failed, identical across repeated runs. Eight tests stay quarantined.
 
 ## Decisions Made
@@ -31,8 +33,7 @@ State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 
 
 ## Follow-up Work
 
-- Add a non-blocking test job running `--filter "Quarantine=true"`, a blocking one for `Quarantine!=true`, and add it to `gate`. Check that `TestConfiguration.Create()` (`AddUserSecrets(optional: false)`) does not throw on a clean runner; this is unverified.
-- Quarantine or fix the two `EllieMainTests` failures that exist on `master`.
+- `EllieMainTests` has two failures that exist on `master` and is not run in CI while Ellie is work in progress.
 - Diagnose the eight quarantined tests: three `Q` validation failures, a Moq proxy mismatch, the stale driver test, a `TransformTests` mismatch, the inverse-kinematics mismatch, and the lean mismatch.
 - Implement the `Tier` trait, the fatal-error handler, the quality gates, the agent workflow and its protections.
 - `Main` has compiler warnings (for example an unused local function) because it does not set `TreatWarningsAsErrors`; a stricter `-warnaserror` build also fails in `EllieMain`.
@@ -43,11 +44,11 @@ State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 
 
 ## Related Findings
 
-[PeriodicScheduler is constructed inside four production classes](../findings/scheduler-constructed-inside-domain-classes.md)
+[PeriodicScheduler is constructed inside four production classes](../findings/scheduler-constructed-inside-domain-classes.md), [Wait ignores cancellation](../findings/periodic-scheduler-wait-ignores-cancellation.md)
 
 ## Related Root Causes
 
-[Test host crash](../root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../root-causes/step-angle-4094-counts.md), [empty leg posture map](../root-causes/empty-leg-posture-map.md)
+[Test host crash](../root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../root-causes/step-angle-4094-counts.md), [empty leg posture map](../root-causes/empty-leg-posture-map.md), [clean-runner failures](../root-causes/tests-failing-only-on-a-clean-runner.md)
 
 ## Related Lessons Learned
 

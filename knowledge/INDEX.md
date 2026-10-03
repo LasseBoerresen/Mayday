@@ -29,11 +29,13 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Test host crash from scheduler FailFast](root-causes/test-host-crash-from-scheduler-failfast.md)
 - [Step angle conversion used 4,094 counts per revolution](root-causes/step-angle-4094-counts.md)
 - [Empty leg posture map rejected by its own callers](root-causes/empty-leg-posture-map.md)
+- [Tests that passed locally failed on a clean CI runner](root-causes/tests-failing-only-on-a-clean-runner.md)
 
 ## Frequently Used Findings
 
 - [MaydayDomain currently references Dynamixel](findings/mayday-domain-hardware-reference.md)
 - [PeriodicScheduler is constructed inside four production classes](findings/scheduler-constructed-inside-domain-classes.md)
+- [PeriodicScheduler.Wait ignores cancellation](findings/periodic-scheduler-wait-ignores-cancellation.md)
 
 ## Recent Lessons Learned
 

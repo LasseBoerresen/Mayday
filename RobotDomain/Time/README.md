@@ -38,11 +38,11 @@ Do not replace periodic timing without reviewing deadlines, shutdown, and platfo
 
 ## Related Findings
 
-[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md)
+[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md), [Wait ignores cancellation](../../knowledge/findings/periodic-scheduler-wait-ignores-cancellation.md)
 
 ## Related Root Causes
 
-[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md)
+[Interpolation drift](../../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [Clean-runner failures](../../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md)
 
 ## Related Lessons Learned
 
