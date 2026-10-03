@@ -12,7 +12,7 @@ Mayday and shared-layer xUnit unit/integration tests and test utilities.
 
 Hardware-independent tests by default; physical tests explicitly marked `PhysicalRobotFact`/`PhysicalRobotTheory`.
 
-For multi-value or domain-specific parameterized cases, prefer a test-specific `TheoryData<TestInput>` with named `TestInput` members over positional `[InlineData]`. See [ThoraxTests](Unit/Components/ThoraxTests.cs) and the [testing guidance](../AGENTS.md#testing).
+For multi-value or domain-specific parameterized cases, prefer a test-specific `TheoryData<TestInput>` with named `TestInput` members over positional `[InlineData]`. See [ThoraxTests](Unit/Components/ThoraxTests.cs) and the [testing guidance](../CLAUDE.md#testing).
 
 ## Dependencies
 

@@ -1,6 +1,6 @@
 # Repository Knowledge Index
 
-Start here before significant work. Read [AGENTS.md](../AGENTS.md), the affected [component READMEs](#component-directory), and the underlying records; this index is a map, not a substitute for evidence. Search all record directories for related concepts. Whenever significant knowledge is added or an ADR changes status, update this index and the corresponding directory README in the same change. Keep links and "recent" lists current; do not invent history to populate a section.
+Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected [component READMEs](#component-directory), and the underlying records; this index is a map, not a substitute for evidence. Search all record directories for related concepts. Whenever significant knowledge is added or an ADR changes status, update this index and the corresponding directory README in the same change. Keep links and "recent" lists current; do not invent history to populate a section.
 
 ## Most Important Architectural Decisions
 

@@ -2,7 +2,7 @@
 
 ## Problem
 
-Architecture guidance and historical observations lived mainly in `README.md`, `AGENTS.md`, and `DevLog.md` without an indexed, repeatable way to preserve decisions and failure analysis.
+Architecture guidance and historical observations lived mainly in `README.md`, `AGENTS.md` (since renamed to `CLAUDE.md`), and `DevLog.md` without an indexed, repeatable way to preserve decisions and failure analysis.
 
 ## Solution
 
