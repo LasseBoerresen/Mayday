@@ -21,7 +21,7 @@ The four `new PeriodicScheduler(...)` call sites above; `RobotDomain/Time/Period
 
 ## Recommendation
 
-The owner chose to pass a fatal-error handler through the constructors from the composition roots, in line with the repository rule to pass dependencies explicitly. The handler would default to today's `FailFast` behavior in production and let tests record the error. **This is planned and not implemented.** It touches control-loop code, so its commit needs timing and safety reasoning.
+The owner chose to pass a fatal-error handler through the constructors from the composition roots, in line with the repository rule to pass dependencies explicitly. **This was implemented in `cc9ab54` and `7eced7a`.** The handler has no default: `Main` and `EllieMain` pass `FailFastFatalErrorHandler`, which keeps today's production behavior, tests with a mocked driver pass a recording handler, and physical tests keep fail-fast. A handler that returns ends the loop. The change touched control-loop code and left cadence, priority, the wait loop and cancellation alone.
 
 ## Related Components
 

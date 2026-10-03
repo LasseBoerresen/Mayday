@@ -42,7 +42,7 @@ Three things combined:
 
 - `813fa03` configured `Read` on the mock. It was not enough: it only moved the crash to the second source. This attempt assumed a single cause, and the `Test` project kept aborting.
 - `d69284f` gave the mock a joint at the center step and made the test class dispose the driver. The full run then completed identically on repeated runs.
-- Planned: inject a fatal-error handler through the constructors ([finding](../findings/scheduler-constructed-inside-domain-classes.md)). It is not implemented.
+- `cc9ab54` injected a `FatalErrorHandler` through the constructors ([finding](../findings/scheduler-constructed-inside-domain-classes.md)), so a test with a mocked driver records a loop error instead of ending the host. `7eced7a` makes the loop stop once a handler returns. Production and physical tests still use `FailFastFatalErrorHandler`.
 
 ## Prevention
 

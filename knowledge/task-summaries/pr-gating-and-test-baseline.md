@@ -14,7 +14,9 @@
 
 - **Test job:** `test` and `quarantined` jobs (`4326f74`) and `test` required by the gate (`69f34c4`). Their first clean-runner runs failed 8 tests; fixed by `f6b788e` and `c756cba`. See [the root cause](../root-causes/tests-failing-only-on-a-clean-runner.md).
 
-State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 passed, 9 skipped, 0 failed, identical across repeated runs. Eight tests stay quarantined.
+- **Fatal-error handler:** `FatalErrorHandler` injected into `PeriodicScheduler` (`cc9ab54`), and the loop stops when a handler returns (`7eced7a`).
+
+State after `7eced7a`: `dotnet test Test --filter "Quarantine!=true"` gives 212 passed, 9 skipped, 0 failed, identical across repeated runs. Eight tests stay quarantined.
 
 ## Decisions Made
 
@@ -23,7 +25,7 @@ State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 
 - Coverage and complexity start as ratchets from their current level, kept in a committed thresholds file raised by hand. Complexity limits are strict everywhere with a suppression baseline. Mutation testing starts non-blocking.
 - Agent runs go through the same `gate`, trigger only on `@claude` mentions or manual dispatch restricted to the owner, with spend caps, and get stricter thresholds. A `CODEOWNERS` file and a check protect the gate files from agent edits. A Claude Code hook runs build and unit tests on `Stop` and before `git push`. All of this is planned.
 - Test tiers (`Tier=Physical`, later simulated) per [ADR 0005](../../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md), Proposed.
-- A fatal-error handler passed through the constructors ([finding](../findings/scheduler-constructed-inside-domain-classes.md)), planned.
+- A fatal-error handler passed through the constructors ([finding](../findings/scheduler-constructed-inside-domain-classes.md)): implemented in `cc9ab54` and `7eced7a`.
 
 ## Tradeoffs
 
@@ -35,7 +37,7 @@ State after `88cc705`: `dotnet test Test --filter "Quarantine!=true"` gives 209 
 
 - `EllieMainTests` has two failures that exist on `master` and is not run in CI while Ellie is work in progress.
 - Diagnose the eight quarantined tests: three `Q` validation failures, a Moq proxy mismatch, the stale driver test, a `TransformTests` mismatch, the inverse-kinematics mismatch, and the lean mismatch.
-- Implement the `Tier` trait, the fatal-error handler, the quality gates, the agent workflow and its protections.
+- Implement the `Tier` trait, the quality gates (coverage, complexity, mutation testing), the agent workflow and its protections.
 - `Main` has compiler warnings (for example an unused local function) because it does not set `TreatWarningsAsErrors`; a stricter `-warnaserror` build also fails in `EllieMain`.
 
 ## Related ADRs
