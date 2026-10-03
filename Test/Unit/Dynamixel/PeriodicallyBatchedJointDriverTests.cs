@@ -11,7 +11,7 @@ using RotationDirection = RobotDomain.Structures.RotationDirection;
 namespace Test.Unit.Dynamixel;
 
 [TestSubject(typeof(PeriodicallyBatchedJointDriver))]
-public class PeriodicallyBatchedJointDriverTests
+public class PeriodicallyBatchedJointDriverTests : IDisposable
 {
     readonly Mock<CommunicationBus> _communicationBusMock = new();
     readonly PeriodicallyBatchedJointDriver _JointDriver;
@@ -29,6 +29,12 @@ public class PeriodicallyBatchedJointDriverTests
             .Setup(pa => pa.Read(It.IsAny<IEnumerable<Id>>(), It.IsAny<ControlRegister>()))
             .Returns(new Dictionary<Id, uint>());
 
+        // Initialize reads the joint's present and goal position. Unconfigured, the mock reports step 0, which
+        // StepAngle.ToAngle maps just outside the range StepAngle.ToSteps accepts, so the update loop would throw.
+        _communicationBusMock
+            .Setup(pa => pa.Read(It.IsAny<Id>(), It.IsAny<ControlRegister>()))
+            .Returns(StepAngle.StepCenter);
+
         Driver driver = new(_communicationBusMock.Object);
         JointStateCacheDictImpl jointStateCache = new();
         
@@ -38,6 +44,13 @@ public class PeriodicallyBatchedJointDriverTests
             new CancellationTokenSource(),
             _timeProvider,
             _updatePeriod);
+    }
+
+    // The driver runs a periodic update loop from construction. Stop it, or it outlives the test and can fail-fast
+    // the whole test host long after this test has finished.
+    public void Dispose()
+    {
+        _JointDriver.Dispose();
     }
 
     // TODO: This test is no longer correct, because portAdapter is no longer called to write single goal angles, but 
