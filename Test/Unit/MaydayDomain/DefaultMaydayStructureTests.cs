@@ -66,7 +66,6 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
-    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
     public void GivenMaydayStructure_WhenGetTransformsOfCoxaMotors_ThenReturnsCorrectTransformsInThoraxFrame()
     {
         // Given
@@ -86,7 +85,6 @@ public class DefaultMaydayStructureTests
     }
 
     [Fact]
-    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
     public void GivenStructureWithStandingPosture__WhenGetCurrentLean__ThenIsZero()
     {
         // Given
@@ -106,7 +104,7 @@ public class DefaultMaydayStructureTests
     }
     
     [Fact]
-    [Quarantine(QuarantineReasons.EchoLegFactoryEmptyMap)]
+    [Quarantine("Assertion mismatch: expected a 1 cm forward lean (X 0.010) but the lean X is 0; previously hidden by EmptyMapException, cause not yet diagnosed.")]
     public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
     {
         // Given

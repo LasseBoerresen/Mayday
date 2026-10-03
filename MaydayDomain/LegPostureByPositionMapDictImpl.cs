@@ -34,8 +34,14 @@ public record LegPostureByPositionMapDictImpl : LegPostureByPositionMap
         }
     }
 
-    public static LegPostureByPositionMap CreateEmpty() => 
-        new LegPostureByPositionMapDictImpl(new Dictionary<Xyz, List<MaydayLegPosture>>());
+    /// <summary>
+    /// A map with a single mapping, from the origin to <see cref="MaydayLegPosture.Neutral"/>, for legs that
+    /// never need real posture lookups, such as echo legs. Any other tip position falls back to the current posture.
+    /// </summary>
+    /// <remarks>An empty map is rejected with <see cref="EmptyMapException"/>, so it cannot stand in here.</remarks>
+    public static LegPostureByPositionMap CreateNeutral() =>
+        new LegPostureByPositionMapDictImpl(
+            new Dictionary<Xyz, List<MaydayLegPosture>> { [Xyz.Zero] = [MaydayLegPosture.Neutral] });
 
     /// <Inheritdoc />
     public MaydayLegPosture GetFor(Xyz tipPosition, MaydayLegPosture currentPosture)

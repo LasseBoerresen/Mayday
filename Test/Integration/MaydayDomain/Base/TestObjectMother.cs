@@ -1,5 +1,4 @@
 ﻿using MaydayDomain;
-using RobotDomain.Geometry;
 
 namespace Test.Integration.MaydayDomain.Base;
 
@@ -12,6 +11,5 @@ public class TestObjectMother : Unit.Base.TestObjectMother
     /// are unaffected.
     /// </summary>
     internal static LegPostureByPositionMap LegPostureByPositionMap
-        => new LegPostureByPositionMapDictImpl(
-            new Dictionary<Xyz, List<MaydayLegPosture>> { [Xyz.Zero] = [MaydayLegPosture.Neutral] });
+        => LegPostureByPositionMapDictImpl.CreateNeutral();
 }
