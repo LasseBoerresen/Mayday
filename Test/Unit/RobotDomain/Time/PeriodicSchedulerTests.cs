@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using AwesomeAssertions;
 using JetBrains.Annotations;
@@ -12,10 +12,13 @@ using Xunit.Sdk;
 namespace Test.Unit.RobotDomain.Time;
 
 [TestSubject(typeof(PeriodicScheduler))]
-public class PeriodicSchedulerTests
+public class PeriodicSchedulerTests : IDisposable
 {
+    static readonly TimeSpan MaxWaitForScheduler = TimeSpan.FromSeconds(10);
+
     readonly ITestOutputHelper _testOutputHelper = new TestOutputHelper();
     readonly FakeTimeProvider _fakeTimeProvider = new();
+    readonly CancellationTokenSource _cancellationTokenSource = new();
     readonly PeriodicScheduler _periodicScheduler;
     readonly Duration _testGracePeriod = Duration.FromMilliseconds(1);
     readonly Duration _schedulerDuration = Duration.FromSeconds(1);
@@ -23,7 +26,17 @@ public class PeriodicSchedulerTests
     public PeriodicSchedulerTests()
     {
         _periodicScheduler = new(_fakeTimeProvider);
-        
+
+    }
+
+    /// <summary>
+    /// Stops the scheduler loop. The loop only checks for cancellation between periods, and a fake clock never
+    /// advances by itself, so cancelling is not enough: advance the clock past the current period as well.
+    /// </summary>
+    public void Dispose()
+    {
+        _cancellationTokenSource.Cancel();
+        _fakeTimeProvider.Advance(_schedulerDuration * 2);
     }
 
     [Fact(Skip = "Manual test so far, needs to be automated with assertions")]
@@ -34,7 +47,7 @@ public class PeriodicSchedulerTests
         var ctSource = new CancellationTokenSource();
         var testStopwatch = Stopwatch.StartNew();
         var periodStopwatch = Stopwatch.StartNew();
-        
+
         // When
         _ = _periodicScheduler.RunAsync(
             () =>
@@ -42,14 +55,14 @@ public class PeriodicSchedulerTests
                 _testOutputHelper.WriteLine($"{periodStopwatch.Elapsed} should be {period}");
                 periodStopwatch.Restart();
             },
-            period, 
+            period,
             ctSource.Token);
 
         while (testStopwatch.Elapsed < period * 100)
             Thread.SpinWait(10);
-        
+
         ctSource.Cancel();
-        
+
         // Then
 
     }
@@ -62,16 +75,20 @@ public class PeriodicSchedulerTests
 
         // When
         _ = _periodicScheduler.RunAsync(
-            action: () => counter++,
+            action: () => Interlocked.Increment(ref counter),
             _schedulerDuration,
-            CancellationToken.None);
-        
-        Thread.Sleep(_testGracePeriod);
+            _cancellationTokenSource.Token);
+
+        // The loop starts on a thread-pool thread, which a busy machine may delay far beyond any fixed sleep.
+        WaitUntil(() => Volatile.Read(ref counter) >= 1);
         _fakeTimeProvider.Advance(_schedulerDuration / 2);
-        Thread.Sleep(_testGracePeriod);
-        
+
+        // A second call would have to happen right away; give it a moment to show up. A correct scheduler never fails
+        // here, however slow the machine is.
+        Thread.Sleep(_testGracePeriod.ToTimeSpan());
+
         // Then
-        counter.Should().Be(1);
+        Volatile.Read(ref counter).Should().Be(1);
     }
 
     [Fact]
@@ -80,17 +97,22 @@ public class PeriodicSchedulerTests
         // Given
         int counter = 0;
 
-        // When 
+        // When
         _ = _periodicScheduler.RunAsync(
-            action: () => counter++,
+            action: () => Interlocked.Increment(ref counter),
             _schedulerDuration,
-            CancellationToken.None);
-        
-        Thread.Sleep(_testGracePeriod);
+            _cancellationTokenSource.Token);
+
+        WaitUntil(() => Volatile.Read(ref counter) >= 1);
         _fakeTimeProvider.Advance(_schedulerDuration + _testGracePeriod);
-        Thread.Sleep(_testGracePeriod);
-        
+        WaitUntil(() => Volatile.Read(ref counter) >= 2);
+
         // Then
-        counter.Should().Be(2);
+        Volatile.Read(ref counter).Should().Be(2);
+    }
+
+    static void WaitUntil(Func<bool> condition)
+    {
+        SpinWait.SpinUntil(condition, MaxWaitForScheduler);
     }
 }
