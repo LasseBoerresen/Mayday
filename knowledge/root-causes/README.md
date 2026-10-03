@@ -8,3 +8,4 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [Test host crash from scheduler FailFast](test-host-crash-from-scheduler-failfast.md)
 - [Step angle conversion used 4,094 counts per revolution](step-angle-4094-counts.md)
 - [Empty leg posture map rejected by its own callers](empty-leg-posture-map.md)
+- [Tests that passed locally failed on a clean CI runner](tests-failing-only-on-a-clean-runner.md)

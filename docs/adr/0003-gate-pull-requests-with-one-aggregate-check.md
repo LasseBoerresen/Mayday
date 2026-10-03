@@ -19,15 +19,15 @@ Accepted
 ```mermaid
 flowchart LR
   PR[Pull request] --> Build[build job]
-  PR -.->|planned| Tests[test job]
+  PR --> Tests[test job]
   PR -.->|planned| Quality[coverage, complexity, mutation]
   Build --> Gate[gate job]
-  Tests -.-> Gate
+  Tests --> Gate
   Quality -.-> Gate
   Gate --> Ruleset{{master ruleset requires gate}}
 ```
 
-Solid arrows exist today; dotted ones are planned.
+Solid arrows exist today; dotted ones are planned. The `test` job joined the gate after its first clean-runner runs exposed two problems ([root cause](../../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md)).
 
 ## Alternatives Considered
 
@@ -43,7 +43,7 @@ A skipped required check counts as passing on GitHub. A `gate` job without `alwa
 
 - Benefits: one stable required check; the same gate for every author; adding a gate is a workflow edit.
 - Costs: the repository admin can still edit or disable the ruleset in GitHub settings, so "no bypass" means no way around it while it is on.
-- Limitations: only `build` is gated. The test job and quality gates are planned. Not yet exercised: up-to-date enforcement, and a cancelled or skipped dependency. The Ellie tests have two failures that predate this work and are not covered.
+- Limitations: `build` and `test` are gated. The quality gates are planned. Not yet exercised: up-to-date enforcement, and a cancelled or skipped dependency. The Ellie tests have two failures that predate this work and are not covered.
 
 ## Related Components
 
