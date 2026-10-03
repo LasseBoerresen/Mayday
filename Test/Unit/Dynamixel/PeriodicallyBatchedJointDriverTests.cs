@@ -22,6 +22,13 @@ public class PeriodicallyBatchedJointDriverTests
     public PeriodicallyBatchedJointDriverTests()
     {
         _communicationBusMock.Setup(pa => pa.Ping(It.IsAny<Id>())).Returns(true);
+
+        // The periodic update loop starts in the driver constructor and reads angles every period. An unconfigured
+        // mock returns null for this dictionary, which throws on the scheduler thread and fail-fasts the test host.
+        _communicationBusMock
+            .Setup(pa => pa.Read(It.IsAny<IEnumerable<Id>>(), It.IsAny<ControlRegister>()))
+            .Returns(new Dictionary<Id, uint>());
+
         Driver driver = new(_communicationBusMock.Object);
         JointStateCacheDictImpl jointStateCache = new();
         
