@@ -38,7 +38,7 @@ Do not replace periodic timing without reviewing deadlines, shutdown, and platfo
 
 ## Related Findings
 
-[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md), [Wait ignores cancellation](../../knowledge/findings/periodic-scheduler-wait-ignores-cancellation.md)
+[Scheduler construction](../../knowledge/findings/scheduler-constructed-inside-domain-classes.md), [Wait ignores cancellation](../../knowledge/findings/periodic-scheduler-wait-ignores-cancellation.md), [Not steppable under a fake clock](../../knowledge/findings/periodic-scheduler-not-steppable-under-fake-time.md)
 
 ## Related Root Causes
 

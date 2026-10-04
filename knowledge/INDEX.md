@@ -37,6 +37,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [MaydayDomain currently references Dynamixel](findings/mayday-domain-hardware-reference.md)
 - [PeriodicScheduler is constructed inside four production classes](findings/scheduler-constructed-inside-domain-classes.md)
 - [PeriodicScheduler.Wait ignores cancellation](findings/periodic-scheduler-wait-ignores-cancellation.md)
+- [PeriodicScheduler cannot be stepped under a fake clock](findings/periodic-scheduler-not-steppable-under-fake-time.md)
 
 ## Recent Lessons Learned
 

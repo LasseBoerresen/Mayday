@@ -7,3 +7,4 @@ Record important, evidence-backed discoveries that have not necessarily caused a
 - [MaydayDomain currently references Dynamixel](mayday-domain-hardware-reference.md)
 - [PeriodicScheduler is constructed inside four production classes](scheduler-constructed-inside-domain-classes.md)
 - [PeriodicScheduler.Wait ignores cancellation](periodic-scheduler-wait-ignores-cancellation.md)
+- [PeriodicScheduler cannot be stepped under a fake clock](periodic-scheduler-not-steppable-under-fake-time.md)

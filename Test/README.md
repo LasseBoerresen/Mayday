@@ -42,7 +42,7 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Related Findings
 
-None recorded.
+[Scheduler not steppable under a fake clock](../knowledge/findings/periodic-scheduler-not-steppable-under-fake-time.md).
 
 ## Related Root Causes
 
