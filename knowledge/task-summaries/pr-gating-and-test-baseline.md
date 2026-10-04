@@ -16,7 +16,9 @@
 
 - **Fatal-error handler:** `FatalErrorHandler` injected into `PeriodicScheduler` (`cc9ab54`), and the loop stops when a handler returns (`7eced7a`).
 
-State after `7eced7a`: `dotnet test Test --filter "Quarantine!=true"` gives 212 passed, 9 skipped, 0 failed, identical across repeated runs. Eight tests stay quarantined.
+- **`Q` validation failures:** three quarantined tests fixed by `515c07a` and `cad4918`. See [the root cause](../root-causes/q-rotate-wrapped-position-in-q.md).
+
+State after `cad4918`: `dotnet test Test --filter "Quarantine!=true"` gives 220 passed, 9 skipped, 0 failed. Five tests stay quarantined. (After `7eced7a`: 212 passed, eight quarantined.)
 
 ## Decisions Made
 
@@ -36,7 +38,7 @@ State after `7eced7a`: `dotnet test Test --filter "Quarantine!=true"` gives 212 
 ## Follow-up Work
 
 - `EllieMainTests` has two failures that exist on `master` and is not run in CI while Ellie is work in progress.
-- Diagnose the eight quarantined tests: three `Q` validation failures, a Moq proxy mismatch, the stale driver test, a `TransformTests` mismatch, the inverse-kinematics mismatch, and the lean mismatch.
+- Diagnose the five quarantined tests: a Moq proxy mismatch, the stale driver test, a `TransformTests` mismatch, the inverse-kinematics mismatch, and the lean mismatch.
 - Implement the `Tier` trait, the quality gates (coverage, complexity, mutation testing), the agent workflow and its protections.
 - `Main` has compiler warnings (for example an unused local function) because it does not set `TreatWarningsAsErrors`; a stricter `-warnaserror` build also fails in `EllieMain`.
 
@@ -50,7 +52,7 @@ State after `7eced7a`: `dotnet test Test --filter "Quarantine!=true"` gives 212 
 
 ## Related Root Causes
 
-[Test host crash](../root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../root-causes/step-angle-4094-counts.md), [empty leg posture map](../root-causes/empty-leg-posture-map.md), [clean-runner failures](../root-causes/tests-failing-only-on-a-clean-runner.md)
+[Test host crash](../root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../root-causes/step-angle-4094-counts.md), [empty leg posture map](../root-causes/empty-leg-posture-map.md), [clean-runner failures](../root-causes/tests-failing-only-on-a-clean-runner.md), [Q.Rotate](../root-causes/q-rotate-wrapped-position-in-q.md)
 
 ## Related Lessons Learned
 

@@ -30,6 +30,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Step angle conversion used 4,094 counts per revolution](root-causes/step-angle-4094-counts.md)
 - [Empty leg posture map rejected by its own callers](root-causes/empty-leg-posture-map.md)
 - [Tests that passed locally failed on a clean CI runner](root-causes/tests-failing-only-on-a-clean-runner.md)
+- [Q.Rotate rejected positions longer than 1.1 m](root-causes/q-rotate-wrapped-position-in-q.md)
 
 ## Frequently Used Findings
 
