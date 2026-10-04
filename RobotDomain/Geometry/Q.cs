@@ -113,12 +113,12 @@ public record Q
     }
 
     /// <summary>
-    /// Rotates <paramref name="xyz"/> by this rotation, normalizing this quaternion first.
-    /// The position is rotated as a vector, never wrapped in a <see cref="Q"/>, so it may have any magnitude.
-    /// Computed in <c>float</c> precision because System.Numerics offers no double-precision quaternion.
+    /// Returns <paramref name="xyz"/> rotated by this rotation. The magnitude of <paramref name="xyz"/> is unrestricted.
     /// </summary>
     public Xyz Rotate(Xyz xyz)
     {
+        // The position is rotated as a vector and never wrapped in a Q, which would be validated as a rotation.
+        // Computed in float precision, because System.Numerics offers no double-precision quaternion.
         var rotated = Vector3.Transform(xyz.AsVector3Meters(), Normalize().ToNumericsQ());
 
         return new Xyz(rotated.X, rotated.Y, rotated.Z);
