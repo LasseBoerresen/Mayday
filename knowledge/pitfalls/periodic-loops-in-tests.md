@@ -14,7 +14,7 @@ The constructor starts a loop that runs every millisecond on a background thread
 
 ## Preferred Approach
 
-Configure every bus read the loop and `Initialize` use (`Read` for several ids and for one id), report a plausible position such as `StepAngle.StepCenter`, and dispose the driver when the test ends. Pass `RecordingFatalErrorHandler` wherever a scheduler is built, so a loop error is an assertion failure, not a lost run; physical tests keep `FailFastFatalErrorHandler`. Prefer `EchoJointDriver` or a fake `TimeProvider` where they fit. After a change, run the whole `Test` project and check that it completes, not only the class you changed.
+Configure every bus read the loop and `Initialize` use (`Read` for several ids and for one id), report a plausible position such as `StepAngle.StepCenter`, and dispose the driver when the test ends. Pass `RecordingFatalErrorHandler` wherever a scheduler is built, so a loop error is an assertion failure, not a lost run; physical tests keep `FailFastFatalErrorHandler`. Prefer `EchoJointDriver` or a fake `TimeProvider` where they fit; a fake clock does not step the scheduler by itself ([finding](../findings/periodic-scheduler-not-steppable-under-fake-time.md)), so a test of the real loop waits on the real clock and asserts "eventually". After a change, run the whole `Test` project and check that it completes, not only the class you changed.
 
 ## Related Components
 
