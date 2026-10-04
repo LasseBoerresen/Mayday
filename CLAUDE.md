@@ -76,6 +76,7 @@ Details on test conventions are in `Test/CLAUDE.md`.
 ## Documentation
 
 - Public methods get XML docs covering behavior, contracts and side effects. Interfaces and significant classes explain their purpose and role.
+- **Preserve the abstraction:** XML docs on interfaces, public methods, and classes describe the contract a caller relies on (what, preconditions, results, side effects) and stay true when the implementation is swapped. Implementation notes (algorithm, numeric precision, library choice, why this approach) live as comments inside the method or class body, beside the code they explain.
 - Update the project `README.md` when responsibilities, APIs, boundaries or invariants change, and update diagrams with the behavior they show. Describe current behavior as current and planned behavior as planned.
 - Use fenced Mermaid for diagrams; link an existing diagram instead of duplicating it.
 
