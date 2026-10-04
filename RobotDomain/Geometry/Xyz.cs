@@ -15,9 +15,6 @@ public record Xyz
     public Length Y { get; init; }
     public Length Z { get; init; }
     
-    // For mayday, anything above a meter is too far.
-    static readonly Length AbsurdValue = Length.FromMeters(5); 
-
     // TODO Refactor this meters constructor to factoryMethod Called Meters
     public Xyz(Length X, Length Y, Length Z)
     {
@@ -32,9 +29,6 @@ public record Xyz
     {
         if (double.IsNaN(X.Value)|| double.IsNaN(Y.Value) || double.IsNaN(Z.Value))
             throw new ArgumentException($"Cannot create {nameof(Xyz)} with NaN values: {this}");
-
-        if (X.Abs() > AbsurdValue || Y.Abs() > AbsurdValue || Z.Abs() > AbsurdValue)
-            throw new ArgumentException($"Cannot create {nameof(Xyz)} with absurd values, i.e > {AbsurdValue}, got: {this}");
     }
 
     public Xyz(double x, double y, double z)
