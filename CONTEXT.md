@@ -1,4 +1,6 @@
-# Mayday domain language
+# Domain language
+
+Shared robotics and geometry terms, not specific to one robot.
 
 ## Geometry
 
