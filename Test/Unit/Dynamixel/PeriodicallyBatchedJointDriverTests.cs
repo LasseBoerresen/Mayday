@@ -86,23 +86,37 @@ public class PeriodicallyBatchedJointDriverTests : IDisposable
         _JointDriver.Dispose();
     }
 
-    // TODO: This test is no longer correct, because portAdapter is no longer called to write single goal angles, but 
-    //  all at once. Also, they are written asyncronyously, so really we should only test if it is written within a
-    //  certain time frame, like 20ms. 
     [Fact]
-    [Quarantine("Stale: expects a single Write, but goals are written in batches and the joint is never initialized (see the TODO in the test).")]
-    void Given_WhenSetGoalToZeroAngle_ThenCallsCommunicationBusCorrectly()
+    void GivenInitializedJoint_WhenSetGoalAngle_ThenBatchWriteContainsStepsForThatJoint()
     {
-        // TODO control time in the PeriodicScheduler to be able to properly test 
-    
+        // Given
+        // A goal other than zero: the joint's initial goal is already the center step, so a zero goal could not
+        // be told apart from the goal the joint started with.
+        var goalAngle = Angle.FromDegrees(30);
+        var expectedSteps = StepAngle.ToSteps(goalAngle);
+        var id = Id.FromBase(_id);
+        _JointDriver.Initialize(_id, RotationDirection.Forward);
+
         // When
-        var goalAngle = Timed<Angle>.Passed(Angle.Zero);
-        _JointDriver.SetGoalAngleFor(_id, goalAngle);
+        _JointDriver.SetGoalAngleFor(_id, Timed<Angle>.Passed(goalAngle));
 
         // Then
-        _communicationBusMock.Verify(
-            pa => pa.Write(Id.FromBase(_id), ControlRegister.GoalPosition, StepAngle.StepCenter), 
-            Times.Once);
+        // Goals are written from the periodic loop, so wait for the write instead of verifying immediately. The
+        // loop repeats the write every period, hence "eventually", not "once".
+        var written = SpinWait.SpinUntil(
+            () => GoalPositionBatches().Any(batch => batch.TryGetValue(id, out var steps) && steps == expectedSteps),
+            TimeSpan.FromSeconds(1));
+        Assert.True(written, $"No goal position batch with step {expectedSteps} for joint {_id} reached the bus.");
+    }
+
+    IEnumerable<IReadOnlyDictionary<Id, uint>> GoalPositionBatches()
+    {
+        return _communicationBusMock.Invocations
+            .Where(i => i.Method.Name == nameof(CommunicationBus.Write)
+                        && i.Arguments is [IReadOnlyDictionary<Id, uint>, ControlRegister cr]
+                        && cr.Equals(ControlRegister.GoalPosition))
+            .Select(i => (IReadOnlyDictionary<Id, uint>)i.Arguments[0])
+            .ToList();
     }
     
     [Fact]
