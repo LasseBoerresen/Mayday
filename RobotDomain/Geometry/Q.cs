@@ -112,16 +112,16 @@ public record Q
         return new(W / magnitude, X / magnitude, Y / magnitude, Z / magnitude);
     }
 
+    /// <summary>
+    /// Rotates <paramref name="xyz"/> by this rotation, normalizing this quaternion first.
+    /// The position is rotated as a vector, never wrapped in a <see cref="Q"/>, so it may have any magnitude.
+    /// Computed in <c>float</c> precision because System.Numerics offers no double-precision quaternion.
+    /// </summary>
     public Xyz Rotate(Xyz xyz)
     {
-        var thisNormalized = Normalize();
-        var thisAsNumericsQ = thisNormalized.ToNumericsQ();
-        
-        var xyzAsQ = new Q(0, xyz.X.Meters, xyz.Y.Meters, xyz.Z.Meters);
-        
-        var xyzAsRotatedQ = thisAsNumericsQ * xyzAsQ.ToNumericsQ() * Quaternion.Inverse(thisAsNumericsQ);
-        
-        return new Xyz(xyzAsRotatedQ.X, xyzAsRotatedQ.Y, xyzAsRotatedQ.Z);
+        var rotated = Vector3.Transform(xyz.AsVector3Meters(), Normalize().ToNumericsQ());
+
+        return new Xyz(rotated.X, rotated.Y, rotated.Z);
     }
 
     public static Q Inverse(Q q) => FromNumericsQ(Quaternion.Inverse(q.ToNumericsQ()));

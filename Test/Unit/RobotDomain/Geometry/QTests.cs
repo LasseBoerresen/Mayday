@@ -126,7 +126,6 @@ public class QTests
     }
     
     [Fact]
-    [Quarantine("Q rejects the test input as absurd values (abs(v) > 1.1); the input or the Q validation needs review.")]
     public void Rotate_IdentityQuaternion_ReturnsSameXyz()
     {
         var quaternion = Q.Unit;
@@ -148,6 +147,17 @@ public class QTests
         var rotatedPoint = quaternion.Rotate(point);
 
         Assert.True(rotatedPoint.IsAlmostEqual(new Xyz(0, 1, 0), _lengthPrecision));
+    }
+
+    [Fact]
+    public void Rotate_PointFurtherThanOneMeter_RotatesPointCorrectly()
+    {
+        var quaternion = Q.FromAxisAngle(new Vector3(0, 0, 1), Angle.FromRevolutions(0.25));
+        var point = new Xyz(10, 0, 0);
+
+        var rotatedPoint = quaternion.Rotate(point);
+
+        Assert.True(rotatedPoint.IsAlmostEqual(new Xyz(0, 10, 0), _lengthPrecision));
     }
 
     [Fact]
@@ -228,10 +238,9 @@ public class QTests
     }
 
     [Fact]
-    [Quarantine("Q rejects the test input as absurd values (abs(v) > 1.1); the input or the Q validation needs review.")]
     public void Rotate_NonUnitQuaternion_NormalizesBeforeRotation()
     {
-        var quaternion = new Q(2, 0, 0, 0); // Non-unit quaternion
+        var quaternion = new Q(0.5, 0, 0, 0); // Non-unit quaternion, within the range Q accepts
         var point = new Xyz(1, 0, 0);
 
         var rotatedPoint = quaternion.Rotate(point);

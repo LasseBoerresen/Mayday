@@ -1,6 +1,7 @@
 ﻿using RobotDomain.Geometry;
 using Test.Utilities;
 using RobotDomain.Structures;
+using UnitsNet;
 using Xunit;
 using Xunit.Sdk;
 
@@ -74,14 +75,18 @@ public class ComponentAttachmentTests
     }
 
     [Fact]
-    [Quarantine("Q rejects the test input as absurd values (abs(v) > 1.1); the input or the Q validation needs review.")]
     void GivenBaseLinkAndAttachedLink_WhenGetTransformOfChildId_ThenReturnsTransformOfAttachment()
     {
         // When
         var actualTransform = _baseLink.GetTransformOf(_link.Id);
 
         // Then
-        Assert.Equal(_transform, actualTransform);
+        Assert.True(
+            actualTransform.Xyz.IsAlmostEqual(_transform.Xyz, Length.FromMeters(1e-6)),
+            $"Expected: {_transform.Xyz}, got: {actualTransform.Xyz}");
+        Assert.True(
+            actualTransform.Q.IsRotationAlmostEqual(_transform.Q),
+            $"Expected: {_transform.Q}, got: {actualTransform.Q}");
     }
     
     [Fact]

@@ -24,6 +24,10 @@ Keep Mayday/Ellie-specific measurements in their respective robot projects.
 
 Preserve coordinate and angle conventions for composition and kinematics.
 
+- `Q` is a rotation quaternion: its components are validated to be plausible for a rotation (|v| <= 1.1), so never wrap a position in one. `Q.Rotate` rotates an `Xyz` as a vector.
+- `Xyz` is any spatial coordinate and has no magnitude limit; only NaN is rejected.
+- `Q` is a facade over `System.Numerics.Quaternion` for non-hot paths. Its operations run in `float` precision, so compare results with `IsRotationAlmostEqual`/`IsAlmostEqual`, not exact equality.
+
 ## Architectural Constraints
 
 Geometry changes propagate into pose estimates and motion limits.
