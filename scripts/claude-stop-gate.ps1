@@ -7,10 +7,13 @@
     almost nothing, so chat-only turns are not slowed. On failure it exits 2 and writes the tail of the gate
     output to stderr, which Claude Code feeds back to Claude so it fixes the failure before stopping.
 #>
+param([string] $GateScript)
+
 $ErrorActionPreference = 'Stop'
+if (-not $GateScript) { $GateScript = Join-Path $PSScriptRoot 'gate.ps1' }
 [void][Console]::In.ReadToEnd() # hook input JSON; not needed, but drain it
 
-$output = & (Join-Path $PSScriptRoot 'gate.ps1') -Configuration Debug 2>&1 | Out-String
+$output = & $GateScript -Configuration Debug 2>&1 | Out-String
 if ($LASTEXITCODE -eq 0) { exit 0 }
 
 $tail = ($output -split "`r?`n" | Select-Object -Last 60) -join "`n"
