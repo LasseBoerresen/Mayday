@@ -22,6 +22,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Physical runs are not ordinary tests](pitfalls/physical-runs.md)
 - [Using measured angle as every interpolation baseline](pitfalls/interpolation-baseline.md)
 - [Periodic loops in tests](pitfalls/periodic-loops-in-tests.md)
+- [Q's `-` operator returns inverse(a)·b](pitfalls/q-minus-operator-direction.md)
 
 ## Common Root Causes
 
@@ -31,6 +32,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Empty leg posture map rejected by its own callers](root-causes/empty-leg-posture-map.md)
 - [Tests that passed locally failed on a clean CI runner](root-causes/tests-failing-only-on-a-clean-runner.md)
 - [Q.Rotate rejected positions longer than 1.1 m](root-causes/q-rotate-wrapped-position-in-q.md)
+- [Transform.HalfWayTo returned the wrong transform](root-causes/transform-halfway-to-wrong-result.md)
 
 ## Frequently Used Findings
 
