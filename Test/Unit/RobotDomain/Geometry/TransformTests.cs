@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Numerics;
+using JetBrains.Annotations;
 using Test.Utilities;
 using RobotDomain.Geometry;
 using UnitsNet;
@@ -75,13 +76,14 @@ public class TransformTests
     }
 
     [Fact]
-    [Quarantine("Assertion mismatch on the halfway transform; cause not yet diagnosed.")]
     public void GivenNonZeroTransform__WhenCalculateHalfwayToZero__ThenShouldBeHalfway()
     {
         // Given
+        // Q.FromAxisAngle requires a unit axis; an unnormalized one yields a non-unit quaternion.
+        var axis = Vector3.Normalize(new(1, 0, 1));
         var transformGiven = new Transform(
-            new Xyz(0.2, 0.4, -0.6), 
-            Q.FromAxisAngle(new(1, 0, 1), Angle.FromRevolutions(0.2)));
+            new Xyz(0.2, 0.4, -0.6),
+            Q.FromAxisAngle(axis, Angle.FromRevolutions(0.2)));
         
         // When
         var actualHalfwayTransform =  transformGiven.HalfWayTo(Transform.Zero);
@@ -89,7 +91,7 @@ public class TransformTests
         // Then
         var transformExpected = new Transform(
             new Xyz(0.1, 0.2, -0.3), 
-            Q.FromAxisAngle(new(1, 0, 1), Angle.FromRevolutions(0.1))); 
+            Q.FromAxisAngle(axis, Angle.FromRevolutions(0.1)));
         
         AssertTransformEqual("testIdFoo", transformExpected, actualHalfwayTransform);
     }

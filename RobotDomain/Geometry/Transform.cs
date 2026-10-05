@@ -53,7 +53,9 @@ public record Transform(Xyz Xyz, Q Q)
     /// </summary>
     public static Transform Subtract(Transform a, Transform b)
     {
-        var relativeRotation = a.Q - b.Q; 
+        // Rotation that, applied after b, yields a: b.Q + relativeRotation == a.Q.
+        // (Q's own "-" operator computes the opposite direction, inverse(a) * b.)
+        var relativeRotation = Q.Inverse(b.Q) + a.Q;
         Xyz worldDelta = a.Xyz - b.Xyz;
         Xyz relativeTranslation = Q.Inverse(b.Q).Rotate(worldDelta);
 
@@ -71,7 +73,7 @@ public record Transform(Xyz Xyz, Q Q)
 
     public Transform HalfWayTo(Transform other)
     {
-        return this + InDirectionTo(other, 0.5);
+        return InDirectionTo(other, 0.5);
     }
     
     public Transform InDirectionTo(Transform other, double factor)
