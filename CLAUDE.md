@@ -89,19 +89,27 @@ Details on test conventions are in `Test/CLAUDE.md`.
 
 ## Commits
 
-History stays clean and reviewable: **each commit has one intent.** Order refactoring commits before, and separate from, the behavior commits they enable; tests, XML docs and README updates ship in the same commit as the change they describe, while knowledge records go in their own `docs:` commit.
+Commit each intent as soon as it is complete and its tests pass, without waiting to be asked. Work on a feature branch, push it and open a pull request when the work is complete; the user reviews, approves and merges. Stage only the files for this commit's intent, so each commit holds **one intent**: its subject needs no "and".
 
-Message format: concise conventional subject (`refactor:`, `feat:`, `fix:`, `test:`, `docs:`, `chore:`), then:
+- **Order:** refactoring commits come before, and separate from, the behavior commits they enable.
+- **Together:** a behavior change ships with its tests, XML docs, README updates and the ADR that records its decision. Use `test:` only for tests added to existing behavior.
+- **Apart:** findings, root causes, lessons, pitfalls, failed attempts and task summaries get their own `docs:` commit, because they outlive the code: reverting the change keeps the record.
+- **Merge style:** ask for a merge commit or rebase merge, never a squash, so these separate commits survive in history.
+
+Subject: `<type>: <imperative summary>`, at most 72 characters, type one of `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
+
+Body, for every type except `chore`: `Problem:`, `Rationale:` (why this approach over the obvious alternative), `Impact:` (say "No behavioral change." when true). Separate fields with a blank line and add the attribution trailer last.
 
 ```text
-refactor: separate reconstruction API dependency
+refactor: keep implementation notes out of the Q.Rotate contract
 
-Problem: Scanner dependency leaked into reconstruction layer.
+Problem: The Q.Rotate XML doc described how it computes (vector transform,
+float precision), which leaks implementation into the public contract.
 
-Rationale: Moving the interface preserves the architectural boundary
-without changing callers, unlike an adapter wrapper.
+Rationale: The doc states the contract only; the how stays as inline comments
+next to the code, which is where a maintainer needs it.
 
 Impact: No behavioral change.
-```
 
-`Rationale:` states why this approach was chosen over the obvious alternatives. `Impact:` says explicitly when behavior is unchanged.
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+```
