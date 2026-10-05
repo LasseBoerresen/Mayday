@@ -33,6 +33,15 @@ dotnet test Ellie\EllieMainTests\EllieMainTests.csproj
 
 Run the smallest relevant test project first. Several projects set `TreatWarningsAsErrors`: fix warnings at their cause.
 
+### Local gate
+
+`scripts\gate.ps1` is the gate: a build plus the tests not marked `[Quarantine]`, with the robot forced to disconnected. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
+
+- A Claude Code `Stop` hook (`scripts\claude-stop-gate.ps1`) runs it in Debug and blocks you from finishing a turn while it fails. Fix the failure it reports; do not work around the hook.
+- A `pre-push` hook (`.githooks`) runs it in Release. After cloning, run `git config core.hooksPath .githooks` once.
+
+`Ellie\EllieMainTests` is not part of the gate: it can initialize physical devices (see its README). GitHub Actions (`.github\workflows\ci.yml`) is manual-only (`workflow_dispatch`) and is not a required check; the user merges pull requests.
+
 ## Hard rules
 
 - **Physical hardware:** `Main`, `EllieMain` and tests marked `PhysicalRobotFact`/`PhysicalRobotTheory` can move a real robot. Run them only after the user confirms the robot, port and operating conditions in this conversation. Verify motion and driver changes with simulation, echo joints or hardware-independent tests.
