@@ -1,0 +1,2 @@
+# Git hooks run under sh, which cannot parse CRLF.
+.githooks/* text eol=lf
