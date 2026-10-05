@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     The same checks as the optional GitHub workflow (.github/workflows/ci.yml): a build and the tests that are
-    not marked [Quarantine]. Exits non-zero when any step fails.
+    not marked [Quarantine]; plus the Pester tests of these scripts. Exits non-zero when any step fails.
 
     A pass is remembered per configuration against a fingerprint of the working tree (every non-Markdown file
     git tracks or could track). When the tree is unchanged since the last pass the gate returns immediately, so
@@ -33,6 +33,10 @@
 .PARAMETER TestCommand
     Runs the blocking tests, with the same contract as -BuildCommand. Defaults to the Test project without the
     [Quarantine] tests.
+
+.PARAMETER ScriptTestCommand
+    Runs the tests of the scripts themselves, with the same contract as -BuildCommand. Defaults to the Pester
+    tests in scripts/Tests. The script tests replace it with a no-op so the gate does not run itself recursively.
 #>
 [CmdletBinding()]
 param(
@@ -48,6 +52,17 @@ param(
     [scriptblock] $TestCommand = {
         param($Configuration)
         dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine!=true'
+    },
+    [scriptblock] $ScriptTestCommand = {
+        param($Configuration)
+        try { Import-Module Pester -MinimumVersion 5.0 -ErrorAction Stop }
+        catch {
+            Write-Host 'Pester 5+ is required: Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser'
+            $global:LASTEXITCODE = 1
+            return
+        }
+        $result = Invoke-Pester -Path 'scripts/Tests' -Output Minimal -PassThru
+        if ($result.Result -ne 'Passed') { $global:LASTEXITCODE = 1 }
     }
 )
 
@@ -89,6 +104,8 @@ if (-not $Force -and (Test-Path $memory) -and ((Get-Content $memory -Raw).Trim()
 Invoke-Step "Build ($Configuration)" { & $BuildCommand $Configuration }
 
 Invoke-Step "Tests, quarantined excluded ($Configuration)" { & $TestCommand $Configuration }
+
+Invoke-Step "Script tests (Pester)" { & $ScriptTestCommand $Configuration }
 
 if ($Quarantined) {
     Write-Host '== Quarantined tests (expected to fail, non-blocking)'
