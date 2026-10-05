@@ -35,7 +35,7 @@ Run the smallest relevant test project first. Several projects set `TreatWarning
 
 ### Local gate
 
-`scripts\gate.ps1` is the gate: a build plus the tests not marked `[Quarantine]`, with the robot forced to disconnected. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
+`scripts\gate.ps1` is the gate: a build, the tests not marked `[Quarantine]` and the Pester tests of the scripts themselves (needs Pester 5+: `Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser`), with the robot forced to disconnected. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
 
 - A Claude Code `Stop` hook (`scripts\claude-stop-gate.ps1`) runs it in Debug and blocks you from finishing a turn while it fails. Fix the failure it reports; do not work around the hook.
 - A `pre-push` hook (`.githooks`) runs it in Release. After cloning, run `git config core.hooksPath .githooks` once.
@@ -79,6 +79,8 @@ Work **outside-in** (*Growing Object-Oriented Software, Guided by Tests*): an en
 Tests are a second, independent **ledger** of behavior:
 - **Behavior change:** make a test go red against the old behavior, then green with the implementation. Change an existing expectation only when the user confirms the contract changed.
 - **Refactoring:** leave the ledger untouched; existing tests prove behavior is preserved.
+
+Scripts, hooks, CI configuration and other infrastructure code are code: they get tests too (Pester under `scripts\Tests` for PowerShell), by the same rules. Without a second ledger of their behavior they drift unnoticed, and everything else depends on them.
 
 Details on test conventions are in `Test/CLAUDE.md`.
 
