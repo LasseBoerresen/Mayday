@@ -32,7 +32,7 @@ Geometry changes propagate into pose estimates and motion limits.
 
 ## Common Pitfalls
 
-Avoid unitless values or silently changing reference frames.
+Avoid unitless values or silently changing reference frames. See also the [Q `-` operator pitfall](../../knowledge/pitfalls/q-minus-operator-direction.md).
 
 ## Related ADRs
 
@@ -44,7 +44,7 @@ None recorded.
 
 ## Related Root Causes
 
-[Q.Rotate rejected positions longer than 1.1 m](../../knowledge/root-causes/q-rotate-wrapped-position-in-q.md)
+[Q.Rotate rejected positions longer than 1.1 m](../../knowledge/root-causes/q-rotate-wrapped-position-in-q.md), [Transform.HalfWayTo returned the wrong transform](../../knowledge/root-causes/transform-halfway-to-wrong-result.md)
 
 ## Related Lessons Learned
 

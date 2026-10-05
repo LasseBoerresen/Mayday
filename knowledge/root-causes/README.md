@@ -10,3 +10,4 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [Empty leg posture map rejected by its own callers](empty-leg-posture-map.md)
 - [Tests that passed locally failed on a clean CI runner](tests-failing-only-on-a-clean-runner.md)
 - [Q.Rotate rejected positions longer than 1.1 m](q-rotate-wrapped-position-in-q.md)
+- [Transform.HalfWayTo returned the wrong transform](transform-halfway-to-wrong-result.md)

@@ -7,3 +7,4 @@ Record recurring mistakes or hazards when there is evidence, not merely speculat
 - [Physical runs are not ordinary tests](physical-runs.md)
 - [Using measured angle as every interpolation baseline](interpolation-baseline.md)
 - [Periodic loops in tests](periodic-loops-in-tests.md)
+- [Q's `-` operator returns inverse(a)·b](q-minus-operator-direction.md)
