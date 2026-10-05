@@ -21,18 +21,39 @@
 
 .PARAMETER Force
     Run even when the working tree matches the last passing run.
+
+.PARAMETER RepoRoot
+    The git working tree to gate. Defaults to the repository this script lives in; the script tests point it at a
+    scratch repository.
+
+.PARAMETER BuildCommand
+    Runs the build; receives the configuration. Must leave a non-zero $LASTEXITCODE on failure. Defaults to
+    building Mayday.sln. Overridden by the script tests so they do not compile the solution.
+
+.PARAMETER TestCommand
+    Runs the blocking tests, with the same contract as -BuildCommand. Defaults to the Test project without the
+    [Quarantine] tests.
 #>
 [CmdletBinding()]
 param(
     [ValidateSet('Release', 'Debug')]
     [string] $Configuration = 'Release',
     [switch] $Quarantined,
-    [switch] $Force
+    [switch] $Force,
+    [string] $RepoRoot,
+    [scriptblock] $BuildCommand = {
+        param($Configuration)
+        dotnet build Mayday.sln --configuration $Configuration --nologo --verbosity quiet
+    },
+    [scriptblock] $TestCommand = {
+        param($Configuration)
+        dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine!=true'
+    }
 )
 
 $ErrorActionPreference = 'Stop'
-$repo = Split-Path -Parent $PSScriptRoot
-Set-Location $repo
+if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
+Set-Location $RepoRoot
 
 $env:MAYDAY_ROBOT_IS_CONNECTED = 'False'
 
@@ -48,6 +69,7 @@ function Get-TreeFingerprint {
 
 function Invoke-Step([string] $Name, [scriptblock] $Command) {
     Write-Host "== $Name"
+    $global:LASTEXITCODE = 0
     & $Command
     if ($LASTEXITCODE -ne 0) {
         Write-Host "== FAILED: $Name (exit $LASTEXITCODE)"
@@ -64,13 +86,9 @@ if (-not $Force -and (Test-Path $memory) -and ((Get-Content $memory -Raw).Trim()
     exit 0
 }
 
-Invoke-Step "Build ($Configuration)" {
-    dotnet build Mayday.sln --configuration $Configuration --nologo --verbosity quiet
-}
+Invoke-Step "Build ($Configuration)" { & $BuildCommand $Configuration }
 
-Invoke-Step "Tests, quarantined excluded ($Configuration)" {
-    dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine!=true'
-}
+Invoke-Step "Tests, quarantined excluded ($Configuration)" { & $TestCommand $Configuration }
 
 if ($Quarantined) {
     Write-Host '== Quarantined tests (expected to fail, non-blocking)'
