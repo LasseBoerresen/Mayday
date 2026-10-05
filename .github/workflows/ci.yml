@@ -1,10 +1,10 @@
 name: CI
 
+# Optional: the gates run locally (scripts/gate.ps1, enforced by the Claude Code Stop hook and the pre-push hook).
+# Start this workflow by hand from the Actions tab when a second opinion on a clean runner is wanted. It must not
+# be a required status check, because it does not run on pull requests.
 on:
-  pull_request:
-    branches: [master]
-  push:
-    branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
