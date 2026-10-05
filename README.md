@@ -31,10 +31,8 @@ The code itself is also following clean code priciples and is a fusion of object
 
 [Demo Video](https://youtu.be/liucpPML-Sw)
 
-## Continuous integration
+## Quality gate
 
-Every pull request to `master` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Its aggregate `gate` job is the single check the `master` ruleset requires; new quality gates are added to the `gate` job's `needs` list.
+The gate runs locally ([ADR 0006](docs/adr/0006-run-quality-gates-locally.md)): [`scripts/gate.ps1`](scripts/README.md) builds the solution, runs the `Test` project without the tests marked `[Quarantine]`, and runs the Pester tests of the scripts. A Claude Code `Stop` hook runs it in Debug and a `pre-push` hook runs it in Release (`git config core.hooksPath .githooks` once per clone). Pull requests are reviewed and merged by the owner.
 
-Currently gated: the solution builds, and the `Test` project passes without the tests marked `[Quarantine]` (the `test` job, results uploaded as an artifact).
-
-Run on every pull request but not gated: the `quarantined` job, which runs the quarantined tests (expected to fail) and reports them without blocking, so a recovering test is noticed. `EllieMainTests` is not run in CI while Ellie is work in progress. Planned, in order: coverage, complexity, mutation testing.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) is optional and manual (`workflow_dispatch`): the same build and tests on a clean GitHub runner, plus the `quarantined` job, which runs the quarantined tests (expected to fail) and reports them without blocking, so a recovering test is noticed. `EllieMainTests` is not gated while Ellie is work in progress. Planned, in order: coverage, complexity, mutation testing.

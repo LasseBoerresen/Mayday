@@ -38,7 +38,7 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Local gate](../docs/adr/0006-run-quality-gates-locally.md) (replaces [aggregate-check gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
 
 ## Related Findings
 
