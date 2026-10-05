@@ -10,6 +10,8 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 |---|---|---|
 | [0001 - Stable robot abstractions](0001-stable-robot-abstractions.md) | Accepted | Dependency direction across the two robots |
 | [0002 - Hardware access at the adapter boundary](0002-hardware-adapter-boundary.md) | Accepted | Device communication and test substitution |
-| [0003 - Gate pull requests with one aggregate check](0003-gate-pull-requests-with-one-aggregate-check.md) | Accepted | Merge gating and the master ruleset |
+| [0003 - Gate pull requests with one aggregate check](0003-gate-pull-requests-with-one-aggregate-check.md) | Superseded by 0006 | Merge gating and the master ruleset |
 | [0004 - Quarantine failing tests with a trait](0004-quarantine-failing-tests-with-a-trait.md) | Accepted | Handling known-failing tests |
 | [0005 - Test tiers for physical and simulated runs](0005-test-tiers-for-physical-and-simulated-runs.md) | Proposed | Physical versus simulated test selection |
+| [0006 - Run quality gates locally](0006-run-quality-gates-locally.md) | Accepted | Local gate and hooks; GitHub CI optional |
+| [0007 - Infrastructure code is tested like product code](0007-infrastructure-code-is-tested-like-product-code.md) | Accepted | Tests for scripts, hooks and CI config |

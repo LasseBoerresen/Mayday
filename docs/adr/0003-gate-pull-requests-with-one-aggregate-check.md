@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR 0006](0006-run-quality-gates-locally.md)
 
 ## Context
 
@@ -51,7 +51,7 @@ A skipped required check counts as passing on GitHub. A `gate` job without `alwa
 
 ## Related ADRs
 
-[0004](0004-quarantine-failing-tests-with-a-trait.md)
+[0004](0004-quarantine-failing-tests-with-a-trait.md), [0006](0006-run-quality-gates-locally.md) (supersedes this)
 
 ## Related Findings
 
