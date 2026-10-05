@@ -97,8 +97,10 @@ Message format: concise conventional subject (`refactor:`, `feat:`, `fix:`, `tes
 refactor: separate reconstruction API dependency
 
 Problem: Scanner dependency leaked into reconstruction layer.
+
 Rationale: Moving the interface preserves the architectural boundary
 without changing callers, unlike an adapter wrapper.
+
 Impact: No behavioral change.
 ```
 
