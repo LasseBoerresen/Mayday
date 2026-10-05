@@ -63,7 +63,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 | Mayday | [MaydayDomain](../MaydayDomain/README.md) ([Components](../MaydayDomain/Components/README.md), [MotionPlanning](../MaydayDomain/MotionPlanning/README.md)), [ManualBehavior](../ManualBehavior/README.md), [MaydayDataAccess](../MaydayDataAccess/README.md) ([Geometry](../MaydayDataAccess/Geometry/README.md)), [Robots](../Robots/README.md), [Main](../Main/README.md) |
 | Hardware | [Dynamixel](../Dynamixel/README.md) |
 | Ellie | [Ellie](../Ellie/README.md): [EllieMain](../Ellie/EllieMain/README.md) ([Base](../Ellie/EllieMain/Base/README.md), [Behaviors](../Ellie/EllieMain/Behaviors/README.md), [MotionPlanning](../Ellie/EllieMain/MotionPlanning/README.md), [Structures](../Ellie/EllieMain/Structures/README.md)), [EllieMainTests](../Ellie/EllieMainTests/README.md) |
-| Tests and other projects | [scripts](../scripts/README.md), [Test](../Test/README.md) ([Unit](../Test/Unit/README.md), [Integration](../Test/Integration/README.md)), [DataAccess](../DataAccess/README.md), [MauiApp1](../MauiApp1/README.md), [Ternimal](../Ternimal/README.md) |
+| Tests and other projects | [scripts](../scripts/README.md), [Test](../Test/README.md) ([Unit](../Test/Unit/README.md), [Integration](../Test/Integration/README.md)), [DataAccess](../DataAccess/README.md), [Ternimal](../Ternimal/README.md) |
 
 ## Documentation Structure
 
