@@ -28,7 +28,7 @@ CA1502 adds no tool: it runs in the build everyone already has, with the same co
 
 - Benefits: new complexity is rejected where it is written; the folder can be copied to another repository.
 - Costs: each `.cs` edit triggers a build of about 8 seconds; the hook builds the whole solution because Roslyn needs a compile.
-- Limitations: CA1502 counts branches and `case` labels, not nesting (cognitive complexity); the wiring in `.claude/settings.json` is exercised by use, not tested; no baseline mechanism exists yet.
+- Limitations: CA1502 counts branches and `case` labels, not nesting (cognitive complexity); the wiring in `.claude/settings.json` is exercised by use, not tested; baseline mode matches methods by file and name, so moving or renaming one looks new (see the amendment).
 
 ## Related Components
 
@@ -45,3 +45,7 @@ None recorded.
 ## Related Root Causes
 
 None recorded.
+
+## Amendment: baseline mode
+
+The decision above assumed no existing violations, true for this repository, and left a baseline for when one is needed. Repositories adopting the folder will have violations, so `complexity-gate.ps1` now has a baseline (ratchet) mode: a committed `complexity-baseline.json` of per-method complexities, failing on new or worse violations and lowered only through `-UpdateBaseline`. The rule stays CA1502 and the threshold stays 12; the baseline only tolerates what already exists. It reads the CA1502 warnings from the build output (a shared SARIF error log would be overwritten by each project of a solution) and keys methods by file and name without line numbers, so overloads are matched by position among the file's violations of that name. See [quality-gates](../../quality-gates/README.md#baseline-mode-existing-violations).
