@@ -1,0 +1,6 @@
+<Project>
+  <!-- Threshold for CA1502 (cyclomatic complexity); see quality-gates/README.md. -->
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt" />
+  </ItemGroup>
+</Project>

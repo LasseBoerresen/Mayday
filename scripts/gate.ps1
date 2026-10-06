@@ -61,7 +61,7 @@ param(
             $global:LASTEXITCODE = 1
             return
         }
-        $result = Invoke-Pester -Path 'scripts/Tests' -Output Minimal -PassThru
+        $result = Invoke-Pester -Path 'scripts/Tests', 'quality-gates/Tests' -Output Minimal -PassThru
         if ($result.Result -ne 'Passed') { $global:LASTEXITCODE = 1 }
     }
 )
