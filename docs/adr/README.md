@@ -15,3 +15,4 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0005 - Test tiers for physical and simulated runs](0005-test-tiers-for-physical-and-simulated-runs.md) | Proposed | Physical versus simulated test selection |
 | [0006 - Run quality gates locally](0006-run-quality-gates-locally.md) | Accepted | Local gate and hooks; GitHub CI optional |
 | [0007 - Infrastructure code is tested like product code](0007-infrastructure-code-is-tested-like-product-code.md) | Accepted | Tests for scripts, hooks and CI config |
+| [0008 - Cyclomatic complexity gate with CA1502](0008-cyclomatic-complexity-gate-with-ca1502.md) | Accepted | Complexity limit of 12 in the build, hooks, portable folder |

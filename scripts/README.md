@@ -8,6 +8,7 @@ The local quality gate and the hooks that enforce it ([ADR 0006](../docs/adr/000
 
 - `gate.ps1 [-Configuration Release|Debug] [-Quarantined] [-Force]`: builds `Mayday.sln`, runs the `Test` project without `[Quarantine]` tests, then the Pester tests of these scripts. Exits non-zero on the first failing step. A pass is remembered per configuration for an unchanged working tree (every non-Markdown file git tracks or could track, excluding `.idea`, `.claude`, `knowledge`, `docs`, `Media`) and skipped next time unless `-Force`.
 - `claude-stop-gate.ps1`: the Claude Code `Stop` hook. Runs `gate.ps1` in Debug; exits 2 with the tail of the output on failure so Claude must fix it before finishing.
+- `quality-gates/` (outside this directory): the portable complexity gate; `gate.ps1` also runs its Pester tests. See its [README](../quality-gates/README.md).
 - `.githooks/pre-push` (outside this directory): runs `gate.ps1` in Release. Enable with `git config core.hooksPath .githooks`.
 
 ## Dependencies

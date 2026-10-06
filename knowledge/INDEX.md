@@ -11,12 +11,14 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Proposed, not implemented)
 - [ADR 0006: Run quality gates locally](../docs/adr/0006-run-quality-gates-locally.md)
 - [ADR 0007: Infrastructure code is tested like product code](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)
+- [ADR 0008: Cyclomatic complexity gate with CA1502](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md)
 
 ## Architectural Constraints
 
 - Dependencies should point toward stable shared contracts, not from `RobotDomain` into robot-specific projects ([architecture map](../docs/architecture/README.md)). The current `MaydayDomain` hardware reference is a [documented exception](findings/mayday-domain-hardware-reference.md).
 - Physical tests and startup can move real hardware: [physical-run pitfall](pitfalls/physical-runs.md).
 - Port access must remain serialized and scheduler changes require timing/safety review ([Dynamixel](../Dynamixel/README.md), [RobotDomain/Time](../RobotDomain/Time/README.md)).
+- Methods may not exceed cyclomatic complexity 12: CA1502 fails the build, with early feedback from a Claude Code hook ([ADR 0008](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md), [quality-gates](../quality-gates/README.md)).
 - The quality gate runs locally (`scripts\gate.ps1`, enforced by a Claude Code Stop hook and a pre-push hook); GitHub CI is optional ([ADR 0006](../docs/adr/0006-run-quality-gates-locally.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)).
 
 ## Known Pitfalls
@@ -63,7 +65,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 | Mayday | [MaydayDomain](../MaydayDomain/README.md) ([Components](../MaydayDomain/Components/README.md), [MotionPlanning](../MaydayDomain/MotionPlanning/README.md)), [ManualBehavior](../ManualBehavior/README.md), [MaydayDataAccess](../MaydayDataAccess/README.md) ([Geometry](../MaydayDataAccess/Geometry/README.md)), [Robots](../Robots/README.md), [Main](../Main/README.md) |
 | Hardware | [Dynamixel](../Dynamixel/README.md) |
 | Ellie | [Ellie](../Ellie/README.md): [EllieMain](../Ellie/EllieMain/README.md) ([Base](../Ellie/EllieMain/Base/README.md), [Behaviors](../Ellie/EllieMain/Behaviors/README.md), [MotionPlanning](../Ellie/EllieMain/MotionPlanning/README.md), [Structures](../Ellie/EllieMain/Structures/README.md)), [EllieMainTests](../Ellie/EllieMainTests/README.md) |
-| Tests and other projects | [scripts](../scripts/README.md), [Test](../Test/README.md) ([Unit](../Test/Unit/README.md), [Integration](../Test/Integration/README.md)), [DataAccess](../DataAccess/README.md), [Ternimal](../Ternimal/README.md) |
+| Tests and other projects | [scripts](../scripts/README.md), [quality-gates](../quality-gates/README.md), [Test](../Test/README.md) ([Unit](../Test/Unit/README.md), [Integration](../Test/Integration/README.md)), [DataAccess](../DataAccess/README.md), [Ternimal](../Ternimal/README.md) |
 
 ## Documentation Structure
 
