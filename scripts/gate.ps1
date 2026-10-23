@@ -70,6 +70,12 @@ $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
 Set-Location $RepoRoot
 
+# git runs hooks of a linked worktree with GIT_DIR (and for some hooks GIT_INDEX_FILE) set to absolute paths. Left
+# in place they override the repository found from $RepoRoot, here and in every step: the script tests' scratch
+# `git init` would then reinitialize the real repository as bare. The gate finds its repository from $RepoRoot only.
+'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_PREFIX', 'GIT_OBJECT_DIRECTORY',
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES' | ForEach-Object { Remove-Item -Path "Env:$_" -ErrorAction SilentlyContinue }
+
 $env:MAYDAY_ROBOT_IS_CONNECTED = 'False'
 
 function Get-TreeFingerprint {

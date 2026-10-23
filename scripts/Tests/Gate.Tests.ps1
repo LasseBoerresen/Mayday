@@ -60,6 +60,28 @@ Describe 'gate.ps1' {
         Set-Content -Path (Join-Path $script:Repo 'Notes.md') -Value 'notes'
     }
 
+    It 'GivenGitHookEnvironmentForAnotherRepo_WhenRun_ThenGatesRepoRootAndHidesItFromSteps' {
+        # Given: git runs hooks of a linked worktree with GIT_DIR set to an absolute path, here another repository
+        $other = Join-Path $TestDrive "other-$([guid]::NewGuid().ToString('N'))"
+        git init -q $other
+        $otherGitDir = Join-Path $other '.git'
+        $test = 'param($c) Add-Content -Path ''LOG'' -Value "git_dir=$env:GIT_DIR"'.Replace('LOG', $script:Log)
+
+        # When
+        $result = Invoke-Wrapper @"
+`$env:GIT_DIR = '$otherGitDir'
+& '$script:Gate' -RepoRoot '$script:Repo' -BuildCommand { } -TestCommand { $test } -ScriptTestCommand { }
+exit `$LASTEXITCODE
+"@
+
+        # Then: the gate remembers its pass in RepoRoot's repository, and steps (which create scratch repositories
+        # of their own) do not inherit a GIT_DIR that would point their git commands at another repository
+        $result.ExitCode | Should -Be 0
+        Join-Path $script:Repo '.git/gate-passed-Release' | Should -Exist
+        Join-Path $otherGitDir 'gate-passed-Release' | Should -Not -Exist
+        Get-Steps | Should -Be @('git_dir=')
+    }
+
     It 'GivenPassingBuildAndTests_WhenRun_ThenExitsZeroAndRunsBuildBeforeTests' {
         # When
         $result = Invoke-Gate
