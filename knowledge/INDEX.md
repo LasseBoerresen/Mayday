@@ -27,6 +27,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Using measured angle as every interpolation baseline](pitfalls/interpolation-baseline.md)
 - [Periodic loops in tests](pitfalls/periodic-loops-in-tests.md)
 - [Q's `-` operator returns inverse(a)·b](pitfalls/q-minus-operator-direction.md)
+- [Git location variables inherited from hooks](pitfalls/git-env-inherited-from-hooks.md)
 
 ## Common Root Causes
 
