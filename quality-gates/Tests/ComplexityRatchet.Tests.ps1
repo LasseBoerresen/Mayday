@@ -47,7 +47,7 @@ BeforeAll {
 
     function Invoke-Gate([string] $ProjectRoot, [string[]] $Arguments = @()) {
         $ErrorActionPreference = 'Continue'
-        $output = '' | & powershell -NoProfile -ExecutionPolicy Bypass -File $script:Gate -ProjectRoot $ProjectRoot @Arguments 2>&1 | Out-String
+        $output = '' | & powershell -NoProfile -ExecutionPolicy Bypass -File $script:Gate -ProjectRoot $ProjectRoot @Arguments 2>&1 | ForEach-Object { "$_" } | Out-String
         [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output }
     }
 }
