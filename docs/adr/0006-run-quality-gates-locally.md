@@ -52,7 +52,7 @@ A gate belongs where the feedback loop is. Running the same checks locally gives
 
 ## Related ADRs
 
-[0003](0003-gate-pull-requests-with-one-aggregate-check.md) (superseded), [0004](0004-quarantine-failing-tests-with-a-trait.md), [0007](0007-infrastructure-code-is-tested-like-product-code.md)
+[0003](0003-gate-pull-requests-with-one-aggregate-check.md) (superseded), [0004](0004-quarantine-failing-tests-with-a-trait.md), [0007](0007-infrastructure-code-is-tested-like-product-code.md), [0010](0010-local-claude-review-of-every-pull-request.md) (local review)
 
 ## Related Findings
 

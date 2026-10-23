@@ -40,7 +40,7 @@ Run the smallest relevant test project first. Several projects set `TreatWarning
 - A Claude Code `Stop` hook (`scripts\claude-stop-gate.ps1`) runs it in Debug and blocks you from finishing a turn while it fails. Fix the failure it reports; do not work around the hook.
 - A `pre-push` hook (`.githooks`) runs it in Release. After cloning, run `git config core.hooksPath .githooks` once.
 
-`Ellie\EllieMainTests` is not part of the gate: it can initialize physical devices (see its README). GitHub Actions (`.github\workflows\ci.yml`) is manual-only (`workflow_dispatch`) and is not a required check; the user merges pull requests.
+`Ellie\EllieMainTests` is not part of the gate: it can initialize physical devices (see its README). GitHub Actions (`.github\workflows\ci.yml`) is manual-only (`workflow_dispatch`) and is not a required check; the user merges pull requests. After `gh pr create` or `git push`, a `PostToolUse` hook has a separate, local Claude Code session review the pull request and post a comment (`scripts\review-pr.ps1`, [ADR 0010](docs/adr/0010-local-claude-review-of-every-pull-request.md)); it is advisory, so answer its findings but do not wait on it.
 
 ## Hard rules
 
