@@ -1,4 +1,5 @@
-﻿using MaydayDomain;
+﻿using MaydayDataAccess;
+using MaydayDomain;
 
 namespace Test.Integration.MaydayDomain.Base;
 
@@ -12,4 +13,16 @@ public class TestObjectMother : Unit.Base.TestObjectMother
     /// </summary>
     internal static LegPostureByPositionMap LegPostureByPositionMap
         => LegPostureByPositionMapDictImpl.CreateNeutral();
+
+    /// <summary>
+    /// The map the robot uses, loaded once from the <c>DefaultLegPostureByPositionMap.json</c> that
+    /// <c>MaydayDataAccess</c> copies to the output directory. Use it when a test moves tips, since the
+    /// neutral map cannot find a posture for any position but the origin.
+    /// </summary>
+    internal static LegPostureByPositionMap DefaultLegPostureByPositionMap => DefaultMap.Value;
+
+    static readonly Lazy<LegPostureByPositionMap> DefaultMap = new(() =>
+        new LegPostureByPositionMapFileRepo(
+            new FileInfo(Path.Combine(AppContext.BaseDirectory, "DefaultLegPostureByPositionMap.json")))
+            .Load());
 }
