@@ -98,6 +98,14 @@ Details on test conventions are in `Test/CLAUDE.md`.
 - **Before non-trivial work:** read the index and the records relevant to the affected area. Name the records you relied on (or say none apply) when proposing the change.
 - **After a real discovery, decision, diagnosed failure, abandoned approach or significant completed task:** use the `record-knowledge` skill. It proposes records and waits for approval before writing them.
 
+## Linear issues
+
+Issues live in the Linear team **Mayday** (`MAY`).
+
+- **Title:** a need, phrased as what is true when the issue is done, as a behavior a test could check: `Need: Mayday has analytical inverse kinematics with sub-mm accuracy`, not `Replace posture-map lookup with IK`.
+- **Description:** `## Problem` with the evidence found, `## Goal`, and `## Done when` as Given/When/Then acceptance criteria. Link related issues.
+- **Project, labels, estimate:** when creating an issue, suggest a fitting existing project, labels (`Bug`, `Feature`, `Improvement`) and an estimate in points to the user, with a reason for each, and set them only once the user agrees.
+
 ## Commits
 
 Commit each intent as soon as it is complete and its tests pass, without waiting to be asked. Work on a feature branch, push it and open a pull request when the work is complete; the user reviews, approves and merges. Stage only the files for this commit's intent, so each commit holds **one intent**: its subject needs no "and".
