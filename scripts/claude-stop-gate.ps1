@@ -13,7 +13,8 @@ $ErrorActionPreference = 'Stop'
 if (-not $GateScript) { $GateScript = Join-Path $PSScriptRoot 'gate.ps1' }
 [void][Console]::In.ReadToEnd() # hook input JSON; not needed, but drain it
 
-$output = & $GateScript -Configuration Debug 2>&1 | Out-String
+# *>&1, not 2>&1: the gate reports its steps with Write-Host (the information stream), which 2>&1 would drop.
+$output = & $GateScript -Configuration Debug *>&1 | Out-String
 if ($LASTEXITCODE -eq 0) { exit 0 }
 
 $tail = ($output -split "`r?`n" | Select-Object -Last 60) -join "`n"
