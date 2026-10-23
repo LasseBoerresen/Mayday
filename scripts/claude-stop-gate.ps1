@@ -13,8 +13,14 @@ $ErrorActionPreference = 'Stop'
 if (-not $GateScript) { $GateScript = Join-Path $PSScriptRoot 'gate.ps1' }
 [void][Console]::In.ReadToEnd() # hook input JSON; not needed, but drain it
 
-# *>&1, not 2>&1: the gate reports its steps with Write-Host (the information stream), which 2>&1 would drop.
-$output = & $GateScript -Configuration Debug *>&1 | Out-String
+# The gate runs in its own process, so every way it can fail ends as a non-zero exit code here, never as an
+# exception that would end this hook with exit 1, which Claude Code treats as non-blocking. In-process, with its
+# streams redirected, Windows PowerShell turns any stderr line from a tool the gate calls into a terminating error
+# under the gate's ErrorActionPreference=Stop. The child's Write-Host lines arrive on its stdout and its stderr
+# lines as error records; "$_" keeps each as the plain line it was.
+$ErrorActionPreference = 'Continue'
+$output = & powershell -NoProfile -ExecutionPolicy Bypass -File $GateScript -Configuration Debug 2>&1 |
+    ForEach-Object { "$_" } | Out-String
 if ($LASTEXITCODE -eq 0) { exit 0 }
 
 $tail = ($output -split "`r?`n" | Select-Object -Last 60) -join "`n"

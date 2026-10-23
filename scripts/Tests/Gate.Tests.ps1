@@ -35,6 +35,19 @@ exit `$LASTEXITCODE
     }
 
     function Get-Steps { if (Test-Path $script:Log) { @(Get-Content $script:Log) } else { @() } }
+
+    # Runs the Stop hook as Claude Code does, as its own process, and returns its exit code and raw stderr. The
+    # stderr goes straight to a file, so it holds exactly what Claude Code would read, without PowerShell wrapping.
+    function Invoke-StopHook([string] $GateScript) {
+        $stdin = Join-Path $TestDrive "stdin-$([guid]::NewGuid().ToString('N')).txt"
+        $stdout = Join-Path $TestDrive "stdout-$([guid]::NewGuid().ToString('N')).txt"
+        $stderr = Join-Path $TestDrive "stderr-$([guid]::NewGuid().ToString('N')).txt"
+        Set-Content -Path $stdin -Value ''
+        $process = Start-Process -FilePath powershell -NoNewWindow -Wait -PassThru `
+            -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$script:StopGate`"", '-GateScript', "`"$GateScript`"" `
+            -RedirectStandardInput $stdin -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+        [pscustomobject]@{ ExitCode = $process.ExitCode; Stderr = (Get-Content -Path $stderr -Raw) }
+    }
 }
 
 Describe 'gate.ps1' {
@@ -227,6 +240,42 @@ Describe 'claude-stop-gate.ps1' {
         # Then
         $exitCode | Should -Be 2
         Get-Content -Path $stderr -Raw | Should -Match '== FAILED: boom step'
+    }
+
+    It 'GivenGatePassesWithNativeStderr_WhenStopHookRuns_ThenExitsZero' {
+        # Given: like gate.ps1, the gate runs with ErrorActionPreference=Stop and a tool it calls writes to stderr
+        Set-Content -Path $script:FakeGate -Value 'param($Configuration); $ErrorActionPreference = ''Stop''; cmd /c "echo tool warning 1>&2"; exit 0'
+
+        # When
+        $result = Invoke-StopHook $script:FakeGate
+
+        # Then
+        $result.ExitCode | Should -Be 0
+    }
+
+    It 'GivenGateFailsWithNativeStderr_WhenStopHookRuns_ThenExitsTwoAndReportsStderrLinesPlainly' {
+        # Given
+        Set-Content -Path $script:FakeGate -Value 'param($Configuration); $ErrorActionPreference = ''Stop''; cmd /c "echo boom on stderr 1>&2"; exit 1'
+
+        # When
+        $result = Invoke-StopHook $script:FakeGate
+
+        # Then: the line arrives as written, not as a five-line PowerShell error record
+        $result.ExitCode | Should -Be 2
+        $result.Stderr | Should -Match 'boom on stderr'
+        $result.Stderr | Should -Not -Match 'NativeCommandError'
+    }
+
+    It 'GivenGateThrows_WhenStopHookRuns_ThenExitsTwoAndReportsTheError' {
+        # Given
+        Set-Content -Path $script:FakeGate -Value 'param($Configuration); throw ''gate crashed'''
+
+        # When
+        $result = Invoke-StopHook $script:FakeGate
+
+        # Then: a crashed gate blocks the turn like a failed one; exit 1 would let Claude Code carry on
+        $result.ExitCode | Should -Be 2
+        $result.Stderr | Should -Match 'gate crashed'
     }
 
     It 'GivenGateRunsInDebug_WhenStopHookRuns_ThenPassesDebugConfiguration' {
