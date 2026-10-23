@@ -37,6 +37,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Tests that passed locally failed on a clean CI runner](root-causes/tests-failing-only-on-a-clean-runner.md)
 - [Q.Rotate rejected positions longer than 1.1 m](root-causes/q-rotate-wrapped-position-in-q.md)
 - [Transform.HalfWayTo returned the wrong transform](root-causes/transform-halfway-to-wrong-result.md)
+- [Pushing from a linked worktree turned the shared repository bare](root-causes/inherited-git-dir-in-worktree-hooks.md)
 
 ## Frequently Used Findings
 
