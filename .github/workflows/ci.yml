@@ -83,10 +83,11 @@ jobs:
           name: quarantined-results
           path: TestResults
 
-  # The only check the master ruleset requires. Add each new gate to `needs`
-  # so the ruleset never has to change. `always()` keeps this job running when
-  # a dependency fails; without it a failed dependency would skip the gate, and
-  # GitHub treats a skipped required check as passing.
+  # One aggregate result for the workflow run. Add each new gated job to `needs`.
+  # It must not be a required status check, because this workflow does not run
+  # on pull requests (ADR 0006). `always()` keeps this job
+  # running when a dependency fails; without it a failed dependency would skip
+  # the gate and the run would look green.
   gate:
     if: always()
     needs: [build, test]
