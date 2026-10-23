@@ -35,4 +35,6 @@ The code itself is also following clean code priciples and is a fusion of object
 
 The gate runs locally ([ADR 0006](docs/adr/0006-run-quality-gates-locally.md)): [`scripts/gate.ps1`](scripts/README.md) builds the solution, runs the `Test` project without the tests marked `[Quarantine]`, and runs the Pester tests of the scripts. A Claude Code `Stop` hook runs it in Debug and a `pre-push` hook runs it in Release (`git config core.hooksPath .githooks` once per clone). Pull requests are reviewed and merged by the owner.
 
+Every pull request gets an advisory review by a separate, local Claude Code session, posted as a PR comment ([ADR 0010](docs/adr/0010-local-claude-review-of-every-pull-request.md)). A Claude Code hook starts it after `gh pr create` or `git push`; for pushes from elsewhere run [`scripts/review-pr.ps1`](scripts/README.md). It is not a check and blocks nothing.
+
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) is optional and manual (`workflow_dispatch`): the same build and tests on a clean GitHub runner, plus the `quarantined` job, which runs the quarantined tests (expected to fail) and reports them without blocking, so a recovering test is noticed. `EllieMainTests` is not gated while Ellie is work in progress. Planned, in order: coverage, complexity, mutation testing.

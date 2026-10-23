@@ -10,6 +10,16 @@
             "timeout": 120
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/scripts/claude-review-hook.ps1\"",
+            "timeout": 30
+          }
+        ]
       }
     ],
     "Stop": [
