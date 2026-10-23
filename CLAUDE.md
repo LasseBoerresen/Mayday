@@ -105,7 +105,8 @@ Commit each intent as soon as it is complete and its tests pass, without waiting
 - **Order:** refactoring commits come before, and separate from, the behavior commits they enable.
 - **Together:** a behavior change ships with its tests, XML docs, README updates and the ADR that records its decision. Use `test:` only for tests added to existing behavior.
 - **Apart:** findings, root causes, lessons, pitfalls, failed attempts and task summaries get their own `docs:` commit, because they outlive the code: reverting the change keeps the record.
-- **Merge style:** ask for a merge commit or rebase merge, never a squash, so these separate commits survive in history.
+- **Merge style:** pull requests are merged by rebase only (the `master gate` ruleset allows nothing else and requires linear history), so these separate commits survive in history.
+- **Linear branches:** keep a feature branch free of merge commits. To bring it up to date with `master` or resolve conflicts, rebase it onto `origin/master` and push with `--force-with-lease`; never merge `master` into it. Force-push only your own feature branch, never `master`.
 
 Subject: `<type>: <imperative summary>`, at most 72 characters, type one of `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
 
