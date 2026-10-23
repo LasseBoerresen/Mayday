@@ -15,7 +15,7 @@ BeforeAll {
         Set-Content -Path $wrapper -Value $Body
         # The gate runs Pester with ErrorActionPreference=Stop, which would turn the child's stderr into an exception.
         $ErrorActionPreference = 'Continue'
-        $output = '' | & powershell -NoProfile -ExecutionPolicy Bypass -File $wrapper 2>&1 | Out-String
+        $output = '' | & powershell -NoProfile -ExecutionPolicy Bypass -File $wrapper 2>&1 | ForEach-Object { "$_" } | Out-String
         [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output }
     }
 
