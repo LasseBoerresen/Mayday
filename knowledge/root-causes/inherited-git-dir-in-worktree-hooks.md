@@ -39,4 +39,4 @@ None recorded. The fix is part of pull request #42 (`chore/local-gates`), with t
 
 ## Related Decisions
 
-[ADR 0006](../../docs/adr/0006-run-quality-gates-locally.md), [ADR 0007](../../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md), [lesson: infrastructure tests must pass inside the thing they test](../lessons-learned/infrastructure-tests-run-in-a-different-environment.md)
+[ADR 0006](../../docs/adr/0006-run-quality-gates-locally.md), [ADR 0007](../../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md), [lesson: infrastructure tests must pass inside the thing they test](../lessons-learned/infrastructure-tests-run-in-a-different-environment.md), [pitfall: git location variables inherited from hooks](../pitfalls/git-env-inherited-from-hooks.md)

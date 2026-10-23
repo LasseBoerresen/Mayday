@@ -8,3 +8,4 @@ Record recurring mistakes or hazards when there is evidence, not merely speculat
 - [Using measured angle as every interpolation baseline](interpolation-baseline.md)
 - [Periodic loops in tests](periodic-loops-in-tests.md)
 - [Q's `-` operator returns inverse(a)·b](q-minus-operator-direction.md)
+- [Git location variables inherited from hooks](git-env-inherited-from-hooks.md)
