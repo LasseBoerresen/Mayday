@@ -214,6 +214,21 @@ Describe 'claude-stop-gate.ps1' {
         $result.Output | Should -Match 'boom in tests'
     }
 
+    It 'GivenGateFailsWithHostOutput_WhenStopHookRuns_ThenReportsThatOutputOnStderr' {
+        # Given: the gate reports its steps with Write-Host, and Claude Code reads only the hook's stderr
+        Set-Content -Path $script:FakeGate -Value 'param($Configuration); Write-Host "== FAILED: boom step"; exit 1'
+        $stderr = Join-Path $TestDrive "stderr-$([guid]::NewGuid().ToString('N')).txt"
+
+        # When
+        $ErrorActionPreference = 'Continue'
+        '' | & powershell -NoProfile -ExecutionPolicy Bypass -File $script:StopGate -GateScript $script:FakeGate 2> $stderr | Out-Null
+        $exitCode = $LASTEXITCODE
+
+        # Then
+        $exitCode | Should -Be 2
+        Get-Content -Path $stderr -Raw | Should -Match '== FAILED: boom step'
+    }
+
     It 'GivenGateRunsInDebug_WhenStopHookRuns_ThenPassesDebugConfiguration' {
         # Given
         Set-Content -Path $script:FakeGate -Value 'param($Configuration); if ($Configuration -eq ''Debug'') { exit 0 } else { exit 1 }'
