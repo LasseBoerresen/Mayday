@@ -28,6 +28,8 @@ public class MaydayLegTests
     
     static readonly TimeProvider TimeProvider = TimeProvider.System;
 
+    static readonly HumanVerifier Human = new(new ConsoleWindowHumanPrompt(timeout: TimeSpan.FromMinutes(10)));
+
     // Physical tests drive a real robot, so they keep the production fail-fast behavior.
     static readonly FatalErrorHandler FatalErrorHandler = new FailFastFatalErrorHandler();
 
@@ -76,8 +78,8 @@ public class MaydayLegTests
         AssertTransformEqual(testId, expectedTransform, actualTransform);
     }
 
-    [PhysicalRobotFact(Skip = "So far only a manual test. Needs to be automated.")]
-    void DemonstrationOfVerticalTipMovement()
+    [ManualRobotFact]
+    void GivenTipsAtStanceWidth_WhenMoveAllTipsDownThenUp_ThenAllTipsMoveVertically()
     {
         // Given
         var minZ = Length.FromMeters(-0.22); // -0.22
@@ -86,8 +88,7 @@ public class MaydayLegTests
         var stanceWidth = Length.FromMeters(0.125);
         var timeStep = TimeSpan.FromSeconds(0.125);
 
-
-
+        // When
         for (var z = maxZ; z > minZ; z -= deltaZ)
         {
             var tipPositions = MaydayStructureSet<Xyz>.FromSingle(new Xyz(stanceWidth, Length.Zero, z));
@@ -109,5 +110,10 @@ public class MaydayLegTests
             _testOutputHelper.WriteLine($"{TimeProvider.GetUtcNow()}: Sleeping");
             Thread.Sleep(timeStep);
         }
+
+        // Then
+        Assert.True(
+            Human.Confirms("Did all six leg tips move straight down about 40 cm and then straight back up, without jerks?"),
+            "The person watching saw a leg tip that did not move straight down and up.");
     }
 }
