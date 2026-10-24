@@ -36,7 +36,10 @@ public class LegTests(ITestOutputHelper output)
         Set-Content -Path $full -Value $Content
     }
 
+    # git warns on stderr, about line endings for one; run inside the gate with redirected streams, that line would be
+    # a terminating error under the gate's Stop preference.
     function Save-Commit {
+        $ErrorActionPreference = 'Continue'
         git -C $script:Repo add -A
         git -C $script:Repo commit -q -m change
     }

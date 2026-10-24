@@ -19,7 +19,10 @@ exit `$LASTEXITCODE
         [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output; GateRan = (Test-Path $script:GateLog) }
     }
 
+    # git warns on stderr, about line endings for one; run inside the gate with redirected streams, that line would be
+    # a terminating error under the gate's Stop preference.
     function New-Commit([string] $Path, [string] $Content = 'x') {
+        $ErrorActionPreference = 'Continue'
         $full = Join-Path $script:Repo $Path
         New-Item -ItemType Directory -Force -Path (Split-Path $full) | Out-Null
         Set-Content -Path $full -Value $Content
