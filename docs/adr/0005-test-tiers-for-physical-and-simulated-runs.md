@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed. The decision was made, but the `Tier` trait is not implemented yet.
+Accepted, partly implemented. `PhysicalRobotFact` and `PhysicalRobotTheory` set `Tier=Physical`, `ManualRobotFact` sets `Tier=Manual` ([ADR 0009](0009-manual-robot-tests-confirmed-by-a-human.md)), and the local gate excludes both. The simulated tier and the hardware workflow are not built.
 
 ## Context
 

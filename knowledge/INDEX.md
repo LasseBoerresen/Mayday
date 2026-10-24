@@ -8,7 +8,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0002: Hardware access at the adapter boundary](../docs/adr/0002-hardware-adapter-boundary.md)
 - [ADR 0003: Gate pull requests with one aggregate check](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md) (Superseded by ADR 0006)
 - [ADR 0004: Quarantine failing tests with a trait](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)
-- [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Proposed, not implemented)
+- [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Accepted; `Tier` trait in use, simulated tier not built)
 - [ADR 0006: Run quality gates locally](../docs/adr/0006-run-quality-gates-locally.md)
 - [ADR 0007: Infrastructure code is tested like product code](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)
 - [ADR 0008: Cyclomatic complexity gate with CA1502](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md)

@@ -10,8 +10,10 @@
     git tracks or could track). When the tree is unchanged since the last pass the gate returns immediately, so
     it can run on every Claude Code stop and every push without repeating work. Use -Force to ignore the memory.
 
-    No robot is attached when the gate runs: MAYDAY_ROBOT_IS_CONNECTED is forced to False so a physical test can
-    never try to move one. Main and EllieMain are never run.
+    The gate never drives the robot: the tests marked Tier=Physical or Tier=Manual are excluded, because user
+    secrets can say the robot is connected and override the environment. MAYDAY_ROBOT_IS_CONNECTED is also forced
+    to False, so a physical test that lacks the trait still skips. Main and EllieMain are never run. Physical and
+    manual tests are run by hand.
 
 .PARAMETER Configuration
     Build configuration. Release matches CI; Debug is faster for tight loops.
@@ -32,7 +34,7 @@
 
 .PARAMETER TestCommand
     Runs the blocking tests, with the same contract as -BuildCommand. Defaults to the Test project without the
-    [Quarantine] tests.
+    [Quarantine], physical and manual tests.
 
 .PARAMETER ScriptTestCommand
     Runs the tests of the scripts themselves, with the same contract as -BuildCommand. Defaults to the Pester
@@ -51,7 +53,8 @@ param(
     },
     [scriptblock] $TestCommand = {
         param($Configuration)
-        dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine!=true'
+        dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo `
+            --filter 'Quarantine!=true&Tier!=Physical&Tier!=Manual'
     },
     [scriptblock] $ScriptTestCommand = {
         param($Configuration)
