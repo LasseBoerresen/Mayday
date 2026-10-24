@@ -47,6 +47,8 @@ public sealed class ConsoleWindowHumanPrompt(TimeSpan timeout) : HumanPrompt
             if (!window.WaitForExit(timeout))
             {
                 window.Kill();
+                // Kill only requests termination; wait so the window releases its files before the directory goes.
+                window.WaitForExit();
                 throw new TimeoutException($"No answer within {timeout} to: {question}");
             }
 
