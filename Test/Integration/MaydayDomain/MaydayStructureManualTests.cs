@@ -33,29 +33,34 @@ public class MaydayStructureManualTests
                 new MaydayLegFactory(jointFactory, MaydayTestObjectMother.DefaultLegPostureByPositionMap))
             .CreateDefault();
 
-        // From Sitting, the posture map has no posture for the rear legs' forward targets, which pull their tips in
-        // towards the body, so they would silently keep their posture. From SittingTall all six targets are mapped.
-        MoveAndSettle(() => structure.SetPostureForAllLegs(
-            TimeProvider.ScheduleIn(MaydayLegPosture.SittingTall, MoveDuration)));
+        // A failed assertion or an unanswered prompt still sits the robot down before the joints are released.
+        try
+        {
+            // From Sitting, the posture map has no posture for the rear legs' forward targets, which pull their tips
+            // in towards the body, so they would silently keep their posture. From SittingTall all six are mapped.
+            MoveAndSettle(() => structure.SetPostureForAllLegs(
+                TimeProvider.ScheduleIn(MaydayLegPosture.SittingTall, MoveDuration)));
 
-        Assert.True(
-            Human.Confirms("Is Mayday sitting tall, with all six legs pointing straight out from the body?"),
-            "Precondition: Mayday did not sit tall with straight legs.");
+            Assert.True(
+                Human.Confirms("Is Mayday sitting tall, with all six legs pointing straight out from the body?"),
+                "Precondition: Mayday did not sit tall with straight legs.");
 
-        // When
-        // Larger moves fold the rear legs so far that the femur motor hits the body on the robot.
-        var forward5Cm = Xyz.Zero with { X = Length.FromCentimeters(5) };
-        MoveAndSettle(() => structure.MoveTipsBy(TimeProvider.ScheduleIn(forward5Cm, MoveDuration)));
+            // When
+            // Larger moves fold the rear legs so far that the femur motor hits the body on the robot.
+            var forward5Cm = Xyz.Zero with { X = Length.FromCentimeters(5) };
+            MoveAndSettle(() => structure.MoveTipsBy(TimeProvider.ScheduleIn(forward5Cm, MoveDuration)));
 
-        // Then
-        var allTipsMovedForward = Human.Confirms(
-            "Did all six leg tips move about 5 cm forward, towards Mayday's front?");
-
-        MoveAndSettle(() => structure.SetPostureForAllLegs(
-            TimeProvider.ScheduleIn(MaydayLegPosture.Sitting, MoveDuration)));
-        cts.Cancel();
-
-        Assert.True(allTipsMovedForward, "The person watching saw a leg tip that did not move forward.");
+            // Then
+            Assert.True(
+                Human.Confirms("Did all six leg tips move about 5 cm forward, towards Mayday's front?"),
+                "The person watching saw a leg tip that did not move forward.");
+        }
+        finally
+        {
+            MoveAndSettle(() => structure.SetPostureForAllLegs(
+                TimeProvider.ScheduleIn(MaydayLegPosture.Sitting, MoveDuration)));
+            cts.Cancel();
+        }
     }
 
     static void MoveAndSettle(Action move)
