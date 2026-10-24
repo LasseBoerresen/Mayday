@@ -22,7 +22,7 @@ public class MaydayStructureManualTests
     static readonly HumanVerifier Human = new(new ConsoleWindowHumanPrompt(timeout: TimeSpan.FromMinutes(10)));
 
     [ManualRobotFact]
-    public void GivenSittingTallRobot_WhenMoveAllTipsForward5cm_ThenAllTipsMoveForward()
+    public void GivenSittingTallRobot_WhenMoveAllTipsForward9cm_ThenAllTipsMoveForward()
     {
         // Given
         using CancellationTokenSource cts = new();
@@ -43,12 +43,14 @@ public class MaydayStructureManualTests
             "Precondition: Mayday did not sit tall with straight legs.");
 
         // When
-        var forward5Cm = Xyz.Zero with { X = Length.FromCentimeters(5) };
-        MoveAndSettle(() => structure.MoveTipsBy(TimeProvider.ScheduleIn(forward5Cm, MoveDuration)));
+        // 9 cm is the largest move the posture map covers for all six legs from SittingTall; at 10 cm the front
+        // tips are out of its reach.
+        var forward9Cm = Xyz.Zero with { X = Length.FromCentimeters(9) };
+        MoveAndSettle(() => structure.MoveTipsBy(TimeProvider.ScheduleIn(forward9Cm, MoveDuration)));
 
         // Then
         var allTipsMovedForward = Human.Confirms(
-            "Did all six leg tips move about 5 cm forward, towards Mayday's front?");
+            "Did all six leg tips move about 9 cm forward, towards Mayday's front?");
 
         MoveAndSettle(() => structure.SetPostureForAllLegs(
             TimeProvider.ScheduleIn(MaydayLegPosture.Sitting, MoveDuration)));
