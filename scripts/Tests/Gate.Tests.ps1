@@ -254,7 +254,9 @@ New-Item -ItemType Directory -Force -Path (Split-Path $ResultsFile) | Out-Null
 $rows = $results | ForEach-Object { "<UnitTestResult testName=`"$($_.name)`" outcome=`"$($_.outcome)`" />" }
 Set-Content -Path $ResultsFile -Value ('<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><Results>' +
     ($rows -join '') + '</Results></TestRun>')
-$exit = (Get-Content -Path $Scenario -Raw | ConvertFrom-Json).exits.$Filter
+$scenarioData = Get-Content -Path $Scenario -Raw | ConvertFrom-Json
+if ($scenarioData.stderr) { cmd /c "echo [FAIL] $Filter 1>&2" }
+$exit = $scenarioData.exits.$Filter
 if ($exit) { exit $exit }
 if ($results | Where-Object { $_.outcome -eq 'Failed' }) { exit 1 }
 exit 0
@@ -290,7 +292,8 @@ exit 0
             [string] $ClearToMove = "'True'",
             [string] $Connected = '$global:LASTEXITCODE = 0',
             [string] $Ratchet = '$global:LASTEXITCODE = 0',
-            [string] $Prelude = '') {
+            [string] $Prelude = '',
+            [string] $Redirect = '') {
             $scenarioFile = Join-Path $TestDrive "scenario-$([guid]::NewGuid().ToString('N')).json"
             $Scenario | ConvertTo-Json -Depth 5 | Set-Content -Path $scenarioFile
             Invoke-Wrapper @"
@@ -302,7 +305,7 @@ $Prelude
     -ClearToMoveCommand { $ClearToMove } ``
     -ConnectedCommand { $Connected } ``
     -ListTestsCommand { param(`$c, `$f) & '$script:FakeList' `$c `$f '$scenarioFile' } ``
-    -TestRunCommand { param(`$c, `$f, `$r) & '$script:FakeRun' `$c `$f `$r '$scenarioFile' '$script:Log' }
+    -TestRunCommand { param(`$c, `$f, `$r) & '$script:FakeRun' `$c `$f `$r '$scenarioFile' '$script:Log' } $Redirect
 exit `$LASTEXITCODE
 "@
         }
@@ -460,6 +463,19 @@ exit `$LASTEXITCODE
         # Then
         $result.ExitCode | Should -Not -Be 0
         $result.Output | Should -Match 'exit 2 with no failing test reported'
+    }
+
+    It 'GivenFailingTestsWriteToStderr_WhenRunWithRedirectedStreams_ThenStillJudgesAllRuns' {
+        # Given: dotnet test reports a failing test on stderr, and the caller redirects the gate's streams
+        $scenario = New-Scenario
+        $scenario.stderr = $true
+
+        # When
+        $result = Invoke-PhysicalGate $scenario -Redirect '*>&1 | Out-Host'
+
+        # Then: the quarantined failure is expected, so the baseline still holds
+        $result.ExitCode | Should -Be 0
+        Get-Runs | Should -HaveCount 4
     }
 
     It 'GivenPhysicalPassOnUnchangedTree_WhenRunAgain_ThenDoesNotDriveTheRobotAgain' {
