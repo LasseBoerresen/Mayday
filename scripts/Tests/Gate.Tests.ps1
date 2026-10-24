@@ -206,6 +206,21 @@ exit `$LASTEXITCODE
         Get-Steps | Should -Contain 'robot=False'
     }
 
+    It 'GivenDefaultTestCommand_WhenInspected_ThenExcludesPhysicalAndManualTiers' {
+        # Given: the user secrets can say the robot is connected, which overrides the forced environment variable,
+        # so the filter is what keeps the gate off the robot. The default is a parameter value, read from the script.
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:Gate, [ref]$null, [ref]$null)
+        $testCommand = $ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'TestCommand' }
+
+        # When
+        $default = $testCommand.DefaultValue.Extent.Text
+
+        # Then
+        $default | Should -Match 'Tier!=Physical'
+        $default | Should -Match 'Tier!=Manual'
+        $default | Should -Match 'Quarantine!=true'
+    }
+
     It 'GivenFailingScriptTests_WhenRun_ThenExitsNonZero' {
         # Given
         $body = @"
