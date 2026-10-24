@@ -12,6 +12,8 @@ Mayday and shared-layer xUnit unit/integration tests and test utilities.
 
 Hardware-independent tests by default; physical tests explicitly marked `PhysicalRobotFact`/`PhysicalRobotTheory`.
 
+Manual tests (`[ManualRobotFact]`, trait `Tier=Manual`) drive the real robot and ask the person watching a yes/no question through `Utilities/HumanVerifier.cs`, which opens a prompt window (`Utilities/HumanPrompt.cs`, Windows only). They skip unless both `MAYDAY_ROBOT_IS_CONNECTED` and `MAYDAY_HUMAN_IS_PRESENT` are `True`; run them with `dotnet test Test\Test.csproj --filter "Tier=Manual"`. See [ADR 0009](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md).
+
 A test known to fail is marked `[Quarantine("reason")]` (`Utilities/QuarantineAttribute.cs`), on the method or the class. It gets the trait `Quarantine=true`, so `dotnet test --filter "Quarantine!=true"` is the blocking run and `--filter "Quarantine=true"` lists what is still broken. Quarantine records a failure with its cause; it never changes what a test expects. Fix the test or the code, then remove the attribute.
 
 For multi-value or domain-specific parameterized cases, prefer a test-specific `TheoryData<TestInput>` with named `TestInput` members over positional `[InlineData]`. See [ThoraxTests](Unit/Components/ThoraxTests.cs) and the [test guidance](CLAUDE.md).
@@ -38,7 +40,7 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Local gate](../docs/adr/0006-run-quality-gates-locally.md) (replaces [aggregate-check gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Local gate](../docs/adr/0006-run-quality-gates-locally.md) (replaces [aggregate-check gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md), [manual robot tests](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
 
 ## Related Findings
 

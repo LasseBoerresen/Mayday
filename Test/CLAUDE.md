@@ -21,3 +21,5 @@ Use `TimeProvider` and `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Te
 ## Physical tests
 
 `[PhysicalRobotFact]` / `[PhysicalRobotTheory]` tests drive the real robot. They skip unless `MAYDAY_ROBOT_IS_CONNECTED` is `True` in the Test project's user secrets or environment. The value is `False` on the development machine; keep it that way unless the user sets it themselves. Mark any new test that needs hardware with one of these attributes.
+
+`[ManualRobotFact]` tests also need a person at the robot: they ask yes/no questions through `HumanVerifier` and skip unless `MAYDAY_HUMAN_IS_PRESENT` is `True` as well. Use them for physical behavior no sensor can report. Confirm the starting state with the human before the move under test, and phrase each question with what to look at and the expected size of the move. Never set `MAYDAY_HUMAN_IS_PRESENT` yourself.
