@@ -43,14 +43,15 @@ public class DefaultMaydayStructureTests
         Assert.True(may != null);
     }
 
-    [Fact] 
-    [Quarantine("Moq cannot create a MaydayLeg proxy: the MaydayLeg constructor no longer takes the arguments the mock supplies.")]
+    [Fact]
     public void GivenMaydayRobotWithMockLegs_WhenSetPosture_ThenCallsSetPostureOnAllLegs()
     {
         // Given
         var thorax = Link.CreateThorax;
+        var legPostureByPositionMap = MaydayTestObjectMother.LegPostureByPositionMap;
         Dictionary<MaydayLegId, Mock<MaydayLeg>> mockLegsDict = new();
-        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id, new(new List<Connection>(), new List<Link>())));
+        AllLegIds.ToList().ForEach(id => mockLegsDict.Add(id,
+            new(new List<Connection>(), new List<Link>(), legPostureByPositionMap)));
         var legsDict = mockLegsDict.MapValue(ml => ml.Object);
         
         DefaultMaydayStructure may = new(thorax, legsDict);
