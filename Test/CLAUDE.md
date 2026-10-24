@@ -20,4 +20,4 @@ Use `TimeProvider` and `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Te
 
 ## Physical tests
 
-`[PhysicalRobotFact]` / `[PhysicalRobotTheory]` tests drive the real robot. They skip unless `MAYDAY_ROBOT_IS_CONNECTED` is `True` in the Test project's user secrets or environment; an environment variable overrides the user secrets. The value is `False` on the development machine; keep it that way unless the user sets it themselves. Mark any new test that needs hardware with one of these attributes.
+`[PhysicalRobotFact]` / `[PhysicalRobotTheory]` tests drive the real robot. They carry the trait `Tier=Physical`, which the gate filters out. They skip unless `MAYDAY_ROBOT_IS_CONNECTED` is `True` in the Test project's user secrets or environment; an environment variable overrides the user secrets. The value is `False` on the development machine; keep it that way unless the user sets it themselves. Mark any new test that needs hardware with one of these attributes.

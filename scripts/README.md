@@ -6,7 +6,7 @@ The local quality gate and the hooks that enforce it ([ADR 0006](../docs/adr/000
 
 ## Public APIs
 
-- `gate.ps1 [-Configuration Release|Debug] [-Quarantined] [-Force]`: builds `Mayday.sln`, runs the `Test` project without `[Quarantine]` tests, then the Pester tests of these scripts. Exits non-zero on the first failing step. A pass is remembered per configuration for an unchanged working tree (every non-Markdown file git tracks or could track, excluding `.idea`, `.claude`, `knowledge`, `docs`, `Media`) and skipped next time unless `-Force`. It finds the repository from `-RepoRoot` only: it clears inherited git location variables such as `GIT_DIR`, which git sets when it runs hooks of a linked worktree, before any step runs.
+- `gate.ps1 [-Configuration Release|Debug] [-Quarantined] [-Force]`: builds `Mayday.sln`, runs the `Test` project without `[Quarantine]` or physical (`Tier=Physical`) tests, then the Pester tests of these scripts. Exits non-zero on the first failing step. A pass is remembered per configuration for an unchanged working tree (every non-Markdown file git tracks or could track, excluding `.idea`, `.claude`, `knowledge`, `docs`, `Media`) and skipped next time unless `-Force`. It finds the repository from `-RepoRoot` only: it clears inherited git location variables such as `GIT_DIR`, which git sets when it runs hooks of a linked worktree, before any step runs.
 - `claude-stop-gate.ps1`: the Claude Code `Stop` hook. Runs `gate.ps1` in Debug, in its own process; exits 2 with the tail of the output on any failure, a crash included, so Claude must fix it before finishing.
 - `quality-gates/` (outside this directory): the portable complexity gate; `gate.ps1` also runs its Pester tests. See its [README](../quality-gates/README.md).
 - `.githooks/pre-push` (outside this directory): runs `gate.ps1` in Release. Enable with `git config core.hooksPath .githooks`.
@@ -17,7 +17,7 @@ PowerShell 5.1, git, the .NET SDK and Pester 5+ (`Install-Module Pester -Minimum
 
 ## Invariants
 
-- The gate forces `MAYDAY_ROBOT_IS_CONNECTED=False` and never runs `Main` or `EllieMain`.
+- The gate never moves a robot: it filters physical tests out (`Tier!=Physical`), forces `MAYDAY_ROBOT_IS_CONNECTED=False`, which overrides the user secrets, and never runs `Main` or `EllieMain`.
 - A failed run never records a pass.
 - Scripts have tests in `Tests` ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). `gate.ps1` takes `-RepoRoot`, `-BuildCommand`, `-TestCommand` and `-ScriptTestCommand`, and the hook takes `-GateScript`, so tests can replace the expensive steps; the defaults are the real behavior.
 

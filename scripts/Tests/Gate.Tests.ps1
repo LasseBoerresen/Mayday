@@ -206,6 +206,14 @@ exit `$LASTEXITCODE
         Get-Steps | Should -Contain 'robot=False'
     }
 
+    It 'GivenAnyRobotConfiguration_WhenRun_ThenTestsExcludePhysicalAndQuarantinedTests' {
+        # When
+        Invoke-Gate -Test 'param($c, $filter) Add-Content -Path ''LOG'' -Value "filter=$filter"' | Out-Null
+
+        # Then
+        Get-Steps | Should -Be @('build Release', 'filter=Quarantine!=true&Tier!=Physical')
+    }
+
     It 'GivenFailingScriptTests_WhenRun_ThenExitsNonZero' {
         # Given
         $body = @"

@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed. The decision was made, but the `Tier` trait is not implemented yet.
+Proposed. Partly implemented: `PhysicalRobotFact` and `PhysicalRobotTheory` set `Tier=Physical`, and the local gate filters on it (`Tier!=Physical`). CI does not filter on it yet, and the simulated tier and manual hardware workflow are not built.
 
 ## Context
 

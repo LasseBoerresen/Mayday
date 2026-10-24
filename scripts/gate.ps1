@@ -4,14 +4,15 @@
 
 .DESCRIPTION
     The same checks as the optional GitHub workflow (.github/workflows/ci.yml): a build and the tests that are
-    not marked [Quarantine]; plus the Pester tests of these scripts. Exits non-zero when any step fails.
+    not marked [Quarantine] or physical; plus the Pester tests of these scripts. Exits non-zero when any step fails.
 
     A pass is remembered per configuration against a fingerprint of the working tree (every non-Markdown file
     git tracks or could track). When the tree is unchanged since the last pass the gate returns immediately, so
     it can run on every Claude Code stop and every push without repeating work. Use -Force to ignore the memory.
 
-    No robot is attached when the gate runs: MAYDAY_ROBOT_IS_CONNECTED is forced to False so a physical test can
-    never try to move one. Main and EllieMain are never run.
+    The gate never moves a robot, even when one is attached: physical tests (trait Tier=Physical) are filtered out
+    of every test run, and MAYDAY_ROBOT_IS_CONNECTED is forced to False, which overrides the user secrets, so any
+    physical test that slips past the filter skips. Main and EllieMain are never run.
 
 .PARAMETER Configuration
     Build configuration. Release matches CI; Debug is faster for tight loops.
@@ -31,8 +32,8 @@
     building Mayday.sln. Overridden by the script tests so they do not compile the solution.
 
 .PARAMETER TestCommand
-    Runs the blocking tests, with the same contract as -BuildCommand. Defaults to the Test project without the
-    [Quarantine] tests.
+    Runs the blocking tests, with the same contract as -BuildCommand; also receives the test filter, which excludes
+    [Quarantine] and physical tests. Defaults to the Test project with that filter.
 
 .PARAMETER ScriptTestCommand
     Runs the tests of the scripts themselves, with the same contract as -BuildCommand. Defaults to the Pester
@@ -50,8 +51,8 @@ param(
         dotnet build Mayday.sln --configuration $Configuration --nologo --verbosity quiet
     },
     [scriptblock] $TestCommand = {
-        param($Configuration)
-        dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine!=true'
+        param($Configuration, $Filter)
+        dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter $Filter
     },
     [scriptblock] $ScriptTestCommand = {
         param($Configuration)
@@ -109,13 +110,15 @@ if (-not $Force -and (Test-Path $memory) -and ((Get-Content $memory -Raw).Trim()
 
 Invoke-Step "Build ($Configuration)" { & $BuildCommand $Configuration }
 
-Invoke-Step "Tests, quarantined excluded ($Configuration)" { & $TestCommand $Configuration }
+Invoke-Step "Tests, quarantined and physical excluded ($Configuration)" {
+    & $TestCommand $Configuration 'Quarantine!=true&Tier!=Physical'
+}
 
 Invoke-Step "Script tests (Pester)" { & $ScriptTestCommand $Configuration }
 
 if ($Quarantined) {
     Write-Host '== Quarantined tests (expected to fail, non-blocking)'
-    dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine=true' |
+    dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine=true&Tier!=Physical' |
         Select-String -Pattern 'Passed!|Failed!|Passed |Total tests|Passed:|Failed:'
     Write-Host '   Any quarantined test that passes should lose its [Quarantine] attribute.'
     $global:LASTEXITCODE = 0

@@ -10,7 +10,7 @@ Accepted. Supersedes [ADR 0003](0003-gate-pull-requests-with-one-aggregate-check
 
 ## Decision
 
-- `scripts/gate.ps1` is the gate: build, the tests not marked `[Quarantine]`, and the Pester tests of the scripts themselves, with `MAYDAY_ROBOT_IS_CONNECTED` forced to `False`. It remembers a pass per configuration for an unchanged working tree, so repeat runs cost nothing.
+- `scripts/gate.ps1` is the gate: build, the tests not marked `[Quarantine]` or `Tier=Physical`, and the Pester tests of the scripts themselves, with `MAYDAY_ROBOT_IS_CONNECTED` forced to `False`. It remembers a pass per configuration for an unchanged working tree, so repeat runs cost nothing.
 - Two hooks enforce it. A Claude Code `Stop` hook (`scripts/claude-stop-gate.ps1`, configured in `.claude/settings.json`) runs it in Debug and blocks a turn from ending while it fails. A `pre-push` hook (`.githooks/pre-push`, enabled with `git config core.hooksPath .githooks`) runs it in Release.
 - `.github/workflows/ci.yml` triggers on `workflow_dispatch` only. It is an optional second opinion on a clean runner, not a merge requirement.
 - The `master gate` ruleset must no longer require the `gate` check, because that check no longer reports on pull requests. The ruleset itself stays active with its remaining rules: pull requests, rebase merges only, no deletion or force-push. GitHub enforces these without a runner, so they add no wait; disabling the whole ruleset would remove them with nothing local to replace them. The owner reviews and merges every pull request.
