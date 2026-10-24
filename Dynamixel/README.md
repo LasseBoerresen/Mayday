@@ -67,7 +67,7 @@ Opening ports and enabling/moving motors are explicit hardware actions; do not r
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Step angle counts](../knowledge/root-causes/step-angle-4094-counts.md), [test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md)
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Step angle counts](../knowledge/root-causes/step-angle-4094-counts.md), [test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [user secrets overrode the gate's robot flag](../knowledge/root-causes/user-secrets-overrode-gate-robot-flag.md)
 
 ## Related Lessons Learned
 

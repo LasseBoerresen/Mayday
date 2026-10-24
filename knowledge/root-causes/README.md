@@ -12,3 +12,4 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [Q.Rotate rejected positions longer than 1.1 m](q-rotate-wrapped-position-in-q.md)
 - [Transform.HalfWayTo returned the wrong transform](transform-halfway-to-wrong-result.md)
 - [Pushing from a linked worktree turned the shared repository bare](inherited-git-dir-in-worktree-hooks.md)
+- [User secrets overrode the gate's robot-disconnected flag](user-secrets-overrode-gate-robot-flag.md)

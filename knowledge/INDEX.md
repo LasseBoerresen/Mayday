@@ -39,6 +39,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Q.Rotate rejected positions longer than 1.1 m](root-causes/q-rotate-wrapped-position-in-q.md)
 - [Transform.HalfWayTo returned the wrong transform](root-causes/transform-halfway-to-wrong-result.md)
 - [Pushing from a linked worktree turned the shared repository bare](root-causes/inherited-git-dir-in-worktree-hooks.md)
+- [User secrets overrode the gate's robot-disconnected flag](root-causes/user-secrets-overrode-gate-robot-flag.md)
 
 ## Frequently Used Findings
 
