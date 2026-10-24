@@ -12,3 +12,5 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [Q.Rotate rejected positions longer than 1.1 m](q-rotate-wrapped-position-in-q.md)
 - [Transform.HalfWayTo returned the wrong transform](transform-halfway-to-wrong-result.md)
 - [Pushing from a linked worktree turned the shared repository bare](inherited-git-dir-in-worktree-hooks.md)
+- [The rear femur motor hit the body](rear-femur-hits-body.md)
+- [User secrets override environment variables in tests](user-secrets-override-environment.md)

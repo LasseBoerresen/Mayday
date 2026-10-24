@@ -30,7 +30,7 @@ The direct Dynamixel project reference is a [documented exception](../knowledge/
 
 ## Common Pitfalls
 
-Do not infer physical orientation or safe angles from numeric IDs alone; test using echo joints first.
+Do not infer physical orientation or safe angles from numeric IDs alone; test using echo joints first. See [posture lookups that silently keep the current posture](../knowledge/pitfalls/posture-map-silent-fallback.md).
 
 ## Related ADRs
 
@@ -38,15 +38,15 @@ Do not infer physical orientation or safe angles from numeric IDs alone; test us
 
 ## Related Findings
 
-[Hardware reference](../knowledge/findings/mayday-domain-hardware-reference.md), [Scheduler construction](../knowledge/findings/scheduler-constructed-inside-domain-classes.md)
+[Hardware reference](../knowledge/findings/mayday-domain-hardware-reference.md), [Scheduler construction](../knowledge/findings/scheduler-constructed-inside-domain-classes.md), [Posture map accuracy](../knowledge/findings/posture-map-accuracy.md), [Right coxa direction mismatch](../knowledge/findings/right-coxa-direction-mismatch.md)
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md)
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md)
 
 ## Related Lessons Learned
 
-[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md).
+[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Predict on echo before hardware](../knowledge/lessons-learned/predict-on-echo-before-hardware.md).
 
 ## Related Failed Attempts
 

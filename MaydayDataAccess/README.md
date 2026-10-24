@@ -30,7 +30,7 @@ The application supplies the file path and owns file availability.
 
 ## Common Pitfalls
 
-JSON object keys are strings; do not deserialize directly into complex coordinate keys.
+JSON object keys are strings; do not deserialize directly into complex coordinate keys. See [posture lookups that silently keep the current posture](../knowledge/pitfalls/posture-map-silent-fallback.md).
 
 ## Related ADRs
 
@@ -38,7 +38,7 @@ JSON object keys are strings; do not deserialize directly into complex coordinat
 
 ## Related Findings
 
-None recorded.
+[Posture map accuracy](../knowledge/findings/posture-map-accuracy.md).
 
 ## Related Root Causes
 
