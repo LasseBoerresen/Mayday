@@ -25,7 +25,7 @@ public record MaydayLegPosture(Angle CoxaAngle, Angle FemurAngle, Angle TibiaAng
     public static MaydayLegPosture Straight => FromRevolutions(0.0, 0.0625, 0.25-0.0625);
     public static MaydayLegPosture StraightWithBackTwist => FromRevolutions(0.125, 0.0625, 0.25-0.0625);
     public static MaydayLegPosture Sitting => FromRevolutions(0.0, -0.3, -0.2);
-    public static MaydayLegPosture SittingTall => FromRevolutions(0.0, -0.25, -0.15);
+    public static MaydayLegPosture SittingTall => FromRevolutions(0.0, -0.25, -0.11);
     public static MaydayLegPosture Standing => FromRevolutions(0.0, -0.21, -0.26);
     public static MaydayLegPosture StandingHigh => FromRevolutions(0.0, 0.35, 0.3);
     public static MaydayLegPosture StandingWide => FromRevolutions(0.0, -0.2, -0.2);
