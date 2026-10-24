@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using AwesomeAssertions;
@@ -41,20 +42,25 @@ public class PeriodicSchedulerTests : IDisposable
         _fakeTimeProvider.Advance(_schedulerDuration * 2);
     }
 
-    [Fact(Skip = "Manual test so far, needs to be automated with assertions")]
+    [Fact]
+    [Quarantine("Assertion mismatch: on the real clock the scheduler ran the action only about 3 times in 100 ms, "
+        + "with periods of 0.5 to 2.6 ms instead of 1 ms within 10 µs (MAY-83).")]
     void ShouldBeWithin1PercentOfDuration()
     {
-        // Given
+        // Given: the real clock, since the period itself is what is measured
         var period = TimeSpan.FromMilliseconds(1);
-        var ctSource = new CancellationTokenSource();
+        var tolerance = period * 0.01;
+        var scheduler = new PeriodicScheduler(TimeProvider.System, _fatalErrorHandler);
+        using var ctSource = new CancellationTokenSource();
+        var periods = new ConcurrentQueue<TimeSpan>();
         var testStopwatch = Stopwatch.StartNew();
         var periodStopwatch = Stopwatch.StartNew();
 
         // When
-        _ = _periodicScheduler.RunAsync(
+        _ = scheduler.RunAsync(
             () =>
             {
-                _testOutputHelper.WriteLine($"{periodStopwatch.Elapsed} should be {period}");
+                periods.Enqueue(periodStopwatch.Elapsed);
                 periodStopwatch.Restart();
             },
             period,
@@ -65,8 +71,9 @@ public class PeriodicSchedulerTests : IDisposable
 
         ctSource.Cancel();
 
-        // Then
-
+        // Then: the first call only starts the measurement
+        periods.Skip(1).Should().NotBeEmpty()
+            .And.OnlyContain(measured => (measured - period).Duration() <= tolerance);
     }
 
     [Fact]
