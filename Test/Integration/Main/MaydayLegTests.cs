@@ -110,20 +110,4 @@ public class MaydayLegTests
             Thread.Sleep(timeStep);
         }
     }
-
-    /// <summary>
-    /// Tests basic inverse kinematics of legs, on real robot.
-    /// </summary>
-    [PhysicalRobotFact(Skip = "So far only a manual test. Needs to be automated.")]
-    void GivenLegsWithTipAtX015_WhenGetTipPosition_ThenReturnsX015()
-    {
-        // Given
-        throw new NotImplementedException();
-    
-        // When
-        // var actualPosition = MotionPlanner.GetPositionsOf(LinkName.Tip).LF;
-
-        // Then
-        // AssertXyzEqual(testId: "bla", expectedPosition, actualPosition);
-    }
 }
