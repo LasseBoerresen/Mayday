@@ -108,9 +108,7 @@ public class DefaultMaydayStructureTests
     public void GivenStructureWithStandingPostureAndTipsMovedBackward3cm__WhenGetCurrentLean__ThenIs3cmForward()
     {
         // Given
-        var mayStructure = new MaydayStructureFactory(
-                new MaydayLegFactory(new EchoJointFactory(), MaydayTestObjectMother.DefaultLegPostureByPositionMap))
-            .CreateDefault();
+        var mayStructure = MaydayTestObjectMother.CreateEchoStructureWithDefaultMap();
         
         var standingPostureCommand = Timed<MaydayLegPosture>.Passed(MaydayLegPosture.StandingWide);
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
