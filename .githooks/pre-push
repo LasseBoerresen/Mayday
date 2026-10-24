@@ -1,2 +1,2 @@
 #!/bin/sh
-exec powershell -NoProfile -ExecutionPolicy Bypass -File scripts/gate.ps1 -Configuration Release
+exec powershell -NoProfile -ExecutionPolicy Bypass -File scripts/pre-push.ps1
