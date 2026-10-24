@@ -10,11 +10,29 @@ public class TestConfiguration
         $"Robot is not connected, set config key '{MaydayRobotIsConnectedConfigKey}' "
         + $"to 'true' to run this test.";
     
+    const string MaydayHumanIsPresentConfigKey = "MAYDAY_HUMAN_IS_PRESENT";
+
+    public const string MaydayHumanIsNotPresentReason =
+        $"No human is present to answer, set config key '{MaydayHumanIsPresentConfigKey}' "
+        + $"to 'True' to run this manual test.";
+
     public static bool IsRobotConnected()
     {
-        // null config value is counted as not connected. 
+        // null config value is counted as not connected.
         var configValue = Create()[MaydayRobotIsConnectedConfigKey];
-        
+
+        return configValue == "True";
+    }
+
+    /// <summary>
+    /// Whether a person is at the robot to answer manual tests. Kept apart from <see cref="IsRobotConnected"/>, so an
+    /// unattended physical run is never left waiting for an answer.
+    /// </summary>
+    public static bool IsHumanPresent()
+    {
+        // null config value is counted as not present.
+        var configValue = Create()[MaydayHumanIsPresentConfigKey];
+
         return configValue == "True";
     }
     
