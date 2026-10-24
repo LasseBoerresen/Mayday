@@ -12,6 +12,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0006: Run quality gates locally](../docs/adr/0006-run-quality-gates-locally.md)
 - [ADR 0007: Infrastructure code is tested like product code](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)
 - [ADR 0008: Cyclomatic complexity gate with CA1502](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md)
+- [ADR 0009: Manual robot tests confirmed by a human](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
 
 ## Architectural Constraints
 
