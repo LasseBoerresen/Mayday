@@ -11,7 +11,7 @@
     it can run on every Claude Code stop and every push without repeating work. Use -Force to ignore the memory.
 
     The gate never drives the robot: the tests marked Tier=Physical or Tier=Manual are excluded, because user
-    secrets can say the robot is connected and override the environment. MAYDAY_ROBOT_IS_CONNECTED is also forced
+    secrets can say the robot is clear to move and override the environment. MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is also forced
     to False, so a physical test that lacks the trait still skips. Main and EllieMain are never run. Physical and
     manual tests are run by hand.
 
@@ -79,7 +79,7 @@ Set-Location $RepoRoot
 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_PREFIX', 'GIT_OBJECT_DIRECTORY',
     'GIT_ALTERNATE_OBJECT_DIRECTORIES' | ForEach-Object { Remove-Item -Path "Env:$_" -ErrorAction SilentlyContinue }
 
-$env:MAYDAY_ROBOT_IS_CONNECTED = 'False'
+$env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = 'False'
 
 function Get-TreeFingerprint {
     $files = git ls-files --cached --others --exclude-standard |

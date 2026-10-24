@@ -35,7 +35,7 @@ Run the smallest relevant test project first. Several projects set `TreatWarning
 
 ### Local gate
 
-`scripts\gate.ps1` is the gate: a build, the tests not marked `[Quarantine]`, physical (`Tier=Physical`) or manual (`Tier=Manual`), and the Pester tests of the scripts themselves (needs Pester 5+: `Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser`), with the robot forced to disconnected. It never drives the robot, even when the user secrets say it is connected; physical and manual tests are run by hand. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
+`scripts\gate.ps1` is the gate: a build, the tests not marked `[Quarantine]`, physical (`Tier=Physical`) or manual (`Tier=Manual`), and the Pester tests of the scripts themselves (needs Pester 5+: `Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser`), with the robot forced to not clear-to-move. It never drives the robot, even when the user secrets say it is clear to move; physical and manual tests are run by hand. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
 
 - A Claude Code `Stop` hook (`scripts\claude-stop-gate.ps1`) runs it in Debug and blocks you from finishing a turn while it fails. Fix the failure it reports; do not work around the hook.
 - A `pre-push` hook (`.githooks`) runs it in Release. After cloning, run `git config core.hooksPath .githooks` once.

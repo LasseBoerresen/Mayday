@@ -28,7 +28,7 @@ jobs:
     runs-on: windows-latest
     env:
       # No robot is attached to a runner. Say so explicitly so a physical test can never try to move one.
-      MAYDAY_ROBOT_IS_CONNECTED: "False"
+      MAYDAY_ROBOT_IS_CLEAR_TO_MOVE: "False"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -49,7 +49,7 @@ jobs:
   quarantined:
     runs-on: windows-latest
     env:
-      MAYDAY_ROBOT_IS_CONNECTED: "False"
+      MAYDAY_ROBOT_IS_CLEAR_TO_MOVE: "False"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

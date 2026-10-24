@@ -17,7 +17,7 @@ PowerShell 5.1, git, the .NET SDK and Pester 5+ (`Install-Module Pester -Minimum
 
 ## Invariants
 
-- The gate forces `MAYDAY_ROBOT_IS_CONNECTED=False` and never runs `Main` or `EllieMain`.
+- The gate forces `MAYDAY_ROBOT_IS_CLEAR_TO_MOVE=False` and never runs `Main` or `EllieMain`.
 - A failed run never records a pass.
 - Scripts have tests in `Tests` ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). `gate.ps1` takes `-RepoRoot`, `-BuildCommand`, `-TestCommand` and `-ScriptTestCommand`, and the hook takes `-GateScript`, so tests can replace the expensive steps; the defaults are the real behavior.
 

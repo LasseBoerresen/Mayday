@@ -193,14 +193,14 @@ exit `$LASTEXITCODE
         Get-Steps | Should -Be @('build Release', 'build Release', 'test Release')
     }
 
-    It 'GivenEnvironmentSaysRobotConnected_WhenRun_ThenTestsSeeRobotDisconnected' {
+    It 'GivenEnvironmentSaysRobotClearToMove_WhenRun_ThenTestsSeeRobotNotClearToMove' {
         # Given
-        $env:MAYDAY_ROBOT_IS_CONNECTED = 'True'
+        $env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = 'True'
         try {
             # When
-            Invoke-Gate -Test 'param($c) Add-Content -Path ''LOG'' -Value "robot=$env:MAYDAY_ROBOT_IS_CONNECTED"' | Out-Null
+            Invoke-Gate -Test 'param($c) Add-Content -Path ''LOG'' -Value "robot=$env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE"' | Out-Null
         }
-        finally { Remove-Item Env:MAYDAY_ROBOT_IS_CONNECTED }
+        finally { Remove-Item Env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE }
 
         # Then
         Get-Steps | Should -Contain 'robot=False'
