@@ -22,7 +22,5 @@ public class TestObjectMother : Unit.Base.TestObjectMother
     internal static LegPostureByPositionMap DefaultLegPostureByPositionMap => DefaultMap.Value;
 
     static readonly Lazy<LegPostureByPositionMap> DefaultMap = new(() =>
-        new LegPostureByPositionMapFileRepo(
-            new FileInfo(Path.Combine(AppContext.BaseDirectory, "DefaultLegPostureByPositionMap.json")))
-            .Load());
+        LegPostureByPositionMapFileRepo.ForDefaultMapIn(new DirectoryInfo(AppContext.BaseDirectory)).Load());
 }
