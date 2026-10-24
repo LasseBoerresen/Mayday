@@ -8,9 +8,10 @@ using RobotDomain.Time;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
+using Test.Unit.MaydayDomain;
 using static Test.Unit.TestObjectFactory;
 
-namespace Test.Unit.MaydayDomain;
+namespace Test.Integration.MaydayDomain;
 
 [Quarantine("Assertion mismatch on the reached tip position; previously hidden by EmptyMapException, cause not yet diagnosed.")]
 public class MaydayLegInverseKinematicsTests
