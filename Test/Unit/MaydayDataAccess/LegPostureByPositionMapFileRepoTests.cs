@@ -47,8 +47,10 @@ public class LegPostureByPositionMapFileRepoTests(ITestOutputHelper testOutputHe
     }
 
     /// <summary>
-    /// Not a test, but a builder of new <see cref="LegPostureByPositionMap"/>
+    /// Not a test, but a builder of new <see cref="LegPostureByPositionMap"/>. Carries <c>Tier=Manual</c>, like the
+    /// other tests that are only run by hand, so the gate's skipped-test check leaves it alone.
     /// </summary>
+    [Trait("Tier", "Manual")]
     [Fact(Skip = 
         $"Run only to rebuild and store {nameof(LegPostureByPositionMap)}, "
         + $"by manual copy from bin to MaydayDataAccess project")]
