@@ -22,7 +22,7 @@ public class MaydayStructureManualTests
     static readonly HumanVerifier Human = new(new ConsoleWindowHumanPrompt(timeout: TimeSpan.FromMinutes(10)));
 
     [ManualRobotFact]
-    public void GivenSittingRobot_WhenMoveAllTipsForward5cm_ThenAllTipsMoveForward()
+    public void GivenSittingTallRobot_WhenMoveAllTipsForward5cm_ThenAllTipsMoveForward()
     {
         // Given
         using CancellationTokenSource cts = new();
@@ -33,12 +33,14 @@ public class MaydayStructureManualTests
                 new MaydayLegFactory(jointFactory, MaydayTestObjectMother.DefaultLegPostureByPositionMap))
             .CreateDefault();
 
+        // From Sitting, the posture map has no posture for the rear legs' forward targets, which pull their tips in
+        // towards the body, so they would silently keep their posture. From SittingTall all six targets are mapped.
         MoveAndSettle(() => structure.SetPostureForAllLegs(
-            TimeProvider.ScheduleIn(MaydayLegPosture.Sitting, MoveDuration)));
+            TimeProvider.ScheduleIn(MaydayLegPosture.SittingTall, MoveDuration)));
 
         Assert.True(
-            Human.Confirms("Is Mayday sitting, with all six legs pointing straight out from the body?"),
-            "Precondition: Mayday did not sit with straight legs.");
+            Human.Confirms("Is Mayday sitting tall, with all six legs pointing straight out from the body?"),
+            "Precondition: Mayday did not sit tall with straight legs.");
 
         // When
         var forward5Cm = Xyz.Zero with { X = Length.FromCentimeters(5) };
