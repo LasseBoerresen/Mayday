@@ -59,11 +59,11 @@ Opening ports and enabling/moving motors are explicit hardware actions; do not r
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Test tiers](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md)
 
 ## Related Findings
 
-[MaydayDomain reference](../knowledge/findings/mayday-domain-hardware-reference.md).
+[MaydayDomain reference](../knowledge/findings/mayday-domain-hardware-reference.md), [Right coxa direction mismatch](../knowledge/findings/right-coxa-direction-mismatch.md).
 
 ## Related Root Causes
 

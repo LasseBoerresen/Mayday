@@ -29,6 +29,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Periodic loops in tests](pitfalls/periodic-loops-in-tests.md)
 - [Q's `-` operator returns inverse(a)·b](pitfalls/q-minus-operator-direction.md)
 - [Git location variables inherited from hooks](pitfalls/git-env-inherited-from-hooks.md)
+- [Posture lookups that silently keep the current posture](pitfalls/posture-map-silent-fallback.md)
 
 ## Common Root Causes
 
@@ -40,6 +41,8 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Q.Rotate rejected positions longer than 1.1 m](root-causes/q-rotate-wrapped-position-in-q.md)
 - [Transform.HalfWayTo returned the wrong transform](root-causes/transform-halfway-to-wrong-result.md)
 - [Pushing from a linked worktree turned the shared repository bare](root-causes/inherited-git-dir-in-worktree-hooks.md)
+- [The rear femur motor hit the body](root-causes/rear-femur-hits-body.md)
+- [User secrets override environment variables in tests](root-causes/user-secrets-override-environment.md)
 
 ## Frequently Used Findings
 
@@ -47,15 +50,19 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [PeriodicScheduler is constructed inside four production classes](findings/scheduler-constructed-inside-domain-classes.md)
 - [PeriodicScheduler.Wait ignores cancellation](findings/periodic-scheduler-wait-ignores-cancellation.md)
 - [PeriodicScheduler cannot be stepped under a fake clock](findings/periodic-scheduler-not-steppable-under-fake-time.md)
+- [Posture map lookups are accurate to about 1 cm](findings/posture-map-accuracy.md)
+- [The model and the robot disagree on the right coxa direction](findings/right-coxa-direction-mismatch.md)
 
 ## Recent Lessons Learned
 
+- [Predict on the echo model before a physical run](lessons-learned/predict-on-echo-before-hardware.md)
 - [Infrastructure tests must pass inside the thing they test](lessons-learned/infrastructure-tests-run-in-a-different-environment.md)
 - [Separate trajectory goals from measured joint state](lessons-learned/goal-versus-measured-state.md)
 - [Make tests able to fail on the bug they guard](lessons-learned/tests-must-discriminate.md)
 
 ## Recently Completed Tasks
 
+- [Lean test and manual robot tests](task-summaries/lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](task-summaries/pr-gating-and-test-baseline.md)
 - [Migrate agent guidance to CLAUDE.md](task-summaries/claude-md-migration.md)
 - [Repository memory foundation](task-summaries/repository-memory-foundation.md)
