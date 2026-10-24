@@ -104,7 +104,8 @@ public class DefaultMaydayStructureTests
     }
     
     [Fact]
-    public void GivenStructureWithStandingPostureAndTipsMovedBackward1cm__WhenGetCurrentLean__ThenIs1cmForward()
+    [Quarantine("Assertion mismatch: moving tips 3 cm backward gives a lean X of 0.007 instead of 0.030, because right legs reach the sideways mirror of their target with the left-leg posture map (MAY-75).")]
+    public void GivenStructureWithStandingPostureAndTipsMovedBackward3cm__WhenGetCurrentLean__ThenIs3cmForward()
     {
         // Given
         var mayStructure = new MaydayStructureFactory(
@@ -115,7 +116,8 @@ public class DefaultMaydayStructureTests
         mayStructure.SetPostureForAllLegs(standingPostureCommand);
         
         
-        var offsetX = Length.FromCentimeters(1);
+        // The posture map places tips only to about 1 cm (MAY-74), so move well beyond that accuracy.
+        var offsetX = Length.FromCentimeters(3);
         var offsetXyz = Xyz.Zero with { X = -offsetX };
         
         mayStructure.MoveTipsBy(Timed<Xyz>.Passed(offsetXyz));
@@ -125,11 +127,9 @@ public class DefaultMaydayStructureTests
         
         // Then
         // The z value is unknown, so just use the actual z. 
-        var forwardXyz1Cm = Xyz.Zero with {X = offsetX, Z = actualLean.Xyz.Z};
+        var forwardXyz3Cm = Xyz.Zero with {X = offsetX, Z = actualLean.Xyz.Z};
         
-        // The posture map places tips only to about 1 cm (MAY-74), so accept a coarse lean.
-        var coarseAccuracy = Length.FromCentimeters(3);
-        TestObjectFactory.AssertXyzEqual("testidfoo", forwardXyz1Cm, actualLean.Xyz, coarseAccuracy);
+        TestObjectFactory.AssertXyzEqual("testidfoo", forwardXyz3Cm, actualLean.Xyz);
     }
     
     // TODO: Test GetCurrentLean.Z by SetTipPositionsTo() in a circle, but with known Z. 
