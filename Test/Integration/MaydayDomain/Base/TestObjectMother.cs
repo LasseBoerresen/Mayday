@@ -27,6 +27,12 @@ public class TestObjectMother : Unit.Base.TestObjectMother
         new MaydayStructureFactory(new MaydayLegFactory(new EchoJointFactory(), DefaultLegPostureByPositionMap))
             .CreateDefault();
 
+    /// <summary>
+    /// A new hardware-free leg of echo joints that looks postures up in <see cref="DefaultLegPostureByPositionMap"/>.
+    /// </summary>
+    internal static MaydayLeg CreateEchoLegWithDefaultMap(MaydayLegId legId) =>
+        new MaydayLegFactory(new EchoJointFactory(), DefaultLegPostureByPositionMap).CreateLeg(legId);
+
     // Loaded once from the copy MaydayDataAccess places in the output directory.
     static readonly Lazy<LegPostureByPositionMap> DefaultMap = new(() =>
         LegPostureByPositionMapFileRepo.ForDefaultMapIn(new DirectoryInfo(AppContext.BaseDirectory)).Load());
