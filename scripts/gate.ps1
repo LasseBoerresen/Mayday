@@ -255,6 +255,9 @@ Invoke-Step "Build ($Configuration)" { & $BuildCommand $Configuration }
 
 if ($Physical) {
     Invoke-Step "Tests with the robot, manual excluded ($Configuration)" {
+        # A failing test writes to stderr. With redirected streams, Windows PowerShell turns such a line into an error
+        # record, which the Stop preference would make terminating; the exit codes and TRX files report the outcome.
+        $ErrorActionPreference = 'Continue'
         $resultsDir = Join-Path $gitDir 'gate-results'
         Remove-Item -Recurse -Force -Path $resultsDir -ErrorAction SilentlyContinue
         $runs = @(Get-PhysicalTierRuns)
