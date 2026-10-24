@@ -15,7 +15,7 @@ Some robot behavior can only be checked by looking at the robot. Mayday has no s
 Add a manual tier. `[ManualRobotFact]` marks a test that drives the real robot and asks the watching human a yes/no question through `HumanVerifier`, whose answer is the assertion.
 
 - It carries the trait `Tier=Manual`, so `dotnet test --filter "Tier=Manual"` runs exactly these tests. This is the first use of the `Tier` trait proposed in [ADR 0005](0005-test-tiers-for-physical-and-simulated-runs.md).
-- It skips unless both `MAYDAY_ROBOT_IS_CONNECTED` and `MAYDAY_HUMAN_IS_PRESENT` are `True`. The second key keeps an unattended physical run from waiting for an answer. The gate forces the robot to disconnected, so it never runs them.
+- It skips unless both `MAYDAY_ROBOT_IS_CONNECTED` and `MAYDAY_HUMAN_IS_PRESENT` are `True`. The second key keeps an unattended physical run from waiting for an answer. The gate never runs them because its test filter excludes `Tier=Manual`; forcing `MAYDAY_ROBOT_IS_CONNECTED` to `False` is not enough, since the user secrets override the environment.
 - `ConsoleWindowHumanPrompt` asks in a new PowerShell window and reads the answer back through a temporary file. `HumanVerifier` accepts `y`/`yes` and `n`/`no` and asks again on anything else; a closed window fails the test.
 - A manual test checks its starting state with the human first, so a "no" in the end points at the behavior under test, not at the setup.
 
