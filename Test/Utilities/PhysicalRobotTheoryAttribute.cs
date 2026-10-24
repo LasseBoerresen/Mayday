@@ -4,7 +4,7 @@ using Xunit.Sdk;
 namespace Test.Utilities;
 
 /// <summary>
-/// The theory form of <see cref="PhysicalRobotFactAttribute"/>: skips unless the robot is connected, and carries the
+/// The theory form of <see cref="PhysicalRobotFactAttribute"/>: skips unless the robot is clear to move, and carries the
 /// trait <c>Tier=Physical</c>, which the gate excludes.
 /// </summary>
 [TraitDiscoverer("Test.Utilities.PhysicalRobotTraitDiscoverer", "Test")]
@@ -13,7 +13,7 @@ public sealed class PhysicalRobotTheoryAttribute : TheoryAttribute, ITraitAttrib
 {
     public PhysicalRobotTheoryAttribute()
     {
-        if (!TestConfiguration.IsRobotConnected())
-            Skip = TestConfiguration.MaydayRobotIsNotConnectedReason;
+        if (!TestConfiguration.IsRobotClearToMove())
+            Skip = TestConfiguration.MaydayRobotIsNotClearToMoveReason;
     }
 }

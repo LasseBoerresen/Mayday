@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 using Xunit.Sdk;
 
 /// <summary>
-/// Marks a test that drives the real robot. Skips unless <see cref="TestConfiguration.IsRobotConnected"/> holds, and
+/// Marks a test that drives the real robot. Skips unless <see cref="TestConfiguration.IsRobotClearToMove"/> holds, and
 /// carries the trait <c>Tier=Physical</c>, which the gate excludes.
 /// </summary>
 [TraitDiscoverer("Test.Utilities.PhysicalRobotTraitDiscoverer", "Test")]
@@ -13,8 +13,8 @@ public sealed class PhysicalRobotFactAttribute : FactAttribute, ITraitAttribute
 {
     public PhysicalRobotFactAttribute()
     {
-        if (!TestConfiguration.IsRobotConnected())
-            Skip = TestConfiguration.MaydayRobotIsNotConnectedReason;
+        if (!TestConfiguration.IsRobotClearToMove())
+            Skip = TestConfiguration.MaydayRobotIsNotClearToMoveReason;
     }
 }
 

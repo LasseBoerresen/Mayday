@@ -12,7 +12,7 @@ Mayday and shared-layer xUnit unit/integration tests and test utilities.
 
 Hardware-independent tests by default; physical tests explicitly marked `PhysicalRobotFact`/`PhysicalRobotTheory`, which carry the trait `Tier=Physical`. The gate excludes `Tier=Physical` and `Tier=Manual`, so these run only by hand, for example `dotnet test Test\Test.csproj --filter "Tier=Physical"`.
 
-Manual tests (`[ManualRobotFact]`, trait `Tier=Manual`) drive the real robot and ask the person watching a yes/no question through `Utilities/HumanVerifier.cs`, which opens a prompt window (`Utilities/HumanPrompt.cs`, Windows only). They skip unless both `MAYDAY_ROBOT_IS_CONNECTED` and `MAYDAY_HUMAN_IS_PRESENT` are `True`; run them with `dotnet test Test\Test.csproj --filter "Tier=Manual"`. See [ADR 0009](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md).
+Manual tests (`[ManualRobotFact]`, trait `Tier=Manual`) drive the real robot and ask the person watching a yes/no question through `Utilities/HumanVerifier.cs`, which opens a prompt window (`Utilities/HumanPrompt.cs`, Windows only). They skip unless both `MAYDAY_ROBOT_IS_CLEAR_TO_MOVE` and `MAYDAY_HUMAN_IS_PRESENT` are `True`; run them with `dotnet test Test\Test.csproj --filter "Tier=Manual"`. See [ADR 0009](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md).
 
 A test known to fail is marked `[Quarantine("reason")]` (`Utilities/QuarantineAttribute.cs`), on the method or the class. It gets the trait `Quarantine=true`, so `dotnet test --filter "Quarantine!=true"` is the blocking run and `--filter "Quarantine=true"` lists what is still broken. Quarantine records a failure with its cause; it never changes what a test expects. Fix the test or the code, then remove the attribute.
 
