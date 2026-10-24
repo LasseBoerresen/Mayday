@@ -8,3 +8,5 @@ Record important, evidence-backed discoveries that have not necessarily caused a
 - [PeriodicScheduler is constructed inside four production classes](scheduler-constructed-inside-domain-classes.md)
 - [PeriodicScheduler.Wait ignores cancellation](periodic-scheduler-wait-ignores-cancellation.md)
 - [PeriodicScheduler cannot be stepped under a fake clock](periodic-scheduler-not-steppable-under-fake-time.md)
+- [Posture map lookups are accurate to about 1 cm](posture-map-accuracy.md)
+- [The model and the robot disagree on the right coxa direction](right-coxa-direction-mismatch.md)

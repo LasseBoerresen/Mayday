@@ -36,23 +36,23 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Common Pitfalls
 
-[Physical runs](../knowledge/pitfalls/physical-runs.md), [periodic loops in tests](../knowledge/pitfalls/periodic-loops-in-tests.md)
+[Physical runs](../knowledge/pitfalls/physical-runs.md), [periodic loops in tests](../knowledge/pitfalls/periodic-loops-in-tests.md), [posture map silent fallback](../knowledge/pitfalls/posture-map-silent-fallback.md)
 
 ## Related ADRs
 
-[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Local gate](../docs/adr/0006-run-quality-gates-locally.md) (replaces [aggregate-check gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers (proposed)](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md), [manual robot tests](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
+[Hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [Local gate](../docs/adr/0006-run-quality-gates-locally.md) (replaces [aggregate-check gating](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md)), [quarantine](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md), [test tiers](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md), [manual robot tests](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
 
 ## Related Findings
 
-[Scheduler not steppable under a fake clock](../knowledge/findings/periodic-scheduler-not-steppable-under-fake-time.md).
+[Scheduler not steppable under a fake clock](../knowledge/findings/periodic-scheduler-not-steppable-under-fake-time.md), [posture map accuracy](../knowledge/findings/posture-map-accuracy.md).
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../knowledge/root-causes/step-angle-4094-counts.md), [empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Clean-runner failures](../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md)
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../knowledge/root-causes/step-angle-4094-counts.md), [empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Clean-runner failures](../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md), [user secrets override the environment](../knowledge/root-causes/user-secrets-override-environment.md), [rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md)
 
 ## Related Lessons Learned
 
-[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md)
+[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md), [Predict on echo before hardware](../knowledge/lessons-learned/predict-on-echo-before-hardware.md)
 
 ## Related Failed Attempts
 

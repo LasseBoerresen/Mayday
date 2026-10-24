@@ -4,6 +4,7 @@ For significant completed work, use [the task summary template](../../templates/
 
 ## Entries
 
+- [Lean test and manual robot tests](lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](pr-gating-and-test-baseline.md)
 - [Migrate agent guidance to CLAUDE.md](claude-md-migration.md)
 - [Repository memory foundation](repository-memory-foundation.md)
