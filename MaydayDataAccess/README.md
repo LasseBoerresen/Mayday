@@ -6,7 +6,7 @@ Persist and map Mayday leg posture-by-position data.
 
 ## Public APIs
 
-`LegPostureByPositionMapFileRepo`, `MaydayLegPostureDao`, `Geometry.XyzDao`.
+`LegPostureByPositionMapFileRepo` (with `ForDefaultMapIn` for the map the robot uses, `DefaultLegPostureByPositionMap.json`), `MaydayLegPostureDao`, `Geometry.XyzDao`.
 
 ## Key Concepts
 

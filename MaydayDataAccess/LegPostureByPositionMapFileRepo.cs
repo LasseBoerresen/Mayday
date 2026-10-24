@@ -8,6 +8,13 @@ namespace MaydayDataAccess;
 
 public class LegPostureByPositionMapFileRepo(FileInfo mapFileInfo) : LegPostureByPositionMapRepo
 {
+    /// <summary>The file name of the map the robot uses, copied to the output directory of each referencing project.</summary>
+    public const string DefaultMapFileName = "DefaultLegPostureByPositionMap.json";
+
+    /// <summary>A repo for the map the robot uses, <see cref="DefaultMapFileName"/> in <paramref name="directory"/>.</summary>
+    public static LegPostureByPositionMapFileRepo ForDefaultMapIn(DirectoryInfo directory) =>
+        new(new FileInfo(Path.Combine(directory.FullName, DefaultMapFileName)));
+
     public LegPostureByPositionMap Load()
     {
         var json = File.ReadAllText(mapFileInfo.FullName);
