@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Test.Utilities;
 using MaydayDataAccess;
 using MaydayDomain;
 using RobotDomain.Geometry;
@@ -8,17 +7,14 @@ using RobotDomain.Time;
 using UnitsNet;
 using Xunit;
 using Xunit.Abstractions;
-using Test.Unit.MaydayDomain;
 using static Test.Unit.TestObjectFactory;
+using MaydayTestObjectMother = Test.Integration.MaydayDomain.Base.TestObjectMother;
 
 namespace Test.Integration.MaydayDomain;
 
-[Quarantine("Assertion mismatch on the reached tip position; previously hidden by EmptyMapException, cause not yet diagnosed.")]
 public class MaydayLegInverseKinematicsTests
 {
-    readonly MaydayLeg _leg = MaydayLegTests
-        .CreateEchoMaydayLegFactoryWithJointsAt(JointState.Zero)
-        .CreateLeg(new(Side.Left, SidePosition.Center));
+    readonly MaydayLeg _leg = MaydayTestObjectMother.CreateEchoLegWithDefaultMap(new(Side.Left, SidePosition.Center));
 
     [Fact]
     public void WhenSetReachableTipPositionTo_TheReachesThatPosition()
