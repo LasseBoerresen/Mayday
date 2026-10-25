@@ -23,7 +23,8 @@
     is not quarantined. Then it runs the
     hardware-free tests, the quarantined hardware-free tests and every physical test method in a process of its own,
     so a test that leaves the robot's port open cannot fail the next one. It fails when a test that is not quarantined
-    fails, when any test is skipped, and when a quarantined test passes: its [Quarantine] must then be removed. It
+    fails, when any test is skipped, when a physical method run executes no test, and when a quarantined test passes:
+    its [Quarantine] must then be removed. It
     reports every such test before failing. Main and EllieMain are never run; manual tests are run by hand.
 
 .PARAMETER Configuration
@@ -197,12 +198,13 @@ function Invoke-Step([string] $Name, [scriptblock] $Command) {
 # in its own process. One process per method because a physical test that leaves the robot's port open makes every
 # later one in the same process fail (MAY-81).
 function Get-PhysicalTierRuns {
-    [pscustomobject]@{ Name = 'Hardware-free tests'; Filter = 'Quarantine!=true&Tier!=Physical&Tier!=Manual'; Quarantined = $false }
-    [pscustomobject]@{ Name = 'Quarantined hardware-free tests'; Filter = 'Quarantine=true&Tier!=Physical&Tier!=Manual'; Quarantined = $true }
+    [pscustomobject]@{ Name = 'Hardware-free tests'; Filter = 'Quarantine!=true&Tier!=Physical&Tier!=Manual'; Quarantined = $false; MustRun = $false }
+    [pscustomobject]@{ Name = 'Quarantined hardware-free tests'; Filter = 'Quarantine=true&Tier!=Physical&Tier!=Manual'; Quarantined = $true; MustRun = $false }
     foreach ($quarantined in $false, $true) {
         foreach ($method in $script:PhysicalMethods[$quarantined]) {
             $name = if ($quarantined) { "Quarantined physical test $method" } else { "Physical test $method" }
-            [pscustomobject]@{ Name = $name; Filter = "FullyQualifiedName=$method"; Quarantined = $quarantined }
+            # A listed method must run: a filter that matches nothing would otherwise pass without the robot moving.
+            [pscustomobject]@{ Name = $name; Filter = "FullyQualifiedName=$method"; Quarantined = $quarantined; MustRun = $true }
         }
     }
 }
@@ -228,13 +230,16 @@ function Read-PhysicalMethods {
     }
 }
 
-# What a test run's results break: a failing or skipped test, or, in a quarantined run, a test that passes.
+# What a test run's results break: a failing or skipped test, in a quarantined run a test that passes, and in a run
+# that must run a test, no test at all.
 function Get-RunProblems($Run, [string] $ResultsFile, [int] $ExitCode) {
     if (-not (Test-Path $ResultsFile)) {
         if ($ExitCode -ne 0) { "$($Run.Name): no results (exit $ExitCode)" }
+        elseif ($Run.MustRun) { "$($Run.Name): no test executed" }
         return
     }
     $results = @(([xml](Get-Content -Path $ResultsFile -Raw)).TestRun.Results.UnitTestResult | Where-Object { $_ })
+    if ($Run.MustRun -and $results.Count -eq 0) { "$($Run.Name): no test executed" }
     $byMethod = $results | Group-Object { ($_.testName -split '\(')[0] }
     foreach ($method in $byMethod) {
         $outcomes = @($method.Group | ForEach-Object { $_.outcome })
