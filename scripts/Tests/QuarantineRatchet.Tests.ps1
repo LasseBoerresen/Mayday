@@ -228,4 +228,59 @@ public sealed class RobotFactAttribute : FactAttribute
         # Then
         $result.ExitCode | Should -Be 0
     }
+
+    Context 'two test classes with the same name in different namespaces' {
+        BeforeEach {
+            # Given: master has an Integration and a Unit LegTests; only the Integration twin's test is quarantined
+            $script:Twin = @'
+namespace Test.__NS__;
+
+public class LegTests
+{
+    [Fact]
+    __MARK__
+    public void GivenLeg_WhenMove_ThenMoves()
+    {
+    }
+
+    [Fact]
+    public void GivenLeg_WhenStep_ThenSteps()
+    {
+    }
+}
+'@
+            Set-TestFile ($script:Twin -replace '__NS__', 'Integration' -replace '__MARK__', '[Quarantine("Broken (MAY-1).")]') 'Test/Integration/LegTests.cs'
+            Set-TestFile ($script:Twin -replace '__NS__', 'Unit.Twin' -replace '__MARK__', '') 'Test/Unit/Twin/LegTests.cs'
+            git -C $script:Repo checkout -q master
+            Save-Commit
+            git -C $script:Repo checkout -q feature
+            git -C $script:Repo rebase -q master
+        }
+
+        It 'GivenTheOtherTwinsExistingTestGainsQuarantine_WhenChecked_ThenFailsNamingItsNamespace' {
+            # Given
+            Set-TestFile ($script:Twin -replace '__NS__', 'Unit.Twin' -replace '__MARK__', '[Quarantine("Broken too (MAY-2).")]') 'Test/Unit/Twin/LegTests.cs'
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'Test\.Unit\.Twin\.LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
+        }
+
+        It 'GivenNewTestNamedLikeAnExistingTestInAnotherNamespace_WhenQuarantinedWithIssue_ThenHolds' {
+            # Given: both twins declare GivenLeg_WhenStep_ThenSteps, unquarantined; a class in a new namespace is new
+            $new = $script:Twin -replace '__NS__', 'Unit.Other' -replace '__MARK__', '' -replace '(\[Fact\]\r?\n    public void GivenLeg_WhenStep)', "[Quarantine(`"New and broken (MAY-3).`")]`n    `$1"
+            Set-TestFile $new 'Test/Unit/Other/LegTests.cs'
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 0
+        }
+    }
 }
