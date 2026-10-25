@@ -24,6 +24,8 @@ Keep shared robot concepts in `RobotDomain`; trace the existing hardware referen
 
 Preserve leg IDs, orientation conventions, dimensions, joint limits, and units.
 
+Right legs are the mirror image of left legs: their coxas turn in reverse, and `MaydayLegFactory` gives them the left-leg posture map through `Internal.MirroredInYLegPostureByPositionMap`, which looks up the target mirrored in Y of the leg's frame ([ADR 0013](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md)).
+
 ## Architectural Constraints
 
 The direct Dynamixel project reference is a [documented exception](../knowledge/findings/mayday-domain-hardware-reference.md) to the intended direction.
@@ -34,7 +36,7 @@ Do not infer physical orientation or safe angles from numeric IDs alone; test us
 
 ## Related ADRs
 
-[Stable abstractions](../docs/adr/0001-stable-robot-abstractions.md), [hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md).
+[Stable abstractions](../docs/adr/0001-stable-robot-abstractions.md), [hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [right-leg coxa direction and mirrored lookup](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md).
 
 ## Related Findings
 
