@@ -1,4 +1,5 @@
 ﻿using MaydayDomain.Components;
+using MaydayDomain.Internal;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
 using static RobotDomain.Structures.RotationDirection;
@@ -6,6 +7,13 @@ using static RobotDomain.Structures.Side;
 
 namespace MaydayDomain;
 
+/// <summary>
+/// Builds Mayday legs from joints made by the given <see cref="JointFactory"/>. Right legs' coxas turn in reverse.
+/// </summary>
+/// <param name="legPostureByPositionMap">
+/// Postures by tip position for a left leg. Right legs, the mirror image of a left leg in Y of the leg's own frame,
+/// look up the mirror of their target in it.
+/// </param>
 public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap legPostureByPositionMap)
 {
     public IDictionary<MaydayLegId, MaydayLeg> CreateAll()
@@ -34,17 +42,26 @@ public class MaydayLegFactory(JointFactory jointFactory, LegPostureByPositionMap
         links.Add(Link.CreateTip);
         connections.Add(CrateTibiaToTipAttachment(links));
 
-        return new MaydayLeg(connections, links, legPostureByPositionMap);
+        return new MaydayLeg(connections, links, LegPostureByPositionMapFor(legId));
     }
-    
+
+    // A reversed coxa makes the same joint values place the tip at the mirror in Y of where they place a left leg's
+    // tip, so the left-leg map serves the leg when asked for the mirror of its target (ADR 0013).
+    LegPostureByPositionMap LegPostureByPositionMapFor(MaydayLegId legId) =>
+        CoxaRotationDirectionFor(legId) == Forward
+            ? legPostureByPositionMap
+            : new MirroredInYLegPostureByPositionMap(legPostureByPositionMap);
+
+    static RotationDirection CoxaRotationDirectionFor(MaydayLegId legId) => legId.Side == Left ? Forward : Reverse;
+
     Joint CreateCoxaMotorToCoxaJoint(MaydayLegId legId, List<Link> links)
     {
         return jointFactory.New(
-            parent: links[0], 
-            child: links[1], 
-            passiveTransform: Transform.FromQ(Q.Unit), 
+            parent: links[0],
+            child: links[1],
+            passiveTransform: Transform.FromQ(Q.Unit),
             id: legId.JointId(1),
-            rotationDirection: legId.Side == Left ? Forward : Reverse, 
+            rotationDirection: CoxaRotationDirectionFor(legId),
             attachmentOrder: AttachmentOrder.LinkLast);
     }
 
