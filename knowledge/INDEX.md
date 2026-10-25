@@ -8,12 +8,13 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0002: Hardware access at the adapter boundary](../docs/adr/0002-hardware-adapter-boundary.md)
 - [ADR 0003: Gate pull requests with one aggregate check](../docs/adr/0003-gate-pull-requests-with-one-aggregate-check.md) (Superseded by ADR 0006)
 - [ADR 0004: Quarantine failing tests with a trait](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)
-- [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Accepted; `Tier` trait in use, simulated tier not built)
+- [ADR 0005: Test tiers for physical and simulated runs](../docs/adr/0005-test-tiers-for-physical-and-simulated-runs.md) (Accepted; `Tier` trait in use, simulated tier not built; pre-push gating superseded by ADR 0011)
 - [ADR 0006: Run quality gates locally](../docs/adr/0006-run-quality-gates-locally.md)
 - [ADR 0007: Infrastructure code is tested like product code](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)
 - [ADR 0008: Cyclomatic complexity gate with CA1502](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md)
 - [ADR 0009: Manual robot tests confirmed by a human](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
 - [ADR 0010: Local Claude review of every pull request](../docs/adr/0010-local-claude-review-of-every-pull-request.md)
+- [ADR 0011: The pre-push gate drives the robot](../docs/adr/0011-pre-push-gate-drives-the-robot.md) (supersedes the pre-push parts of ADR 0005 and 0006)
 
 ## Architectural Constraints
 
@@ -21,7 +22,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - Physical tests and startup can move real hardware: [physical-run pitfall](pitfalls/physical-runs.md).
 - Port access must remain serialized and scheduler changes require timing/safety review ([Dynamixel](../Dynamixel/README.md), [RobotDomain/Time](../RobotDomain/Time/README.md)).
 - Methods may not exceed cyclomatic complexity 12: CA1502 fails the build, with early feedback from a Claude Code hook ([ADR 0008](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md), [quality-gates](../quality-gates/README.md)).
-- The quality gate runs locally (`scripts\gate.ps1`, enforced by a Claude Code Stop hook and a pre-push hook); GitHub CI is optional ([ADR 0006](../docs/adr/0006-run-quality-gates-locally.md)). A separate, local Claude Code session reviews every pull request, advisory only ([ADR 0010](../docs/adr/0010-local-claude-review-of-every-pull-request.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)).
+- The quality gate runs locally (`scripts\gate.ps1`, enforced by a Claude Code Stop hook and a pre-push hook); GitHub CI is optional ([ADR 0006](../docs/adr/0006-run-quality-gates-locally.md)). A separate, local Claude Code session reviews every pull request, advisory only ([ADR 0010](../docs/adr/0010-local-claude-review-of-every-pull-request.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)). A code push runs the physical tier on the robot and fails on any skipped test and on a quarantined test that passes ([ADR 0011](../docs/adr/0011-pre-push-gate-drives-the-robot.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)).
 
 ## Known Pitfalls
 

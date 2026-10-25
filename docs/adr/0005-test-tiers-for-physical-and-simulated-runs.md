@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted, partly implemented. `PhysicalRobotFact` and `PhysicalRobotTheory` set `Tier=Physical`, `ManualRobotFact` sets `Tier=Manual` ([ADR 0009](0009-manual-robot-tests-confirmed-by-a-human.md)), and the local gate excludes both. The simulated tier and the hardware workflow are not built.
+Accepted, partly implemented. `PhysicalRobotFact` and `PhysicalRobotTheory` set `Tier=Physical`, `ManualRobotFact` sets `Tier=Manual` ([ADR 0009](0009-manual-robot-tests-confirmed-by-a-human.md)), and the local gate excludes both. The simulated tier and the hardware workflow are not built. "Never as a merge gate" is superseded for the pre-push hook by [ADR 0011](0011-pre-push-gate-drives-the-robot.md).
 
 ## Context
 

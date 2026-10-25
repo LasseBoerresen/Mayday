@@ -63,7 +63,7 @@ Describe 'pre-push.ps1' {
         $result.GateRan | Should -BeFalse
     }
 
-    It 'GivenNewBranchChangingCode_WhenPushed_ThenRunsTheGateInRelease' {
+    It 'GivenNewBranchChangingCode_WhenPushed_ThenRunsThePhysicalGateInRelease' {
         # Given
         New-Commit 'README.md' | Out-Null
         $sha = New-Commit 'Code.cs' 'changed'
@@ -73,7 +73,7 @@ Describe 'pre-push.ps1' {
 
         # Then
         $result.GateRan | Should -BeTrue
-        Get-Content $script:GateLog | Should -Match '-Configuration Release'
+        Get-Content $script:GateLog | Should -Match '-Configuration Release -Physical'
     }
 
     It 'GivenChangeToClaudeSettings_WhenPushed_ThenRunsTheGateBecauseHooksAreCode' {

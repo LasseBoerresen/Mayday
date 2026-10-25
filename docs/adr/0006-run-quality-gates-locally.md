@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Supersedes [ADR 0003](0003-gate-pull-requests-with-one-aggregate-check.md).
+Accepted. Supersedes [ADR 0003](0003-gate-pull-requests-with-one-aggregate-check.md). For the pre-push hook, superseded by [ADR 0011](0011-pre-push-gate-drives-the-robot.md): it drives the robot; the Stop hook's gate stays as decided here.
 
 ## Context
 

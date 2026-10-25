@@ -35,16 +35,16 @@ Run the smallest relevant test project first. Several projects set `TreatWarning
 
 ### Local gate
 
-`scripts\gate.ps1` is the gate: a build, the tests not marked `[Quarantine]`, physical (`Tier=Physical`) or manual (`Tier=Manual`), and the Pester tests of the scripts themselves (needs Pester 5+: `Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser`), with the robot forced to not clear-to-move. It never drives the robot, even when the user secrets say it is clear to move; physical and manual tests are run by hand. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
+`scripts\gate.ps1` is the gate: a build, the tests not marked `[Quarantine]`, physical (`Tier=Physical`) or manual (`Tier=Manual`), and the Pester tests of the scripts themselves (needs Pester 5+: `Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser`), with the robot forced to not clear-to-move. Without `-Physical` it never drives the robot, even when the user secrets say it is clear to move; manual tests are always run by hand. It remembers a pass for an unchanged working tree, so repeat runs are free. It is enforced automatically:
 
 - A Claude Code `Stop` hook (`scripts\claude-stop-gate.ps1`) runs it in Debug and blocks you from finishing a turn while it fails. Fix the failure it reports; do not work around the hook.
-- A `pre-push` hook (`.githooks`) runs it in Release. After cloning, run `git config core.hooksPath .githooks` once.
+- A `pre-push` hook (`.githooks`, `scripts\pre-push.ps1`) runs it in Release with `-Physical` for any push that changes more than documentation ([ADR 0011](docs/adr/0011-pre-push-gate-drives-the-robot.md)). That gate **drives the robot**: it fails unless the robot is clear to move and connected, then runs every test except `Tier=Manual`, each physical test method in its own process. It fails on any skipped test and on a quarantined test that passes. A documentation-only push runs nothing. After cloning, run `git config core.hooksPath .githooks` once.
 
 `Ellie\EllieMainTests` is not part of the gate: it can initialize physical devices (see its README). GitHub Actions (`.github\workflows\ci.yml`) is manual-only (`workflow_dispatch`) and is not a required check; the user merges pull requests. After `gh pr create` or `git push`, a `PostToolUse` hook has a separate, local Claude Code session review the pull request and post a comment (`scripts\review-pr.ps1`, [ADR 0010](docs/adr/0010-local-claude-review-of-every-pull-request.md)); it is advisory, so answer its findings but do not wait on it.
 
 ## Hard rules
 
-- **Physical hardware:** `Main`, `EllieMain` and tests marked `PhysicalRobotFact`/`PhysicalRobotTheory` can move a real robot. Run them only after the user confirms the robot, port and operating conditions in this conversation. Verify motion and driver changes with simulation, echo joints or hardware-independent tests.
+- **Physical hardware:** `Main`, `EllieMain` and tests marked `PhysicalRobotFact`/`PhysicalRobotTheory` can move a real robot. Run them only after the user confirms the robot, port and operating conditions in this conversation. The one standing exception is the pre-push gate: the operator's `MAYDAY_ROBOT_IS_CLEAR_TO_MOVE=True` in the Test user secrets is their confirmation for it, so a `git push` of code may move the robot. Never set, change or work around that flag, and never `--no-verify` a push. Verify motion and driver changes with simulation, echo joints or hardware-independent tests.
 - **Safety limits:** preserve joint limits, velocity limits and other motion constraints when changing motion or driver behavior.
 - **Units:** represent physical quantities with `UnitsNet` types (`Angle`, `Length`, `RotationalSpeed`), never bare numbers.
 - **Focus:** keep each change to its task; leave unrelated formatting, renames and restructuring for their own change.
