@@ -221,6 +221,21 @@ exit `$LASTEXITCODE
         $default | Should -Match 'Quarantine!=true'
     }
 
+    It 'GivenQuarantinedSwitch_WhenInspected_ThenItsRunExcludesPhysicalAndManualTiers' {
+        # Given: the -Quarantined report runs every quarantined test in one process; with the flag set by the operator
+        # (or by user secrets, which override the forced environment) physical tests in it would drive the robot
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:Gate, [ref]$null, [ref]$null)
+        $block = $ast.FindAll({ param($node)
+                $node -is [System.Management.Automation.Language.IfStatementAst] -and
+                $node.Clauses[0].Item1.Extent.Text -ceq '$Quarantined' }, $true) | Select-Object -First 1
+
+        # When
+        $text = $block.Extent.Text
+
+        # Then
+        $text | Should -Match "--filter 'Quarantine=true&Tier!=Physical&Tier!=Manual'"
+    }
+
     It 'GivenFailingScriptTests_WhenRun_ThenExitsNonZero' {
         # Given
         $body = @"
