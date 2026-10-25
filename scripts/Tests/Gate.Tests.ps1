@@ -492,6 +492,33 @@ exit `$LASTEXITCODE
         $result.Output | Should -Match 'PASSES WHILE QUARANTINED T\.Leg\.Transform: remove its \[Quarantine\]'
     }
 
+    It 'GivenPhysicalMethodRunMatchesNoTest_WhenRun_ThenFailsInsteadOfPassingWithoutTheRobot' {
+        # Given: the listed name no longer matches the test's fully qualified name, so the run executes nothing,
+        # exits 0 and writes an empty TRX file
+        $scenario = New-Scenario
+        $scenario.runs['FullyQualifiedName=T.Bus.Moves'] = @()
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'Physical test T\.Bus\.Moves: no test executed'
+    }
+
+    It 'GivenQuarantinedPhysicalMethodRunMatchesNoTest_WhenRun_ThenFails' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs['FullyQualifiedName=T.Leg.Transform'] = @()
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'Quarantined physical test T\.Leg\.Transform: no test executed'
+    }
+
     It 'GivenTestHostCrashesWithoutReportingAFailure_WhenRun_ThenFails' {
         # Given
         $scenario = New-Scenario
