@@ -103,7 +103,8 @@ function Read-TestFile([string[]] $Lines) {
             $declared.Add($name)
             foreach ($attribute in $attributes) {
                 # The gate selects quarantined tests by trait, so setting the trait by hand quarantines a test too.
-                if ($attribute -match '\bQuarantine\s*\(|\bTrait\s*\(\s*"Quarantine"') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute }) }
+                # C# also accepts each attribute's class name with its Attribute suffix.
+                if ($attribute -match '\bQuarantine(?:Attribute)?\s*\(|\bTrait(?:Attribute)?\s*\(\s*"Quarantine"') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute }) }
                 if ($attribute -match '\bSkip\s*=') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Skip'; Text = $attribute }) }
             }
         }

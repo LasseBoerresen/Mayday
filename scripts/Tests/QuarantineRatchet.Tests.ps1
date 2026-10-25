@@ -117,6 +117,22 @@ Describe 'quarantine-ratchet.ps1' {
         $result.Output | Should -Match 'LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
     }
 
+    It 'GivenExistingTestGainsQuarantineByFullAttributeName_WhenChecked_ThenFailsNamingIt' -TestCases @(
+        @{ Attribute = '[QuarantineAttribute("Broken (MAY-2).")]' }
+        @{ Attribute = '[TraitAttribute("Quarantine", "true")]' }
+    ) {
+        # Given: C# accepts an attribute's class name with its Attribute suffix
+        Set-TestFile ($script:MasterTests -replace '(\[Fact\]\r?\n    public void GivenLeg_WhenMove)', "$Attribute`n    `$1")
+        Save-Commit
+
+        # When
+        $result = Invoke-Ratchet
+
+        # Then
+        $result.ExitCode | Should -Be 1
+        $result.Output | Should -Match 'LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
+    }
+
     It 'GivenExistingTestGainsSkip_WhenChecked_ThenFailsNamingIt' {
         # Given
         Set-TestFile ($script:MasterTests -replace '\[Fact\](\r?\n    public void GivenLeg_WhenMove)', '[Fact(Skip = "later")]$1')
