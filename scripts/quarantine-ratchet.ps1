@@ -6,8 +6,8 @@
     Compares the C# files under Test/ at HEAD with those at the merge-base of HEAD and -Upstream. The set of
     quarantined and skipped tests may only shrink (MAY-80, ADR 0011):
 
-    - A test, or test class, that exists at the merge-base may not gain [Quarantine(...)] or a Skip = ... in its test
-      attribute.
+    - A test, or test class, that exists at the merge-base may not gain [Quarantine(...)], [Trait("Quarantine", ...)]
+      or a Skip = ... in its test attribute.
     - A new test may arrive quarantined only if its reason names the Linear issue that will fix it (MAY-<number>).
 
     Tests are named Class.Method (a class-level mark: Class), so a test moved to another file keeps its identity.
@@ -67,7 +67,8 @@ function Read-TestFile([string[]] $Lines) {
         if ($name) {
             $declared.Add($name)
             foreach ($attribute in $attributes) {
-                if ($attribute -match '\bQuarantine\s*\(') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute }) }
+                # The gate selects quarantined tests by trait, so setting the trait by hand quarantines a test too.
+                if ($attribute -match '\bQuarantine\s*\(|\bTrait\s*\(\s*"Quarantine"') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute }) }
                 if ($attribute -match '\bSkip\s*=') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Skip'; Text = $attribute }) }
             }
         }
