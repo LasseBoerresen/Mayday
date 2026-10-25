@@ -10,7 +10,8 @@
       or a Skip = ... in its test attribute.
     - A new test may arrive quarantined only if its reason names the Linear issue that will fix it (MAY-<number>).
 
-    Tests are named Class.Method (a class-level mark: Class), so a test moved to another file keeps its identity.
+    Tests are named Namespace.Class.Method (a class-level mark: Namespace.Class), so a test moved to another file in
+    the same namespace keeps its identity, and classes of the same name in different namespaces stay apart.
     Exits 1 and lists every violation, or 0 when the ratchet holds.
 
 .PARAMETER RepoRoot
@@ -32,6 +33,7 @@ Set-Location $RepoRoot
 $keywords = 'return|await|new|throw|else|if|while|for|foreach|using|yield|case|var|nameof|typeof|lock|switch|catch'
 $methodPattern = "^\s*(?:(?:public|private|protected|internal|static|async|override|virtual|sealed|unsafe)\s+)*(?!(?:$keywords)\b)[\w<>\[\],.?]+\s+(\w+)\s*(?:<[^>]*>)?\s*\("
 $classPattern = '\b(?:class|record|struct)\s+(\w+)'
+$namespacePattern = '^\uFEFF?namespace\s+([\w.]+)'
 
 # Brackets that are not inside a string literal, so a reason may contain any text.
 function Get-BracketDepthChange([string] $Line) {
@@ -43,6 +45,7 @@ function Get-BracketDepthChange([string] $Line) {
 function Read-TestFile([string[]] $Lines) {
     $declared = [System.Collections.Generic.List[string]]::new()
     $marks = [System.Collections.Generic.List[object]]::new()
+    $namespace = $null
     $class = $null
     $attributes = @()
     $current = $null
@@ -61,8 +64,10 @@ function Read-TestFile([string[]] $Lines) {
             if ($depth -le 0) { $attributes += $trimmed } else { $current = $trimmed }
             continue
         }
+        if ($trimmed -match $namespacePattern) { $namespace = $Matches[1]; $attributes = @(); continue }
         $name = $null
-        if ($trimmed -match $classPattern) { $class = $Matches[1]; $name = $class }
+        # Keyed with the namespace: test classes with the same name live in several namespaces.
+        if ($trimmed -match $classPattern) { $class = (@($namespace, $Matches[1]) | Where-Object { $_ }) -join '.'; $name = $class }
         elseif ($trimmed -match $methodPattern) { $name = if ($class) { "$class.$($Matches[1])" } else { $Matches[1] } }
         if ($name) {
             $declared.Add($name)
