@@ -330,6 +330,40 @@ public class ArmTests
             $result.Output | Should -Match 'ArmTests\.GivenHand_WhenGrip_ThenGrips'
         }
 
+        It 'GivenTestMovedIntoTheQuarantinedClassAfterANestedType_WhenChecked_ThenFailsNamingIt' -TestCases @(
+            @{ Nested = '    public record TestInput(string Id);' }
+            @{ Nested = "    public sealed class Helper`n    {`n        public int Value { get; } = 1;`n    }" }
+        ) {
+            # Given: test classes nest TestInput records and helpers; HandTests' test moves in after one
+            Set-TestFile -Path 'Test/Unit/ArmTests.cs' -Content @"
+namespace Test.Unit;
+
+[Quarantine("All broken, cause unknown.")]
+public class ArmTests
+{
+$Nested
+
+    [Fact]
+    public void GivenArm_WhenLift_ThenLifts()
+    {
+    }
+
+    [Fact]
+    public void GivenHand_WhenGrip_ThenGrips()
+    {
+    }
+}
+"@
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'Test\.Unit\.ArmTests\.GivenHand_WhenGrip_ThenGrips '
+        }
+
         It 'GivenQuarantinedClassUnchanged_WhenChecked_ThenHolds' {
             # Given
             Set-TestFile ($script:MasterTests -replace 'var leg = new Leg\(\);', 'var leg = new Leg(2);')
