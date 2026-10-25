@@ -73,8 +73,9 @@ function Read-TestFile([string[]] $Lines) {
     $declared = [System.Collections.Generic.List[string]]::new()
     $marks = [System.Collections.Generic.List[object]]::new()
     $namespace = $null
-    $class = $null
-    $classQuarantine = $null
+    # The types open at the current line, innermost last.
+    $types = [System.Collections.Generic.List[object]]::new()
+    $braces = 0
     $attributes = @()
     $current = $null
     $depth = 0
@@ -98,12 +99,16 @@ function Read-TestFile([string[]] $Lines) {
             $attributes += $attribute
             if (-not $trimmed) { continue }
         }
-        if ($trimmed -match $namespacePattern) { $namespace = $Matches[1]; $attributes = @(); continue }
         $name = $null
         $isClass = $false
-        # Keyed with the namespace: test classes with the same name live in several namespaces.
-        if ($trimmed -match $classPattern) { $class = (@($namespace, $Matches[1]) | Where-Object { $_ }) -join '.'; $name = $class; $isClass = $true }
-        elseif ($trimmed -match $methodPattern) { $name = if ($class) { "$class.$($Matches[1])" } else { $Matches[1] } }
+        $outer = if ($types.Count) { $types[$types.Count - 1] } else { $null }
+        if ($trimmed -match $namespacePattern) { $namespace = $Matches[1] }
+        elseif ($trimmed -match $classPattern) {
+            # Keyed with the namespace: test classes with the same name live in several namespaces.
+            $name = if ($outer) { "$($outer.Name).$($Matches[1])" } else { (@($namespace, $Matches[1]) | Where-Object { $_ }) -join '.' }
+            $isClass = $true
+        }
+        elseif ($trimmed -match $methodPattern) { $name = if ($outer) { "$($outer.Name).$($Matches[1])" } else { $Matches[1] } }
         if ($name) {
             $declared.Add($name)
             $own = @(foreach ($attribute in $attributes) {
@@ -113,12 +118,27 @@ function Read-TestFile([string[]] $Lines) {
                 if ($attribute -match '\bSkip\s*=') { [pscustomobject]@{ Name = $name; Kind = 'Skip'; Text = $attribute } }
             })
             $own | ForEach-Object { $marks.Add($_) }
-            if ($isClass) { $classQuarantine = $own | Where-Object { $_.Kind -eq 'Quarantine' } | Select-Object -First 1 }
-            elseif ($classQuarantine -and -not ($own | Where-Object { $_.Kind -eq 'Quarantine' })) {
+            $quarantine = $own | Where-Object { $_.Kind -eq 'Quarantine' } | Select-Object -First 1
+            $enclosing = $types | Where-Object { $_.Quarantine } | Select-Object -Last 1
+            if ($isClass) {
+                # A positional record without a body, such as a nested TestInput, opens no scope of its own.
+                if ($trimmed -notmatch ';\s*$') {
+                    $types.Add([pscustomobject]@{ Name = $name; Quarantine = $quarantine; Depth = $braces; Opened = $false })
+                }
+            }
+            elseif ($enclosing -and -not $quarantine) {
                 # A quarantined class quarantines every test in it, so each test carries the class's mark: one added
                 # to or moved into the class is then checked like any newly quarantined test.
-                $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $classQuarantine.Text })
+                $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $enclosing.Quarantine.Text })
             }
+        }
+        # Braces outside strings and line comments tell when a type's body closes, so a nested type hands its outer
+        # class back to the declarations after it.
+        $code = ($trimmed -replace '"(?:[^"\\]|\\.)*"', '""') -replace '//.*$', ''
+        $braces += ([regex]::Matches($code, '\{')).Count - ([regex]::Matches($code, '\}')).Count
+        foreach ($type in $types) { if ($braces -gt $type.Depth) { $type.Opened = $true } }
+        while ($types.Count -and $types[$types.Count - 1].Opened -and $braces -le $types[$types.Count - 1].Depth) {
+            $types.RemoveAt($types.Count - 1)
         }
         $attributes = @()
     }
