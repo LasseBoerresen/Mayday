@@ -139,6 +139,21 @@ exit `$LASTEXITCODE
         Get-Steps | Should -HaveCount 4
     }
 
+    It 'GivenGatePassed_WhenClaudeSettingsChange_ThenRunsAgainBecauseTheyHoldHooks' {
+        # Given: pre-push counts .claude/ as code, so a remembered pass must not cover a change there
+        $settings = Join-Path $script:Repo '.claude/settings.json'
+        New-Item -ItemType Directory -Path (Split-Path $settings) | Out-Null
+        Set-Content -Path $settings -Value '{}'
+        Invoke-Gate | Out-Null
+        Set-Content -Path $settings -Value '{ "hooks": {} }'
+
+        # When
+        Invoke-Gate | Out-Null
+
+        # Then
+        Get-Steps | Should -HaveCount 4
+    }
+
     It 'GivenGatePassed_WhenOnlyMarkdownChanges_ThenSkips' {
         # Given
         Invoke-Gate | Out-Null

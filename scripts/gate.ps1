@@ -177,7 +177,8 @@ if (-not $Physical) { $env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = 'False' }
 
 function Get-TreeFingerprint {
     $files = git ls-files --cached --others --exclude-standard |
-        Where-Object { $_ -notmatch '\.md$' -and $_ -notmatch '^(\.idea|\.claude|knowledge|docs|Media)/' } |
+        # .claude/ counts: its settings hold the hooks, so pre-push treats it as code too.
+        Where-Object { $_ -notmatch '\.md$' -and $_ -notmatch '^(\.idea|knowledge|docs|Media)/' } |
         Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
         Sort-Object
     $lines = foreach ($file in $files) { "$file $((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash)" }
