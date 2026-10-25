@@ -18,6 +18,7 @@ A run on the robot on 2026-10-24 showed what an honest gate meets:
 - A push that changes anything besides documentation (Markdown, `docs/`, `knowledge/`, `Media/`) runs `scripts/gate.ps1 -Physical` in Release: every `Test` test except `Tier=Manual`, the physical tier included. A documentation-only push runs nothing.
 - The gate fails before building unless the robot is **clear to move** (`MAYDAY_ROBOT_IS_CLEAR_TO_MOVE` is `True`, read with the tests' precedence: user secrets over environment) and **connected** (Mayday's FTDI adapter is present and its port opens). The flag is the operator's standing confirmation; Claude never sets it.
 - Each physical test method runs in a dotnet test process of its own, so a leaked port cannot fail the next test. The hardware-free and quarantined hardware-free tests run as one process each.
+- Known failures are the `[Quarantine]` set ([ADR 0004](0004-quarantine-failing-tests-with-a-trait.md)), and it can only shrink. Before anything else the gate runs `scripts/quarantine-ratchet.ps1`: it fails when the committed branch adds `[Quarantine]` or `Skip =` to a test that exists at its merge-base with `origin/master`, or quarantines a new test without naming the `MAY-` issue that will fix it.
 - A skipped test fails the push, quarantined or not. A test that is not quarantined fails it by failing. A quarantined test fails it by passing: its `[Quarantine]` must come off. The gate runs every test run and reports every such test before failing.
 - A physical pass is remembered against the working tree like any gate pass, apart from the hardware-free pass, so pushing an unchanged tree again does not move the robot again.
 
@@ -27,7 +28,9 @@ A run on the robot on 2026-10-24 showed what an honest gate meets:
 flowchart LR
   Push[git push] --> Docs{Only documentation changed?}
   Docs -->|yes| Pass[push]
-  Docs -->|no| Clear{Clear to move?}
+  Docs -->|no| Ratchet{Quarantine set only shrinks?}
+  Ratchet -->|no| Fail
+  Ratchet -->|yes| Clear{Clear to move?}
   Clear -->|no| Fail[push fails]
   Clear -->|yes| Connected{Connected?}
   Connected -->|no| Fail
@@ -41,6 +44,8 @@ flowchart LR
 - Keep physical tests manual: the cost being removed.
 - Ask the operator in a prompt window before each physical run ([ADR 0009](0009-manual-robot-tests-confirmed-by-a-human.md)'s prompt): stronger per-run consent, but the owner chose the standing flag, so a push needs no extra step while the robot is set up.
 - Trust the flag alone, without the connected check: a stale flag would let a push fail later with device errors, or pass with nothing attached to drive.
+- A baseline file of known failures instead of `[Quarantine]`: it drifts from the code, as ADR 0004 found.
+- A ratchet on the count of quarantined tests: a regression could hide behind a fix in the same push.
 - Run the physical tier in one process: shorter, but results depend on which test opens the adapter first, so the baseline would flip between runs.
 - Gate physical tests in the Stop hook too: every Claude turn would move the robot.
 
@@ -50,9 +55,9 @@ The gate is where a skipped check becomes impossible to skip quietly; the owner 
 
 ## Consequences
 
-- Benefits: every code push is checked on the real robot; a known failure stays visible and its fix is noticed at once.
+- Benefits: every code push is checked on the real robot; a known failure stays visible and its fix is noticed at once; a regression cannot be quarantined away.
 - Costs: pushes take longer, roughly a dotnet test start per physical method plus the moves; a code push needs the robot attached and clear to move.
-- Limitations: `git push --no-verify` still bypasses the hook. The connected check knows Mayday's adapter serial number, a copy of the one in `NativeSerialPortCommunicationBus`, and is Windows only. The gate tests the working tree, not the pushed commits; they are the same for the usual push of a clean `HEAD`. Manual tests stay by hand.
+- Limitations: `git push --no-verify` still bypasses the hook. The connected check knows Mayday's adapter serial number, a copy of the one in `NativeSerialPortCommunicationBus`, and is Windows only. The ratchet reads attributes by pattern, not by compiling: it knows `[Quarantine(...)]` and `Skip =` inside a test attribute, and a renamed test counts as new. Landing a new baseline needs a pull request merged before the ratchet sees it, as MAY-80's own baseline did. The gate tests the working tree, not the pushed commits; they are the same for the usual push of a clean `HEAD`. Manual tests stay by hand.
 
 ## Related Components
 
