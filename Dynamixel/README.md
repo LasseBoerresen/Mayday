@@ -49,6 +49,8 @@ Keep native SDK calls within this adapter; higher-level code should use stable c
 
 `StepAngle` maps XL430 position steps 0 to 4,095 (4,096 counts per revolution, 0.088 degrees per count, center step 2,048) to angles from -0.5 up to, but not including, 0.5 revolutions, and rounds an angle to the nearest step. Every step the actuator can report round-trips through `ToAngle` and `ToSteps`, including both ends of the range. Source: Robotis e-Manual, XL430-W250 control table.
 
+`Driver.Initialize` owns each actuator's Drive Mode register: it writes the rotation direction to bit 0 (0 normal, 1 reverse) and clears every other bit, whatever the actuator had stored. Bit 2 must stay clear (velocity-based profile), because the velocity limit is written to `ProfileVelocity` as a speed; with bit 2 set the actuator reads it as a move duration in ms. Source: Robotis e-Manual, XL430-W250 Drive Mode (address 10).
+
 ## Architectural Constraints
 
 Opening ports and enabling/moving motors are explicit hardware actions; do not run casually.

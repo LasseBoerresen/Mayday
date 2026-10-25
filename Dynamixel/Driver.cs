@@ -26,6 +26,14 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
     static uint _POSITION_I_GAIN_SOFT = 200;
     static uint _POSITION_D_GAIN_SOFT = 4000;
 
+    /// <summary>
+    /// Prepares the actuator for position control: reboots it if it does not answer a ping, sets its velocity limit,
+    /// rotation direction, PID gains and return delay, and enables torque.
+    /// </summary>
+    /// <remarks>
+    /// The rotation direction is written to the actuator's Drive Mode (EEPROM) with torque disabled. Every other
+    /// drive mode is turned off, whatever the actuator had stored, so the velocity limit always applies as a speed.
+    /// </remarks>
     public void Initialize(ActuatorId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
         if(!Ping(id))
@@ -157,14 +165,10 @@ public class Driver(CommunicationBus _communicationBus) : ActuatorDriver
 
     void SetRotationDirection(ActuatorId id, RobotDomain.Structures.RotationDirection rotationDirection)
     {
-        var driveMode = GetDriveMode(id);
-        var driveModeUpdated = driveMode & RotationDirection.FromDomain(rotationDirection).Value;
-        SetDriveMode(id, driveModeUpdated);
-    }
-
-    uint GetDriveMode(ActuatorId id)
-    {
-        return _communicationBus.Read(Id.FromBase(id), ControlRegister.DriveMode);
+        // The driver owns the whole Drive Mode register: bit 0 is the direction and every other mode stays off,
+        // whatever the servo has stored. SetVelocityLimit relies on the velocity-based profile (bit 2 clear), in
+        // which ProfileVelocity is a speed; with bit 2 set the servo would read it as a move duration in ms.
+        SetDriveMode(id, RotationDirection.FromDomain(rotationDirection).Value);
     }
 
     void SetDriveMode(ActuatorId id, uint driveMode)
