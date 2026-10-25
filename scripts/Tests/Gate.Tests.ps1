@@ -478,6 +478,18 @@ exit `$LASTEXITCODE
         Get-Runs | Should -HaveCount 4
     }
 
+    It 'GivenPhysicalPassRemembered_WhenTheRatchetNowFailsOnTheUnchangedTree_ThenFailsAnyway' {
+        # Given: an uncommitted quarantine passes the ratchet, which reads commits only, and the pass is remembered
+        Invoke-PhysicalGate | Out-Null
+
+        # When: the quarantine is committed, which changes no file in the working tree
+        $result = Invoke-PhysicalGate -Ratchet 'Write-Host "Quarantine ratchet: X is now quarantined"; $global:LASTEXITCODE = 1'
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'X is now quarantined'
+    }
+
     It 'GivenPhysicalPassOnUnchangedTree_WhenRunAgain_ThenDoesNotDriveTheRobotAgain' {
         # Given
         Invoke-PhysicalGate | Out-Null
