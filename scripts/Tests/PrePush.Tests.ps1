@@ -139,6 +139,34 @@ Describe 'pre-push.ps1' {
         $result.ExitCode | Should -Be 3
     }
 
+    It 'GivenNoRefLineArrives_WhenRun_ThenRunsTheGateInsteadOfPassing' {
+        # Given: git runs pre-push only with refs to send, so an empty list means its standard input did not arrive
+
+        # When
+        $result = Invoke-PrePush @()
+
+        # Then
+        $result.GateRan | Should -BeTrue
+        $result.Output | Should -Match 'No pushed ref was read'
+    }
+
+    It 'GivenRefLinesOnStandardInput_WhenRunAsGitDoes_ThenReadsThem' {
+        # Given: a documentation-only change, written to the hook's standard input as git does
+        $sha = New-Commit 'Notes.md'
+        $stdin = Join-Path $TestDrive "stdin-$([guid]::NewGuid().ToString('N')).txt"
+        Set-Content -Path $stdin -Value (Get-RefLine $sha)
+
+        # When
+        $process = Start-Process -FilePath powershell -NoNewWindow -Wait -PassThru -RedirectStandardInput $stdin `
+            -RedirectStandardOutput (Join-Path $TestDrive 'stdout.txt') -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass',
+            '-File', "`"$script:PrePush`"", '-RepoRoot', "`"$script:Repo`"", '-Upstream', 'master', '-GateScript', "`"$script:FakeGate`""
+
+        # Then: the ref was read, so the push is documentation-only and the gate does not run
+        $process.ExitCode | Should -Be 0
+        Test-Path $script:GateLog | Should -BeFalse
+        Get-Content (Join-Path $TestDrive 'stdout.txt') -Raw | Should -Match 'Documentation-only push'
+    }
+
     It 'GivenHookFile_WhenInspected_ThenRunsThisScript' {
         # Given
         $hook = Join-Path $PSScriptRoot '..\..\.githooks\pre-push'
