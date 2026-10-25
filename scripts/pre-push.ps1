@@ -9,7 +9,8 @@
     passes at once. Any other push runs scripts/gate.ps1 in Release with -Physical, and its exit code decides the push.
 
     A ref is compared with the remote's commit when the remote already has one this repository knows, otherwise
-    (a new branch) with its merge-base with -Upstream. Deleting a remote ref changes no files.
+    (a new branch) with its merge-base with -Upstream. Deleting a remote ref changes no files. When no ref line
+    arrives at all, which git never sends, the input is taken as lost and the full gate runs.
 
 .PARAMETER RepoRoot
     The git working tree being pushed. Defaults to the repository this script lives in.
@@ -55,13 +56,18 @@ function Get-ChangedFiles([string] $LocalSha, [string] $RemoteSha) {
     git diff --name-only $base $LocalSha
 }
 
-$changed = foreach ($line in $RefLines | Where-Object { $_.Trim() }) {
+$refs = @($RefLines | Where-Object { $_ -and $_.Trim() })
+$changed = foreach ($line in $refs) {
     $null, $localSha, $null, $remoteSha = $line.Trim() -split '\s+'
     if ($localSha -ne $noCommit) { Get-ChangedFiles $localSha $remoteSha }
 }
 
 $code = @($changed | Where-Object { -not (Test-DocumentationFile $_) })
-if ($code.Count -eq 0) {
+# git runs this hook only with refs to send, so an empty list means its input never arrived: fail closed, run the gate.
+if ($refs.Count -eq 0) {
+    Write-Host '== No pushed ref was read from standard input; running the full gate.'
+}
+elseif ($code.Count -eq 0) {
     Write-Host '== Documentation-only push; the gate is not needed.'
     exit 0
 }
