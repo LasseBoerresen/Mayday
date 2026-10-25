@@ -105,6 +105,7 @@ Issues live in the Linear team **Mayday** (`MAY`).
 - **Title:** a need, phrased as what is true when the issue is done, as a behavior a test could check: `Need: Mayday has analytical inverse kinematics with sub-mm accuracy`, not `Replace posture-map lookup with IK`.
 - **Description:** `## Problem` with the evidence found, `## Goal`, and `## Done when` as Given/When/Then acceptance criteria. Link related issues.
 - **Project, labels, estimate:** when creating an issue, suggest a fitting existing project, labels (`Bug`, `Feature`, `Improvement`) and an estimate in points (1, 2, 4, 8 or 16; Linear rounds any other value) to the user, with a reason for each, and set them only once the user agrees.
+- **Referring to issues and projects:** in messages to the user, PR descriptions and comments, give every Linear issue or project as a real link with its title inline, never a bare ID or name: `[MAY-81: Need: Mayday physical tests release the robot's port…](https://linear.app/mayday-robot/issue/MAY-81)`, `[A good starting setup for Claude](<project url>)`. Take the URL and title from Linear, not from memory.
 
 ## Commits
 
