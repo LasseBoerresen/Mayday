@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    git pre-push hook: skips the gate for a documentation-only push, otherwise runs the gate.
+    git pre-push hook: skips the gate for a documentation-only push, otherwise runs the full gate with the robot.
 
 .DESCRIPTION
     Reads the refs being pushed from standard input, one line per ref as git writes them:
     "<local ref> <local sha> <remote ref> <remote sha>". A push is documentation-only when every file changed by
     every pushed ref is Markdown or lies under docs/, knowledge/ or Media/. Such a push needs no build or tests and
-    passes at once. Any other push runs scripts/gate.ps1 in Release, and its exit code decides the push.
+    passes at once. Any other push runs scripts/gate.ps1 in Release with -Physical, and its exit code decides the push.
 
     A ref is compared with the remote's commit when the remote already has one this repository knows, otherwise
     (a new branch) with its merge-base with -Upstream. Deleting a remote ref changes no files.
@@ -66,5 +66,5 @@ if ($code.Count -eq 0) {
     exit 0
 }
 
-& powershell -NoProfile -ExecutionPolicy Bypass -File $GateScript -Configuration Release
+& powershell -NoProfile -ExecutionPolicy Bypass -File $GateScript -Configuration Release -Physical
 exit $LASTEXITCODE

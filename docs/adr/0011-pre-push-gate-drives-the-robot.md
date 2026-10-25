@@ -1,0 +1,71 @@
+# The pre-push gate drives the robot
+
+## Status
+
+Accepted. Supersedes, for the pre-push hook only, "never as a merge gate" in [ADR 0005](0005-test-tiers-for-physical-and-simulated-runs.md) and "the gate never drives the robot" in [ADR 0006](0006-run-quality-gates-locally.md). The Claude Code Stop hook keeps ADR 0006's hardware-free gate.
+
+## Context
+
+Physical tests skip themselves unless the robot is clear to move, and the gate excluded them, so a run without the robot looked green and no push ever ran one. Running them by hand was easy to skip, and was skipped: progress on how the real robot moves was anchored in nothing ([MAY-80](https://linear.app/mayday-robot/issue/MAY-80)).
+
+A run on the robot on 2026-10-24 showed what an honest gate meets:
+
+- The tests never release the robot's serial adapter. In one test process only the first physical test can open it; every later one fails with `FT_DEVICE_NOT_OPENED` ([MAY-81](https://linear.app/mayday-robot/issue/MAY-81)).
+- One physical theory fails on its own ([MAY-82](https://linear.app/mayday-robot/issue/MAY-82)), and several tests were skipped permanently.
+
+## Decision
+
+- A push that changes anything besides documentation (Markdown, `docs/`, `knowledge/`, `Media/`) runs `scripts/gate.ps1 -Physical` in Release: every `Test` test except `Tier=Manual`, the physical tier included. A documentation-only push runs nothing.
+- The gate fails before building unless the robot is **clear to move** (`MAYDAY_ROBOT_IS_CLEAR_TO_MOVE` is `True`, read with the tests' precedence: user secrets over environment) and **connected** (Mayday's FTDI adapter is present and its port opens). The flag is the operator's standing confirmation; Claude never sets it.
+- Each physical test method runs in a dotnet test process of its own, so a leaked port cannot fail the next test. The hardware-free and quarantined hardware-free tests run as one process each.
+- A skipped test fails the push, quarantined or not. A test that is not quarantined fails it by failing. A quarantined test fails it by passing: its `[Quarantine]` must come off. The gate runs every test run and reports every such test before failing.
+- A physical pass is remembered against the working tree like any gate pass, apart from the hardware-free pass, so pushing an unchanged tree again does not move the robot again.
+
+## Diagram (if helpful)
+
+```mermaid
+flowchart LR
+  Push[git push] --> Docs{Only documentation changed?}
+  Docs -->|yes| Pass[push]
+  Docs -->|no| Clear{Clear to move?}
+  Clear -->|no| Fail[push fails]
+  Clear -->|yes| Connected{Connected?}
+  Connected -->|no| Fail
+  Connected -->|yes| Tests[build, hardware-free tests, quarantined tests, each physical method alone]
+  Tests -->|failure, skip, or quarantined pass| Fail
+  Tests -->|baseline holds| Pass
+```
+
+## Alternatives Considered
+
+- Keep physical tests manual: the cost being removed.
+- Ask the operator in a prompt window before each physical run ([ADR 0009](0009-manual-robot-tests-confirmed-by-a-human.md)'s prompt): stronger per-run consent, but the owner chose the standing flag, so a push needs no extra step while the robot is set up.
+- Trust the flag alone, without the connected check: a stale flag would let a push fail later with device errors, or pass with nothing attached to drive.
+- Run the physical tier in one process: shorter, but results depend on which test opens the adapter first, so the baseline would flip between runs.
+- Gate physical tests in the Stop hook too: every Claude turn would move the robot.
+
+## Why
+
+The gate is where a skipped check becomes impossible to skip quietly; the owner wants the physical tier there, accepting slower pushes and a robot attached for every code push. Requiring both a flag and a port check separates the statement only a person can make (the robot may move) from the fact the software can check (it is there). One process per method costs a few seconds per method and buys deterministic results until the tests release the adapter themselves.
+
+## Consequences
+
+- Benefits: every code push is checked on the real robot; a known failure stays visible and its fix is noticed at once.
+- Costs: pushes take longer, roughly a dotnet test start per physical method plus the moves; a code push needs the robot attached and clear to move.
+- Limitations: `git push --no-verify` still bypasses the hook. The connected check knows Mayday's adapter serial number, a copy of the one in `NativeSerialPortCommunicationBus`, and is Windows only. The gate tests the working tree, not the pushed commits; they are the same for the usual push of a clean `HEAD`. Manual tests stay by hand.
+
+## Related Components
+
+[scripts](../../scripts/README.md), [Test](../../Test/README.md), [Dynamixel](../../Dynamixel/README.md)
+
+## Related ADRs
+
+[0004](0004-quarantine-failing-tests-with-a-trait.md), [0005](0005-test-tiers-for-physical-and-simulated-runs.md), [0006](0006-run-quality-gates-locally.md), [0007](0007-infrastructure-code-is-tested-like-product-code.md), [0009](0009-manual-robot-tests-confirmed-by-a-human.md)
+
+## Related Findings
+
+None recorded.
+
+## Related Root Causes
+
+None recorded.

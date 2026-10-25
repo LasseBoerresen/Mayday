@@ -235,6 +235,307 @@ exit `$LASTEXITCODE
     }
 }
 
+Describe 'gate.ps1 -Physical' {
+    BeforeAll {
+        # A scenario says what the fake test commands list and report, by filter. The fakes are scripts, so the gate's
+        # child process can call them; they log every run, so a test can see which filters ran and in which order.
+        $script:FakeList = Join-Path $TestDrive 'fake-list.ps1'
+        Set-Content -Path $script:FakeList -Value @'
+param($Configuration, $Filter, $Scenario)
+$lists = (Get-Content -Path $Scenario -Raw | ConvertFrom-Json).lists
+@($lists.$Filter) | Where-Object { $_ }
+'@
+        $script:FakeRun = Join-Path $TestDrive 'fake-run.ps1'
+        Set-Content -Path $script:FakeRun -Value @'
+param($Configuration, $Filter, $ResultsFile, $Scenario, $Log)
+Add-Content -Path $Log -Value "run $Filter robot=$env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE"
+$results = @((Get-Content -Path $Scenario -Raw | ConvertFrom-Json).runs.$Filter) | Where-Object { $_ }
+New-Item -ItemType Directory -Force -Path (Split-Path $ResultsFile) | Out-Null
+$rows = $results | ForEach-Object { "<UnitTestResult testName=`"$($_.name)`" outcome=`"$($_.outcome)`" />" }
+Set-Content -Path $ResultsFile -Value ('<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><Results>' +
+    ($rows -join '') + '</Results></TestRun>')
+$exit = (Get-Content -Path $Scenario -Raw | ConvertFrom-Json).exits.$Filter
+if ($exit) { exit $exit }
+if ($results | Where-Object { $_.outcome -eq 'Failed' }) { exit 1 }
+exit 0
+'@
+
+        $script:HardwareFree = 'Quarantine!=true&Tier!=Physical&Tier!=Manual'
+        $script:QuarantinedHardwareFree = 'Quarantine=true&Tier!=Physical&Tier!=Manual'
+        $script:PhysicalList = 'Tier=Physical&Quarantine!=true'
+        $script:QuarantinedPhysicalList = 'Tier=Physical&Quarantine=true'
+
+        function New-Result([string] $Name, [string] $Outcome = 'Passed') { @{ name = $Name; outcome = $Outcome } }
+
+        # The robot's tests as they are today, all passing: one physical test, one quarantined physical theory that
+        # fails, one hardware-free test and one quarantined hardware-free test that fails.
+        function New-Scenario {
+            @{
+                lists = @{
+                    $script:PhysicalList = @('T.Bus.Moves')
+                    $script:QuarantinedPhysicalList = @('T.Leg.Transform(id: 0)', 'T.Leg.Transform(id: 1)')
+                }
+                runs = @{
+                    $script:HardwareFree = @(New-Result 'T.Unit.Adds')
+                    $script:QuarantinedHardwareFree = @(New-Result 'T.Unit.Broken' 'Failed')
+                    'FullyQualifiedName=T.Bus.Moves' = @(New-Result 'T.Bus.Moves')
+                    'FullyQualifiedName=T.Leg.Transform' = @(
+                        (New-Result 'T.Leg.Transform(id: 0)' 'Failed'), (New-Result 'T.Leg.Transform(id: 1)'))
+                }
+            }
+        }
+
+        function Invoke-PhysicalGate(
+            $Scenario = (New-Scenario),
+            [string] $ClearToMove = "'True'",
+            [string] $Connected = '$global:LASTEXITCODE = 0',
+            [string] $Prelude = '') {
+            $scenarioFile = Join-Path $TestDrive "scenario-$([guid]::NewGuid().ToString('N')).json"
+            $Scenario | ConvertTo-Json -Depth 5 | Set-Content -Path $scenarioFile
+            Invoke-Wrapper @"
+$Prelude
+& '$script:Gate' -RepoRoot '$script:Repo' -Physical ``
+    -BuildCommand { param(`$c) Add-Content -Path '$script:Log' -Value "build `$c" } ``
+    -ScriptTestCommand { } ``
+    -ClearToMoveCommand { $ClearToMove } ``
+    -ConnectedCommand { $Connected } ``
+    -ListTestsCommand { param(`$c, `$f) & '$script:FakeList' `$c `$f '$scenarioFile' } ``
+    -TestRunCommand { param(`$c, `$f, `$r) & '$script:FakeRun' `$c `$f `$r '$scenarioFile' '$script:Log' }
+exit `$LASTEXITCODE
+"@
+        }
+
+        function Get-Runs { Get-Steps | Where-Object { $_ -like 'run *' } | ForEach-Object { ($_ -split ' ')[1] } }
+    }
+
+    BeforeEach {
+        $script:Repo = Join-Path $TestDrive "repo-$([guid]::NewGuid().ToString('N'))"
+        $script:Log = Join-Path $TestDrive "log-$([guid]::NewGuid().ToString('N')).txt"
+        New-Item -ItemType Directory -Path $script:Repo | Out-Null
+        git -C $script:Repo init -q
+        Set-Content -Path (Join-Path $script:Repo 'Code.cs') -Value 'class A {}'
+    }
+
+    It 'GivenRobotNotClearToMove_WhenRun_ThenFailsNamingTheFlagBeforeBuilding' {
+        # When
+        $result = Invoke-PhysicalGate -ClearToMove "'False'"
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match "MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is 'False'"
+        Get-Steps | Should -BeNullOrEmpty
+    }
+
+    It 'GivenClearToMoveFlagMissing_WhenRun_ThenFails' {
+        # When
+        $result = Invoke-PhysicalGate -ClearToMove '$null'
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'MAYDAY_ROBOT_IS_CLEAR_TO_MOVE'
+    }
+
+    It 'GivenRobotNotConnected_WhenRun_ThenFailsSayingSoBeforeBuilding' {
+        # When
+        $result = Invoke-PhysicalGate -Connected 'Write-Host "Robot not connected: no adapter"; $global:LASTEXITCODE = 1'
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'Robot not connected'
+        Get-Steps | Should -BeNullOrEmpty
+    }
+
+    It 'GivenBaselineHolds_WhenRun_ThenRunsHardwareFreeQuarantinedAndEachPhysicalMethodAlone' {
+        # When
+        $result = Invoke-PhysicalGate
+
+        # Then: a theory listed once per case runs once, as its method
+        $result.ExitCode | Should -Be 0
+        Get-Runs | Should -Be @($script:HardwareFree, $script:QuarantinedHardwareFree,
+            'FullyQualifiedName=T.Bus.Moves', 'FullyQualifiedName=T.Leg.Transform')
+        (Get-Steps)[0] | Should -Be 'build Release'
+    }
+
+    It 'GivenPhysicalTestFails_WhenRun_ThenFailsNamingIt' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs['FullyQualifiedName=T.Bus.Moves'] = @(New-Result 'T.Bus.Moves' 'Failed')
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'FAILED T\.Bus\.Moves'
+    }
+
+    It 'GivenHardwareFreeTestFails_WhenRun_ThenStillRunsThePhysicalTestsAndReportsAll' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs[$script:HardwareFree] = @(New-Result 'T.Unit.Adds' 'Failed')
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'FAILED T\.Unit\.Adds'
+        Get-Runs | Should -Contain 'FullyQualifiedName=T.Bus.Moves'
+    }
+
+    It 'GivenSkippedTest_WhenRun_ThenFailsListingIt' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs[$script:HardwareFree] = @((New-Result 'T.Unit.Adds'), (New-Result 'T.Unit.Later' 'NotExecuted'))
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'SKIPPED T\.Unit\.Later'
+    }
+
+    It 'GivenSkippedQuarantinedTest_WhenRun_ThenFailsListingIt' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs[$script:QuarantinedHardwareFree] = @(New-Result 'T.Unit.Broken' 'NotExecuted')
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.Output | Should -Match 'SKIPPED T\.Unit\.Broken'
+        $result.ExitCode | Should -Not -Be 0
+    }
+
+    It 'GivenQuarantinedTestPasses_WhenRun_ThenFailsAskingToRemoveItsQuarantine' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs['FullyQualifiedName=T.Leg.Transform'] = @(
+            (New-Result 'T.Leg.Transform(id: 0)'), (New-Result 'T.Leg.Transform(id: 1)'))
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'PASSES WHILE QUARANTINED T\.Leg\.Transform: remove its \[Quarantine\]'
+    }
+
+    It 'GivenTestHostCrashesWithoutReportingAFailure_WhenRun_ThenFails' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.runs['FullyQualifiedName=T.Bus.Moves'] = @()
+        $scenario.exits = @{ 'FullyQualifiedName=T.Bus.Moves' = 2 }
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'exit 2 with no failing test reported'
+    }
+
+    It 'GivenPhysicalPassOnUnchangedTree_WhenRunAgain_ThenDoesNotDriveTheRobotAgain' {
+        # Given
+        Invoke-PhysicalGate | Out-Null
+
+        # When
+        $result = Invoke-PhysicalGate
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'already passed'
+        Get-Runs | Should -HaveCount 4
+    }
+
+    It 'GivenHardwareFreePassOnUnchangedTree_WhenRunPhysical_ThenRunsBecauseThePassesAreKeptApart' {
+        # Given
+        Invoke-Gate | Out-Null
+
+        # When
+        Invoke-PhysicalGate | Out-Null
+
+        # Then
+        Get-Runs | Should -HaveCount 4
+    }
+
+    It 'GivenOperatorSetClearToMoveInEnvironment_WhenRun_ThenTestsSeeItUnchanged' {
+        # When
+        Invoke-PhysicalGate -Prelude '$env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = ''True''' | Out-Null
+
+        # Then
+        Get-Steps | Where-Object { $_ -like 'run *' } | ForEach-Object { $_ | Should -Match 'robot=True$' }
+    }
+
+    It 'GivenRunWithoutPhysical_WhenRun_ThenNeverListsOrRunsPhysicalTests' {
+        # When
+        $result = Invoke-Gate
+
+        # Then: the hardware-free gate still uses its own test command only
+        $result.ExitCode | Should -Be 0
+        Get-Runs | Should -BeNullOrEmpty
+    }
+}
+
+Describe 'gate.ps1 default clear-to-move check' {
+    BeforeAll {
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:Gate, [ref]$null, [ref]$null)
+        $parameter = $ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'ClearToMoveCommand' }
+        $script:ClearToMove = $parameter.DefaultValue.ScriptBlock.GetScriptBlock()
+    }
+
+    BeforeEach {
+        $script:Root = Join-Path $TestDrive "root-$([guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Force -Path (Join-Path $script:Root 'Test') | Out-Null
+        Set-Content -Path (Join-Path $script:Root 'Test/Test.csproj') -Value '<Project><PropertyGroup><UserSecretsId>abc-123</UserSecretsId></PropertyGroup></Project>'
+        $script:OldAppData = $env:APPDATA
+        $env:APPDATA = Join-Path $TestDrive "appdata-$([guid]::NewGuid().ToString('N'))"
+        $script:Secrets = Join-Path $env:APPDATA 'Microsoft/UserSecrets/abc-123/secrets.json'
+        New-Item -ItemType Directory -Force -Path (Split-Path $script:Secrets) | Out-Null
+    }
+
+    AfterEach {
+        $env:APPDATA = $script:OldAppData
+        Remove-Item Env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE -ErrorAction SilentlyContinue
+    }
+
+    It 'GivenSecretIsJsonTrueWithTrailingComma_WhenChecked_ThenReturnsTrue' {
+        # Given: the configuration reader accepts trailing commas, and the owner's secrets file has one
+        Set-Content -Path $script:Secrets -Value "{`n  `"MAYDAY_ROBOT_IS_CLEAR_TO_MOVE`" : true,`n  `"MAYDAY_HUMAN_IS_PRESENT`" : false,`n}"
+
+        # When / Then
+        & $script:ClearToMove $script:Root | Should -BeExactly 'True'
+    }
+
+    It 'GivenSecretIsFalseAndEnvironmentTrue_WhenChecked_ThenTheSecretWinsAsInTheTests' {
+        # Given
+        Set-Content -Path $script:Secrets -Value '{ "MAYDAY_ROBOT_IS_CLEAR_TO_MOVE": false }'
+        $env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = 'True'
+
+        # When / Then
+        & $script:ClearToMove $script:Root | Should -BeExactly 'False'
+    }
+
+    It 'GivenNoSecretAndEnvironmentTrue_WhenChecked_ThenReturnsTheEnvironment' {
+        # Given
+        Set-Content -Path $script:Secrets -Value '{ "MAYDAY_HUMAN_IS_PRESENT": false }'
+        $env:MAYDAY_ROBOT_IS_CLEAR_TO_MOVE = 'True'
+
+        # When / Then
+        & $script:ClearToMove $script:Root | Should -BeExactly 'True'
+    }
+
+    It 'GivenOnlyTheOldConnectedKey_WhenChecked_ThenReturnsNothing' {
+        # Given
+        Set-Content -Path $script:Secrets -Value '{ "MAYDAY_ROBOT_IS_CONNECTED": true }'
+
+        # When / Then
+        & $script:ClearToMove $script:Root | Should -BeNullOrEmpty
+    }
+}
+
 Describe 'claude-stop-gate.ps1' {
     BeforeEach {
         $script:FakeGate = Join-Path $TestDrive "fake-gate-$([guid]::NewGuid().ToString('N')).ps1"
@@ -313,6 +614,17 @@ Describe 'claude-stop-gate.ps1' {
         # Then: a crashed gate blocks the turn like a failed one; exit 1 would let Claude Code carry on
         $result.ExitCode | Should -Be 2
         $result.Stderr | Should -Match 'gate crashed'
+    }
+
+    It 'GivenStopHook_WhenRuns_ThenNeverAsksForThePhysicalTier' {
+        # Given: the robot is driven only on push, never on a Claude Code stop
+        Set-Content -Path $script:FakeGate -Value 'param($Configuration, [switch] $Physical); if ($Physical) { exit 1 } else { exit 0 }'
+
+        # When
+        $result = Invoke-Wrapper "'' | & '$script:StopGate' -GateScript '$script:FakeGate'; exit `$LASTEXITCODE"
+
+        # Then
+        $result.ExitCode | Should -Be 0
     }
 
     It 'GivenGateRunsInDebug_WhenStopHookRuns_ThenPassesDebugConfiguration' {

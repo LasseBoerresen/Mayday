@@ -14,7 +14,7 @@ Tests use `PhysicalRobotFact` or `PhysicalRobotTheory`, or code calls `NativeSer
 
 ## Preferred Approach
 
-Use echo joints, mocks, or hardware-independent tests first. Confirm intended robot, port, environment, and operating conditions before an explicit physical run. See [CLAUDE.md](../../CLAUDE.md#hard-rules).
+Use echo joints, mocks, or hardware-independent tests first. Confirm intended robot, port, environment, and operating conditions before an explicit physical run. See [CLAUDE.md](../../CLAUDE.md#hard-rules). A `git push` of code is a physical run: the pre-push gate drives the robot when the operator's `MAYDAY_ROBOT_IS_CLEAR_TO_MOVE` is `True` ([ADR 0011](../../docs/adr/0011-pre-push-gate-drives-the-robot.md)).
 
 ## Related Components
 
