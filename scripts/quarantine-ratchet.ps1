@@ -75,6 +75,8 @@ function Read-TestFile([string[]] $Lines) {
     $namespace = $null
     # The types open at the current line, innermost last.
     $types = [System.Collections.Generic.List[object]]::new()
+    # A type declared but whose body has not started yet.
+    $pending = $null
     $braces = 0
     $attributes = @()
     $current = $null
@@ -119,22 +121,25 @@ function Read-TestFile([string[]] $Lines) {
             })
             $own | ForEach-Object { $marks.Add($_) }
             $quarantine = $own | Where-Object { $_.Kind -eq 'Quarantine' } | Select-Object -First 1
-            $enclosing = $types | Where-Object { $_.Quarantine } | Select-Object -Last 1
-            if ($isClass) {
-                # A positional record without a body, such as a nested TestInput, opens no scope of its own.
-                if ($trimmed -notmatch ';\s*$') {
-                    $types.Add([pscustomobject]@{ Name = $name; Quarantine = $quarantine; Depth = $braces; Opened = $false })
-                }
-            }
-            elseif ($enclosing -and -not $quarantine) {
-                # A quarantined class quarantines every test in it, so each test carries the class's mark: one added
-                # to or moved into the class is then checked like any newly quarantined test.
-                $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $enclosing.Quarantine.Text })
+            # A type opens a scope only once its body starts: a positional record such as a nested TestInput, on one
+            # line or several, ends at ';' and opens none.
+            if ($isClass) { $pending = [pscustomobject]@{ Name = $name; Quarantine = $quarantine; Depth = $braces; Opened = $false } }
+            elseif ($outer.Quarantine -and -not $quarantine) {
+                # A quarantined class quarantines every test in it (not a nested class's, which xUnit gives no outer
+                # traits), so each test carries the class's mark: one added to or moved into the class is then checked
+                # like any newly quarantined test.
+                $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $outer.Quarantine.Text })
             }
         }
         # Braces outside strings and line comments tell when a type's body closes, so a nested type hands its outer
         # class back to the declarations after it.
         $code = ($trimmed -replace '"(?:[^"\\]|\\.)*"', '""') -replace '//.*$', ''
+        if ($pending) {
+            $open = $code.IndexOf('{')
+            $end = $code.IndexOf(';')
+            if ($open -ge 0 -and ($end -lt 0 -or $open -lt $end)) { $types.Add($pending); $pending = $null }
+            elseif ($end -ge 0) { $pending = $null }
+        }
         $braces += ([regex]::Matches($code, '\{')).Count - ([regex]::Matches($code, '\}')).Count
         foreach ($type in $types) { if ($braces -gt $type.Depth) { $type.Opened = $true } }
         while ($types.Count -and $types[$types.Count - 1].Opened -and $braces -le $types[$types.Count - 1].Depth) {

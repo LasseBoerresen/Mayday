@@ -377,6 +377,20 @@ $Nested
         }
     }
 
+    It 'GivenMultiLineRecordAddedAboveAnExistingTestThatGainsQuarantine_WhenChecked_ThenFailsNamingIt' {
+        # Given: a positional record whose parameters span lines has no body, so it opens no scope
+        Set-TestFile ($script:MasterTests -replace '(\[Fact\]\r?\n    public void GivenLeg_WhenMove)',
+            "public record TestInput(`n        string Id,`n        int Value);`n`n    [Quarantine(`"Broken (MAY-2).`")]`n    `$1")
+        Save-Commit
+
+        # When
+        $result = Invoke-Ratchet
+
+        # Then
+        $result.ExitCode | Should -Be 1
+        $result.Output | Should -Match 'Test\.Unit\.LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
+    }
+
     Context 'two test classes with the same name in different namespaces' {
         BeforeEach {
             # Given: master has an Integration and a Unit LegTests; only the Integration twin's test is quarantined
