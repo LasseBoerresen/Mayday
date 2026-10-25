@@ -17,8 +17,9 @@
 
     With -Physical (the pre-push gate) it runs every test except Tier=Manual against the robot. It first fails
     when the committed branch quarantines or skips a test that exists on origin/master (scripts/quarantine-ratchet.ps1),
-    and unless the operator has said the robot is clear to move (MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is True, read like the
-    tests read it) and the robot is connected (its serial adapter is present and its port opens). Then it runs the
+    even when the working tree already passed. It then fails unless the operator has said the robot is clear to move
+    (MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is True, read like the tests read it) and the robot is connected (its serial adapter
+    is present and its port opens). Then it runs the
     hardware-free tests, the quarantined hardware-free tests and every physical test method in a process of its own,
     so a test that leaves the robot's port open cannot fail the next one. It fails when a test that is not quarantined
     fails, when any test is skipped, and when a quarantined test passes: its [Quarantine] must then be removed. It
@@ -233,13 +234,16 @@ $gitDir = git rev-parse --absolute-git-dir
 $memory = Join-Path $gitDir ("gate-passed-$Configuration" + $(if ($Physical) { '-Physical' } else { '' }))
 $fingerprint = Get-TreeFingerprint
 
+# Before the remembered pass: the ratchet reads commits, which the working tree fingerprint does not see, so committing
+# a quarantine after a pass would otherwise skip it.
+if ($Physical) { Invoke-Step 'Quarantine ratchet' { & $RatchetCommand $RepoRoot } }
+
 if (-not $Force -and (Test-Path $memory) -and ((Get-Content $memory -Raw).Trim() -eq $fingerprint)) {
     Write-Host "== Gate ($Configuration) already passed for this exact working tree; skipping. Use -Force to rerun."
     exit 0
 }
 
 if ($Physical) {
-    Invoke-Step 'Quarantine ratchet' { & $RatchetCommand $RepoRoot }
     Invoke-Step 'Robot clear to move' {
         $clearToMove = & $ClearToMoveCommand $RepoRoot
         if ($clearToMove -cne 'True') {
