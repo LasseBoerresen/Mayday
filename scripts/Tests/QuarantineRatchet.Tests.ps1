@@ -104,6 +104,19 @@ Describe 'quarantine-ratchet.ps1' {
         $result.Output | Should -Match 'LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
     }
 
+    It 'GivenExistingTestGainsQuarantineOnTheDeclarationLine_WhenChecked_ThenFailsNamingIt' {
+        # Given: the attributes and the method share one line
+        Set-TestFile ($script:MasterTests -replace '\[Fact\]\r?\n    public void GivenLeg_WhenMove', '[Fact, Quarantine("Broken (MAY-2).")] public void GivenLeg_WhenMove')
+        Save-Commit
+
+        # When
+        $result = Invoke-Ratchet
+
+        # Then
+        $result.ExitCode | Should -Be 1
+        $result.Output | Should -Match 'LegTests\.GivenLeg_WhenMove_ThenMoves .*existed on master and is now quarantined'
+    }
+
     It 'GivenExistingTestGainsSkip_WhenChecked_ThenFailsNamingIt' {
         # Given
         Set-TestFile ($script:MasterTests -replace '\[Fact\](\r?\n    public void GivenLeg_WhenMove)', '[Fact(Skip = "later")]$1')

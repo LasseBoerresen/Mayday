@@ -41,6 +41,30 @@ function Get-BracketDepthChange([string] $Line) {
     ([regex]::Matches($code, '\[')).Count - ([regex]::Matches($code, '\]')).Count
 }
 
+# Splits text that starts with attributes into the attributes and any code after them on the same line, such as
+# "[Fact, Quarantine("x")] void M()". Brackets inside string literals do not count.
+function Split-Attributes([string] $Text) {
+    $depth = 0
+    $inString = $false
+    for ($i = 0; $i -lt $Text.Length; $i++) {
+        $c = $Text[$i]
+        if ($inString) {
+            if ($c -eq '\') { $i++ } elseif ($c -eq '"') { $inString = $false }
+            continue
+        }
+        if ($c -eq '"') { $inString = $true }
+        elseif ($c -eq '[') { $depth++ }
+        elseif ($c -eq ']') {
+            $depth--
+            $rest = $Text.Substring($i + 1).Trim()
+            if ($depth -eq 0 -and $rest -and -not $rest.StartsWith('[') -and -not $rest.StartsWith('//')) {
+                return $Text.Substring(0, $i + 1), $rest
+            }
+        }
+    }
+    $Text, ''
+}
+
 # The tests a C# file declares and the marks on them: each attribute block before a declaration belongs to it.
 function Read-TestFile([string[]] $Lines) {
     $declared = [System.Collections.Generic.List[string]]::new()
@@ -52,17 +76,23 @@ function Read-TestFile([string[]] $Lines) {
     $depth = 0
     foreach ($line in $Lines) {
         $trimmed = $line.Trim()
+        # An attribute block may end in the declaration it marks, on the same line: that rest is read as a declaration.
         if ($null -ne $current) {
             $current += "`n$trimmed"
             $depth += Get-BracketDepthChange $line
-            if ($depth -le 0) { $attributes += $current; $current = $null }
-            continue
+            if ($depth -gt 0) { continue }
+            $attribute, $trimmed = Split-Attributes $current
+            $attributes += $attribute
+            $current = $null
+            if (-not $trimmed) { continue }
         }
-        if ($trimmed -eq '' -or $trimmed.StartsWith('//')) { continue }
-        if ($trimmed.StartsWith('[')) {
+        elseif ($trimmed -eq '' -or $trimmed.StartsWith('//')) { continue }
+        elseif ($trimmed.StartsWith('[')) {
             $depth = Get-BracketDepthChange $line
-            if ($depth -le 0) { $attributes += $trimmed } else { $current = $trimmed }
-            continue
+            if ($depth -gt 0) { $current = $trimmed; continue }
+            $attribute, $trimmed = Split-Attributes $trimmed
+            $attributes += $attribute
+            if (-not $trimmed) { continue }
         }
         if ($trimmed -match $namespacePattern) { $namespace = $Matches[1]; $attributes = @(); continue }
         $name = $null
