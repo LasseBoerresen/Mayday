@@ -31,7 +31,8 @@
     Build configuration. Release matches CI; Debug is faster for tight loops.
 
 .PARAMETER Quarantined
-    Also run the [Quarantine] tests, non-blocking, and report any that now pass.
+    Also run the hardware-free [Quarantine] tests, non-blocking, and report any that now pass. Physical and manual
+    ones are left out; -Physical runs the quarantined physical tests itself.
 
 .PARAMETER Physical
     Run the physical tier against the robot as described above. A physical pass is remembered apart from a
@@ -317,7 +318,10 @@ Invoke-Step "Script tests (Pester)" { & $ScriptTestCommand $Configuration }
 
 if ($Quarantined) {
     Write-Host '== Quarantined tests (expected to fail, non-blocking)'
-    dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo --filter 'Quarantine=true' |
+    # Hardware-free only: in one process a physical test would drive the robot outside the one-process-per-method runs,
+    # and manual tests are run by hand.
+    dotnet test Test/Test.csproj --configuration $Configuration --no-build --nologo `
+        --filter 'Quarantine=true&Tier!=Physical&Tier!=Manual' |
         Select-String -Pattern 'Passed!|Failed!|Passed |Total tests|Passed:|Failed:'
     Write-Host '   Any quarantined test that passes should lose its [Quarantine] attribute.'
     $global:LASTEXITCODE = 0
