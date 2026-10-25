@@ -258,6 +258,91 @@ public sealed class RobotFactAttribute : FactAttribute
         $result.ExitCode | Should -Be 0
     }
 
+    Context 'a class quarantined as a whole on master' {
+        BeforeEach {
+            # Given: master quarantines a whole class, with a reason that names no issue, next to an unquarantined class
+            Set-TestFile -Path 'Test/Unit/ArmTests.cs' -Content @'
+namespace Test.Unit;
+
+[Quarantine("All broken, cause unknown.")]
+public class ArmTests
+{
+    [Fact]
+    public void GivenArm_WhenLift_ThenLifts()
+    {
+    }
+}
+
+public class HandTests
+{
+    [Fact]
+    public void GivenHand_WhenGrip_ThenGrips()
+    {
+    }
+}
+'@
+            git -C $script:Repo checkout -q master
+            Save-Commit
+            git -C $script:Repo checkout -q feature
+            git -C $script:Repo rebase -q master
+        }
+
+        It 'GivenNewTestAddedToTheQuarantinedClass_WhenChecked_ThenFailsBecauseItsReasonNamesNoIssue' {
+            # Given
+            Set-TestFile -Path 'Test/Unit/ArmTests.cs' -Content ((Get-Content (Join-Path $script:Repo 'Test/Unit/ArmTests.cs') -Raw) -replace
+                '(    public void GivenArm_WhenLift_ThenLifts\(\)\r?\n    \{\r?\n    \}\r?\n)', "`$1`n    [Fact]`n    public void GivenArm_WhenDrop_ThenDrops()`n    {`n    }`n")
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'ArmTests\.GivenArm_WhenDrop_ThenDrops .*new test quarantined without a MAY- issue'
+        }
+
+        It 'GivenExistingTestMovedIntoTheQuarantinedClass_WhenChecked_ThenFailsNamingIt' {
+            # Given: HandTests' test moves into ArmTests
+            Set-TestFile -Path 'Test/Unit/ArmTests.cs' -Content @'
+namespace Test.Unit;
+
+[Quarantine("All broken, cause unknown.")]
+public class ArmTests
+{
+    [Fact]
+    public void GivenArm_WhenLift_ThenLifts()
+    {
+    }
+
+    [Fact]
+    public void GivenHand_WhenGrip_ThenGrips()
+    {
+    }
+}
+'@
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then: by name it is new to ArmTests, so it needs an issue, which the class reason lacks
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'ArmTests\.GivenHand_WhenGrip_ThenGrips'
+        }
+
+        It 'GivenQuarantinedClassUnchanged_WhenChecked_ThenHolds' {
+            # Given
+            Set-TestFile ($script:MasterTests -replace 'var leg = new Leg\(\);', 'var leg = new Leg(2);')
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 0
+        }
+    }
+
     Context 'two test classes with the same name in different namespaces' {
         BeforeEach {
             # Given: master has an Integration and a Unit LegTests; only the Integration twin's test is quarantined

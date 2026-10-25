@@ -10,6 +10,9 @@
       or a Skip = ... in its test attribute.
     - A new test may arrive quarantined only if its reason names the Linear issue that will fix it (MAY-<number>).
 
+    A test in a quarantined class counts as quarantined with the class's reason, so adding a test to such a class, or
+    moving one into it, is checked like quarantining it directly.
+
     Tests are named Namespace.Class.Method (a class-level mark: Namespace.Class), so a test moved to another file in
     the same namespace keeps its identity, and classes of the same name in different namespaces stay apart.
     Exits 1 and lists every violation, or 0 when the ratchet holds.
@@ -71,6 +74,7 @@ function Read-TestFile([string[]] $Lines) {
     $marks = [System.Collections.Generic.List[object]]::new()
     $namespace = $null
     $class = $null
+    $classQuarantine = $null
     $attributes = @()
     $current = $null
     $depth = 0
@@ -96,16 +100,24 @@ function Read-TestFile([string[]] $Lines) {
         }
         if ($trimmed -match $namespacePattern) { $namespace = $Matches[1]; $attributes = @(); continue }
         $name = $null
+        $isClass = $false
         # Keyed with the namespace: test classes with the same name live in several namespaces.
-        if ($trimmed -match $classPattern) { $class = (@($namespace, $Matches[1]) | Where-Object { $_ }) -join '.'; $name = $class }
+        if ($trimmed -match $classPattern) { $class = (@($namespace, $Matches[1]) | Where-Object { $_ }) -join '.'; $name = $class; $isClass = $true }
         elseif ($trimmed -match $methodPattern) { $name = if ($class) { "$class.$($Matches[1])" } else { $Matches[1] } }
         if ($name) {
             $declared.Add($name)
-            foreach ($attribute in $attributes) {
+            $own = @(foreach ($attribute in $attributes) {
                 # The gate selects quarantined tests by trait, so setting the trait by hand quarantines a test too.
                 # C# also accepts each attribute's class name with its Attribute suffix.
-                if ($attribute -match '\bQuarantine(?:Attribute)?\s*\(|\bTrait(?:Attribute)?\s*\(\s*"Quarantine"') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute }) }
-                if ($attribute -match '\bSkip\s*=') { $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Skip'; Text = $attribute }) }
+                if ($attribute -match '\bQuarantine(?:Attribute)?\s*\(|\bTrait(?:Attribute)?\s*\(\s*"Quarantine"') { [pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $attribute } }
+                if ($attribute -match '\bSkip\s*=') { [pscustomobject]@{ Name = $name; Kind = 'Skip'; Text = $attribute } }
+            })
+            $own | ForEach-Object { $marks.Add($_) }
+            if ($isClass) { $classQuarantine = $own | Where-Object { $_.Kind -eq 'Quarantine' } | Select-Object -First 1 }
+            elseif ($classQuarantine -and -not ($own | Where-Object { $_.Kind -eq 'Quarantine' })) {
+                # A quarantined class quarantines every test in it, so each test carries the class's mark: one added
+                # to or moved into the class is then checked like any newly quarantined test.
+                $marks.Add([pscustomobject]@{ Name = $name; Kind = 'Quarantine'; Text = $classQuarantine.Text })
             }
         }
         $attributes = @()
