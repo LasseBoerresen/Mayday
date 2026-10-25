@@ -3,7 +3,6 @@ using RobotDomain.Structures;
 using RobotDomain.Time;
 using MaydayDomain;
 using Test.Unit;
-using Test.Utilities;
 using UnitsNet;
 using Xunit;
 using MaydayTestObjectMother = Test.Integration.MaydayDomain.Base.TestObjectMother;
@@ -16,7 +15,6 @@ namespace Test.Integration.MaydayDomain;
 public class DefaultMaydayStructureTests
 {
     [Fact]
-    [Quarantine("Assertion mismatch: moving tips 3 cm backward gives a lean X of 0.007 instead of 0.030, because right legs reach the sideways mirror of their target with the left-leg posture map (MAY-75).")]
     public void GivenStructureWithStandingPostureAndTipsMovedBackward3cm__WhenGetCurrentLean__ThenIs3cmForward()
     {
         // Given
