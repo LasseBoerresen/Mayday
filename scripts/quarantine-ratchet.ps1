@@ -77,6 +77,7 @@ function Read-TestFile([string[]] $Lines) {
     $types = [System.Collections.Generic.List[object]]::new()
     # A type declared but whose body has not started yet.
     $pending = $null
+    $inBlockComment = $false
     $braces = 0
     $attributes = @()
     $current = $null
@@ -93,7 +94,10 @@ function Read-TestFile([string[]] $Lines) {
             $current = $null
             if (-not $trimmed) { continue }
         }
-        elseif ($trimmed -eq '' -or $trimmed.StartsWith('//')) { continue }
+        # Lines with no declaration in them keep the pending attributes: blank lines, comments, preprocessor lines.
+        elseif ($inBlockComment) { if ($trimmed.Contains('*/')) { $inBlockComment = $false }; continue }
+        elseif ($trimmed.StartsWith('/*')) { $inBlockComment = -not $trimmed.Contains('*/'); continue }
+        elseif ($trimmed -eq '' -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('#')) { continue }
         elseif ($trimmed.StartsWith('[')) {
             $depth = Get-BracketDepthChange $line
             if ($depth -gt 0) { $current = $trimmed; continue }
