@@ -364,6 +364,19 @@ $Nested
             $result.Output | Should -Match 'Test\.Unit\.ArmTests\.GivenHand_WhenGrip_ThenGrips '
         }
 
+        It 'GivenHelperMethodAddedToTheQuarantinedClass_WhenChecked_ThenHoldsBecauseItIsNoTest' {
+            # Given: fixing a quarantined class often adds helpers, which carry no test attribute
+            Set-TestFile -Path 'Test/Unit/ArmTests.cs' -Content ((Get-Content (Join-Path $script:Repo 'Test/Unit/ArmTests.cs') -Raw) -replace
+                '(    public void GivenArm_WhenLift_ThenLifts\(\)\r?\n    \{\r?\n    \}\r?\n)', "`$1`n    static int Twice(int value)`n    {`n        return value * 2;`n    }`n")
+            Save-Commit
+
+            # When
+            $result = Invoke-Ratchet
+
+            # Then
+            $result.ExitCode | Should -Be 0
+        }
+
         It 'GivenQuarantinedClassUnchanged_WhenChecked_ThenHolds' {
             # Given
             Set-TestFile ($script:MasterTests -replace 'var leg = new Leg\(\);', 'var leg = new Leg(2);')
