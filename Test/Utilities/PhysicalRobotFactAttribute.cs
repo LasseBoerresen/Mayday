@@ -5,7 +5,8 @@ using Xunit.Sdk;
 
 /// <summary>
 /// Marks a test that drives the real robot. Skips unless <see cref="TestConfiguration.IsRobotClearToMove"/> holds, and
-/// carries the trait <c>Tier=Physical</c>, which the gate excludes.
+/// carries the trait <c>Tier=Physical</c>, which the Stop hook's gate excludes; the pre-push gate runs it on the robot
+/// (ADR 0011).
 /// </summary>
 [TraitDiscoverer("Test.Utilities.PhysicalRobotTraitDiscoverer", "Test")]
 [AttributeUsage(AttributeTargets.Method)]
