@@ -242,8 +242,10 @@ Describe 'gate.ps1 -Physical' {
         $script:FakeList = Join-Path $TestDrive 'fake-list.ps1'
         Set-Content -Path $script:FakeList -Value @'
 param($Configuration, $Filter, $Scenario)
-$lists = (Get-Content -Path $Scenario -Raw | ConvertFrom-Json).lists
-@($lists.$Filter) | Where-Object { $_ }
+$scenarioData = Get-Content -Path $Scenario -Raw | ConvertFrom-Json
+@($scenarioData.lists.$Filter) | Where-Object { $_ }
+$exit = $scenarioData.listExits.$Filter
+if ($exit) { exit $exit }
 '@
         $script:FakeRun = Join-Path $TestDrive 'fake-run.ps1'
         Set-Content -Path $script:FakeRun -Value @'
@@ -382,6 +384,45 @@ exit `$LASTEXITCODE
         Get-Runs | Should -Be @($script:HardwareFree, $script:QuarantinedHardwareFree,
             'FullyQualifiedName=T.Bus.Moves', 'FullyQualifiedName=T.Leg.Transform')
         (Get-Steps)[0] | Should -Be 'build Release'
+    }
+
+    It 'GivenNoPhysicalTestListed_WhenRun_ThenFailsInsteadOfPassingWithoutTheRobot' {
+        # Given: a listing that matches nothing, as a changed test platform output format would give
+        $scenario = New-Scenario
+        $scenario.lists[$script:PhysicalList] = @()
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'No physical test is listed'
+        Get-Runs | Should -BeNullOrEmpty
+    }
+
+    It 'GivenListingTheQuarantinedPhysicalTestsFails_WhenRun_ThenFails' {
+        # Given
+        $scenario = New-Scenario
+        $scenario.listExits = @{ $script:QuarantinedPhysicalList = 3 }
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'Listing the tests matching .* failed \(exit 3\)'
+    }
+
+    It 'GivenNoQuarantinedPhysicalTest_WhenRun_ThenPasses' {
+        # Given: an empty quarantine is the goal, not a fault
+        $scenario = New-Scenario
+        $scenario.lists[$script:QuarantinedPhysicalList] = @()
+
+        # When
+        $result = Invoke-PhysicalGate $scenario
+
+        # Then
+        $result.ExitCode | Should -Be 0
     }
 
     It 'GivenPhysicalTestFails_WhenRun_ThenFailsNamingIt' {

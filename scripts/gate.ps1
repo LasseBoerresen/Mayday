@@ -19,7 +19,8 @@
     when the committed branch quarantines or skips a test that exists on origin/master (scripts/quarantine-ratchet.ps1),
     even when the working tree already passed. It then fails unless the operator has said the robot is clear to move
     (MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is True, read like the tests read it) and the robot is connected (its serial adapter
-    is present and its port opens). Then it runs the
+    is present and its port opens). After building, it fails when listing the physical tests fails or lists none that
+    is not quarantined. Then it runs the
     hardware-free tests, the quarantined hardware-free tests and every physical test method in a process of its own,
     so a test that leaves the robot's port open cannot fail the next one. It fails when a test that is not quarantined
     fails, when any test is skipped, and when a quarantined test passes: its [Quarantine] must then be removed. It
@@ -199,13 +200,31 @@ function Get-PhysicalTierRuns {
     [pscustomobject]@{ Name = 'Hardware-free tests'; Filter = 'Quarantine!=true&Tier!=Physical&Tier!=Manual'; Quarantined = $false }
     [pscustomobject]@{ Name = 'Quarantined hardware-free tests'; Filter = 'Quarantine=true&Tier!=Physical&Tier!=Manual'; Quarantined = $true }
     foreach ($quarantined in $false, $true) {
-        $filter = 'Tier=Physical&Quarantine' + $(if ($quarantined) { '=' } else { '!=' }) + 'true'
-        # A theory may be listed once per case; its cases run together, by method.
-        $methods = & $ListTestsCommand $Configuration $filter | ForEach-Object { ($_ -split '\(')[0] } | Sort-Object -Unique
-        foreach ($method in $methods) {
+        foreach ($method in $script:PhysicalMethods[$quarantined]) {
             $name = if ($quarantined) { "Quarantined physical test $method" } else { "Physical test $method" }
             [pscustomobject]@{ Name = $name; Filter = "FullyQualifiedName=$method"; Quarantined = $quarantined }
         }
+    }
+}
+
+# The physical test methods by whether they are quarantined, in $script:PhysicalMethods. Fails when listing fails or
+# lists no physical test that is not quarantined: a gate that ran no physical test must not record a physical pass.
+function Read-PhysicalMethods {
+    $script:PhysicalMethods = @{}
+    foreach ($quarantined in $false, $true) {
+        $filter = 'Tier=Physical&Quarantine' + $(if ($quarantined) { '=' } else { '!=' }) + 'true'
+        $global:LASTEXITCODE = 0
+        $listed = @(& $ListTestsCommand $Configuration $filter)
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Listing the tests matching '$filter' failed (exit $LASTEXITCODE)."
+            return
+        }
+        # A theory may be listed once per case; its cases run together, by method.
+        $script:PhysicalMethods[$quarantined] = @($listed | ForEach-Object { ($_ -split '\(')[0] } | Sort-Object -Unique)
+    }
+    if ($script:PhysicalMethods[$false].Count -eq 0) {
+        Write-Host 'No physical test is listed: the gate would pass without moving the robot.'
+        $global:LASTEXITCODE = 1
     }
 }
 
@@ -258,6 +277,10 @@ if ($Physical) {
 Invoke-Step "Build ($Configuration)" { & $BuildCommand $Configuration }
 
 if ($Physical) {
+    Invoke-Step "List physical tests ($Configuration)" {
+        $ErrorActionPreference = 'Continue'
+        Read-PhysicalMethods
+    }
     Invoke-Step "Tests with the robot, manual excluded ($Configuration)" {
         # A failing test writes to stderr. With redirected streams, Windows PowerShell turns such a line into an error
         # record, which the Stop preference would make terminating; the exit codes and TRX files report the outcome.
