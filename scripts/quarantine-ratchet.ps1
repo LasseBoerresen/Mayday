@@ -121,10 +121,11 @@ function Read-TestFile([string[]] $Lines) {
             })
             $own | ForEach-Object { $marks.Add($_) }
             $quarantine = $own | Where-Object { $_.Kind -eq 'Quarantine' } | Select-Object -First 1
+            $isTest = $attributes | Where-Object { $_ -match '\b\w*(?:Fact|Theory)(?:Attribute)?\b' }
             # A type opens a scope only once its body starts: a positional record such as a nested TestInput, on one
             # line or several, ends at ';' and opens none.
             if ($isClass) { $pending = [pscustomobject]@{ Name = $name; Quarantine = $quarantine; Depth = $braces; Opened = $false } }
-            elseif ($outer.Quarantine -and -not $quarantine) {
+            elseif ($isTest -and $outer.Quarantine -and -not $quarantine) {
                 # A quarantined class quarantines every test in it (not a nested class's, which xUnit gives no outer
                 # traits), so each test carries the class's mark: one added to or moved into the class is then checked
                 # like any newly quarantined test.
