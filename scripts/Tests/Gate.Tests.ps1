@@ -289,6 +289,7 @@ exit 0
             $Scenario = (New-Scenario),
             [string] $ClearToMove = "'True'",
             [string] $Connected = '$global:LASTEXITCODE = 0',
+            [string] $Ratchet = '$global:LASTEXITCODE = 0',
             [string] $Prelude = '') {
             $scenarioFile = Join-Path $TestDrive "scenario-$([guid]::NewGuid().ToString('N')).json"
             $Scenario | ConvertTo-Json -Depth 5 | Set-Content -Path $scenarioFile
@@ -297,6 +298,7 @@ $Prelude
 & '$script:Gate' -RepoRoot '$script:Repo' -Physical ``
     -BuildCommand { param(`$c) Add-Content -Path '$script:Log' -Value "build `$c" } ``
     -ScriptTestCommand { } ``
+    -RatchetCommand { $Ratchet } ``
     -ClearToMoveCommand { $ClearToMove } ``
     -ConnectedCommand { $Connected } ``
     -ListTestsCommand { param(`$c, `$f) & '$script:FakeList' `$c `$f '$scenarioFile' } ``
@@ -314,6 +316,29 @@ exit `$LASTEXITCODE
         New-Item -ItemType Directory -Path $script:Repo | Out-Null
         git -C $script:Repo init -q
         Set-Content -Path (Join-Path $script:Repo 'Code.cs') -Value 'class A {}'
+    }
+
+    It 'GivenRatchetFails_WhenRun_ThenFailsBeforeBuildingOrTesting' {
+        # When
+        $result = Invoke-PhysicalGate -Ratchet 'Write-Host "Quarantine ratchet: X is now quarantined"; $global:LASTEXITCODE = 1'
+
+        # Then
+        $result.ExitCode | Should -Not -Be 0
+        $result.Output | Should -Match 'X is now quarantined'
+        Get-Steps | Should -BeNullOrEmpty
+    }
+
+    It 'GivenDefaultRatchetCommand_WhenInspected_ThenComparesWithOriginMaster' {
+        # Given
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:Gate, [ref]$null, [ref]$null)
+        $ratchet = $ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'RatchetCommand' }
+
+        # When
+        $default = $ratchet.DefaultValue.Extent.Text
+
+        # Then
+        $default | Should -Match 'quarantine-ratchet\.ps1'
+        $default | Should -Match '-Upstream origin/master'
     }
 
     It 'GivenRobotNotClearToMove_WhenRun_ThenFailsNamingTheFlagBeforeBuilding' {

@@ -16,7 +16,8 @@
     the Claude Code Stop hook's gate.
 
     With -Physical (the pre-push gate) it runs every test except Tier=Manual against the robot. It first fails
-    unless the operator has said the robot is clear to move (MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is True, read like the
+    when the committed branch quarantines or skips a test that exists on origin/master (scripts/quarantine-ratchet.ps1),
+    and unless the operator has said the robot is clear to move (MAYDAY_ROBOT_IS_CLEAR_TO_MOVE is True, read like the
     tests read it) and the robot is connected (its serial adapter is present and its port opens). Then it runs the
     hardware-free tests, the quarantined hardware-free tests and every physical test method in a process of its own,
     so a test that leaves the robot's port open cannot fail the next one. It fails when a test that is not quarantined
@@ -51,6 +52,10 @@
 .PARAMETER ScriptTestCommand
     Runs the tests of the scripts themselves, with the same contract as -BuildCommand. Defaults to the Pester
     tests in scripts/Tests. The script tests replace it with a no-op so the gate does not run itself recursively.
+
+.PARAMETER RatchetCommand
+    With -Physical: receives the repository root and checks the quarantine ratchet, with the same contract as
+    -BuildCommand. Defaults to scripts/quarantine-ratchet.ps1 against origin/master.
 
 .PARAMETER ClearToMoveCommand
     With -Physical: receives the repository root and returns the value of MAYDAY_ROBOT_IS_CLEAR_TO_MOVE. Defaults to
@@ -95,6 +100,11 @@ param(
         }
         $result = Invoke-Pester -Path 'scripts/Tests', 'quality-gates/Tests' -Output Minimal -PassThru
         if ($result.Result -ne 'Passed') { $global:LASTEXITCODE = 1 }
+    },
+    [scriptblock] $RatchetCommand = {
+        param($RepoRoot)
+        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot 'scripts/quarantine-ratchet.ps1') `
+            -RepoRoot $RepoRoot -Upstream origin/master
     },
     [scriptblock] $ClearToMoveCommand = {
         param($RepoRoot)
@@ -229,6 +239,7 @@ if (-not $Force -and (Test-Path $memory) -and ((Get-Content $memory -Raw).Trim()
 }
 
 if ($Physical) {
+    Invoke-Step 'Quarantine ratchet' { & $RatchetCommand $RepoRoot }
     Invoke-Step 'Robot clear to move' {
         $clearToMove = & $ClearToMoveCommand $RepoRoot
         if ($clearToMove -cne 'True') {
