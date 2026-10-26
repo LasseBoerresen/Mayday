@@ -108,7 +108,9 @@ Look for, in order of importance:
 - Tests: behavior changes without a test that fails against the old behavior; changed expectations in existing tests;
   refactorings that touch tests; untested scripts or CI configuration.
 - Documentation: XML docs that leak implementation into a contract; README or diagrams left stale.
-- Commits: one intent per commit, subject format, Problem/Rationale/Impact bodies.
+- Commits: one intent per commit, subject format, Problem/Rationale/Impact bodies. Unfolded fixup! and amend! commits
+  are how review fixes are meant to arrive (CLAUDE.md, Review fixes): check what they change like any other diff, but
+  do not report their subject or body format; at most note once that they must be folded before merge.
 
 Report only issues you are confident about, each with file:line and the concrete failure it causes; say nothing about
 style the repository does not ask for. Your final message is posted verbatim as the review comment, so make it only
