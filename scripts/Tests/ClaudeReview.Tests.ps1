@@ -85,6 +85,19 @@ Describe 'review-pr.ps1' {
         $prompt | Should -Match 'docs/adr'
     }
 
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptTreatsUnfoldedFixupsAsFoldBeforeMergeNotFormatViolations' {
+        # Given: CLAUDE.md asks for review fixes as fixup!/amend! commits, folded only once the review is satisfied
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match 'fixup!'
+        $prompt | Should -Match 'amend!'
+        $prompt | Should -Match 'fold'
+    }
+
     It 'GivenHeadAlreadyReviewed_WhenRunAgain_ThenSkips' {
         # Given
         Invoke-ReviewPr | Out-Null
