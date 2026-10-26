@@ -14,3 +14,4 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [Pushing from a linked worktree turned the shared repository bare](inherited-git-dir-in-worktree-hooks.md)
 - [The rear femur motor hit the body](rear-femur-hits-body.md)
 - [User secrets override environment variables in tests](user-secrets-override-environment.md)
+- [Physical tests leak the robot's serial adapter](physical-tests-leak-the-serial-adapter.md)

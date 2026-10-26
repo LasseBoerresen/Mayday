@@ -32,6 +32,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Q's `-` operator returns inverse(a)·b](pitfalls/q-minus-operator-direction.md)
 - [Git location variables inherited from hooks](pitfalls/git-env-inherited-from-hooks.md)
 - [Posture lookups that silently keep the current posture](pitfalls/posture-map-silent-fallback.md)
+- [Native stderr under the Stop preference](pitfalls/native-stderr-under-stop-preference.md)
 
 ## Common Root Causes
 
@@ -45,6 +46,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Pushing from a linked worktree turned the shared repository bare](root-causes/inherited-git-dir-in-worktree-hooks.md)
 - [The rear femur motor hit the body](root-causes/rear-femur-hits-body.md)
 - [User secrets override environment variables in tests](root-causes/user-secrets-override-environment.md)
+- [Physical tests leak the robot's serial adapter](root-causes/physical-tests-leak-the-serial-adapter.md)
 
 ## Frequently Used Findings
 
@@ -54,9 +56,11 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [PeriodicScheduler cannot be stepped under a fake clock](findings/periodic-scheduler-not-steppable-under-fake-time.md)
 - [Posture map lookups are accurate to about 1 cm](findings/posture-map-accuracy.md)
 - [The model and the robot disagree on the right coxa direction](findings/right-coxa-direction-mismatch.md)
+- [Worktrees share the main checkout's hooks](findings/absolute-hooks-path-shared-by-worktrees.md)
 
 ## Recent Lessons Learned
 
+- [A ratchet that reads C# by pattern has a long tail of bypasses](lessons-learned/ratchet-by-pattern-reading-has-a-long-tail.md)
 - [Predict on the echo model before a physical run](lessons-learned/predict-on-echo-before-hardware.md)
 - [Infrastructure tests must pass inside the thing they test](lessons-learned/infrastructure-tests-run-in-a-different-environment.md)
 - [Separate trajectory goals from measured joint state](lessons-learned/goal-versus-measured-state.md)
@@ -64,6 +68,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 
 ## Recently Completed Tasks
 
+- [Physical pre-push gate (MAY-80)](task-summaries/physical-pre-push-gate.md)
 - [Lean test and manual robot tests](task-summaries/lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](task-summaries/pr-gating-and-test-baseline.md)
 - [Migrate agent guidance to CLAUDE.md](task-summaries/claude-md-migration.md)

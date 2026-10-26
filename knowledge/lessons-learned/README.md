@@ -8,3 +8,4 @@ Use [the lesson template](../../templates/lesson-learned-template.md) to capture
 - [Make tests able to fail on the bug they guard](tests-must-discriminate.md)
 - [Infrastructure tests must pass inside the thing they test](infrastructure-tests-run-in-a-different-environment.md)
 - [Predict on the echo model before a physical run](predict-on-echo-before-hardware.md)
+- [A ratchet that reads C# by pattern has a long tail of bypasses](ratchet-by-pattern-reading-has-a-long-tail.md)

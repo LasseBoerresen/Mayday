@@ -10,3 +10,4 @@ Record recurring mistakes or hazards when there is evidence, not merely speculat
 - [Q's `-` operator returns inverse(a)·b](q-minus-operator-direction.md)
 - [Git location variables inherited from hooks](git-env-inherited-from-hooks.md)
 - [Posture lookups that silently keep the current posture](posture-map-silent-fallback.md)
+- [Native stderr under the Stop preference](native-stderr-under-stop-preference.md)

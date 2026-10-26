@@ -48,11 +48,11 @@ Prefer deterministic unit/integration tests and `TimeProvider`; never run physic
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../knowledge/root-causes/step-angle-4094-counts.md), [empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Clean-runner failures](../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md), [user secrets override the environment](../knowledge/root-causes/user-secrets-override-environment.md), [rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md)
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Test host crash](../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [step angle](../knowledge/root-causes/step-angle-4094-counts.md), [empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Clean-runner failures](../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md), [user secrets override the environment](../knowledge/root-causes/user-secrets-override-environment.md), [rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md), [physical tests leak the serial adapter](../knowledge/root-causes/physical-tests-leak-the-serial-adapter.md)
 
 ## Related Lessons Learned
 
-[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md), [Predict on echo before hardware](../knowledge/lessons-learned/predict-on-echo-before-hardware.md)
+[Goal versus measured state](../knowledge/lessons-learned/goal-versus-measured-state.md), [Tests must discriminate](../knowledge/lessons-learned/tests-must-discriminate.md), [Predict on echo before hardware](../knowledge/lessons-learned/predict-on-echo-before-hardware.md), [Ratchet by pattern reading](../knowledge/lessons-learned/ratchet-by-pattern-reading-has-a-long-tail.md)
 
 ## Related Failed Attempts
 

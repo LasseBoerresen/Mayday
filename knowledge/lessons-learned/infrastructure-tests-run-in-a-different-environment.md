@@ -6,7 +6,7 @@ The Pester tests for `scripts/gate.ps1` and `scripts/claude-stop-gate.ps1` passe
 
 ## Observation
 
-`gate.ps1` sets `$ErrorActionPreference = 'Stop'`, and Pester runs in a child scope that inherits it. The test helper captured a child process with `2>&1`, and under `Stop` Windows PowerShell 5.1 turns each stderr line of a native command into a terminating error. The tests themselves were right; the environment they ran in differed from the one they were written in. Only running them the way they will really run exposed it.
+`gate.ps1` sets `$ErrorActionPreference = 'Stop'`, and Pester runs in a child scope that inherits it. The test helper captured a child process with `2>&1`, and under `Stop` Windows PowerShell 5.1 turns each stderr line of a native command into a terminating error. The tests themselves were right; the environment they ran in differed from the one they were written in. Only running them the way they will really run exposed it. The same failure has recurred since; the [native stderr pitfall](../pitfalls/native-stderr-under-stop-preference.md) lists the occurrences.
 
 ## Recommendation
 

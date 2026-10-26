@@ -69,8 +69,8 @@ The gate is where a skipped check becomes impossible to skip quietly; the owner 
 
 ## Related Findings
 
-None recorded.
+[Worktrees share the main checkout's hooks](../../knowledge/findings/absolute-hooks-path-shared-by-worktrees.md)
 
 ## Related Root Causes
 
-None recorded.
+[Physical tests leak the robot's serial adapter](../../knowledge/root-causes/physical-tests-leak-the-serial-adapter.md)
