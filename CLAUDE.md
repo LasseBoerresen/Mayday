@@ -115,10 +115,13 @@ Commit each intent as soon as it is complete and its tests pass, without waiting
 - **Apart:** findings, root causes, lessons, pitfalls, failed attempts and task summaries get their own `docs:` commit, because they outlive the code: reverting the change keeps the record.
 - **Merge style:** pull requests are merged by rebase only (the `master gate` ruleset allows nothing else and requires linear history), so these separate commits survive in history.
 - **Linear branches:** keep a feature branch free of merge commits. To bring it up to date with `master` or resolve conflicts, rebase it onto `origin/master` and push with `--force-with-lease`; never merge `master` into it. Force-push only your own feature branch, never `master`.
+- **Review fixes:** a fix to a commit not yet on `master` (a review finding, an oversight) is not a new intent. Commit it with `git commit --fixup=<sha>` of the commit it corrects, so review replies can cite it. When a fix outgrows the corrected commit's message, reword it in the same step: commit the fix with `git commit -m "amend! <subject of the corrected commit>" -m "<its new full message>"` (add `--allow-empty` for a message-only change). Once the review is satisfied and before asking the user to merge, fold the fixups in with `git -c sequence.editor=true rebase -i --autosquash origin/master`, which works in PowerShell and bash and opens no editor. Then push with `--force-with-lease`. A fix to something already on `master` is its own `fix:` commit.
 
 Subject: `<type>: <imperative summary>`, at most 72 characters, type one of `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
 
 Body, for every type except `chore`: `Problem:`, `Rationale:` (why this approach over the obvious alternative), `Impact:` (say "No behavioral change." when true). Separate fields with a blank line and add the attribution trailer last.
+
+An unfolded `fixup!` or `amend!` commit (see **Review fixes**) is exempt from this subject and body format: git writes its subject, and folding drops it. Only the folded commits must meet the format.
 
 ```text
 refactor: keep implementation notes out of the Q.Rotate contract
