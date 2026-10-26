@@ -4,6 +4,7 @@ For significant completed work, use [the task summary template](../../templates/
 
 ## Entries
 
+- [Physical pre-push gate (MAY-80)](physical-pre-push-gate.md)
 - [Lean test and manual robot tests](lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](pr-gating-and-test-baseline.md)
 - [Migrate agent guidance to CLAUDE.md](claude-md-migration.md)
