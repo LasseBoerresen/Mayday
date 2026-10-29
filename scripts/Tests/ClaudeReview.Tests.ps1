@@ -98,6 +98,17 @@ Describe 'review-pr.ps1' {
         $prompt | Should -Match 'fold'
     }
 
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptAsksForLinearReferencesAsTitledLinksLookedUpInLinear' {
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match 'Linear issue or project'
+        $prompt | Should -Match 'ID and title'
+        $prompt | Should -Match 'look (it|them) up'
+    }
+
     It 'GivenHeadAlreadyReviewed_WhenRunAgain_ThenSkips' {
         # Given
         Invoke-ReviewPr | Out-Null
@@ -231,6 +242,23 @@ Describe 'claude review wiring' {
         $review | Should -Not -BeNullOrEmpty
         'Bash' | Should -Match "^($($review.matcher))$"
         'PowerShell' | Should -Match "^($($review.matcher))$"
+    }
+
+    It 'GivenDefaultReviewCommand_WhenInspected_ThenAllowsReadingLinearButNothingThatWrites' {
+        # Given: CLAUDE.md asks for Linear issues and projects as links with ID and title taken from Linear, and the
+        # review is posted as a comment, so the reviewer must be able to look them up, and only that
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:ReviewPr, [ref]$null, [ref]$null)
+        $review = $ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'Review' }
+
+        # When
+        # Every mention of the connector, including a server-wide rule (mcp__claude_ai_Linear) or a wildcard, which would
+        # grant its write tools too
+        $linear = @([regex]::Matches($review.DefaultValue.Extent.Text, 'mcp__claude_ai_Linear[\w*]*') | ForEach-Object { $_.Value })
+
+        # Then: exactly these four read tools
+        ($linear | Sort-Object) | Should -Be @(
+            'mcp__claude_ai_Linear__get_issue', 'mcp__claude_ai_Linear__get_project',
+            'mcp__claude_ai_Linear__list_issues', 'mcp__claude_ai_Linear__list_projects')
     }
 
     It 'GivenWorkflows_WhenListed_ThenNoneReviewsPullRequestsOnGitHub' {

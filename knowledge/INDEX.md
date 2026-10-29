@@ -15,6 +15,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0009: Manual robot tests confirmed by a human](../docs/adr/0009-manual-robot-tests-confirmed-by-a-human.md)
 - [ADR 0010: Local Claude review of every pull request](../docs/adr/0010-local-claude-review-of-every-pull-request.md)
 - [ADR 0011: The pre-push gate drives the robot](../docs/adr/0011-pre-push-gate-drives-the-robot.md) (supersedes the pre-push parts of ADR 0005 and 0006)
+- [ADR 0012: The PR reviewer reads Linear](../docs/adr/0012-pr-reviewer-reads-linear.md) (amends ADR 0010's tool boundary)
 
 ## Architectural Constraints
 
