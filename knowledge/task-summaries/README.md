@@ -4,6 +4,7 @@ For significant completed work, use [the task summary template](../../templates/
 
 ## Entries
 
+- [Quarantine cleanup and right-leg mirroring (MAY-75, MAY-77, MAY-78, MAY-79)](quarantine-cleanup-and-right-leg-mirroring.md)
 - [Physical pre-push gate (MAY-80)](physical-pre-push-gate.md)
 - [Lean test and manual robot tests](lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](pr-gating-and-test-baseline.md)

@@ -49,6 +49,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [The rear femur motor hit the body](root-causes/rear-femur-hits-body.md)
 - [User secrets override environment variables in tests](root-causes/user-secrets-override-environment.md)
 - [Physical tests leak the robot's serial adapter](root-causes/physical-tests-leak-the-serial-adapter.md)
+- [The tip position test used the one-posture neutral map](root-causes/tip-position-test-used-neutral-map.md)
 
 ## Frequently Used Findings
 
@@ -57,7 +58,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [PeriodicScheduler.Wait ignores cancellation](findings/periodic-scheduler-wait-ignores-cancellation.md)
 - [PeriodicScheduler cannot be stepped under a fake clock](findings/periodic-scheduler-not-steppable-under-fake-time.md)
 - [Posture map lookups are accurate to about 1 cm](findings/posture-map-accuracy.md)
-- [The model and the robot disagree on the right coxa direction](findings/right-coxa-direction-mismatch.md)
+- [The model and the robot disagreed on the right coxa direction (resolved, ADR 0013)](findings/right-coxa-direction-mismatch.md)
 - [Worktrees share the main checkout's hooks](findings/absolute-hooks-path-shared-by-worktrees.md)
 
 ## Recent Lessons Learned
@@ -70,6 +71,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 
 ## Recently Completed Tasks
 
+- [Quarantine cleanup and right-leg mirroring (MAY-75, MAY-77, MAY-78, MAY-79)](task-summaries/quarantine-cleanup-and-right-leg-mirroring.md)
 - [Physical pre-push gate (MAY-80)](task-summaries/physical-pre-push-gate.md)
 - [Lean test and manual robot tests](task-summaries/lean-test-and-manual-robot-tests.md)
 - [Gate pull requests and establish a test baseline](task-summaries/pr-gating-and-test-baseline.md)
