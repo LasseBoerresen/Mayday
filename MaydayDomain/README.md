@@ -44,7 +44,7 @@ Do not infer physical orientation or safe angles from numeric IDs alone; test us
 
 ## Related Root Causes
 
-[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md)
+[Interpolation baseline drift](../knowledge/root-causes/interpolation-baseline-drift.md), [Empty leg posture map](../knowledge/root-causes/empty-leg-posture-map.md), [Rear femur hits the body](../knowledge/root-causes/rear-femur-hits-body.md), [Tip position test used the neutral map](../knowledge/root-causes/tip-position-test-used-neutral-map.md)
 
 ## Related Lessons Learned
 

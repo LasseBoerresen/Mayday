@@ -9,5 +9,5 @@ Record important, evidence-backed discoveries that have not necessarily caused a
 - [PeriodicScheduler.Wait ignores cancellation](periodic-scheduler-wait-ignores-cancellation.md)
 - [PeriodicScheduler cannot be stepped under a fake clock](periodic-scheduler-not-steppable-under-fake-time.md)
 - [Posture map lookups are accurate to about 1 cm](posture-map-accuracy.md)
-- [The model and the robot disagree on the right coxa direction](right-coxa-direction-mismatch.md)
+- [The model and the robot disagreed on the right coxa direction (resolved, ADR 0013)](right-coxa-direction-mismatch.md)
 - [Worktrees share the main checkout's hooks](absolute-hooks-path-shared-by-worktrees.md)
