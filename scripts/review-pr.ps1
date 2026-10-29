@@ -46,8 +46,10 @@ param(
         Push-Location $Directory
         try {
             # User settings only: the project's hooks (the Stop gate, this review hook) must not run in the reviewer.
+            # Linear is read-only: the user's claude.ai Linear connector, to look up issue and project titles for links.
             $Prompt | claude -p --setting-sources user --no-session-persistence --output-format text `
-                --allowedTools 'Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)' |
+                --allowedTools ('Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),' +
+                    'mcp__claude_ai_Linear__get_issue,mcp__claude_ai_Linear__get_project,mcp__claude_ai_Linear__list_issues,mcp__claude_ai_Linear__list_projects') |
                 Out-String
         }
         finally { Pop-Location }
@@ -111,6 +113,9 @@ Look for, in order of importance:
 - Commits: one intent per commit, subject format, Problem/Rationale/Impact bodies. Unfolded fixup! and amend! commits
   are how review fixes are meant to arrive (CLAUDE.md, Review fixes): check what they change like any other diff, but
   do not report their subject or body format; at most note once that they must be folded before merge.
+
+Give every Linear issue or project you mention as a link with its ID and title (CLAUDE.md, Linear issues); look it up
+with the read-only Linear tools rather than from memory, and if a lookup fails, give the ID with its URL.
 
 Report only issues you are confident about, each with file:line and the concrete failure it causes; say nothing about
 style the repository does not ask for. Your final message is posted verbatim as the review comment, so make it only

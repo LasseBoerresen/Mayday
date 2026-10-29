@@ -19,3 +19,4 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0009 - Manual robot tests confirmed by a human](0009-manual-robot-tests-confirmed-by-a-human.md) | Accepted | Physical tests asserted by the person watching |
 | [0010 - Local Claude review of every pull request](0010-local-claude-review-of-every-pull-request.md) | Accepted | Independent, comment-only review by a local headless session; not a gate |
 | [0011 - The pre-push gate drives the robot](0011-pre-push-gate-drives-the-robot.md) | Accepted | Physical tier, skips and quarantine on every code push |
+| [0012 - The PR reviewer reads Linear](0012-pr-reviewer-reads-linear.md) | Accepted | Four read-only Linear tools for titled issue links; amends 0010's tool boundary |

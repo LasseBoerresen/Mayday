@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Extends [ADR 0006](0006-run-quality-gates-locally.md) with an advisory review that, like the gate, runs locally.
+Accepted. Extends [ADR 0006](0006-run-quality-gates-locally.md) with an advisory review that, like the gate, runs locally. The reviewer's tool boundary is amended by [ADR 0012](0012-pr-reviewer-reads-linear.md): it may also read Linear.
 
 ## Context
 
