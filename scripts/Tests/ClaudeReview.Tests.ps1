@@ -398,6 +398,24 @@ exit `$LASTEXITCODE
         Get-Log | Should -Contain "review $script:Sha reviewer=1"
     }
 
+    It 'GivenPullRequestMovedPastTheHead_WhenRunWithHead_ThenStandsDownAndMarksItSuperseded' {
+        # Given: the push of this head failed in the pre-push gate, and a newer commit on top of it was pushed instead
+        git -C $script:Repo -c user.name=t -c user.email=t@t commit -q --allow-empty -m newer
+        $newer = (git -C $script:Repo rev-parse HEAD).Trim()
+        $pullRequest = "[pscustomobject]@{ number = 7; headRefOid = '$newer'; baseRefName = 'master'; isDraft = `$false; state = 'OPEN' }"
+
+        # When
+        $result = Invoke-ReviewPr -PullRequest $pullRequest -Head $script:Sha
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        Get-Log | Should -BeNullOrEmpty
+        $reviews = Join-Path (git -C $script:Repo rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+        Join-Path $reviews "7-$script:Sha.superseded" | Should -Exist
+        Join-Path $reviews "7-$script:Sha.failed" | Should -Not -Exist
+        Join-Path $reviews "7-$script:Sha.lock" | Should -Not -Exist
+    }
+
     It 'GivenFirstLookupFailsForAMoment_WhenRunWithHead_ThenRetriesAndReviewsTheHead' {
         # Given
         $calls = Join-Path $TestDrive "calls-$([guid]::NewGuid().ToString('N')).txt"
@@ -524,6 +542,19 @@ exit `$LASTEXITCODE
         # Then
         $result.ExitCode | Should -Be 0
         $result.Output | Should -Match 'No findings\.'
+    }
+
+    It 'GivenHeadSupersededByANewerPush_WhenWaitingForIt_ThenExitsZeroWithoutWaiting' {
+        # Given
+        Set-Content -Path "$script:Reviews\7-$script:Sha.superseded" -Value 'now'
+
+        # When
+        $result = Invoke-Wait -Sleep 'throw ''waited'''
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'newer push'
+        $result.Output | Should -Not -Match 'waited'
     }
 
     It 'GivenReviewFoundNoPullRequestForTheHead_WhenWaitingForIt_ThenExitsZeroWithoutWaiting' {
@@ -728,6 +759,15 @@ exit `$LASTEXITCODE
         $context = ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext
         $context | Should -Not -Match 'wait-for-review'
         $context | Should -Match 'push again in its own command'
+    }
+
+    It 'GivenGitCommandOnlyInQuotedText_WhenHookRuns_ThenStillStartsTheReview' {
+        # When: a pull request body that mentions a commit
+        $result = Invoke-Hook 'gh pr create --title "fix" --body "run git commit --fixup, then git push"'
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        Get-Log | Should -Be @('started C:\work\wt')
     }
 
     It 'GivenEarlierFailureMarkedForThePushedHead_WhenHookRuns_ThenClearsItBeforeTheReviewStarts' {

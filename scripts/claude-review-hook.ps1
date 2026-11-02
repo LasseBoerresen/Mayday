@@ -64,7 +64,9 @@ if ($dashC.Success) {
 # A command that also moves HEAD (`git commit ... && git push`) may still be doing so; HEAD read now could be the
 # commit before the pushed one, so neither a review nor a wait would follow the pushed commit. The session pushes
 # again in its own command instead, which reaches the code below.
-$movesHead = $command -match "(^|[\s;&|(])git$gitOptions\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b"
+# Quoted text, such as a pull request body that mentions `git commit`, runs nothing.
+$unquoted = $command -replace '"[^"]*"|''[^'']*''', '""'
+$movesHead = $unquoted -match "(^|[\s;&|(])git$gitOptions\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b"
 if ($movesHead) {
     @{
         hookSpecificOutput = @{

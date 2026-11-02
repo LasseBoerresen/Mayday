@@ -148,7 +148,20 @@ trap {
     exit 1
 }
 
+# The pull request moved past this head when its head contains it: this push failed and a newer commit on top was
+# pushed instead, so this head will never be the pull request's. A force-push (folded fixups) does not contain the old
+# head and keeps waiting.
+function Test-Superseded {
+    $ErrorActionPreference = 'Continue'
+    git merge-base --is-ancestor $sha $pr.headRefOid 2>$null
+    $LASTEXITCODE -eq 0
+}
 while ($pr.headRefOid -ne $sha -and (Get-Date) -lt $deadline) {
+    if (Test-Superseded) {
+        Write-Host "== #$($pr.number) moved past $sha to $($pr.headRefOid); standing down."
+        Set-Content -Path "$memory.superseded" -Value (Get-Date -Format o)
+        Exit-Review 0
+    }
     & $Sleep $PollSeconds
     if (-not (Test-LockIsOurs)) {
         Write-Host "== A newer run took over #$($pr.number) at $sha; standing down."

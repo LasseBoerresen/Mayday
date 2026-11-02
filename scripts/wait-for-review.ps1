@@ -80,6 +80,10 @@ while ($true) {
         Write-Output (Get-Content "$posted.md" -Raw)
         exit 0
     }
+    if (Test-Path "$posted.superseded") {
+        Write-Host "== #$($pr.number) moved past $sha to a newer push; follow the review of that push instead."
+        exit 0
+    }
     if (Test-Path $failed) {
         Write-Host "== FAILED: the review of #$($pr.number) at $sha failed; see the logs in $reviews and run review-pr.ps1 -PullRequest $($pr.number)."
         exit 1
