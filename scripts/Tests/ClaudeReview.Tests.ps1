@@ -695,6 +695,23 @@ exit `$LASTEXITCODE
         ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext | Should -Match "-Head $sha"
     }
 
+    It 'GivenPushWithGitDashCIntoAnotherRepository_WhenHookRuns_ThenReviewsThatRepositorysHead' {
+        # Given: the session's cwd is another checkout (another branch, maybe no pull request)
+        $repo = Join-Path $TestDrive "repo with space-$([guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $repo | Out-Null
+        git -C $repo init -q
+        git -C $repo -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+        $sha = (git -C $repo rev-parse HEAD).Trim()
+
+        # When
+        $result = Invoke-Hook "git -C `"$repo`" push origin feature" -Cwd 'C:\work\main'
+
+        # Then
+        Get-Log | Should -Be @("started $repo", "head $sha")
+        $context = ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext
+        $context | Should -Match ([regex]::Escape("-RepoRoot `"$repo`" -Head $sha"))
+    }
+
     It 'GivenCommitChainedBeforeThePush_WhenHookRuns_ThenNamesNoHeadAndAsksForThePushOnItsOwn' {
         # Given: `git commit ... && git push` in one background command; the hook may read HEAD before the commit lands,
         # which would name an already reviewed commit

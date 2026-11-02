@@ -46,13 +46,25 @@ if (-not $command) { exit 0 }
 
 $creates = $command -match '(^|[\s;&|(])gh\s+pr\s+create\b'
 # git's own options may come before the subcommand: `git -C ../wt push`, `git -c key=value push`.
-$pushes = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+push\b' -and $command -notmatch '--dry-run'
+$argument = '(''[^'']*''|"[^"]*"|\S+)'
+$gitOptions = "((\s+(-[cC]\s+$argument|--?[\w-]+(=\S+)?))*)"
+$push = [regex]::Match($command, "(^|[\s;&|(])git$gitOptions\s+push\b")
+$pushes = $push.Success -and $command -notmatch '--dry-run'
 if (-not ($creates -or $pushes)) { exit 0 }
+
+# The pushed repository is the one `git -C <dir>` names, if any, not the session's working directory.
+$directory = $payload.cwd
+$dashC = [regex]::Match($push.Groups[2].Value, "-C\s+$argument")
+if ($dashC.Success) {
+    $directory = $dashC.Groups[1].Value.Trim('''', '"')
+    if ($payload.cwd -and -not [IO.Path]::IsPathRooted($directory)) { $directory = Join-Path $payload.cwd $directory }
+    $directory = [IO.Path]::GetFullPath($directory)
+}
 
 # A command that also moves HEAD (`git commit ... && git push`) may still be doing so; HEAD read now could be the
 # commit before the pushed one, so neither a review nor a wait would follow the pushed commit. The session pushes
 # again in its own command instead, which reaches the code below.
-$movesHead = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b'
+$movesHead = $command -match "(^|[\s;&|(])git$gitOptions\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b"
 if ($movesHead) {
     @{
         hookSpecificOutput = @{
@@ -68,21 +80,21 @@ if ($movesHead) {
 # The hook runs as soon as a background push starts, before the pull request has the pushed head; review-pr.ps1
 # waits for this one.
 $head = $null
-if ($payload.cwd) {
+if ($directory) {
     $ErrorActionPreference = 'Continue'
-    $head = git -C $payload.cwd rev-parse HEAD 2>$null
+    $head = git -C $directory rev-parse HEAD 2>$null
     if ($LASTEXITCODE -ne 0) { $head = $null }
 }
 if ($head) {
     # The session's wait trusts any failure mark of this head, so one left by an earlier push of the same commit goes
     # now, before the session can start waiting; the detached run might clear it only after the wait has read it.
     # The same goes for an earlier run's mark that no pull request came for this head.
-    $reviews = Join-Path (git -C $payload.cwd rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+    $reviews = Join-Path (git -C $directory rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
     Remove-Item -Path (Join-Path $reviews "*-$head.failed"), (Join-Path $reviews "none-$head") -ErrorAction SilentlyContinue
 }
-$started = & $StartReview $payload.cwd $head | Out-String
+$started = & $StartReview $directory $head | Out-String
 $wait = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\wait-for-review.ps1`""
-if ($payload.cwd) { $wait += " -RepoRoot `"$($payload.cwd)`"" }
+if ($directory) { $wait += " -RepoRoot `"$directory`"" }
 if ($head) { $wait += " -Head $head" }
 # Claude Code shows a PostToolUse hook's plain stdout only in the transcript; additionalContext reaches the session.
 @{
