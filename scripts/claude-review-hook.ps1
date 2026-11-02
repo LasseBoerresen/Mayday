@@ -49,13 +49,26 @@ $creates = $command -match '(^|[\s;&|(])gh\s+pr\s+create\b'
 $pushes = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+push\b' -and $command -notmatch '--dry-run'
 if (-not ($creates -or $pushes)) { exit 0 }
 
+# A command that also moves HEAD (`git commit ... && git push`) may still be doing so; HEAD read now could be the
+# commit before the pushed one, so neither a review nor a wait would follow the pushed commit. The session pushes
+# again in its own command instead, which reaches the code below.
+$movesHead = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b'
+if ($movesHead) {
+    @{
+        hookSpecificOutput = @{
+            hookEventName     = 'PostToolUse'
+            additionalContext = 'This command also moved HEAD, so the review hook could not tell which commit it pushes ' +
+                'and started no review (ADR 0014). Once it has finished, push again in its own command; that push ' +
+                'starts the review and says how to wait for it.'
+        }
+    } | ConvertTo-Json -Compress
+    exit 0
+}
+
 # The hook runs as soon as a background push starts, before the pull request has the pushed head; review-pr.ps1
 # waits for this one.
-# A command that also moves HEAD (`git commit ... && git push`) may still be doing so; HEAD read now could be the
-# commit before the pushed one, so no head is named and the context asks for pushes in their own command.
-$movesHead = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b'
 $head = $null
-if ($payload.cwd -and -not $movesHead) {
+if ($payload.cwd) {
     $ErrorActionPreference = 'Continue'
     $head = git -C $payload.cwd rev-parse HEAD 2>$null
     if ($LASTEXITCODE -ne 0) { $head = $null }
@@ -63,8 +76,9 @@ if ($payload.cwd -and -not $movesHead) {
 if ($head) {
     # The session's wait trusts any failure mark of this head, so one left by an earlier push of the same commit goes
     # now, before the session can start waiting; the detached run might clear it only after the wait has read it.
+    # The same goes for an earlier run's mark that no pull request came for this head.
     $reviews = Join-Path (git -C $payload.cwd rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
-    Remove-Item -Path (Join-Path $reviews "*-$head.failed") -ErrorAction SilentlyContinue
+    Remove-Item -Path (Join-Path $reviews "*-$head.failed"), (Join-Path $reviews "none-$head") -ErrorAction SilentlyContinue
 }
 $started = & $StartReview $payload.cwd $head | Out-String
 $wait = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\wait-for-review.ps1`""

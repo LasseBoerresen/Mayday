@@ -99,8 +99,12 @@ while ($Head -and -not $pr -and (Get-Date) -lt $deadline) {
     & $Sleep $PollSeconds
     try { $pr = & $GetPullRequest $number } catch { $pr = $null }
 }
+$reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+New-Item -ItemType Directory -Force -Path $reviews | Out-Null
 if (-not $pr) {
     Write-Host '== No pull request for this branch; nothing to review.'
+    # A wait for this head has no pull request number to look for; this tells it that none came.
+    if ($Head) { Set-Content -Path (Join-Path $reviews "none-$Head") -Value (Get-Date -Format o) }
     exit 0
 }
 if ($pr.isDraft -or $pr.state -ne 'OPEN') {
@@ -108,8 +112,6 @@ if ($pr.isDraft -or $pr.state -ne 'OPEN') {
     exit 0
 }
 
-$reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
-New-Item -ItemType Directory -Force -Path $reviews | Out-Null
 $sha = if ($Head) { $Head } else { $pr.headRefOid }
 $memory = Join-Path $reviews "$($pr.number)-$sha"
 if (-not $Force -and (Test-Path $memory)) {

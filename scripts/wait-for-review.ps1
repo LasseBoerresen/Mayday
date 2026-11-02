@@ -53,18 +53,26 @@ $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
 Set-Location $RepoRoot
 
+# The head just pushed is HEAD here unless named; the pull request's own head can lag behind GitHub for a moment.
+$sha = if ($Head) { $Head } else { (git rev-parse HEAD).Trim() }
+$reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+$deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+
 $pr = & $GetPullRequest
+# For a named head, `git push && gh pr create` in one command may not have created the pull request yet; wait for it
+# until review-pr.ps1, which waits for it as well, says that none came.
+$none = Join-Path $reviews "none-$sha"
+while ($Head -and -not $pr -and -not (Test-Path $none) -and (Get-Date) -lt $deadline) {
+    & $Sleep $PollSeconds
+    try { $pr = & $GetPullRequest } catch { $pr = $null }
+}
 if (-not $pr -or $pr.isDraft -or $pr.state -ne 'OPEN') {
     Write-Host '== No open, non-draft pull request for this branch; no review to wait for.'
     exit 0
 }
 
-# The head just pushed is HEAD here unless named; the pull request's own head can lag behind GitHub for a moment.
-$sha = if ($Head) { $Head } else { (git rev-parse HEAD).Trim() }
-$reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
 $posted = Join-Path $reviews "$($pr.number)-$sha"
 $failed = "$posted.failed"
-$deadline = (Get-Date).AddSeconds($TimeoutSeconds)
 Write-Host "== Waiting for the review of #$($pr.number) at $sha"
 while ($true) {
     if (Test-Path $posted) {

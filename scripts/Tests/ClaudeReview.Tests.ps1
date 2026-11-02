@@ -415,10 +415,12 @@ exit `$LASTEXITCODE
         # When
         $result = Invoke-ReviewPr -PullRequest '$null' -Head $script:Sha -HeadTimeoutSeconds 0
 
-        # Then
+        # Then: marked, so a wait for this head ends too
         $result.ExitCode | Should -Be 0
         $result.Output | Should -Match 'No pull request'
         Get-Log | Should -BeNullOrEmpty
+        $reviews = Join-Path (git -C $script:Repo rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+        Join-Path $reviews "none-$script:Sha" | Should -Exist
     }
 
     It 'GivenPushedHeadNeverReachesThePullRequest_WhenRunWithHead_ThenFailsAndMarksThatHeadFailed' {
@@ -504,6 +506,41 @@ exit `$LASTEXITCODE
         # Then
         $result.ExitCode | Should -Be 0
         $result.Output | Should -Match 'Review of the pushed head\.'
+    }
+
+    It 'GivenPullRequestCreatedAfterTheWaitStarts_WhenWaitingForAHead_ThenWaitsForItAndPrintsTheReview' {
+        # Given: `git push && gh pr create` in one background command; the session starts the wait before either ends
+        $calls = Join-Path $TestDrive "calls-$([guid]::NewGuid().ToString('N')).txt"
+        $pullRequest = "Add-Content -Path '$calls' -Value x; if (@(Get-Content '$calls').Count -lt 3) { `$null } else { [pscustomobject]@{ number = 7; isDraft = `$false; state = 'OPEN' } }"
+        Write-Posted
+
+        # When
+        $result = Invoke-Wrapper @"
+& '$script:Wait' -RepoRoot '$script:Repo' -Head '$script:Sha' -TimeoutSeconds 60 -PollSeconds 1 ``
+    -GetPullRequest { $pullRequest } -Sleep { param(`$Seconds) }
+exit `$LASTEXITCODE
+"@
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'No findings\.'
+    }
+
+    It 'GivenReviewFoundNoPullRequestForTheHead_WhenWaitingForIt_ThenExitsZeroWithoutWaiting' {
+        # Given: review-pr.ps1 -Head waited for a pull request that never came (a push of a branch without one)
+        Set-Content -Path "$script:Reviews\none-$script:Sha" -Value 'now'
+
+        # When
+        $result = Invoke-Wrapper @"
+& '$script:Wait' -RepoRoot '$script:Repo' -Head '$script:Sha' -TimeoutSeconds 60 ``
+    -GetPullRequest { `$null } -Sleep { throw 'waited' }
+exit `$LASTEXITCODE
+"@
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'no review to wait for'
+        $result.Output | Should -Not -Match 'waited'
     }
 
     It 'GivenReviewOfHeadPostedLater_WhenWaiting_ThenWaitsAndPrintsIt' {
@@ -669,11 +706,11 @@ exit `$LASTEXITCODE
         # When
         $result = Invoke-Hook 'git commit -q --fixup=abc && git push' -Cwd $repo
 
-        # Then
-        Get-Log | Should -Be @("started $repo")
+        # Then: no review of an unknown head, and no wait that nothing would end; the session pushes again on its own
+        Get-Log | Should -BeNullOrEmpty
         $context = ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext
-        $context | Should -Not -Match '-Head '
-        $context | Should -Match 'own command'
+        $context | Should -Not -Match 'wait-for-review'
+        $context | Should -Match 'push again in its own command'
     }
 
     It 'GivenEarlierFailureMarkedForThePushedHead_WhenHookRuns_ThenClearsItBeforeTheReviewStarts' {
@@ -687,6 +724,7 @@ exit `$LASTEXITCODE
         $reviews = Join-Path $repo '.git\claude-reviews'
         New-Item -ItemType Directory -Path $reviews | Out-Null
         Set-Content -Path "$reviews\7-$sha.failed" -Value 'earlier'
+        Set-Content -Path "$reviews\none-$sha" -Value 'earlier'
         Set-Content -Path "$reviews\7-$('1' * 40).failed" -Value 'another head'
 
         # When
@@ -694,6 +732,7 @@ exit `$LASTEXITCODE
 
         # Then
         "$reviews\7-$sha.failed" | Should -Not -Exist
+        "$reviews\none-$sha" | Should -Not -Exist
         "$reviews\7-$('1' * 40).failed" | Should -Exist
     }
 
