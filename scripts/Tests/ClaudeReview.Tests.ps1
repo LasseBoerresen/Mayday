@@ -658,8 +658,14 @@ exit `$LASTEXITCODE
         $context | Should -Match '-RepoRoot "C:\\work\\wt"'
         $context | Should -Match 'background'
         $context | Should -Match 'No findings'
-        # The wait runs up to an hour (the head wait plus the review); a shell tool's default limit must not end it
-        $context | Should -Match 'timeout of 3600000 ms'
+        # The wait runs up to an hour (the head wait plus the review). The tool's limit must outlast the script's own
+        # deadline, so a stalled review ends with the script's message on how to recover, not with the tool killing it.
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $PSScriptRoot '..\wait-for-review.ps1'), [ref]$null, [ref]$null)
+        $waitSeconds = [int]($ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'TimeoutSeconds' }).DefaultValue.Extent.Text
+        $toolTimeout = [regex]::Match($context, 'timeout of (\d+) ms').Groups[1].Value
+        $toolTimeout | Should -Not -BeNullOrEmpty
+        [int64]$toolTimeout | Should -BeGreaterOrEqual (($waitSeconds + 300) * 1000)
     }
 
     It 'GivenCommand<Command>_WhenHookRuns_ThenStartsNothing' -ForEach @(

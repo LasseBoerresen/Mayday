@@ -5,8 +5,8 @@
 .DESCRIPTION
     The authoring session runs this in the background after a push, so it is told when the review that
     claude-review-hook.ps1 started has arrived and can address its findings (ADR 0014). Looks up the pull request of
-    the current branch and waits for review-pr.ps1's marker for that pull request and the working tree's HEAD in
-    <git common dir>/claude-reviews. Exits 0 and prints the posted review once it is there, and exits 0 at once when
+    the current branch and waits for review-pr.ps1's marker for that pull request and the pushed commit (-Head, by
+    default the working tree's HEAD) in <git common dir>/claude-reviews. Exits 0 and prints the posted review once it is there, and exits 0 at once when
     there is no open, non-draft pull request to review. Exits 1 when the review of HEAD failed or none arrived within
     the timeout; run review-pr.ps1 then.
 

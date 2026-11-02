@@ -74,7 +74,7 @@ if ($head) { $wait += " -Head $head" }
         additionalContext = @"
 $($started.Trim())
 Follow this review before asking the owner to review or merge (ADR 0014): run ``$wait`` in the background now, with a
-timeout of 3600000 ms if the tool takes one; it ends and prints the review once it is posted. Address every finding: fix it with a fixup commit, or reply on the pull request
+timeout of 3900000 ms if the tool takes one; it ends and prints the review once it is posted. Address every finding: fix it with a fixup commit, or reply on the pull request
 why not. Push, which starts a review of the new head, and wait again. Repeat until a review of the head says
 ``No findings.``, then fold the fixups as CLAUDE.md says.
 "@
