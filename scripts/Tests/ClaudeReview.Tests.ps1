@@ -398,6 +398,19 @@ exit `$LASTEXITCODE
         Get-Log | Should -Contain "review $script:Sha reviewer=1"
     }
 
+    It 'GivenFirstLookupFailsForAMoment_WhenRunWithHead_ThenRetriesAndReviewsTheHead' {
+        # Given
+        $calls = Join-Path $TestDrive "calls-$([guid]::NewGuid().ToString('N')).txt"
+        $pullRequest = "Add-Content -Path '$calls' -Value x; if (@(Get-Content '$calls').Count -eq 1) { throw 'gh pr view failed: offline' }; [pscustomobject]@{ number = 7; headRefOid = 'SHA'; baseRefName = 'master'; isDraft = `$false; state = 'OPEN' }"
+
+        # When
+        $result = Invoke-ReviewPr -PullRequest $pullRequest -Head $script:Sha
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        Get-Log | Should -Contain "review $script:Sha reviewer=1"
+    }
+
     It 'GivenNoPullRequestEverCreated_WhenRunWithHead_ThenExitsZeroWithoutReviewing' {
         # When
         $result = Invoke-ReviewPr -PullRequest '$null' -Head $script:Sha -HeadTimeoutSeconds 0
@@ -643,6 +656,24 @@ exit `$LASTEXITCODE
         # Then: the review and the session's wait both follow the pushed head, even if HEAD moves before the wait starts
         Get-Log | Should -Be @("started $repo", "head $sha")
         ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext | Should -Match "-Head $sha"
+    }
+
+    It 'GivenCommitChainedBeforeThePush_WhenHookRuns_ThenNamesNoHeadAndAsksForThePushOnItsOwn' {
+        # Given: `git commit ... && git push` in one background command; the hook may read HEAD before the commit lands,
+        # which would name an already reviewed commit
+        $repo = Join-Path $TestDrive "repo-$([guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $repo | Out-Null
+        git -C $repo init -q
+        git -C $repo -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+
+        # When
+        $result = Invoke-Hook 'git commit -q --fixup=abc && git push' -Cwd $repo
+
+        # Then
+        Get-Log | Should -Be @("started $repo")
+        $context = ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext
+        $context | Should -Not -Match '-Head '
+        $context | Should -Match 'own command'
     }
 
     It 'GivenEarlierFailureMarkedForThePushedHead_WhenHookRuns_ThenClearsItBeforeTheReviewStarts' {

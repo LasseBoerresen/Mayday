@@ -90,7 +90,8 @@ if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
 Set-Location $RepoRoot
 
 $number = if ($PullRequest) { $PullRequest } else { $null }
-$pr = & $GetPullRequest $number
+# With -Head, a lookup that fails for a moment is retried below, like every later one.
+$pr = if ($Head) { try { & $GetPullRequest $number } catch { $null } } else { & $GetPullRequest $number }
 # One deadline for the whole wait for -Head: `git push && gh pr create` in one background command fires the hook
 # before the pull request even exists.
 $deadline = (Get-Date).AddSeconds($HeadTimeoutSeconds)

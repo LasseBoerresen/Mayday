@@ -51,8 +51,11 @@ if (-not ($creates -or $pushes)) { exit 0 }
 
 # The hook runs as soon as a background push starts, before the pull request has the pushed head; review-pr.ps1
 # waits for this one.
+# A command that also moves HEAD (`git commit ... && git push`) may still be doing so; HEAD read now could be the
+# commit before the pushed one, so no head is named and the context asks for pushes in their own command.
+$movesHead = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+(commit|rebase|merge|cherry-pick|reset|am|pull)\b'
 $head = $null
-if ($payload.cwd) {
+if ($payload.cwd -and -not $movesHead) {
     $ErrorActionPreference = 'Continue'
     $head = git -C $payload.cwd rev-parse HEAD 2>$null
     if ($LASTEXITCODE -ne 0) { $head = $null }
@@ -75,7 +78,8 @@ if ($head) { $wait += " -Head $head" }
 $($started.Trim())
 Follow this review before asking the owner to review or merge (ADR 0014): run ``$wait`` in the background now, with a
 timeout of 3900000 ms if the tool takes one; it ends and prints the review once it is posted. Address every finding: fix it with a fixup commit, or reply on the pull request
-why not. Push, which starts a review of the new head, and wait again. Repeat until a review of the head says
+why not. Push in its own command, not chained after a commit, so this hook names the pushed commit; that starts a
+review of the new head. Wait again. Repeat until a review of the head says
 ``No findings.``, then fold the fixups as CLAUDE.md says.
 "@
     }
