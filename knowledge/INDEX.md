@@ -62,6 +62,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [Posture map lookups are accurate to about 1 cm](findings/posture-map-accuracy.md)
 - [The model and the robot disagreed on the right coxa direction (resolved, ADR 0013)](findings/right-coxa-direction-mismatch.md)
 - [Worktrees share the main checkout's hooks](findings/absolute-hooks-path-shared-by-worktrees.md)
+- [Onboard charger and BMS candidates](findings/onboard-charger-and-bms-candidates.md)
 
 ## Recent Lessons Learned
 
