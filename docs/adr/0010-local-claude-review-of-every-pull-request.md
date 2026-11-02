@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Extends [ADR 0006](0006-run-quality-gates-locally.md) with an advisory review that, like the gate, runs locally. The reviewer's tool boundary is amended by [ADR 0012](0012-pr-reviewer-reads-linear.md): it may also read Linear.
+Accepted. Extends [ADR 0006](0006-run-quality-gates-locally.md) with an advisory review that, like the gate, runs locally. The reviewer's tool boundary is amended by [ADR 0012](0012-pr-reviewer-reads-linear.md): it may also read Linear. How the authoring session answers the review is amended by [ADR 0014](0014-authoring-session-follows-the-review-until-clean.md): it waits for each review and addresses it until one has no findings. ADR 0014 also has `review-pr.ps1` wait for the pushed head, hold a lock per head and mark a failed review.
 
 ## Context
 
@@ -13,7 +13,7 @@ Most pull requests are written by a Claude Code session. That session reviews it
 - `scripts/review-pr.ps1 [-PullRequest <n>] [-Force]` reviews a pull request: it checks the head commit out into a temporary worktree, runs a fresh headless `claude -p` session there and posts its output with `gh pr comment`. The session has no history of the authoring session. Its tools are limited to reading files and `gh pr diff|view`, `git diff|log|show`; it cannot edit, push, approve or merge. It loads user settings only (`--setting-sources user`), so the project's hooks (the Stop gate, the review hook) do not run in it.
 - The prompt makes the reviewer read `CLAUDE.md`, the touched projects' `CLAUDE.md` and `README.md`, the relevant ADRs and `knowledge/INDEX.md`, and review against them: correctness, physical safety, units, architecture, the test ledger, documentation and commit conventions.
 - A Claude Code `PostToolUse` hook (`scripts/claude-review-hook.ps1`, on `Bash|PowerShell`) starts `review-pr.ps1` in a hidden background process after a command that runs `gh pr create` or `git push`, and returns at once. It reviews the pull request of the branch checked out in the command's working directory, so pushes from any worktree are covered. Each run logs to its own file in `<git common dir>/claude-reviews`.
-- Draft and closed pull requests are skipped. Each head commit is reviewed once: a marker in `<git common dir>/claude-reviews` records it, so repeated pushes of the same commit cost nothing. A failed review records nothing and is retried on the next trigger.
+- Draft and closed pull requests are skipped. Each head commit is reviewed once: a marker in `<git common dir>/claude-reviews` records it, so repeated pushes of the same commit cost nothing. A failed review records no review marker, so it is retried on the next trigger; it marks the head failed instead ([ADR 0014](0014-authoring-session-follows-the-review-until-clean.md)).
 - The review is advisory. It is not a status check and blocks nothing; the gate stays `scripts/gate.ps1`. The comment is posted with the owner's `gh` login and the model usage is the owner's Claude login.
 
 ```mermaid

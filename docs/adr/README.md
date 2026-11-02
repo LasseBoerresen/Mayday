@@ -21,3 +21,4 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0011 - The pre-push gate drives the robot](0011-pre-push-gate-drives-the-robot.md) | Accepted | Physical tier, skips and quarantine on every code push |
 | [0012 - The PR reviewer reads Linear](0012-pr-reviewer-reads-linear.md) | Accepted | Four read-only Linear tools for titled issue links; amends 0010's tool boundary |
 | [0013 - Right legs reverse the coxa and look up the left-leg map mirrored in Y](0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md) | Accepted | Right coxa direction in model and servos; mirrored posture lookup |
+| [0014 - The authoring session follows the review until it is clean](0014-authoring-session-follows-the-review-until-clean.md) | Accepted | Hook tells the session to wait for each review and address it until `No findings.`; amends 0010 |

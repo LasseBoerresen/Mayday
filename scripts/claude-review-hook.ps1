@@ -5,19 +5,23 @@
 .DESCRIPTION
     Reads the hook payload from stdin. When the command ran `gh pr create` or a real `git push`, starts a review of
     the current branch's pull request in the background and returns at once, so the authoring session is not held up.
-    Does nothing inside the reviewer session itself (MAYDAY_CLAUDE_REVIEWER), for other commands, or on malformed
-    input. Always exits 0: a review is advisory and never blocks the session. See ADR 0010.
+    It then tells the session, as additional context, to wait for the review with wait-for-review.ps1 and address its
+    findings until a review of the head has none (ADR 0014). Does nothing inside the reviewer session itself
+    (MAYDAY_CLAUDE_REVIEWER), for other commands, or on malformed input. Always exits 0: a review is advisory and
+    never blocks the session. See ADR 0010.
 
 .PARAMETER StartReview
     Starts the review of the pull request of the branch checked out in the given directory (the payload's cwd, or
-    $null when it has none). The default runs review-pr.ps1 in a hidden, detached PowerShell that logs to its own
-    file in <git common dir>/claude-reviews. The script tests replace it.
+    $null when it has none), at the given head commit (that directory's HEAD, or $null when unknown). The default
+    runs review-pr.ps1 in a hidden, detached PowerShell that logs to its own file in <git common dir>/claude-reviews.
+    The script tests replace it.
 #>
 [CmdletBinding()]
 param(
     [scriptblock] $StartReview = {
-        param($Directory)
+        param($Directory, $Head)
         $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSScriptRoot\review-pr.ps1`"")
+        if ($Head) { $arguments += '-Head', $Head }
         if ($Directory) {
             $Directory = git -C $Directory rev-parse --show-toplevel
             $arguments += '-RepoRoot', "`"$Directory`""
@@ -43,5 +47,36 @@ if (-not $command) { exit 0 }
 $creates = $command -match '(^|[\s;&|(])gh\s+pr\s+create\b'
 # git's own options may come before the subcommand: `git -C ../wt push`, `git -c key=value push`.
 $pushes = $command -match '(^|[\s;&|(])git(\s+(-[cC]\s+\S+|--?[\w-]+(=\S+)?))*\s+push\b' -and $command -notmatch '--dry-run'
-if ($creates -or $pushes) { & $StartReview $payload.cwd }
+if (-not ($creates -or $pushes)) { exit 0 }
+
+# The hook runs as soon as a background push starts, before the pull request has the pushed head; review-pr.ps1
+# waits for this one.
+$head = $null
+if ($payload.cwd) {
+    $ErrorActionPreference = 'Continue'
+    $head = git -C $payload.cwd rev-parse HEAD 2>$null
+    if ($LASTEXITCODE -ne 0) { $head = $null }
+}
+if ($head) {
+    # The session's wait trusts any failure mark of this head, so one left by an earlier push of the same commit goes
+    # now, before the session can start waiting; the detached run might clear it only after the wait has read it.
+    $reviews = Join-Path (git -C $payload.cwd rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
+    Remove-Item -Path (Join-Path $reviews "*-$head.failed") -ErrorAction SilentlyContinue
+}
+$started = & $StartReview $payload.cwd $head | Out-String
+$wait = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\wait-for-review.ps1`""
+if ($payload.cwd) { $wait += " -RepoRoot `"$($payload.cwd)`"" }
+# Claude Code shows a PostToolUse hook's plain stdout only in the transcript; additionalContext reaches the session.
+@{
+    hookSpecificOutput = @{
+        hookEventName     = 'PostToolUse'
+        additionalContext = @"
+$($started.Trim())
+Follow this review before asking the owner to review or merge (ADR 0014): run ``$wait`` in the background now, with a
+timeout of 3600000 ms if the tool takes one; it ends and prints the review once it is posted. Address every finding: fix it with a fixup commit, or reply on the pull request
+why not. Push, which starts a review of the new head, and wait again. Repeat until a review of the head says
+``No findings.``, then fold the fixups as CLAUDE.md says.
+"@
+    }
+} | ConvertTo-Json -Compress
 exit 0

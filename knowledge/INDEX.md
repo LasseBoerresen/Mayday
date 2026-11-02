@@ -17,6 +17,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0011: The pre-push gate drives the robot](../docs/adr/0011-pre-push-gate-drives-the-robot.md) (supersedes the pre-push parts of ADR 0005 and 0006)
 - [ADR 0012: The PR reviewer reads Linear](../docs/adr/0012-pr-reviewer-reads-linear.md) (amends ADR 0010's tool boundary)
 - [ADR 0013: Right legs reverse the coxa and look up the left-leg map mirrored in Y](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md)
+- [ADR 0014: The authoring session follows the review until it is clean](../docs/adr/0014-authoring-session-follows-the-review-until-clean.md) (amends how ADR 0010's review is answered)
 
 ## Architectural Constraints
 
@@ -24,7 +25,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - Physical tests and startup can move real hardware: [physical-run pitfall](pitfalls/physical-runs.md).
 - Port access must remain serialized and scheduler changes require timing/safety review ([Dynamixel](../Dynamixel/README.md), [RobotDomain/Time](../RobotDomain/Time/README.md)).
 - Methods may not exceed cyclomatic complexity 12: CA1502 fails the build, with early feedback from a Claude Code hook ([ADR 0008](../docs/adr/0008-cyclomatic-complexity-gate-with-ca1502.md), [quality-gates](../quality-gates/README.md)).
-- The quality gate runs locally (`scripts\gate.ps1`, enforced by a Claude Code Stop hook and a pre-push hook); GitHub CI is optional ([ADR 0006](../docs/adr/0006-run-quality-gates-locally.md)). A separate, local Claude Code session reviews every pull request, advisory only ([ADR 0010](../docs/adr/0010-local-claude-review-of-every-pull-request.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)). A code push runs the physical tier on the robot and fails on any skipped test and on a quarantined test that passes ([ADR 0011](../docs/adr/0011-pre-push-gate-drives-the-robot.md)).
+- The quality gate runs locally (`scripts\gate.ps1`, enforced by a Claude Code Stop hook and a pre-push hook); GitHub CI is optional ([ADR 0006](../docs/adr/0006-run-quality-gates-locally.md)). A separate, local Claude Code session reviews every pull request, advisory only ([ADR 0010](../docs/adr/0010-local-claude-review-of-every-pull-request.md)); the authoring session waits for each review and addresses it until one has no findings ([ADR 0014](../docs/adr/0014-authoring-session-follows-the-review-until-clean.md)). Scripts and other infrastructure code are tested too ([ADR 0007](../docs/adr/0007-infrastructure-code-is-tested-like-product-code.md)). A test known to fail is quarantined with a recorded reason, not skipped ([ADR 0004](../docs/adr/0004-quarantine-failing-tests-with-a-trait.md)). A code push runs the physical tier on the robot and fails on any skipped test and on a quarantined test that passes ([ADR 0011](../docs/adr/0011-pre-push-gate-drives-the-robot.md)).
 
 ## Known Pitfalls
 

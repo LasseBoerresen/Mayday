@@ -7,7 +7,8 @@
     temporary worktree, runs a fresh `claude -p` session there with no history of the authoring session, and posts its
     output with `gh pr comment`. The reviewer only reads and reports: it cannot edit, push, approve or merge. Draft and
     closed pull requests are skipped, and a head commit that was already reviewed is skipped unless -Force. Exits 0
-    when it reviewed or skipped, non-zero when the review produced nothing or could not be posted. See ADR 0010.
+    when it reviewed or skipped, non-zero when the review produced nothing or could not be posted; a failure is marked
+    in <git common dir>/claude-reviews, so wait-for-review.ps1 stops waiting. See ADR 0010 and ADR 0014.
 
 .PARAMETER PullRequest
     The pull request number. Defaults to the pull request of the current branch.
@@ -18,9 +19,23 @@
 .PARAMETER RepoRoot
     The git working tree whose pull request to review. Defaults to the repository this script lives in.
 
+.PARAMETER Head
+    The commit to review. When given, waits up to -HeadTimeoutSeconds for the pull request's head to become this
+    commit, as it does when the push that started the review is still running, and fails, marking it failed, when it
+    does not.
+
+.PARAMETER HeadTimeoutSeconds
+    How long to wait for the pull request's head to become -Head. The pre-push gate can take many minutes.
+
+.PARAMETER PollSeconds
+    The pause between checks of the pull request's head.
+
+.PARAMETER Sleep
+    Pauses for the given number of seconds between checks.
+
 .PARAMETER GetPullRequest
-    Returns the pull request (number, headRefOid, baseRefName, isDraft, state) or $null for none. Takes the number,
-    or $null for the current branch. The script tests replace it, -Review and -PostComment.
+    Returns the pull request (number, headRefOid, baseRefName, isDraft, state) or $null for none, and throws when the
+    lookup itself fails. Takes the number, or $null for the current branch. The script tests replace it, -Review, -PostComment and -Sleep.
 
 .PARAMETER Review
     Runs the reviewer on a prompt in a directory and returns its review as text, setting $LASTEXITCODE.
@@ -33,11 +48,21 @@ param(
     [int] $PullRequest,
     [switch] $Force,
     [string] $RepoRoot,
+    [string] $Head,
+    [int] $HeadTimeoutSeconds = 1800,
+    [int] $PollSeconds = 15,
+    [scriptblock] $Sleep = { param($Seconds) Start-Sleep -Seconds $Seconds },
     [scriptblock] $GetPullRequest = {
         param($Number)
+        # Under Stop, Windows PowerShell turns gh's stderr ("no pull requests found") into an error, even with 2>$null.
+        $ErrorActionPreference = 'Continue'
         $fields = 'number,headRefOid,baseRefName,isDraft,state'
-        $json = if ($Number) { gh pr view $Number --json $fields 2>$null } else { gh pr view --json $fields 2>$null }
-        if ($LASTEXITCODE -eq 0 -and $json) { $json | Out-String | ConvertFrom-Json } else { $null }
+        $output = @(if ($Number) { gh pr view $Number --json $fields 2>&1 } else { gh pr view --json $fields 2>&1 }) |
+            ForEach-Object { "$_" }
+        # Only gh's own "no pull requests found" means there is none; offline or logged out must not look like it.
+        if ($LASTEXITCODE -eq 0) { $output | Out-String | ConvertFrom-Json }
+        elseif ($output -match 'no pull requests found') { $null }
+        else { throw "gh pr view failed: $($output -join ' ')" }
     },
     [scriptblock] $Review = {
         param($Prompt, $Directory)
@@ -64,7 +89,8 @@ $ErrorActionPreference = 'Stop'
 if (-not $RepoRoot) { $RepoRoot = Split-Path -Parent $PSScriptRoot }
 Set-Location $RepoRoot
 
-$pr = & $GetPullRequest $(if ($PullRequest) { $PullRequest } else { $null })
+$number = if ($PullRequest) { $PullRequest } else { $null }
+$pr = & $GetPullRequest $number
 if (-not $pr) {
     Write-Host '== No pull request for this branch; nothing to review.'
     exit 0
@@ -74,14 +100,60 @@ if ($pr.isDraft -or $pr.state -ne 'OPEN') {
     exit 0
 }
 
-$sha = $pr.headRefOid
 $reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
 New-Item -ItemType Directory -Force -Path $reviews | Out-Null
+$sha = if ($Head) { $Head } else { $pr.headRefOid }
 $memory = Join-Path $reviews "$($pr.number)-$sha"
 if (-not $Force -and (Test-Path $memory)) {
     Write-Host "== #$($pr.number) at $sha was already reviewed; skipping. Use -Force to review again."
     exit 0
 }
+# One run per head. A push of the same commit again, after a failed push, starts a second run while the first may still
+# wait for that head with little of its time left, so the newer run takes over a lock that is still waiting and the
+# older one stands down; a lock that is reviewing makes the newer run skip. A lock older than the longest run is left
+# by a killed run and taken over.
+$lock = "$memory.lock"
+$token = [guid]::NewGuid().ToString('N')
+if ((Test-Path $lock) -and (Get-Item $lock).LastWriteTime -gt (Get-Date).AddSeconds(-($HeadTimeoutSeconds + 1800)) -and
+    (Get-Content $lock -Raw) -notmatch '^waiting ') {
+    Write-Host "== Another run is reviewing #$($pr.number) at $sha; skipping."
+    exit 0
+}
+Set-Content -Path $lock -Value "waiting $token"
+# wait-for-review.ps1 stops waiting on a head marked failed, so a new run clears an earlier failure's mark first.
+$failed = "$memory.failed"
+Remove-Item -Path $failed -ErrorAction SilentlyContinue
+
+function Test-LockIsOurs { (Test-Path $lock) -and (Get-Content $lock -Raw) -match " $token\s*$" }
+# Every exit from here on releases the lock while it is ours, and a failure marks the head failed.
+function Exit-Review([int] $Code, [switch] $MarkFailed) {
+    if ($MarkFailed) { Set-Content -Path $failed -Value (Get-Date -Format o) }
+    if (Test-LockIsOurs) { Remove-Item -Path $lock -ErrorAction SilentlyContinue }
+    exit $Code
+}
+# A trap covers its whole scope, so it also sees errors raised before $lock is known; those mark nothing.
+trap {
+    Write-Host "== FAILED: $_"
+    if ($lock) { Exit-Review 1 -MarkFailed }
+    exit 1
+}
+
+$deadline = (Get-Date).AddSeconds($HeadTimeoutSeconds)
+while ($pr.headRefOid -ne $sha -and (Get-Date) -lt $deadline) {
+    & $Sleep $PollSeconds
+    if (-not (Test-LockIsOurs)) {
+        Write-Host "== A newer run took over #$($pr.number) at $sha; standing down."
+        exit 0
+    }
+    # A lookup that fails for a moment keeps the last pull request seen.
+    try { $next = & $GetPullRequest $number } catch { $next = $null }
+    if ($next) { $pr = $next }
+}
+if ($pr.headRefOid -ne $sha) {
+    Write-Host "== FAILED: the head of #$($pr.number) did not become $sha within $HeadTimeoutSeconds s"
+    Exit-Review 1 -MarkFailed
+}
+Set-Content -Path $lock -Value "reviewing $token"
 
 $ErrorActionPreference = 'Continue'
 git cat-file -e "$sha^{commit}" 2>$null
@@ -90,7 +162,7 @@ $checkout = Join-Path ([IO.Path]::GetTempPath()) "mayday-review-$($pr.number)-$(
 git worktree add -q --detach $checkout $sha
 if ($LASTEXITCODE -ne 0) {
     Write-Host "== FAILED: could not check out $sha"
-    exit 1
+    Exit-Review 1 -MarkFailed
 }
 
 $prompt = @"
@@ -119,7 +191,8 @@ with the read-only Linear tools rather than from memory, and if a lookup fails, 
 
 Report only issues you are confident about, each with file:line and the concrete failure it causes; say nothing about
 style the repository does not ask for. Your final message is posted verbatim as the review comment, so make it only
-the review in Markdown: a one-line verdict, the findings ranked most severe first, then what you did not check. Do not
+the review in Markdown: a one-line verdict (exactly ``No findings.`` when you have none: the author fixes and pushes
+until a review says so), the findings ranked most severe first, then what you did not check. Do not
 post it yourself, approve, request changes or merge: the owner decides.
 "@
 
@@ -138,7 +211,7 @@ finally {
 $text = ($text | Out-String).Trim()
 if ($reviewExit -ne 0 -or -not $text) {
     Write-Host "== FAILED: the reviewer produced no review (exit $reviewExit)"
-    exit 1
+    Exit-Review 1 -MarkFailed
 }
 
 $body = Join-Path $reviews "$($pr.number)-$sha.md"
@@ -153,9 +226,10 @@ $text
 $global:LASTEXITCODE = 0
 & $PostComment $pr.number $body
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "== FAILED: could not post the review (exit $LASTEXITCODE); it is in $body"
-    exit $LASTEXITCODE
+    $postExit = $LASTEXITCODE
+    Write-Host "== FAILED: could not post the review (exit $postExit); it is in $body"
+    Exit-Review $postExit -MarkFailed
 }
 Set-Content -Path $memory -Value (Get-Date -Format o)
 Write-Host "== Posted the review of #$($pr.number)."
-exit 0
+Exit-Review 0
