@@ -34,7 +34,7 @@ Joint IDs, orientation, and graph ordering affect kinematics and physical motion
 
 ## Related ADRs
 
-[Stable abstractions](../../docs/adr/0001-stable-robot-abstractions.md).
+[Stable abstractions](../../docs/adr/0001-stable-robot-abstractions.md), [C# structure as kinematic source](../../docs/adr/0015-the-csharp-structure-stays-the-kinematic-source.md).
 
 ## Related Findings
 
