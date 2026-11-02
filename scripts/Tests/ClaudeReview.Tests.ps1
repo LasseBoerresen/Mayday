@@ -385,6 +385,29 @@ exit `$LASTEXITCODE
         $result.Output | Should -Match 'error connecting'
     }
 
+    It 'GivenPullRequestCreatedAfterThePush_WhenRunWithHead_ThenWaitsForItAndReviewsTheHead' {
+        # Given: `git push && gh pr create` in one background command fires the hook before the pull request exists
+        $calls = Join-Path $TestDrive "calls-$([guid]::NewGuid().ToString('N')).txt"
+        $pullRequest = "Add-Content -Path '$calls' -Value x; if (@(Get-Content '$calls').Count -lt 3) { `$null } else { [pscustomobject]@{ number = 7; headRefOid = 'SHA'; baseRefName = 'master'; isDraft = `$false; state = 'OPEN' } }"
+
+        # When
+        $result = Invoke-ReviewPr -PullRequest $pullRequest -Head $script:Sha
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        Get-Log | Should -Contain "review $script:Sha reviewer=1"
+    }
+
+    It 'GivenNoPullRequestEverCreated_WhenRunWithHead_ThenExitsZeroWithoutReviewing' {
+        # When
+        $result = Invoke-ReviewPr -PullRequest '$null' -Head $script:Sha -HeadTimeoutSeconds 0
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'No pull request'
+        Get-Log | Should -BeNullOrEmpty
+    }
+
     It 'GivenPushedHeadNeverReachesThePullRequest_WhenRunWithHead_ThenFailsAndMarksThatHeadFailed' {
         # When
         $result = Invoke-ReviewPr -PullRequest "[pscustomobject]@{ number = 7; headRefOid = 'old'; baseRefName = 'master'; isDraft = `$false; state = 'OPEN' }" -Head $script:Sha -HeadTimeoutSeconds 0

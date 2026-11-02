@@ -20,9 +20,9 @@
     The git working tree whose pull request to review. Defaults to the repository this script lives in.
 
 .PARAMETER Head
-    The commit to review. When given, waits up to -HeadTimeoutSeconds for the pull request's head to become this
-    commit, as it does when the push that started the review is still running, and fails, marking it failed, when it
-    does not.
+    The commit to review. When given, waits up to -HeadTimeoutSeconds for the pull request to exist and for its head
+    to become this commit, as it does when the push that started the review is still running. Exits 0 when no pull
+    request appears, and fails, marking the commit failed, when its head does not become this commit.
 
 .PARAMETER HeadTimeoutSeconds
     How long to wait for the pull request's head to become -Head. The pre-push gate can take many minutes.
@@ -91,6 +91,13 @@ Set-Location $RepoRoot
 
 $number = if ($PullRequest) { $PullRequest } else { $null }
 $pr = & $GetPullRequest $number
+# One deadline for the whole wait for -Head: `git push && gh pr create` in one background command fires the hook
+# before the pull request even exists.
+$deadline = (Get-Date).AddSeconds($HeadTimeoutSeconds)
+while ($Head -and -not $pr -and (Get-Date) -lt $deadline) {
+    & $Sleep $PollSeconds
+    try { $pr = & $GetPullRequest $number } catch { $pr = $null }
+}
 if (-not $pr) {
     Write-Host '== No pull request for this branch; nothing to review.'
     exit 0
@@ -138,7 +145,6 @@ trap {
     exit 1
 }
 
-$deadline = (Get-Date).AddSeconds($HeadTimeoutSeconds)
 while ($pr.headRefOid -ne $sha -and (Get-Date) -lt $deadline) {
     & $Sleep $PollSeconds
     if (-not (Test-LockIsOurs)) {
