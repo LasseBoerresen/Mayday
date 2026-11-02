@@ -17,6 +17,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0011: The pre-push gate drives the robot](../docs/adr/0011-pre-push-gate-drives-the-robot.md) (supersedes the pre-push parts of ADR 0005 and 0006)
 - [ADR 0012: The PR reviewer reads Linear](../docs/adr/0012-pr-reviewer-reads-linear.md) (amends ADR 0010's tool boundary)
 - [ADR 0013: Right legs reverse the coxa and look up the left-leg map mirrored in Y](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md)
+- [ADR 0014: Fusion 360 is the CAD source; the repository holds exports](../docs/adr/0014-fusion-is-the-cad-source-the-repository-holds-exports.md)
 
 ## Architectural Constraints
 
@@ -84,7 +85,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 |---|---|
 | Shared | [Generic](../Generic/README.md) ([System](../Generic/System/README.md)), [RobotDomain](../RobotDomain/README.md) ([Behavior](../RobotDomain/Behavior/README.md), [Geometry](../RobotDomain/Geometry/README.md), [System.Numerics](../RobotDomain/Geometry/SystemNumerics/README.md), [Motion](../RobotDomain/Motion/README.md), [Physics](../RobotDomain/Physics/README.md), [Structures](../RobotDomain/Structures/README.md), [Time](../RobotDomain/Time/README.md)) |
 | Mayday | [MaydayDomain](../MaydayDomain/README.md) ([Components](../MaydayDomain/Components/README.md), [MotionPlanning](../MaydayDomain/MotionPlanning/README.md)), [ManualBehavior](../ManualBehavior/README.md), [MaydayDataAccess](../MaydayDataAccess/README.md) ([Geometry](../MaydayDataAccess/Geometry/README.md)), [Robots](../Robots/README.md), [Main](../Main/README.md) |
-| Hardware | [Dynamixel](../Dynamixel/README.md) |
+| Hardware | [Dynamixel](../Dynamixel/README.md), [Mayday hardware](../hardware/mayday/README.md) |
 | Ellie | [Ellie](../Ellie/README.md): [EllieMain](../Ellie/EllieMain/README.md) ([Base](../Ellie/EllieMain/Base/README.md), [Behaviors](../Ellie/EllieMain/Behaviors/README.md), [MotionPlanning](../Ellie/EllieMain/MotionPlanning/README.md), [Structures](../Ellie/EllieMain/Structures/README.md)), [EllieMainTests](../Ellie/EllieMainTests/README.md) |
 | Tests and other projects | [scripts](../scripts/README.md), [quality-gates](../quality-gates/README.md), [Test](../Test/README.md) ([Unit](../Test/Unit/README.md), [Integration](../Test/Integration/README.md)), [DataAccess](../DataAccess/README.md), [Ternimal](../Ternimal/README.md) |
 
