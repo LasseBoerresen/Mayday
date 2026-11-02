@@ -26,3 +26,9 @@ The operator's standing statement that the connected robot may move under test: 
 
 **Quarantined test**:
 A test known to fail, marked with the cause of its failure, still run so its recovery shows. Quarantine never changes what the test expects.
+
+## Physical build
+
+**Hardware revision**:
+A named version of a robot's physical design: its mechanics, electronics and power system. Every unit built to the same hardware revision shares one nominal geometry; how one unit differs from it is not part of the revision.
+_Avoid_: Version, build, model
