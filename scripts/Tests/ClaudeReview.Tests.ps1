@@ -451,6 +451,25 @@ exit `$LASTEXITCODE
         $result.Output | Should -Match 'No findings\.'
     }
 
+    It 'GivenHeadMovedAfterThePush_WhenWaitingForThePushedHead_ThenPrintsItsReview' {
+        # Given: the session committed again while the background push ran
+        $pushed = $script:Sha
+        Set-Content -Path "$script:Reviews\7-$pushed.md" -Value 'Review of the pushed head.'
+        Set-Content -Path "$script:Reviews\7-$pushed" -Value 'now'
+        git -C $script:Repo -c user.name=t -c user.email=t@t commit -q --allow-empty -m later
+
+        # When
+        $result = Invoke-Wrapper @"
+& '$script:Wait' -RepoRoot '$script:Repo' -Head '$pushed' -TimeoutSeconds 0 ``
+    -GetPullRequest { [pscustomobject]@{ number = 7; isDraft = `$false; state = 'OPEN' } } -Sleep { param(`$Seconds) }
+exit `$LASTEXITCODE
+"@
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match 'Review of the pushed head\.'
+    }
+
     It 'GivenReviewOfHeadPostedLater_WhenWaiting_ThenWaitsAndPrintsIt' {
         # When
         $result = Invoke-Wait -Sleep "Set-Content -Path '$script:Reviews\7-$script:Sha.md' -Value 'Finding: off by one.'; Set-Content -Path '$script:Reviews\7-$script:Sha' -Value now"
@@ -596,10 +615,11 @@ exit `$LASTEXITCODE
         $sha = (git -C $repo rev-parse HEAD).Trim()
 
         # When
-        Invoke-Hook 'git push' -Cwd $repo | Out-Null
+        $result = Invoke-Hook 'git push' -Cwd $repo
 
-        # Then
+        # Then: the review and the session's wait both follow the pushed head, even if HEAD moves before the wait starts
         Get-Log | Should -Be @("started $repo", "head $sha")
+        ($result.Output | ConvertFrom-Json).hookSpecificOutput.additionalContext | Should -Match "-Head $sha"
     }
 
     It 'GivenEarlierFailureMarkedForThePushedHead_WhenHookRuns_ThenClearsItBeforeTheReviewStarts' {

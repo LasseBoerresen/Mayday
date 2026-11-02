@@ -66,6 +66,7 @@ if ($head) {
 $started = & $StartReview $payload.cwd $head | Out-String
 $wait = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$PSScriptRoot\wait-for-review.ps1`""
 if ($payload.cwd) { $wait += " -RepoRoot `"$($payload.cwd)`"" }
+if ($head) { $wait += " -Head $head" }
 # Claude Code shows a PostToolUse hook's plain stdout only in the transcript; additionalContext reaches the session.
 @{
     hookSpecificOutput = @{

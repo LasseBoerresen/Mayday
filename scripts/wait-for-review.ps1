@@ -13,6 +13,10 @@
 .PARAMETER RepoRoot
     The git working tree whose pull request and HEAD to wait for. Defaults to the repository this script lives in.
 
+.PARAMETER Head
+    The pushed commit whose review to wait for. Defaults to the working tree's HEAD; the hook names the commit it saw
+    pushed, since the session may commit again before it starts the wait.
+
 .PARAMETER TimeoutSeconds
     How long to wait for the review. It must outlast review-pr.ps1's wait for the pushed head (30 minutes by default)
     plus the review itself, which usually takes a few minutes.
@@ -30,6 +34,7 @@
 [CmdletBinding()]
 param(
     [string] $RepoRoot,
+    [string] $Head,
     [int] $TimeoutSeconds = 3600,
     [int] $PollSeconds = 15,
     [scriptblock] $GetPullRequest = {
@@ -54,8 +59,8 @@ if (-not $pr -or $pr.isDraft -or $pr.state -ne 'OPEN') {
     exit 0
 }
 
-# The head just pushed is HEAD here; the pull request's own head can lag behind GitHub for a moment.
-$sha = (git rev-parse HEAD).Trim()
+# The head just pushed is HEAD here unless named; the pull request's own head can lag behind GitHub for a moment.
+$sha = if ($Head) { $Head } else { (git rev-parse HEAD).Trim() }
 $reviews = Join-Path (git rev-parse --path-format=absolute --git-common-dir) 'claude-reviews'
 $posted = Join-Path $reviews "$($pr.number)-$sha"
 $failed = "$posted.failed"
