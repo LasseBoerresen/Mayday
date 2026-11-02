@@ -23,3 +23,4 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0013 - Right legs reverse the coxa and look up the left-leg map mirrored in Y](0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md) | Accepted | Right coxa direction in model and servos; mirrored posture lookup |
 | [0014 - Fusion 360 is the CAD source; the repository holds exports](0014-fusion-is-the-cad-source-the-repository-holds-exports.md) | Accepted | Mechanical design in Fusion; BOM, wiring, power budget and exports in `hardware/` |
 | [0015 - The C# structure stays the kinematic source](0015-the-csharp-structure-stays-the-kinematic-source.md) | Accepted | Kinematics in C#; simple collision shapes; description file once a simulator is chosen |
+| [0016 - A Li-ion battery, charged on board](0016-li-ion-battery-charged-on-board.md) | Accepted, planned for hardware revision C | 3S1P 18650 with BMS, USB-C charging at 4.1 V per cell, motor power switch |

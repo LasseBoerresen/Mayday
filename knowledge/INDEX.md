@@ -19,6 +19,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0013: Right legs reverse the coxa and look up the left-leg map mirrored in Y](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md)
 - [ADR 0014: Fusion 360 is the CAD source; the repository holds exports](../docs/adr/0014-fusion-is-the-cad-source-the-repository-holds-exports.md)
 - [ADR 0015: The C# structure stays the kinematic source](../docs/adr/0015-the-csharp-structure-stays-the-kinematic-source.md)
+- [ADR 0016: A Li-ion battery, charged on board](../docs/adr/0016-li-ion-battery-charged-on-board.md) (Accepted; planned for hardware revision C)
 
 ## Architectural Constraints
 
