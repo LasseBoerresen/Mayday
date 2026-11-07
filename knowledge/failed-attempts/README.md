@@ -5,3 +5,4 @@ Preserve negative knowledge so future work does not repeat known rejected approa
 ## Entries
 
 - [Measured-angle interpolation baseline](measured-angle-interpolation.md)
+- [Wait machinery around a detached PR reviewer (PR #57)](review-wait-machinery.md)
