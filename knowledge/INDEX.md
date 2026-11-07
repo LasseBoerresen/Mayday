@@ -64,6 +64,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [The model and the robot disagreed on the right coxa direction (resolved, ADR 0013)](findings/right-coxa-direction-mismatch.md)
 - [Worktrees share the main checkout's hooks](findings/absolute-hooks-path-shared-by-worktrees.md)
 - [Claude Code background tasks and hooks](findings/claude-code-background-tasks-and-hooks.md)
+- [Onboard charger and BMS candidates](findings/onboard-charger-and-bms-candidates.md)
 
 ## Recent Lessons Learned
 

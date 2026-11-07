@@ -78,7 +78,7 @@ Geometry exported from Fusion (STEP, STL) will live in `exports/`, stored with G
 
 ## Related Findings
 
-None recorded.
+[Onboard charger and BMS candidates](../../knowledge/findings/onboard-charger-and-bms-candidates.md)
 
 ## Related Root Causes
 
