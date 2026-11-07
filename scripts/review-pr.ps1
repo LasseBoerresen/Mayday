@@ -5,7 +5,8 @@
 .DESCRIPTION
     Looks up the pull request (the current branch's when -PullRequest is omitted), checks its head commit out into a
     temporary worktree, runs a fresh `claude -p` session there with no history of the authoring session, and posts its
-    output with `gh pr comment`. The reviewer only reads and reports: it cannot edit, push, approve or merge. Draft and
+    output with `gh pr comment`, then prints the posted review. The reviewer only reads and reports: it cannot edit,
+    push, approve or merge. Draft and
     closed pull requests are skipped, and a head commit that was already reviewed is skipped unless -Force. Exits 0
     when it reviewed or skipped, non-zero when the review produced nothing or could not be posted. See ADR 0010.
 
@@ -165,5 +166,6 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 Set-Content -Path $memory -Value (Get-Date -Format o)
-Write-Host "== Posted the review of #$($pr.number)."
+Write-Host "== Posted the review of #$($pr.number):"
+Write-Host (Get-Content -Path $body -Raw -Encoding UTF8)
 exit 0

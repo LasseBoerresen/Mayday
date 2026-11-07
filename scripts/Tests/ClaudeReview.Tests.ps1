@@ -62,6 +62,16 @@ Describe 'review-pr.ps1' {
         ($log -join "`n") | Should -Match "post 7 [\s\S]*$script:Sha[\s\S]*Looks fine\."
     }
 
+    It 'GivenOpenPullRequest_WhenRun_ThenPrintsThePostedReview' {
+        # Given: the authoring session runs the review in the background and reads it when the task ends
+
+        # When
+        $result = Invoke-ReviewPr
+
+        # Then
+        $result.Output | Should -Match "Claude review of $script:Sha[\s\S]*Looks fine\."
+    }
+
     It 'GivenOpenPullRequest_WhenRun_ThenReviewsInASeparateCheckoutRemovedAfterwards' {
         # When
         Invoke-ReviewPr | Out-Null
