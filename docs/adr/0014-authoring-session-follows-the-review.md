@@ -51,7 +51,7 @@ A background task that ends is the one wake signal that works today, and the rev
 
 ## Related Findings
 
-None recorded.
+[Claude Code background tasks and hooks](../../knowledge/findings/claude-code-background-tasks-and-hooks.md); failed attempt: [wait machinery around a detached PR reviewer](../../knowledge/failed-attempts/review-wait-machinery.md)
 
 ## Related Root Causes
 
