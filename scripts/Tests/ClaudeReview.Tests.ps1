@@ -1,5 +1,5 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
-# Tests for scripts/review-pr.ps1 and scripts/claude-review-hook.ps1 (ADR 0010).
+# Tests for scripts/review-pr.ps1 (ADR 0010, ADR 0014).
 #
 # Each review test gets a scratch git repository with one commit and runs the script in a child PowerShell, because
 # the scripts call `exit`. gh and claude are replaced with commands that append to a log, so nothing reaches GitHub
@@ -7,7 +7,6 @@
 
 BeforeAll {
     $script:ReviewPr = Join-Path $PSScriptRoot '..\review-pr.ps1' | Resolve-Path | Select-Object -ExpandProperty Path
-    $script:Hook = Join-Path $PSScriptRoot '..\claude-review-hook.ps1' | Resolve-Path | Select-Object -ExpandProperty Path
     $script:RepoRoot = Join-Path $PSScriptRoot '..\..' | Resolve-Path | Select-Object -ExpandProperty Path
 
     # Runs powershell on a wrapper script and returns its exit code and combined output.
@@ -220,82 +219,18 @@ Describe 'review-pr.ps1' {
     }
 }
 
-Describe 'claude-review-hook.ps1' {
-    BeforeEach {
-        $script:Log = Join-Path $TestDrive "log-$([guid]::NewGuid().ToString('N')).txt"
-    }
-
-    BeforeAll {
-        # Runs the hook with a PostToolUse payload for a shell command; StartReview appends to the log instead.
-        function Invoke-Hook([string] $Command, [string] $Raw, [switch] $AsReviewer) {
-            $payload = if ($Raw) { $Raw } else { @{ tool_name = 'Bash'; cwd = 'C:\work\wt'; tool_input = @{ command = $Command } } | ConvertTo-Json -Compress }
-            $reviewer = if ($AsReviewer) { "`$env:MAYDAY_CLAUDE_REVIEWER = '1'" } else { "Remove-Item Env:MAYDAY_CLAUDE_REVIEWER -ErrorAction SilentlyContinue" }
-            $body = @"
-$reviewer
-& '$script:Hook' -StartReview { param(`$Directory) Add-Content -Path '$script:Log' -Value "started `$Directory" }
-exit `$LASTEXITCODE
-"@
-            Invoke-Wrapper $body $payload
-        }
-    }
-
-    It 'GivenCommand<Command>_WhenHookRuns_ThenStartsAReview' -ForEach @(
-        @{ Command = 'gh pr create --base master --title x' },
-        @{ Command = 'git push -u origin feature' },
-        @{ Command = 'cd repo && git push 2>&1 | tail -5' },
-        @{ Command = 'git -C ../wt push origin feature' },
-        @{ Command = 'git -c core.hooksPath=.githooks push' }
-    ) {
-        # When
-        $result = Invoke-Hook $Command
-
-        # Then
-        $result.ExitCode | Should -Be 0
-        Get-Log | Should -Be @('started C:\work\wt')
-    }
-
-    It 'GivenCommand<Command>_WhenHookRuns_ThenStartsNothing' -ForEach @(
-        @{ Command = 'git status --short' },
-        @{ Command = 'gh pr view 43' },
-        @{ Command = 'git push --dry-run origin feature' }
-    ) {
-        # When
-        $result = Invoke-Hook $Command
-
-        # Then
-        $result.ExitCode | Should -Be 0
-        Get-Log | Should -BeNullOrEmpty
-    }
-
-    It 'GivenReviewerSession_WhenItPushes_ThenStartsNothing' {
-        # When
-        $result = Invoke-Hook 'git push' -AsReviewer
-
-        # Then
-        $result.ExitCode | Should -Be 0
-        Get-Log | Should -BeNullOrEmpty
-    }
-
-    It 'GivenMalformedInput_WhenHookRuns_ThenStartsNothingAndExitsZero' {
-        # When
-        $result = Invoke-Hook -Raw 'not json'
-
-        # Then
-        $result.ExitCode | Should -Be 0
-        Get-Log | Should -BeNullOrEmpty
-    }
-}
-
 Describe 'claude review wiring' {
-    It 'GivenSettings_WhenPostToolUseHooksRead_ThenReviewHookRunsAfterShellCommands' {
+    It 'GivenSettings_WhenHooksRead_ThenNoneStartsAReview' {
+        # Given: the authoring session starts the review once its push has finished (ADR 0014); a hook fires when a
+        # background push starts, before the pull request has the new head
+
         # When
-        $hooks = (Get-Content (Join-Path $script:RepoRoot '.claude\settings.json') -Raw | ConvertFrom-Json).hooks.PostToolUse
-        $review = $hooks | Where-Object { $_.hooks.command -match 'claude-review-hook\.ps1' }
+        $hooks = (Get-Content (Join-Path $script:RepoRoot '.claude\settings.json') -Raw | ConvertFrom-Json).hooks
+        $commands = @($hooks.PSObject.Properties.Value | ForEach-Object { $_.hooks.command })
 
         # Then
-        $review | Should -Not -BeNullOrEmpty
-        'Bash' | Should -Match "^($($review.matcher))$"
-        'PowerShell' | Should -Match "^($($review.matcher))$"
+        $commands | Should -Not -BeNullOrEmpty
+        $commands | Where-Object { $_ -match 'review' } | Should -BeNullOrEmpty
     }
 
     It 'GivenDefaultReviewCommand_WhenInspected_ThenAllowsReadingLinearButNothingThatWrites' {
