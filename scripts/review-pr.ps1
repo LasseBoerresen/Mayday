@@ -6,15 +6,16 @@
     Looks up the pull request (the current branch's when -PullRequest is omitted), checks its head commit out into a
     temporary worktree, runs a fresh `claude -p` session there with no history of the authoring session, and posts its
     output with `gh pr comment`, then prints the posted review. The reviewer only reads and reports: it cannot edit,
-    push, approve or merge. Draft and
-    closed pull requests are skipped, and a head commit that was already reviewed is skipped unless -Force. Exits 0
-    when it reviewed or skipped, non-zero when the review produced nothing or could not be posted. See ADR 0010.
+    push, approve or merge. Draft and closed pull requests are skipped. Unless -Force, so is a head commit that was
+    already reviewed or has the same code (tree) as one reviewed on the same pull request, as after folding fixup
+    commits; the skip is printed. Exits 0 when it reviewed or skipped, non-zero when the review produced nothing or
+    could not be posted. See ADR 0010.
 
 .PARAMETER PullRequest
     The pull request number. Defaults to the pull request of the current branch.
 
 .PARAMETER Force
-    Review even when this head commit was already reviewed.
+    Review even when this head commit, or one with the same code, was already reviewed.
 
 .PARAMETER RepoRoot
     The git working tree whose pull request to review. Defaults to the repository this script lives in.
@@ -87,6 +88,17 @@ if (-not $Force -and (Test-Path $memory)) {
 $ErrorActionPreference = 'Continue'
 git cat-file -e "$sha^{commit}" 2>$null
 if ($LASTEXITCODE -ne 0) { git fetch -q origin $sha }
+
+# Folding fixup commits gives a new head commit with the code of one already reviewed; that needs no second review.
+$tree = git rev-parse --verify -q "$sha^{tree}"
+$sameCode = Get-ChildItem -Path $reviews -File | Where-Object { $_.Name -match "^$($pr.number)-([0-9a-f]{40})$" } |
+    ForEach-Object { $Matches[1] } |
+    Where-Object { $tree -and (git rev-parse --verify -q "$_^{tree}") -eq $tree } | Select-Object -First 1
+if (-not $Force -and $sameCode) {
+    Set-Content -Path $memory -Value (Get-Date -Format o)
+    Write-Host "== #$($pr.number) at $sha has the same code as the reviewed $sameCode; not reviewing again."
+    exit 0
+}
 $checkout = Join-Path ([IO.Path]::GetTempPath()) "mayday-review-$($pr.number)-$([guid]::NewGuid().ToString('N'))"
 git worktree add -q --detach $checkout $sha
 if ($LASTEXITCODE -ne 0) {

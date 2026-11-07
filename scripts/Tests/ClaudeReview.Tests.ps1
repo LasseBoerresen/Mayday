@@ -156,6 +156,36 @@ Describe 'review-pr.ps1' {
         @(Get-Log | Where-Object { $_ -like 'review *' }).Count | Should -Be 2
     }
 
+    It 'GivenNewHeadWithTheCodeOfAReviewedHead_WhenRun_ThenSaysSoWithoutReviewing' {
+        # Given: a fold of fixup commits gives a new head commit with unchanged code
+        Invoke-ReviewPr | Out-Null
+        $reviewed = $script:Sha
+        git -C $script:Repo -c user.name=t -c user.email=t@t commit -q --allow-empty -m folded
+        $script:Sha = (git -C $script:Repo rev-parse HEAD).Trim()
+
+        # When
+        $result = Invoke-ReviewPr
+
+        # Then
+        $result.ExitCode | Should -Be 0
+        @(Get-Log | Where-Object { $_ -like 'review *' }).Count | Should -Be 1
+        $result.Output | Should -Match "same code as the reviewed $reviewed"
+    }
+
+    It 'GivenNewHeadWithChangedCode_WhenRun_ThenReviewsIt' {
+        # Given
+        Invoke-ReviewPr | Out-Null
+        Set-Content -Path (Join-Path $script:Repo 'Code.cs') -Value 'class B {}'
+        git -C $script:Repo -c user.name=t -c user.email=t@t commit -q -am changed
+        $script:Sha = (git -C $script:Repo rev-parse HEAD).Trim()
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        Get-Log | Should -Contain "review $script:Sha reviewer=1"
+    }
+
     It 'GivenDraftPullRequest_WhenRun_ThenSkips' {
         # When
         $result = Invoke-ReviewPr -PullRequest "[pscustomobject]@{ number = 7; headRefOid = 'SHA'; baseRefName = 'master'; isDraft = `$true; state = 'OPEN' }"
