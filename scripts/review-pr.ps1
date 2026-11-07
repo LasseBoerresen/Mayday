@@ -118,9 +118,17 @@ Give every Linear issue or project you mention as a link with its ID and title (
 with the read-only Linear tools rather than from memory, and if a lookup fails, give the ID with its URL.
 
 Report only issues you are confident about, each with file:line and the concrete failure it causes; say nothing about
-style the repository does not ask for. Your final message is posted verbatim as the review comment, so make it only
-the review in Markdown: a one-line verdict, the findings ranked most severe first, then what you did not check. Do not
-post it yourself, approve, request changes or merge: the owner decides.
+style the repository does not ask for. Label every finding Major or Minor; the author fixes Major findings before the
+owner reviews, so keep Major for what must not reach the owner:
+- Major: wrong behavior on the normal path, a physical safety or hardware risk, a behavior change without a test,
+  docs that state behavior the code does not have, or a solution clearly bigger than the issue needs.
+- Minor: anything else, such as a rare sequence of commands, wording or a nice-to-have.
+Earlier reviews of this pull request and the author's replies are in gh pr view $($pr.number) --comments. Do not raise
+a declined Minor finding again without new evidence; check the author's claims against the code yourself.
+
+Your final message is posted verbatim as the review comment, so make it only the review in Markdown. Its first line is
+exactly **Verdict:** <n> Major, <m> Minor (with the counts), then the Major findings, then the Minor ones, each
+numbered, then what you did not check. Do not post it yourself, approve, request changes or merge: the owner decides.
 "@
 
 $env:MAYDAY_CLAUDE_REVIEWER = '1'

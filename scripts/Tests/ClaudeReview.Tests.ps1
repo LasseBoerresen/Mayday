@@ -109,6 +109,20 @@ Describe 'review-pr.ps1' {
         $prompt | Should -Match 'look (it|them) up'
     }
 
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptAsksForMajorOrMinorFindingsUnderAVerdictLine' {
+        # Given: the authoring session fixes Major findings and stops at a review without any
+        # (docs/designs/may-84-review-loop.md)
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match 'Major'
+        $prompt | Should -Match 'Minor'
+        $prompt | Should -Match ([regex]::Escape('**Verdict:** <n> Major, <m> Minor'))
+    }
+
     It 'GivenHeadAlreadyReviewed_WhenRunAgain_ThenSkips' {
         # Given
         Invoke-ReviewPr | Out-Null
