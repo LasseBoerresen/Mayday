@@ -22,3 +22,4 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0012 - The PR reviewer reads Linear](0012-pr-reviewer-reads-linear.md) | Accepted | Four read-only Linear tools for titled issue links; amends 0010's tool boundary |
 | [0013 - Right legs reverse the coxa and look up the left-leg map mirrored in Y](0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md) | Accepted | Right coxa direction in model and servos; mirrored posture lookup |
 | [0014 - The authoring session follows the PR review](0014-authoring-session-follows-the-review.md) | Accepted | Session starts the review after its push, fixes Major findings, stops when none are left or after 3 reviews; amends 0010 |
+| [0015 - Fusion 360 is the CAD source; the repository holds exports](0015-fusion-is-the-cad-source-the-repository-holds-exports.md) | Accepted | Mechanical design in Fusion; BOM, wiring, power budget and exports in `hardware/` |
