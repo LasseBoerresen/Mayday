@@ -47,7 +47,7 @@ param(
         $OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
         Push-Location $Directory
         try {
-            # User settings only: the project's hooks (the Stop gate, this review hook) must not run in the reviewer.
+            # User settings only: the project's hooks (the Stop gate) must not run in the reviewer.
             # Linear is read-only: the user's claude.ai Linear connector, to look up issue and project titles for links.
             $Prompt | claude -p --setting-sources user --no-session-persistence --output-format text `
                 --allowedTools ('Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),' +

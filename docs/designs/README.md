@@ -6,4 +6,4 @@ behavior is described in the affected component README once the change is built.
 
 | Design | Issue | Status |
 |---|---|---|
-| [The authoring session waits for each PR review and fixes the main findings](may-84-review-loop.md) | [MAY-84](https://linear.app/mayday-robot/issue/MAY-84) | Accepted, not yet implemented |
+| [The authoring session waits for each PR review and fixes the main findings](may-84-review-loop.md) | [MAY-84](https://linear.app/mayday-robot/issue/MAY-84) | Implemented (ADR 0014) |

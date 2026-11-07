@@ -17,7 +17,8 @@ For decisions about dependencies, API relationships, or interactions, add or lin
 | [0007 - Infrastructure code is tested like product code](0007-infrastructure-code-is-tested-like-product-code.md) | Accepted | Tests for scripts, hooks and CI config |
 | [0008 - Cyclomatic complexity gate with CA1502](0008-cyclomatic-complexity-gate-with-ca1502.md) | Accepted | Complexity limit of 12 in the build, hooks, portable folder |
 | [0009 - Manual robot tests confirmed by a human](0009-manual-robot-tests-confirmed-by-a-human.md) | Accepted | Physical tests asserted by the person watching |
-| [0010 - Local Claude review of every pull request](0010-local-claude-review-of-every-pull-request.md) | Accepted | Independent, comment-only review by a local headless session; not a gate |
+| [0010 - Local Claude review of every pull request](0010-local-claude-review-of-every-pull-request.md) | Accepted; review start amended by 0014 | Independent, comment-only review by a local headless session; not a gate |
 | [0011 - The pre-push gate drives the robot](0011-pre-push-gate-drives-the-robot.md) | Accepted | Physical tier, skips and quarantine on every code push |
 | [0012 - The PR reviewer reads Linear](0012-pr-reviewer-reads-linear.md) | Accepted | Four read-only Linear tools for titled issue links; amends 0010's tool boundary |
 | [0013 - Right legs reverse the coxa and look up the left-leg map mirrored in Y](0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md) | Accepted | Right coxa direction in model and servos; mirrored posture lookup |
+| [0014 - The authoring session follows the PR review](0014-authoring-session-follows-the-review.md) | Accepted | Session starts the review after its push, fixes Major findings, stops when none are left or after 3 reviews; amends 0010 |

@@ -4,7 +4,7 @@
 * **Date:** 2026-11-07
 * **Issue:** [MAY-84: Need: The automatic code review comments are addressed before agent asks me to review.](https://linear.app/mayday-robot/issue/MAY-84)
 * **Replaces:** [LasseBoerresen/Mayday#57](https://github.com/LasseBoerresen/Mayday/pull/57) (closed)
-* **Status:** Accepted, not yet implemented.
+* **Status:** Implemented ([ADR 0014](../adr/0014-authoring-session-follows-the-review.md)).
 
 ## Overview
 
