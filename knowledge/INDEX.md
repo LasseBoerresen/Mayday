@@ -92,6 +92,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 
 - [Root overview](../README.md) and [architecture map](../docs/architecture/README.md): intent and dependencies.
 - [ADRs](../docs/adr/README.md): decisions and supersession history.
+- [Designs](../docs/designs/README.md): designs for planned changes, such as the [PR review loop (MAY-84)](../docs/designs/may-84-review-loop.md).
 - [Knowledge categories](#where-to-record-new-knowledge): evidence, mistakes, and work history.
 - [Templates](../templates/README.md): required record format.
 - [Diagram conventions and architecture example](../docs/architecture/README.md#diagram-conventions): how to document relationships and interactions visually without obscuring current implementation.
@@ -101,6 +102,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 | New knowledge | Location |
 |---|---|
 | Decision, alternatives, deviation | [ADRs](../docs/adr/README.md) |
+| Design for a planned change | [Designs](../docs/designs/README.md) |
 | Discovery supported by evidence | [Findings](findings/README.md) |
 | Diagnosed failure and prevention | [Root causes](root-causes/README.md) |
 | Transferable insight | [Lessons learned](lessons-learned/README.md) |
