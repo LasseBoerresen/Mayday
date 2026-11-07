@@ -39,7 +39,7 @@ Fusion is good at editing the design and already versions it; git is good at wha
 
 ## Related ADRs
 
-None recorded.
+[0016](0016-the-csharp-structure-stays-the-kinematic-source.md)
 
 ## Related Findings
 

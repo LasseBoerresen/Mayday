@@ -74,7 +74,7 @@ Geometry exported from Fusion (STEP, STL) will live in `exports/`, stored with G
 
 ## Related ADRs
 
-[0015](../../docs/adr/0015-fusion-is-the-cad-source-the-repository-holds-exports.md)
+[0015](../../docs/adr/0015-fusion-is-the-cad-source-the-repository-holds-exports.md), [0016](../../docs/adr/0016-the-csharp-structure-stays-the-kinematic-source.md)
 
 ## Related Findings
 
@@ -82,4 +82,4 @@ None recorded.
 
 ## Related Root Causes
 
-None recorded.
+[Rear femur hits the body](../../knowledge/root-causes/rear-femur-hits-body.md)
