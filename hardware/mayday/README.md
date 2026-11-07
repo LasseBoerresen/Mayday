@@ -12,7 +12,7 @@ The current revision is **A**. Later revisions are planned and not built. Each g
 |---|---|---|
 | A | Current | 12 V 5 A supply on a tether, one power feed |
 | B | Planned | 12 V 15 A supply, a 20 A breaker as kill switch and main fuse, fused distribution into three power hubs, inline watt meter |
-| C | Planned | 3S Li-ion battery with BMS, USB-C charging on board |
+| C | Planned | 3S Li-ion battery with BMS, USB-C charging on board ([ADR 0017](../../docs/adr/0017-li-ion-battery-charged-on-board.md)) |
 | D | Planned | Onboard computer, and a motor power switch it controls |
 | E | Planned | Wireless charging nest |
 
@@ -65,7 +65,7 @@ Revision A's 5 A supply is far below the stall total. Servos reset on large, fas
 
 ## Invariants
 
-- Supply voltage stays within the XL430's 6.5–12.0 V operating range; 11.1 V is recommended.
+- Supply voltage stays between 6.5 V and 12.6 V. The XL430's rated operating range is 6.5–12.0 V; Robotis recommends a 3S Li-ion supply (11.1 V nominal) for it, which reaches 12.6 V when full, and the servos flag an input voltage error only above their Max Voltage Limit, 14.0 V by default ([`ControlRegister`](../../Dynamixel/ControlRegister.cs)). Revision C charges to 12.3 V ([ADR 0017](../../docs/adr/0017-li-ion-battery-charged-on-board.md)).
 - No single connector, hub or cable is asked for more than its rating.
 
 ## Exports
@@ -74,7 +74,7 @@ Geometry exported from Fusion (STEP, STL) will live in `exports/`, stored with G
 
 ## Related ADRs
 
-[0015](../../docs/adr/0015-fusion-is-the-cad-source-the-repository-holds-exports.md), [0016](../../docs/adr/0016-the-csharp-structure-stays-the-kinematic-source.md)
+[0015](../../docs/adr/0015-fusion-is-the-cad-source-the-repository-holds-exports.md), [0016](../../docs/adr/0016-the-csharp-structure-stays-the-kinematic-source.md), [0017](../../docs/adr/0017-li-ion-battery-charged-on-board.md)
 
 ## Related Findings
 

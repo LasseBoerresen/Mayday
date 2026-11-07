@@ -2,7 +2,7 @@
 
 ## Description
 
-Candidates found on 2026-11-02 for Mayday's planned battery (3S1P 18650 Li-ion, hardware revision C). Requirements: USB-C PD input that a wireless receiver can also feed later, charging while the robot stays on, charge end at 4.1 V per cell, and a BMS that allows the servos' ~25 A peaks. Nothing here was bought or tested; ratings come from vendor pages and, where marked, from seller listings or third-party summaries.
+Candidates found on 2026-11-02 for [ADR 0017](../../docs/adr/0017-li-ion-battery-charged-on-board.md)'s battery (3S1P 18650 Li-ion). Requirements: USB-C PD input that a wireless receiver can also feed later, charging while the robot stays on, charge end at 4.1 V per cell, and a BMS that allows the servos' ~25 A peaks. Nothing here was bought or tested; ratings come from vendor pages and, where marked, from seller listings or third-party summaries.
 
 | Candidate | Kind | What was found | Open question |
 |---|---|---|---|
@@ -35,4 +35,4 @@ For revision C, without an onboard computer: a standalone charge-only module (IP
 
 ## Related Decisions
 
-None recorded.
+[ADR 0017](../../docs/adr/0017-li-ion-battery-charged-on-board.md)

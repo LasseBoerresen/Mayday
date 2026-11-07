@@ -20,6 +20,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [ADR 0014: The authoring session follows the PR review](../docs/adr/0014-authoring-session-follows-the-review.md) (amends ADR 0010's review start)
 - [ADR 0015: Fusion 360 is the CAD source; the repository holds exports](../docs/adr/0015-fusion-is-the-cad-source-the-repository-holds-exports.md)
 - [ADR 0016: The C# structure stays the kinematic source](../docs/adr/0016-the-csharp-structure-stays-the-kinematic-source.md)
+- [ADR 0017: A Li-ion battery, charged on board](../docs/adr/0017-li-ion-battery-charged-on-board.md) (Accepted; planned for hardware revision C)
 
 ## Architectural Constraints
 

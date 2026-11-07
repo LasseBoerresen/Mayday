@@ -39,7 +39,7 @@ Fusion is good at editing the design and already versions it; git is good at wha
 
 ## Related ADRs
 
-[0016](0016-the-csharp-structure-stays-the-kinematic-source.md)
+[0016](0016-the-csharp-structure-stays-the-kinematic-source.md), [0017](0017-li-ion-battery-charged-on-board.md)
 
 ## Related Findings
 
