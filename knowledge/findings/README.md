@@ -12,3 +12,4 @@ Record important, evidence-backed discoveries that have not necessarily caused a
 - [The model and the robot disagreed on the right coxa direction (resolved, ADR 0013)](right-coxa-direction-mismatch.md)
 - [Worktrees share the main checkout's hooks](absolute-hooks-path-shared-by-worktrees.md)
 - [Claude Code background tasks and hooks](claude-code-background-tasks-and-hooks.md)
+- [Onboard charger and BMS candidates](onboard-charger-and-bms-candidates.md)

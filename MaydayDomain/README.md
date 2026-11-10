@@ -36,7 +36,7 @@ Do not infer physical orientation or safe angles from numeric IDs alone; test us
 
 ## Related ADRs
 
-[Stable abstractions](../docs/adr/0001-stable-robot-abstractions.md), [hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [right-leg coxa direction and mirrored lookup](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md).
+[Stable abstractions](../docs/adr/0001-stable-robot-abstractions.md), [hardware boundary](../docs/adr/0002-hardware-adapter-boundary.md), [right-leg coxa direction and mirrored lookup](../docs/adr/0013-right-legs-reverse-coxa-and-mirrored-posture-lookup.md), [C# structure as kinematic source](../docs/adr/0016-the-csharp-structure-stays-the-kinematic-source.md).
 
 ## Related Findings
 
