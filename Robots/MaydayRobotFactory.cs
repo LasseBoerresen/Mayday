@@ -1,6 +1,6 @@
 ﻿using Dynamixel;
 using RobotDomain.Time;
-using Generic.System;
+using Generic.Terminals;
 using LanguageExt;
 using ManualBehavior;
 using MaydayDataAccess;

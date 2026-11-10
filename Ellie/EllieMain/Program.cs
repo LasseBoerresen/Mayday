@@ -5,7 +5,7 @@ using EllieMain.Base;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
 using EllieMain.Structures;
-using Generic.System;
+using Generic.Terminals;
 using LanguageExt;
 using LanguageExt.Sys.Live;
 using RobotDomain.Motion;

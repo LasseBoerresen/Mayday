@@ -67,7 +67,7 @@ Never depend on concrete robot projects, entry points, or hardware libraries. Th
 
 Physical dimensions use explicit units; hardware creation stays outside this layer.
 
-- Hardware is reached only through injected ports (`Motion.ActuatorDriver`, `Structures.JointFactory`, `Generic.System.Terminal`); this project constructs no device.
+- Hardware is reached only through injected ports (`Motion.ActuatorDriver`, `Structures.JointFactory`, `Generic.Terminals.Terminal`); this project constructs no device.
 - Time comes from a caller-supplied `TimeProvider` in `PeriodicScheduler` and `PeriodicallyBatchedJointDriver`.
 - Interpolation starts from the previous commanded goal, never the measured angle (`JointState.InterpolateGoalAngleOneTimeStep`, used each period by `PeriodicallyBatchedJointDriver`).
 - An exception from a periodic action goes to the injected `FatalErrorHandler`; composition roots that drive a real robot pass `FailFastFatalErrorHandler`.

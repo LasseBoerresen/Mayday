@@ -1,4 +1,4 @@
-# System abstractions
+# Terminals
 
 ## Overview
 
@@ -11,9 +11,9 @@ Provide terminal IO behind a replaceable interface.
 
 ## Interface
 
-- `Generic.System.Terminal` (`Terminal.cs`): interface with
+- `Generic.Terminals.Terminal` (`Terminal.cs`): interface with
   `Write(string? value)`, `WriteLine(string? value)` and `string? ReadLine()`.
-- `Generic.System.SystemTerminal` (`SystemTerminal.cs`): `Terminal` backed by
+- `Generic.Terminals.SystemTerminal` (`SystemTerminal.cs`): `Terminal` backed by
   `System.Console` (`Console.Write`, `Console.WriteLine`, `Console.ReadLine`).
 - Known other implementation: `Test.Utilities.TestTerminal`
   ([Test/Utilities/TestTerminal.cs](../../Test/Utilities/TestTerminal.cs)), a

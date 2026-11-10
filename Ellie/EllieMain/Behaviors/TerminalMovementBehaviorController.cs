@@ -1,5 +1,5 @@
 ﻿using EllieMain.MotionPlanning;
-using Generic.System;
+using Generic.Terminals;
 using RobotDomain.Behavior;
 using RobotDomain.Time;
 using UnitsNet;
