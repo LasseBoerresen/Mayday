@@ -115,7 +115,9 @@ No project references. Package references in `Generic.csproj`:
 
 ## Dependency Rules
 
-Do not add Mayday, Ellie, or hardware project references here.
+Reference no other project in the solution, and only general-purpose packages
+(no robot, device or hardware libraries). Other projects depend on `Generic`,
+never the reverse, so it never needs to know which projects use it.
 
 ## Global Invariants
 
