@@ -14,7 +14,7 @@ Manual command selection and cancellation.
 
 ## Dependencies
 
-`EllieMain.MotionPlanning`, `Generic.System.Terminal`, shared behavior contracts.
+`EllieMain.MotionPlanning`, `Generic.Terminals.Terminal`, shared behavior contracts.
 
 ## Dependency Rules
 

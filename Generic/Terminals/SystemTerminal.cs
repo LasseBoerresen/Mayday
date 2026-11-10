@@ -1,4 +1,4 @@
-﻿namespace Generic.System;
+﻿namespace Generic.Terminals;
 
 public class SystemTerminal : Terminal
 {

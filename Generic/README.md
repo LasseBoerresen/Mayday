@@ -6,7 +6,7 @@ General-purpose code that any .NET project could use: extension methods over
 built-in types (`IEnumerable<T>`, dictionaries, `KeyValuePair`, `TimeSpan`,
 `Random`) and external libraries (`UnitsNet` quantities, `LanguageExt`
 `Option<T>`), plus utility tools such as the substitutable terminal in
-[`System`](./System/README.md) and `ExceptionHelper`.
+[`Terminals`](./Terminals/README.md) and `ExceptionHelper`.
 
 ## Responsibility
 
@@ -16,7 +16,7 @@ make sense unchanged in a project that has nothing to do with robots.
 
 ## Public APIs
 
-`Generic.System.Terminal`, `SystemTerminal`, and extension methods for units,
+`Generic.Terminals.Terminal`, `SystemTerminal`, and extension methods for units,
 time, dictionaries, and sequences.
 
 ## Local Interface & Invariants
@@ -91,7 +91,7 @@ All types below are `public static` classes in namespace `Generic`.
 
 ## Subdirectories
 
-- System: [./System/README.md](./System/README.md) - `Terminal` interface and
+- Terminals: [./Terminals/README.md](./Terminals/README.md) - `Terminal` interface and
   console-backed `SystemTerminal`, the substitutable terminal IO boundary.
 
 ## Key Concepts
@@ -131,7 +131,7 @@ Do not add Mayday, Ellie, or hardware project references here.
 - `ExceptionHelper.ThrowExceptionOnAnyKey` writes to the console, blocks on
   `Console.ReadKey`, and always throws.
 - `SystemTerminal` reads standard input and writes standard output
-  (see [System](./System/README.md)).
+  (see [Terminals](./Terminals/README.md)).
 
 ## Architectural Constraints
 

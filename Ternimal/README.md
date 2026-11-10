@@ -10,7 +10,7 @@ Standalone experimental console project (directory spelling retained).
 
 ## Key Concepts
 
-Separate from `Generic.System.Terminal`, which is the shared terminal contract.
+Separate from `Generic.Terminals.Terminal`, which is the shared terminal contract.
 
 ## Dependencies
 
@@ -30,7 +30,7 @@ Keep experiments independent of robot startup.
 
 ## Common Pitfalls
 
-Confusing this executable with the `Generic.System` terminal abstraction.
+Confusing this executable with the `Generic.Terminals` terminal abstraction.
 
 ## Related ADRs
 

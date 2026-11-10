@@ -3,7 +3,7 @@ using EllieMain;
 using EllieMain.Behaviors;
 using EllieMain.MotionPlanning;
 using EllieMain.Structures;
-using Generic.System;
+using Generic.Terminals;
 using Moq;
 using RobotDomain.Motion;
 using RobotDomain.Structures;

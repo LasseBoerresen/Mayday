@@ -1,4 +1,4 @@
-﻿using Generic.System;
+﻿using Generic.Terminals;
 
 namespace Test.Utilities;
 

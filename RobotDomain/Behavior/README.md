@@ -44,7 +44,7 @@ Preserve cancellation and start lifecycle when implementing controllers.
 
 ## Side Effects
 
-- Terminal I/O through the injected `Generic.System.Terminal` only (prompt, command list, wake-up/sleep and invalid-command lines); no direct `Console` access.
+- Terminal I/O through the injected `Generic.Terminals.Terminal` only (prompt, command list, wake-up/sleep and invalid-command lines); no direct `Console` access.
 - `Start()` blocks the calling thread; this namespace starts no threads or tasks.
 
 ## Verification
