@@ -13,7 +13,7 @@ Projects with special rules have their own `CLAUDE.md` (`Test`, `Dynamixel`, `Ro
 | `RobotDomain` | Shared foundation: geometry, links, joints, structures, motion, behavior, timing. |
 | `MaydayDomain` | Hexapod structure, legs, postures, joint limits, kinematics, motion planning. |
 | `Dynamixel` | Actuator adapter, register/unit conversions, driver, communication bus. |
-| `ManualBehavior` | Manually selected Mayday behaviors, terminal-driven experiments. |
+| `ManualBehavior` | Mayday behavior controllers, terminal-driven and automated (sway). |
 | `Robots` | Mayday robot assembly and factories. |
 | `Main` | Mayday executable and composition root. **Starts real hardware.** |
 | `MaydayDataAccess` | Mayday persistence, e.g. leg posture-by-position maps. |
