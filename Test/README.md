@@ -1,5 +1,25 @@
 # Test
 
+## System Overview
+
+The main xUnit project of the repository: unit and integration tests of the
+Mayday and shared-layer projects, and the test infrastructure that decides
+which tests may move the real robot. `Ellie/EllieMainTests` references this
+project only for the test doubles `TestTerminal` and
+`RecordingFatalErrorHandler`; it uses no tier attribute, so its tests are not
+gated by `Tier`.
+
+## Subdirectories & System Boundaries
+
+| Folder | What it holds |
+|---|---|
+| [Unit](./Unit/README.md) | One collaborator at a time, hardware-free except one FTDI latency call; shared assertions `TestObjectFactory` and `TestId`. |
+| [Integration](./Integration/README.md) | Several real components together: echo-joint tests with the default posture map, and the physical and manual tests that move the robot. |
+| [Utilities](./Utilities/README.md) | The tier attributes (`PhysicalRobotFact`, `PhysicalRobotTheory`, `ManualRobotFact`, `Quarantine`), `TestConfiguration`, `HumanVerifier`, `RecordingFatalErrorHandler`, `TestTerminal`. |
+
+Each folder under `Unit` and `Integration` mirrors a production project and
+links its own README.
+
 ## Responsibility
 
 Mayday and shared-layer xUnit unit/integration tests and test utilities.
@@ -29,6 +49,49 @@ Test helpers may depend on production code; production code must not depend on t
 ## Invariants
 
 Do not treat a passing skipped physical test as evidence of real-hardware behavior.
+
+### Global Invariants
+
+- A test that may move the robot carries `Tier=Physical` or `Tier=Manual`
+  through its attribute; the gates select tests by these traits and by
+  `Quarantine=true`. The trait discoverers are named by string in
+  `Utilities`, so renaming or moving them drops the traits silently.
+- `TestConfiguration` reads environment variables, then the user secrets of
+  `Test.csproj` (`UserSecretsId` `de615b0d-591a-44e6-8040-6f9239d5d5dc`), and
+  the secrets win. A physical test runs only when
+  `MAYDAY_ROBOT_IS_CLEAR_TO_MOVE` is exactly `True` (case-sensitive), a manual
+  test only when `MAYDAY_HUMAN_IS_PRESENT` is also exactly `True`. The skip
+  message for the first flag says `'true'`; only `True` passes.
+- The attributes check only these flags, not whether the robot is connected.
+- Most physical tests never release the serial adapter, so the pre-push gate
+  runs each physical test method in its own process.
+- Hardware-free tests that place tips use the default posture map, not the
+  neutral one (see
+  [Integration/MaydayDomain/Base](./Integration/MaydayDomain/Base/README.md)).
+- Warnings are errors in Debug and Release.
+- `Test.csproj` declares the folders `Integration\Base` and
+  `Unit\MaydayDomain\Structures` (`<Folder Include=…>`), but neither exists;
+  the object mothers live in each area's own `Base` folder.
+
+### Global Side Effects
+
+- Physical and manual tests open the FTDI adapter (serial number `FT2H2YMW`)
+  and its COM port, enable torque and move the robot; manual tests open a
+  PowerShell prompt window.
+- Building any `MaydayRobotFactory` robot effect opens and closes the FTDI
+  adapter when it is plugged in, even when the effect is never run.
+- Any test that uses `PeriodicScheduler` sets the whole test process to high
+  priority and 1 ms Windows timer resolution.
+- `Unit/MaydayDataAccess/TestData/*.json` are copied to the output directory
+  and read from there; `DefaultLegPostureByPositionMap.json` comes from
+  `MaydayDataAccess`.
+
+### System Verification
+
+- Run without moving the robot (still reaches the FTDI adapter, see above): `dotnet test Test\Test.csproj --filter "Tier!=Physical&Tier!=Manual&Quarantine!=true"`,
+  or `scripts\gate.ps1`, which also forces the robot to not clear-to-move.
+- Physical and manual runs move the robot: only after the operator confirms
+  the robot, port and operating conditions.
 
 ## Architectural Constraints
 
