@@ -11,6 +11,11 @@ the tests in `Test` call it to drive the real robot.
 
 Assemble Mayday structures, planners, behavior, and actuator factory into a runnable robot.
 
+Robots knows what Mayday is made of, not how it is used: it does not know
+which program starts it, from where its configuration comes or how the
+process runs. That is why it is a project of its own, apart from `Main`,
+which faces the outside world.
+
 ## Public APIs
 
 `MaydayRobotFactory` and `Base.MaydayRobot` (`Start`, `Stop`).
@@ -87,6 +92,17 @@ project.
 ## Dependency Rules
 
 Compose concrete objects here rather than in the shared domain.
+
+Take everything that depends on how the robot is used as a constructor or
+method parameter: today the leg posture map, the `FatalErrorHandler`, the
+`TimeProvider` and the `Terminal`. Startup IO and process concerns belong in
+the caller (`Main`): reading files, environment variables and launch
+settings, choosing the behavior, and how the process blocks and ends. The
+actuator hardware is the exception today: every factory method creates the
+Dynamixel joints itself through `DynamixelJointFactory.Create`, and with them
+the hard-coded adapter serial number `FT2H2YMW` and the `High` process
+priority their driver loop sets. So a caller cannot choose other joints,
+another adapter or the normal process priority through this project.
 
 ## Invariants
 
