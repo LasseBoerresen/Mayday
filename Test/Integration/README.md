@@ -24,7 +24,7 @@ placement rule in [Test/CLAUDE.md](../CLAUDE.md):
 |---|---|---|
 | [Dynamixel](./Dynamixel/README.md) | `NativeSerialPortCommunicationBus` goal-position writes on all 18 servos; servo Drive Mode direction bit against the Mayday model. | `Tier=Physical` only |
 | [Main](./Main/README.md) | `MaydayLegTests` (link transforms, quarantined; tip sweep) and `MaydayRobotTests` (start and stop of two robots), on the real robot. | `Tier=Physical`, `Tier=Manual` |
-| [MaydayDomain](./MaydayDomain/README.md) | Lean and tip moves of an echo `DefaultMaydayStructure`, echo-leg tip placement, and the manual tips-forward test on the robot. | hardware-free, `Tier=Manual` |
+| [MaydayDomain](./MaydayDomain/README.md) | Lean, tip moves and body-frame link transforms of an echo `DefaultMaydayStructure`, echo-leg tip placement, and the manual tips-forward test on the robot. | hardware-free, `Tier=Manual` |
 | [MaydayDomain/Base](./MaydayDomain/Base/README.md) | `TestObjectMother`: neutral and default posture maps, echo structures and legs. | no tests |
 | [Robots](./Robots/README.md), [Robots/Base](./Robots/Base/README.md) | `TestObjectMother.MaydayRobotFactory`, the real hardware factory. | no tests |
 

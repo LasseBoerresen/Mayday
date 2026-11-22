@@ -2,9 +2,10 @@
 
 ## Overview
 
-Tests of [MaydayDomain](../../../MaydayDomain/README.md) legs and structures
-together with the robot's real posture map from
-[MaydayDataAccess](../../../MaydayDataAccess/README.md). Most run on echo
+Tests of [MaydayDomain](../../../MaydayDomain/README.md) legs and structures,
+most together with the robot's real posture map from
+[MaydayDataAccess](../../../MaydayDataAccess/README.md); the link transform
+test uses the neutral map, as its physical twin does. Most run on echo
 joints without hardware; one manual test moves the real Mayday and asks the
 person watching.
 
@@ -13,14 +14,18 @@ person watching.
 ### `DefaultMaydayStructureTests`
 
 Moves the tips of an echo structure and checks where they and the body lean
-end up. File: `DefaultMaydayStructureTests.cs`. Production types:
-`DefaultMaydayStructure`, `MaydayLegPosture`, built with
-`TestObjectMother.CreateEchoStructureWithDefaultMap()`.
+end up, and which frame its link transforms are in. File:
+`DefaultMaydayStructureTests.cs`. Production types:
+`DefaultMaydayStructure`, `MaydayLegPosture`, `Thorax`, built with
+`TestObjectMother.CreateEchoStructureWithDefaultMap()` or, for the link
+transform test, `MaydayStructureFactory.CreateEcho()` (neutral map, as the
+physical test uses).
 
 | Test | What it checks |
 |---|---|
 | `GivenStructureWithStandingPostureAndTipsMovedBackward3cm__WhenGetCurrentLean__ThenIs3cmForward` (`[Fact]`) | From `StandingWide`, `MoveTipsBy` 3 cm backward (−X) gives a `GetCurrentLean` of 3 cm forward in X within 1 cm. Z is not checked. |
 | `GivenSittingTall_WhenMoveAllTipsForward5cm_ThenTipMoves5cmForward` (`[Theory]`, one row per leg) | From `SittingTall`, `MoveTipsBy` 5 cm forward moves that leg's tip (`GetPositionsOf(LinkName.Tip)`) by 5 cm in X, within 1 cm. It is the echo prediction of the manual test below. |
+| `GivenNeutral_WhenGetTransformsOf_ThenLeftFrontIsLegFrameTransformAtItsMount` (`[Theory]`, rows from `TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected`) | On `MaydayStructureFactory.CreateEcho()` at `Neutral`, the LF transform of each link from `GetTransformsOf` is the body-frame transform `Thorax.LeftFrontTransform + <leg-frame row>`, within 1 cm and 0.01 rev. It is the echo prediction of the physical link transform test in [Main](../Main/README.md). |
 
 `TestInput(TestId Id, MaydayLegId MaydayLegId)` is the theory row.
 

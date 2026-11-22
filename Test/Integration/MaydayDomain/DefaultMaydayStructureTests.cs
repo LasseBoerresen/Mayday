@@ -2,6 +2,7 @@
 using RobotDomain.Structures;
 using RobotDomain.Time;
 using MaydayDomain;
+using MaydayDomain.Components;
 using Test.Unit;
 using UnitsNet;
 using Xunit;
@@ -74,6 +75,33 @@ public class DefaultMaydayStructureTests
 
         // The posture map places tips only to about 1 cm (MAY-74), which the default tolerance allows.
         TestObjectFactory.AssertXyzEqual(input.Id.Value, forward5Cm, tipPositionAfter - tipPositionBefore);
+    }
+
+    public static TheoryData<string, LinkName, Transform>
+        DataFor_GivenNeutral_WhenGetTransformsOf_ThenLeftFrontIsLegFrameTransformAtItsMount()
+    {
+        return TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected();
+    }
+
+    /// <summary>
+    /// The echo prediction of <see cref="Main.MaydayLegTests"/>'s link transform test: the structure reports
+    /// body-frame transforms, which for a leg are its mount on the thorax followed by the leg-frame transform.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DataFor_GivenNeutral_WhenGetTransformsOf_ThenLeftFrontIsLegFrameTransformAtItsMount))]
+    public void GivenNeutral_WhenGetTransformsOf_ThenLeftFrontIsLegFrameTransformAtItsMount(
+        string testId, LinkName linkName, Transform expectedInLegFrame)
+    {
+        // Given
+        var mayStructure = MaydayStructureFactory.CreateEcho();
+        mayStructure.SetPostureForAllLegs(Timed<MaydayLegPosture>.Passed(MaydayLegPosture.Neutral));
+
+        // When
+        var actualTransform = mayStructure.GetTransformsOf(linkName).LF;
+
+        // Then
+        var expectedInBodyFrame = Thorax.LeftFrontTransform + expectedInLegFrame;
+        TestObjectFactory.AssertTransformEqual(testId, expectedInBodyFrame, actualTransform);
     }
 
     public record TestInput(TestId Id, MaydayLegId MaydayLegId);
