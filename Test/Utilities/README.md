@@ -4,8 +4,9 @@
 
 Shared test infrastructure of the `Test` project (namespace `Test.Utilities`):
 the xUnit attributes that mark physical, manual and quarantined tests, the
-configuration they read, the yes/no prompt for manual tests, and test doubles
-for `FatalErrorHandler` and `Terminal`. It tests no production code itself;
+configuration they read, the yes/no prompt for manual tests, the xUnit
+collection that runs real-clock tests alone, and test doubles for
+`FatalErrorHandler` and `Terminal`. It tests no production code itself;
 `Ellie\EllieMainTests` also uses it through its project reference to `Test`
 (see [EllieMainTests](../../Ellie/EllieMainTests/README.md)).
 
@@ -148,6 +149,20 @@ File: `HumanPrompt.cs`.
 `TimeoutException` (`No answer within {timeout} to: {question}`) after killing
 the window when the timeout passes.
 
+### `RealClockCollection`
+
+The xUnit collection for tests that measure timing on the real clock. It is
+defined with `DisableParallelization = true`, so xUnit runs it alone, after
+every parallel collection has finished, and other tests do not load the CPU
+while it measures.
+File: `RealClockCollection.cs`.
+
+| Member | What it does |
+|---|---|
+| `Name` | The collection's name, `Real clock`, for `[Collection(RealClockCollection.Name)]`. |
+
+Used by `Test.Unit.RobotDomain.Time.PeriodicSchedulerCadenceTests`.
+
 ### `RecordingFatalErrorHandler`
 
 A `FatalErrorHandler` (from `RobotDomain.Time`) that records the exception
@@ -161,7 +176,8 @@ File: `RecordingFatalErrorHandler.cs`.
 | `Exceptions` | The recorded exceptions, oldest first; safe to read from any thread. |
 
 Used by `Test.Unit.Dynamixel.PeriodicallyBatchedJointDriverTests`,
-`Test.Unit.RobotDomain.Time.PeriodicSchedulerTests` and Ellie's
+`Test.Unit.RobotDomain.Time.PeriodicSchedulerTests`,
+`Test.Unit.RobotDomain.Time.PeriodicSchedulerCadenceTests` and Ellie's
 `EndToEnd/EllieTests.cs`.
 
 ### `TestTerminal`
@@ -207,6 +223,10 @@ Used by `Test.Integration.Main.MaydayRobotTests` and Ellie's
 - Physical tests keep `FailFastFatalErrorHandler`; `RecordingFatalErrorHandler`
   is for hardware-free tests only.
 - `TestTerminal` uses an unsynchronized `Queue<string>`.
+- A test that asserts real-clock timing belongs in `RealClockCollection`. Run
+  in parallel with the other tests, the scheduler's 20 ms cadence test saw
+  stalls of up to 10 ms in its first half-second and failed about 1 full run
+  in 6.
 
 ## Side Effects
 

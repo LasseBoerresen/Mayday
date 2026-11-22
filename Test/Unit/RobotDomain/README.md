@@ -15,10 +15,10 @@ tests of `PeriodicallyBatchedJointDriver` (`RobotDomain.Motion`) live in
 | [Geometry](./Geometry/README.md) | `QTests`, `TransformTests`, `XyzTests`: rotations, transform chaining and halfway interpolation, `Xyz` construction. |
 | [Motion](./Motion/README.md) | `LinearStepsMotionPlanTests`: which step a plan returns at a time. |
 | [Structures](./Structures/README.md) | No tests. `FakeJoint`, a `Joint` fixed at one angle, used by `MaydayLegTests`. |
-| [Time](./Time/README.md) | `PeriodicSchedulerTests`: cadence under a fake clock and on the real clock, and fatal-error handling. |
+| [Time](./Time/README.md) | `PeriodicSchedulerTests`: cadence under a fake clock, and fatal-error handling. `PeriodicSchedulerCadenceTests`: cadence on the real clock, run without other tests in parallel. |
 
-No test here is `Tier=Physical` or `Tier=Manual`. `PeriodicSchedulerTests`
-raises the test process's priority and Windows timer resolution (see
+No test here is `Tier=Physical` or `Tier=Manual`. The first `PeriodicScheduler`
+either class builds raises the test process's priority and Windows timer resolution (see
 [Time](./Time/README.md#side-effects)).
 
 ## Verification
