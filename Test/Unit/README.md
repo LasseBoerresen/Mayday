@@ -81,8 +81,7 @@ when the adapter is plugged in, without moving the robot.
 
 The only `Tier=Manual` test, `MaydayDataAccess`'s map rebuilder, is also
 skipped; it keeps the trait so the pre-push gate does not fail on the skip.
-The only quarantined test is `RobotDomain/Time`'s real-clock test
-`ShouldBeWithin1PercentOfDuration`.
+No unit test is quarantined.
 
 The default tolerances of `TestObjectFactory` are 1 cm and 0.01 rev
 (3.6°). A test that needs finer checks passes its own `precision`, as
