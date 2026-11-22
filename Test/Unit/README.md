@@ -30,7 +30,7 @@ Static class. File: `TestObjectFactory.cs`.
 | `AssertXyzEqual(testId, expected, actual[, precision])` | Asserts `Xyz.IsAlmostEqual` within `precision`, default 0.01 m. |
 | `AssertLengthEqual(testId, expected, actual[, precision])` | Asserts the absolute difference is at most `precision`, default 0.01 m. |
 | `TestMessage(testId, expected, actual)` | The failure message the assertions use: test id, expected and actual. |
-| `DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()` | Expected link transforms (`CoxaMotor` to `Tip`) of a leg with all joints at zero, as positional `TheoryData<string, LinkName, Transform>`. |
+| `DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected()` | Expected link transforms (`CoxaMotor` to `Tip`) of a leg with all joints at zero, in the leg's own frame (`CoxaMotor` at the origin), as positional `TheoryData<string, LinkName, Transform>`. |
 | `TimeProvider` | A fresh `Mock.Of<TimeProvider>()`. No test uses it. |
 
 Used by `Unit.MaydayDomain`, `Unit.Components`, `Unit.RobotDomain.Geometry`

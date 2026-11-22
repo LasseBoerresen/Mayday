@@ -1,6 +1,7 @@
 ﻿using Dynamixel;
 using LanguageExt;
 using MaydayDomain;
+using MaydayDomain.Components;
 using MaydayDomain.MotionPlanning;
 using RobotDomain.Geometry;
 using RobotDomain.Structures;
@@ -55,14 +56,13 @@ public class MaydayLegTests
     }
 
     /// <summary>
-    /// Tests basic movements of legs, on real robot.
+    /// Tests basic movements of legs, on real robot. The rows are leg-frame transforms; the planner reports
+    /// body-frame ones, so each row is placed at the LF leg's mount on the thorax before comparing.
     /// </summary>
     [PhysicalRobotTheory]
-    [Quarantine("Assertion mismatch: the expectations are leg-frame transforms, but GetTransformsOf returns body-frame "
-        + "transforms; the Coxa reads the LF leg mount (0.085, 0.075, 0) at 45° yaw instead of identity (MAY-82).")]
     [MemberData(nameof(DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected))]
     void GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected(
-        string testId, LinkName linkName, Transform expectedTransform)
+        string testId, LinkName linkName, Transform expectedInLegFrame)
     {
         // Given
         var timeStep = TimeSpan.FromSeconds(1);
@@ -75,7 +75,8 @@ public class MaydayLegTests
         var actualTransform = MotionPlanner.GetTransformsOf(linkName).LF;
 
         // Then
-        AssertTransformEqual(testId, expectedTransform, actualTransform);
+        var expectedInBodyFrame = Thorax.LeftFrontTransform + expectedInLegFrame;
+        AssertTransformEqual(testId, expectedInBodyFrame, actualTransform);
     }
 
     [ManualRobotFact]
