@@ -21,11 +21,23 @@ File: `PeriodicSchedulerTests.cs`.
 | `ShouldCallActionTwiceAfterOneDurationIsPassed` | Advancing the fake clock by one period plus 1 ms causes exactly one more call. |
 | `ShouldHandOverAnExceptionFromTheActionToTheFatalErrorHandler` | The exception the action throws reaches the `FatalErrorHandler`, once and as the same instance. |
 | `ShouldStopTheLoopAfterTheFatalErrorHandlerReturns` | When the handler returns, the task from `RunAsync` completes by itself after one call, without cancelling or advancing the clock. |
-| `GivenTheRealClockAnd20MsPeriod_When100PeriodsRun_ThenMeanIsWithin1PercentAnd99PercentAreWithin1Ms` | On `TimeProvider.System` with a 20 ms period (the strictest the robots use), the mean of 100 periods is within 1% (0.2 ms) and at least 99 of them are within 1 ms. One stalled period is tolerated: Windows occasionally holds the thread back by a few milliseconds. |
 
 The class implements `IDisposable`: `Dispose` cancels the shared token and
 advances the fake clock by two periods, so the loop sees the cancellation and
 ends.
+
+### `PeriodicSchedulerCadenceTests`
+
+Checks the scheduler's cadence on the real clock.
+File: `PeriodicSchedulerCadenceTests.cs`.
+
+| Test | What it checks |
+|---|---|
+| `GivenTheRealClockAnd20MsPeriod_When100PeriodsRun_ThenMeanIsWithin1PercentAnd99PercentAreWithin1Ms` | On `TimeProvider.System` with a 20 ms period (the strictest the robots use), the mean of 100 periods is within 1% (0.2 ms) and at least 99 of them are within 1 ms. One stalled period is tolerated: Windows occasionally holds the thread back by a few milliseconds. |
+
+The class is in `RealClockCollection`
+([Utilities](../../../Utilities/README.md#realclockcollection)), so xUnit runs
+it alone, after the parallel tests.
 
 ## Invariants
 
@@ -48,6 +60,10 @@ ends.
   preallocated array and calls the action once before the loop starts, so
   neither allocation nor compilation inside the action shifts a period. It
   takes about 2 s.
+- The real-clock test runs without other tests in parallel. With them, their
+  load stalled its thread by up to 10 ms in the first half-second, and two or
+  more periods missed 1 ms in about 16% of full runs (4 of 25); alone in its
+  collection, 0 of 25 full runs failed.
 
 ## Side Effects
 

@@ -15,7 +15,7 @@ gated by `Tier`.
 |---|---|
 | [Unit](./Unit/README.md) | One collaborator at a time, hardware-free except one FTDI latency call; shared assertions `TestObjectFactory` and `TestId`. |
 | [Integration](./Integration/README.md) | Several real components together: echo-joint tests with the default posture map, and the physical and manual tests that move the robot. |
-| [Utilities](./Utilities/README.md) | The tier attributes (`PhysicalRobotFact`, `PhysicalRobotTheory`, `ManualRobotFact`, `Quarantine`), `TestConfiguration`, `HumanVerifier`, `RecordingFatalErrorHandler`, `TestTerminal`. |
+| [Utilities](./Utilities/README.md) | The tier attributes (`PhysicalRobotFact`, `PhysicalRobotTheory`, `ManualRobotFact`, `Quarantine`), `TestConfiguration`, `HumanVerifier`, `RealClockCollection` (runs real-clock timing tests alone, after the parallel tests), `RecordingFatalErrorHandler`, `TestTerminal`. |
 
 Each folder under `Unit` and `Integration` mirrors a production project and
 links its own README.
