@@ -20,7 +20,7 @@ types: `DynamixelJointFactory`, `MaydayLegFactory`, `MaydayStructureFactory`,
 
 | Test | What it checks |
 |---|---|
-| `GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected` (`[PhysicalRobotTheory]`, `[Quarantine]`, rows from `TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected`) | Sets `MaydayLegPosture.Neutral` over 1 s, waits 1 s, and compares the LF leg's transform of each link from `GetTransformsOf` with the expected leg-frame transform. Quarantined ([MAY-82: Need: Mayday physical leg test checks link transforms in the frame the planner reports](https://linear.app/mayday-robot/issue/MAY-82)): `GetTransformsOf` returns body-frame transforms. |
+| `GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected` (`[PhysicalRobotTheory]`, rows from `TestObjectFactory.DataFor_GivenLegWithJointsAtZero_WhenGetLinkTransform_ThenReturnsExpected`) | Sets `MaydayLegPosture.Neutral` over 1 s, waits 1 s, and compares the LF leg's transform of each link from `GetTransformsOf`, which is in the body frame, with the leg-frame row placed at the LF mount (`Thorax.LeftFrontTransform + row`), within 1 cm and 0.01 rev. Its echo prediction is in [MaydayDomain](../MaydayDomain/README.md). |
 | `GivenTipsAtStanceWidth_WhenMoveAllTipsDownThenUp_ThenAllTipsMoveVertically` (`[ManualRobotFact]`) | Sets all tips with `SetTipPositionsForLegs` to (0.125, 0, z) m, in 1 cm steps of 0.125 s: z from 0.18 m down to about −0.21 m, then from −0.22 m up to about 0.17 m (each loop stops before its bound), then asserts the human confirms all six tips moved straight down about 40 cm and back up. |
 
 ### `MaydayRobotTests`
