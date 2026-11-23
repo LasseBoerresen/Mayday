@@ -83,7 +83,7 @@ Do not replace periodic timing without reviewing deadlines, shutdown, and platfo
 
 ## Related Root Causes
 
-[Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [Clean-runner failures](../../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md)
+[Test host crash](../../knowledge/root-causes/test-host-crash-from-scheduler-failfast.md), [Clean-runner failures](../../knowledge/root-causes/tests-failing-only-on-a-clean-runner.md), [Parallel tests stalled the cadence test](../../knowledge/root-causes/real-clock-test-stalled-by-parallel-tests.md)
 
 ## Related Lessons Learned
 

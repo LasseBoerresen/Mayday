@@ -51,6 +51,7 @@ Start here before significant work. Read [CLAUDE.md](../CLAUDE.md), the affected
 - [User secrets override environment variables in tests](root-causes/user-secrets-override-environment.md)
 - [Physical tests leak the robot's serial adapter](root-causes/physical-tests-leak-the-serial-adapter.md)
 - [The tip position test used the one-posture neutral map](root-causes/tip-position-test-used-neutral-map.md)
+- [Parallel tests stalled the real-clock cadence test](root-causes/real-clock-test-stalled-by-parallel-tests.md)
 
 ## Frequently Used Findings
 
