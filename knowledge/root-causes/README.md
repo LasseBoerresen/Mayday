@@ -16,3 +16,4 @@ Record diagnosed incidents with symptoms, investigation evidence, the mechanism,
 - [User secrets override environment variables in tests](user-secrets-override-environment.md)
 - [Physical tests leak the robot's serial adapter](physical-tests-leak-the-serial-adapter.md)
 - [The tip position test used the one-posture neutral map](tip-position-test-used-neutral-map.md)
+- [Parallel tests stalled the real-clock cadence test](real-clock-test-stalled-by-parallel-tests.md)
