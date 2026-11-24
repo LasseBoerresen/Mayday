@@ -1,7 +1,7 @@
 # PR descriptions give a current summary with a risk level and the test changes
 
 *   **Author:** LB
-*   **Status:** Proposed
+*   **Status:** Implemented ([ADR 0015](../adr/0015-pr-descriptions-set-a-risk-level.md)).
 *   **Date:** 2026-11-22, revised 2026-11-23 after two design review rounds
 *   **Issue:** [MAY-72: Need: Pr descriptions are more concise, hierarchical and has a risk level](https://linear.app/mayday-robot/issue/MAY-72/need-pr-descriptions-are-more-concise-hierarchical-and-has-a-risk)
 
@@ -738,6 +738,15 @@ which keeps its wrapping. Links in the fenced texts are plain Markdown links.
     outside the gate); a shared test helper weakened. Tests are every test the
     gate runs, plus `Ellie\EllieMainTests`. A new test that arrives with
     `[Quarantine]` and a `MAY-` issue counts as added, not weakened.
+    ```
+
+*   **Commit 3, Testing section:** after "Change an existing expectation
+    only when the user confirms the contract changed.", add (decided with the
+    owner on 2026-11-24, so that the Risks bullet "The author's text lowers
+    severity" matches the rule):
+
+    ```markdown
+    Approving a pull request whose Test changes section lists the changed expectation and its reason counts as that confirmation (see **Pull requests**).
     ```
 
 *   **Commit 3, review loop** (the bullets under "Local gate"):

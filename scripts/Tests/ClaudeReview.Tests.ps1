@@ -1,5 +1,5 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
-# Tests for scripts/review-pr.ps1 (ADR 0010, ADR 0014).
+# Tests for scripts/review-pr.ps1 (ADR 0010, ADR 0014, ADR 0015).
 #
 # Each review test gets a scratch git repository with one commit and runs the script in a child PowerShell, because
 # the scripts call `exit`. gh and claude are replaced with commands that append to a log, so nothing reaches GitHub
@@ -143,6 +143,34 @@ Describe 'review-pr.ps1' {
         $prompt | Should -Match 'Problem/Rationale/Impact/Verification bodies'
         $prompt | Should -Match 'missing Verification field is Minor'
         $prompt | Should -Match 'Verification field that names a test that does not exist or does not exercise the change is Major'
+    }
+
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptChecksTheDescriptionAgainstClaudeMdPullRequests' {
+        # Given: CLAUDE.md, Pull requests, sets the description's risk level and Test changes section (ADR 0015)
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match 'description with gh pr view 7\b'
+        $prompt | Should -Match 'CLAUDE\.md, Pull requests'
+        $prompt | Should -Match 'Major: a test weakened[^\r\n]*without a reason'
+        $prompt | Should -Match 'Major: a test added, changed or weakened that the Test changes section does not list'
+        $prompt | Should -Match 'Major: a risk level lower than[^\r\n]*or no risk level'
+        $prompt | Should -Match 'Major: a Critical PR that also carries changes unrelated'
+        $prompt | Should -Match 'Minor: a risk level higher than[^\r\n]*top block over 5 lines'
+    }
+
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptAsksForARiskLineAfterTheVerdictLine' {
+        # Given: the review comment shows the reviewer's own risk grade under its Verdict line (ADR 0015)
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match ([regex]::Escape('**Verdict:** <n> Major, <m> Minor') + '[\s\S]*' + [regex]::Escape('**Risk:** <level> (agrees | understated | overstated | missing)'))
     }
 
     It 'GivenHeadAlreadyReviewed_WhenRunAgain_ThenSkips' {

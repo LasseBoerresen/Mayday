@@ -9,7 +9,8 @@
     push, approve or merge. Draft and closed pull requests are skipped. Unless -Force, so is a head commit that was
     already reviewed or has the same code (tree) as one reviewed on the same pull request, as after folding fixup
     commits; the skip is printed. Exits 0 when it reviewed or skipped, non-zero when the review produced nothing or
-    could not be posted. The prompt also has the reviewer check each commit body's Verification field. See ADR 0010.
+    could not be posted. The prompt also has the reviewer check each commit body's Verification field, and the PR
+    description's risk level and test changes against CLAUDE.md, Pull requests. See ADR 0010 and ADR 0015.
 
 .PARAMETER PullRequest
     The pull request number. Defaults to the pull request of the current branch.
@@ -130,6 +131,16 @@ Look for, in order of importance:
   change like any other diff, but do not report their subject or body format; at most note once that they must be
   folded before merge.
 
+Read the PR description with gh pr view $($pr.number) and check it against CLAUDE.md, Pull requests:
+- Major: a test weakened, as CLAUDE.md defines it, without a reason in the description.
+- Major: a test added, changed or weakened that the Test changes section does not list,
+  or "No tests changed." when tests changed.
+- Major: a risk level lower than the highest criterion the diff matches, or no risk level.
+- Major: a Critical PR that also carries changes unrelated to its critical change. Do
+  not ask for related changes to be split out.
+- Minor: a risk level higher than the diff matches, a top block over 5 lines, or
+  sections out of order.
+
 Give every Linear issue or project you mention as a link with its ID and title (CLAUDE.md, Linear issues); look it up
 with the read-only Linear tools rather than from memory, and if a lookup fails, give the ID with its URL.
 
@@ -138,13 +149,15 @@ style the repository does not ask for. Label every finding Major or Minor; the a
 owner reviews, so keep Major for what must not reach the owner:
 - Major: wrong behavior on the normal path, a physical safety or hardware risk, a behavior change without a test,
   docs that state behavior the code does not have, or a solution clearly bigger than the issue needs.
-- Minor: anything else, such as a rare sequence of commands, wording or a nice-to-have.
+- Minor: anything else not graded above, such as a rare sequence of commands, wording or a nice-to-have.
 Earlier reviews of this pull request and the author's replies are in gh pr view $($pr.number) --comments. Do not raise
 a declined Minor finding again without new evidence; check the author's claims against the code yourself.
 
 Your final message is posted verbatim as the review comment, so make it only the review in Markdown. Its first line is
-exactly **Verdict:** <n> Major, <m> Minor (with the counts), then the Major findings, then the Minor ones, each
-numbered, then what you did not check. Do not post it yourself, approve, request changes or merge: the owner decides.
+exactly **Verdict:** <n> Major, <m> Minor (with the counts). Its second line is exactly
+**Risk:** <level> (agrees | understated | overstated | missing), where <level> is your own grade of the PR's risk.
+Then come the Major findings, then the Minor ones, each numbered, then what you did not check. Do not post it
+yourself, approve, request changes or merge: the owner decides.
 "@
 
 $env:MAYDAY_CLAUDE_REVIEWER = '1'

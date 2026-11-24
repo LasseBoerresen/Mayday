@@ -45,8 +45,8 @@ Run the smallest relevant test project first. Several projects set `TreatWarning
 A separate, local Claude Code session reviews each pull request and posts a comment (`scripts\review-pr.ps1`, [ADR 0010](docs/adr/0010-local-claude-review-of-every-pull-request.md)). It is advisory, not a merge gate, but follow it before asking the user to review ([ADR 0014](docs/adr/0014-authoring-session-follows-the-review.md)):
 
 - After `gh pr create` and after each `git push` that succeeds, run `scripts\review-pr.ps1` in the background; nothing else starts it. Push as its own command, not chained after a commit or branch switch. When the task ends, its output holds the review or says why it skipped. If it failed, run it once more, then tell the user.
-- While a review has Major findings and fewer than 3 reviews have run, fix every Major finding, and Minor ones that are cheap and local (a typo, a stale doc line, a wrong link), as fixup commits (see **Review fixes**), push and run the review again. Decline other Minor findings with a one-line reason. Dispute a Major finding you think is wrong with evidence in your reply.
-- Stop after a review with no Major findings, or after 3 reviews. Fix that review's cheap Minor findings as fixups, reply once on the pull request listing each finding as fixed (with the fixup SHA) or declined (with the reason), fold the fixups and push. Run the review once more on that push: it skips a head whose code was already reviewed, and otherwise is the last review, which you do not follow up. Then ask the user to review, naming any Major findings still open.
+- While a review has Major findings and fewer than 3 reviews have run, fix every Major finding, and Minor ones that are cheap and local (a typo, a stale doc line, a wrong link), as fixup commits (see **Review fixes**), push and run the review again. After that push succeeds and before running the review, update the description with `gh pr edit --body-file`. When a round's only fixes are to the description, run `scripts\review-pr.ps1 -Force` instead of pushing; it counts toward the 3 reviews. Decline other Minor findings with a one-line reason. Dispute a Major finding you think is wrong with evidence in your reply.
+- Stop after a review with no Major findings, or after 3 reviews. Fix that review's cheap Minor findings as fixups, reply once on the pull request listing each finding as fixed (with the fixup SHA) or declined (with the reason), fold the fixups and push. Then update the description with `gh pr edit --body-file` if the fold or that review's findings change what it says. Run the review once more on that push: it skips a head whose code was already reviewed, and otherwise is the last review, which you do not follow up. Then ask the user to review, naming any Major findings still open.
 
 ## Hard rules
 
@@ -83,7 +83,7 @@ Match the surrounding file: file-scoped namespaces, `_camelCase` private fields,
 Work **outside-in** (*Growing Object-Oriented Software, Guided by Tests*): an end-to-end or integration test for the behavior, then unit tests for collaborators and edge cases, then the smallest implementation.
 
 Tests are a second, independent **ledger** of behavior:
-- **Behavior change:** make a test go red against the old behavior, then green with the implementation. Change an existing expectation only when the user confirms the contract changed.
+- **Behavior change:** make a test go red against the old behavior, then green with the implementation. Change an existing expectation only when the user confirms the contract changed. Approving a pull request whose Test changes section lists the changed expectation and its reason counts as that confirmation (see **Pull requests**).
 - **Refactoring:** leave the ledger untouched; existing tests prove behavior is preserved.
 
 Scripts, hooks, CI configuration and other infrastructure code are code: they get tests too (Pester under `scripts\Tests` for PowerShell), by the same rules. Without a second ledger of their behavior they drift unnoticed, and everything else depends on them.
@@ -112,6 +112,24 @@ Issues live in the Linear team **Mayday** (`MAY`).
 - **Description:** `## Problem` with the evidence found, `## Goal`, and `## Done when` as Given/When/Then acceptance criteria. Link related issues.
 - **Project, labels, estimate:** when creating an issue, suggest a fitting existing project, labels (`Bug`, `Feature`, `Improvement`) and an estimate in points (1, 2, 4, 8 or 16; Linear rounds any other value) to the user, with a reason for each, and set them only once the user agrees.
 - **Referring to issues and projects:** in messages to the user, PR descriptions and comments, give every Linear issue or project as a real link with its ID and title inline, never a bare ID or name: `[MAY-81: Need: Mayday physical tests release the robot's port…](https://linear.app/mayday-robot/issue/MAY-81)`, `[P-MAY-9: A good starting setup for Claude](<project url>)`. Take the URL and title from Linear, not from memory.
+
+## Pull requests
+
+The user approves a pull request from its description, the Commits tab and the review, and reads as deep as the risk level says. Write the full description at `gh pr create`: write the body to a file without a BOM (in Windows PowerShell, `[IO.File]::WriteAllText($path, $text, [Text.UTF8Encoding]::new($false))`) and pass it with `--body-file`. After every later push that succeeds, update it the same way with `gh pr edit` before running the review. Its parts, in this order:
+
+1. Top block, at most 5 source lines: `Fixes <issue link>` (or `Part of <issue link>` when the PR does not finish the issue), then `**Risk:** <level> (<criteria matched>)`, then the outcome in one sentence. The user reads it at every level.
+2. `## Test changes`: one line per test added, changed, quarantined, skipped or removed: its name, what changed in plain words and why; or `No tests changed.` The user reads it from Medium up.
+3. `## Verification`: what ran (the gate in Debug, manual runs, behavior observed on the robot or the echo model) and what was not run. The user reads it from Medium up.
+4. `<details><summary>Details</summary>`: problem, rationale, knowledge relied on. The user reads it, with the commit bodies, from High up.
+
+Do not list the commits. The risk level is the highest one whose criterion the PR matches; name the matched criteria:
+
+- **Critical** (the user reads everything, including the code): weakens a test of behavior that stays; loosens a joint, velocity or motion limit (removing a clamp included); loosens the gate, a hook, the quarantine ratchet, the reviewer prompt or its tools, the clear-to-move handling, or the permissions in `.claude/settings.json`; loosens a rule in `CLAUDE.md` or an accepted ADR. A Critical PR holds the critical change and what belongs with it, and nothing unrelated.
+- **High** (the user reads to the details and commit bodies): changes a need (an issue's stated outcome) or a main assumption (one the design rests on, such as how a robot is driven or what a test tier means); changes the architecture (dependency direction, project boundaries, `RobotDomain` root types); adds a project reference or package; changes a persisted data format; adds or changes a rule in `CLAUDE.md` or an ADR without loosening one; changes an existing test's expectation without weakening it; removes tests together with the production behavior they cover.
+- **Medium** (the user reads the top block and the sections): changes behavior, adds tests, renames or moves a test without changing what it asserts, or any other code change.
+- **Low** (the user reads the top block): documentation only, only `chore:` commits, or a refactoring that leaves every test untouched.
+
+A test is weakened when, after the change, it passes in more cases, runs less often or no longer runs: a test method, file or theory row deleted; `[Fact]` removed; a tolerance widened; an assertion replaced by a weaker one (`NotNull` for `Equal`); `[Quarantine]` or `Skip` added; the test moved to a tier or project that runs less often (`Tier=Manual`, a project outside the gate); a shared test helper weakened. Tests are every test the gate runs, plus `Ellie\EllieMainTests`. A new test that arrives with `[Quarantine]` and a `MAY-` issue counts as added, not weakened.
 
 ## Commits
 
