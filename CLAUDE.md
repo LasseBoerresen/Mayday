@@ -122,11 +122,11 @@ Commit each intent as soon as it is complete and its tests pass, without waiting
 - **Apart:** findings, root causes, lessons, pitfalls, failed attempts and task summaries get their own `docs:` commit, because they outlive the code: reverting the change keeps the record.
 - **Merge style:** pull requests are merged by rebase only (the `master gate` ruleset allows nothing else and requires linear history), so these separate commits survive in history.
 - **Linear branches:** keep a feature branch free of merge commits. To bring it up to date with `master` or resolve conflicts, rebase it onto `origin/master` and push with `--force-with-lease`; never merge `master` into it. Force-push only your own feature branch, never `master`.
-- **Review fixes:** a fix to a commit not yet on `master` (a review finding, an oversight) is not a new intent. Commit it with `git commit --fixup=<sha>` of the commit it corrects, so review replies can cite it. When a fix outgrows the corrected commit's message, reword it in the same step: commit the fix with `git commit -m "amend! <subject of the corrected commit>" -m "<its new full message>"` (add `--allow-empty` for a message-only change). Once the review is satisfied and before asking the user to merge, fold the fixups in with `git -c sequence.editor=true rebase -i --autosquash origin/master`, which works in PowerShell and bash and opens no editor. Then push with `--force-with-lease`. A fix to something already on `master` is its own `fix:` commit.
+- **Review fixes:** a fix to a commit not yet on `master` (a review finding, an oversight) is not a new intent. Commit it with `git commit --fixup=<sha>` of the commit it corrects, so review replies can cite it. A fix that makes the corrected commit's `Verification:` untrue or incomplete outgrows its message. When a fix outgrows the corrected commit's message, reword it in the same step: commit the fix with `git commit -m "amend! <subject of the corrected commit>" -m "<its new full message>"` (add `--allow-empty` for a message-only change). Once the review is satisfied and before asking the user to merge, fold the fixups in with `git -c sequence.editor=true rebase -i --autosquash origin/master`, which works in PowerShell and bash and opens no editor. Then push with `--force-with-lease`. A fix to something already on `master` is its own `fix:` commit.
 
 Subject: `<type>: <imperative summary>`, at most 72 characters, type one of `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
 
-Body, for every type except `chore`: `Problem:`, `Rationale:` (why this approach over the obvious alternative), `Impact:` (say "No behavioral change." when true). Separate fields with a blank line and add the attribution trailer last.
+Body, for every type except `chore`: `Problem:`, `Rationale:` (why this approach over the obvious alternative), `Impact:` (say "No behavioral change." when true), `Verification:` (how this commit's intent was shown to work, true of this commit and not of the branch: for a behavior change, the test that fails against the old behavior and passes with the new; for a refactoring, the existing tests that prove behavior was preserved; for a `test:` commit on existing behavior, the new test and how it was shown able to fail; for documentation, "Not run: documentation only."). Separate fields with a blank line and add the attribution trailer last.
 
 An unfolded `fixup!` or `amend!` commit (see **Review fixes**) is exempt from this subject and body format: git writes its subject, and folding drops it. Only the folded commits must meet the format.
 
@@ -140,6 +140,9 @@ Rationale: The doc states the contract only; the how stays as inline comments
 next to the code, which is where a maintainer needs it.
 
 Impact: No behavioral change.
+
+Verification: The existing Q.Rotate tests pass unchanged; only XML docs
+changed.
 
 Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
 ```

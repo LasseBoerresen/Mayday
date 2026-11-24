@@ -9,7 +9,7 @@
     push, approve or merge. Draft and closed pull requests are skipped. Unless -Force, so is a head commit that was
     already reviewed or has the same code (tree) as one reviewed on the same pull request, as after folding fixup
     commits; the skip is printed. Exits 0 when it reviewed or skipped, non-zero when the review produced nothing or
-    could not be posted. See ADR 0010.
+    could not be posted. The prompt also has the reviewer check each commit body's Verification field. See ADR 0010.
 
 .PARAMETER PullRequest
     The pull request number. Defaults to the pull request of the current branch.
@@ -123,9 +123,12 @@ Look for, in order of importance:
 - Tests: behavior changes without a test that fails against the old behavior; changed expectations in existing tests;
   refactorings that touch tests; untested scripts or CI configuration.
 - Documentation: XML docs that leak implementation into a contract; README or diagrams left stale.
-- Commits: one intent per commit, subject format, Problem/Rationale/Impact bodies. Unfolded fixup! and amend! commits
-  are how review fixes are meant to arrive (CLAUDE.md, Review fixes): check what they change like any other diff, but
-  do not report their subject or body format; at most note once that they must be folded before merge.
+- Commits: one intent per commit, subject format, Problem/Rationale/Impact/Verification bodies.
+  A missing Verification field is Minor.
+  A Verification field that names a test that does not exist or does not exercise the change is Major. Unfolded
+  fixup! and amend! commits are how review fixes are meant to arrive (CLAUDE.md, Review fixes): check what they
+  change like any other diff, but do not report their subject or body format; at most note once that they must be
+  folded before merge.
 
 Give every Linear issue or project you mention as a link with its ID and title (CLAUDE.md, Linear issues); look it up
 with the read-only Linear tools rather than from memory, and if a lookup fails, give the ID with its URL.

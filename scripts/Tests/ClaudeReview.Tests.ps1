@@ -132,6 +132,19 @@ Describe 'review-pr.ps1' {
         $prompt | Should -Match ([regex]::Escape('**Verdict:** <n> Major, <m> Minor'))
     }
 
+    It 'GivenOpenPullRequest_WhenRun_ThenPromptChecksEachCommitBodyForVerification' {
+        # Given: CLAUDE.md, Commits, asks every commit body except chore for a Verification field
+
+        # When
+        Invoke-ReviewPr | Out-Null
+
+        # Then
+        $prompt = Get-Content "$script:Log.prompt" -Raw
+        $prompt | Should -Match 'Problem/Rationale/Impact/Verification bodies'
+        $prompt | Should -Match 'missing Verification field is Minor'
+        $prompt | Should -Match 'Verification field that names a test that does not exist or does not exercise the change is Major'
+    }
+
     It 'GivenHeadAlreadyReviewed_WhenRunAgain_ThenSkips' {
         # Given
         Invoke-ReviewPr | Out-Null
