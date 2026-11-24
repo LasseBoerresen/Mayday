@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Amends [ADR 0010](0010-local-claude-review-of-every-pull-request.md): the authoring session, not a hook, starts the review, and it follows the review before the owner is asked. The review stays advisory and independent.
+Accepted. Amends [ADR 0010](0010-local-claude-review-of-every-pull-request.md): the authoring session, not a hook, starts the review, and it follows the review before the owner is asked. The review stays advisory and independent. [ADR 0015](0015-pr-descriptions-set-a-risk-level.md) adds new findings, a Risk line and a forced re-review after description-only fixes.
 
 ## Context
 
